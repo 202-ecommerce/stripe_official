@@ -176,7 +176,7 @@ $(document).ready(function() {
         this.value = cc_format(this.value);
 
         cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
-        if (cardNmb && $('.stripe-card-number').val().length == 19) {
+        if (cardNmb) {
             $(this).parent().find('.payment-ko').hide();
             $(this).parent().find('.payment-ok').show();
         } else {
@@ -188,6 +188,8 @@ $(document).ready(function() {
         if (cardType != "Unknown") {
             if (cardType == "American Express")
                 cardType = "amex";
+            if (cardType == "Diners Club")
+                cardType = "diners";
             if ($('.img-card').length > 0) {
                 if ($('#img-'+cardType).length > 0) {
                     return false;
