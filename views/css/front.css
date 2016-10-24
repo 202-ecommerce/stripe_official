@@ -68,7 +68,10 @@ div.stripe-card-deleted {
 	display: none;
 	text-transform: none;
 }
-
+#stripe-payment-form .payment-ok, #stripe-payment-form .payment-ko {
+	display: none;
+	margin-left: -23px;
+}
 #stripe-translations, #stripe-ajax-loader { display: none; }
 #stripe_save_token { vertical-align: top; }
 a#stripe_error { display: none; }

@@ -45,11 +45,19 @@
 			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
 				<div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div><a name="stripe_error" style="display:none"></a>
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+                <div>
 				<label>{l s='Card Number' mod='prestastripe'}</label><br />
 				<input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
-				<br />
+                <img style="margin-left: -52px;" class="payment-ok" src="/img/admin/enabled.gif">
+                <img style="margin-left: -52px;" class="payment-ko" src="/img/admin/disabled.gif">
+                </div>
+                <br />
+                <div>
 				<label>{l s='Cardholder Name' mod='prestastripe'}</label><br />
-        <input type="text" style="width: 200px;display:block;" autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+        <input type="text" style="width: 200px;" autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+                <img class="payment-ok" src="/img/admin/enabled.gif">
+                <img class="payment-ko" src="/img/admin/disabled.gif">
+                </div>
 				<div class="block-left">
 					<label>{l s='Card Type' mod='prestastripe'}</label><br />
 					{if $mode == 1}
@@ -64,8 +72,10 @@
 				</div>
 				<div class="block-left">
 					<label>{l s='CVC' mod='prestastripe'}</label><br />
-					<input type="text" size="4" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
-					<a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
+					<input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
+                    <img class="payment-ok" src="/img/admin/enabled.gif">
+                    <img class="payment-ko" src="/img/admin/disabled.gif">
+                    <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
 						{l s='What\'s this?' mod='prestastripe'}
 						<div class="cvc-info">
 						{l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='prestastripe'}
@@ -165,8 +175,19 @@ $(document).ready(function() {
     document.getElementById('card_number').oninput = function() {
         this.value = cc_format(this.value);
 
+        cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
+        if (cardNmb && $('.stripe-card-number').val().length == 19) {
+            $(this).parent().find('.payment-ko').hide();
+            $(this).parent().find('.payment-ok').show();
+        } else {
+            $(this).parent().find('.payment-ok').hide();
+            $(this).parent().find('.payment-ko').show();
+        }
+
         var cardType = Stripe.card.cardType(this.value);
         if (cardType != "Unknown") {
+            if (cardType == "American Express")
+                cardType = "amex";
             if ($('.img-card').length > 0) {
                 if ($('#img-'+cardType).length > 0) {
                     return false;
@@ -174,24 +195,48 @@ $(document).ready(function() {
                     $('.img-card').remove();
                 }
             }
+
             var card_logo = document.createElement('img');
             card_logo.src = baseDir + 'modules/prestastripe/views/img/cc-' + cardType.toLowerCase() +'.png';
             card_logo.id = "img-"+cardType;
             card_logo.className = "img-card";
             $(card_logo).insertAfter('.stripe-card-number');
-            $('#img-'+cardType).css({'margin-left': '-40px'});
+            $('#img-'+cardType).css({'margin-left': '-34px'});
             if (ps_version) {
                 $('#img-'+cardType).css({
                     float: 'none',
                     'margin-bottom': '-6px'
                 });
             }
+
         } else {
             if ($('.img-card').length > 0) {
                 $('.img-card').remove();
             }
+
         }
     }
+
+    $('.stripe-name').on('focusout', function(){
+        if($(this).val().length > 0){
+            $(this).parent().find('.payment-ko').hide();
+            $(this).parent().find('.payment-ok').show();
+        }else{
+            $(this).parent().find('.payment-ok').hide();
+            $(this).parent().find('.payment-ko').show();
+        }
+    });
+
+    $('.stripe-card-cvc').on('keyup', function(){
+        validCVC = Stripe.card.validateCVC($('.stripe-card-cvc').val());
+        if(validCVC){
+            $(this).parent().find('.payment-ko').hide();
+            $(this).parent().find('.payment-ok').show();
+        }else{
+            $(this).parent().find('.payment-ok').hide();
+            $(this).parent().find('.payment-ko').show();
+        }
+    });
 
     // Get Stripe public key
     var StripePubKey = $('#stripe-publishable-key').val();
