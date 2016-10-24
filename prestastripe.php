@@ -698,6 +698,8 @@ class PrestaStripe extends PaymentModule
             $state_delivery = State::getNameById($address_delivery->id_state);
             if (!$params['cardHolderName'] || $params['cardHolderName'] == '') {
                 $cardHolderName = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+            } else {
+                $cardHolderName = $params['cardHolderName'];
             }
             $charge = \Stripe\Charge::create(
                 array(
