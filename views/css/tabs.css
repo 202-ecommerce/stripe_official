@@ -152,7 +152,15 @@
 }
 
 label[for=secure_all], label[for=secure_only] {
-	width: inherit;
+	width: 345px;
 	float: none;
 	text-align: left;
+}
+#section-shape-4 #secure_all, #section-shape-4 #secure_only {
+	display: inline-block;
+	margin:0;
+}
+#section-shape-4 .margin-form {
+	width: 370px;
+	box-sizing: content-box;
 }
