@@ -48,8 +48,8 @@
                 <div>
 				<label>{l s='Card Number' mod='prestastripe'}</label><br />
 				<input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
-                <img style="margin-left: -52px;" class="payment-ok" src="/img/admin/enabled.gif">
-                <img style="margin-left: -52px;" class="payment-ko" src="/img/admin/disabled.gif">
+                <img style="margin-left: -57px;" class="payment-ok" src="/img/admin/enabled.gif">
+                <img style="margin-left: -57px;" class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
                 <br />
                 <div>
@@ -219,6 +219,13 @@ $(document).ready(function() {
         }
     }
 
+    if (ps_version) {
+        $('.payment-ko, .payment-ok').css({
+            float: 'none',
+            'margin-bottom': '-4px'
+        });
+    }
+
     $('.stripe-name').on('focusout', function(){
         if($(this).val().length > 0){
             $(this).parent().find('.payment-ko').hide();
@@ -290,7 +297,10 @@ $(document).ready(function() {
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
                             Stripe.threeDSecure.createIframe(response.redirect_url, result_3d, callbackFunction3D);
-                            $('#result_3d iframe').css({height: '400px'});
+                            $('#result_3d iframe').css({
+                                height: '400px',
+                                width: '100%'
+                            });
                         } else if (response.status == "succeeded") {
                             createCharge();
                         }

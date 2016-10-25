@@ -159,6 +159,8 @@ label[for=secure_all], label[for=secure_only] {
 #section-shape-4 #secure_all, #section-shape-4 #secure_only {
 	display: inline-block;
 	margin:0;
+	vertical-align: top;
+	margin-top: 4px;
 }
 #section-shape-4 .margin-form {
 	width: 370px;
