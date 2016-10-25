@@ -23,6 +23,9 @@ $_MODULE['<{prestastripe}prestashop>prestastripe_6a6e86ce4dad2c60af2ed273fa3dae6
 $_MODULE['<{prestastripe}prestashop>prestastripe_2c9360a1d3c79d4adba0cbc6c9ad2618'] = 'Remboursement réussi';
 $_MODULE['<{prestastripe}prestashop>prestastripe_9769caadb45900927273623278fd5de2'] = 'Références Stripe inconnues, veuillez vérifier votre configuration.';
 $_MODULE['<{prestastripe}prestashop>prestastripe_d745ae693a620300df47650b75a38d2b'] = 'Paiement refusé. Erreur inconnue, veuillez utiliser une autre carte ou nous contacter.';
+$_MODULE['<{prestastripe}prestashop>prestastripe_38994da797ccbc60cca7ac070e184b8e'] = 'Appliquer le 3DS sur toutes les transactions';
+$_MODULE['<{prestastripe}prestashop>prestastripe_66f768fe70d168ff019ffae26fafef83'] = 'Appliquer le 3DS sur les transactions supérieures à 50€ seulement';
+$_MODULE['<{prestastripe}prestashop>prestastripe_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{prestastripe}prestashop>prestastripe_d43ffab03011327dd0d4de14611446a1'] = 'Connexion Stripe';
 $_MODULE['<{prestastripe}prestashop>prestastripe_4245499695408b974322be6f01b0d17a'] = 'Mode test';
 $_MODULE['<{prestastripe}prestashop>prestastripe_9e543c36303b7ea64edefe0cbdab0f2e'] = 'Vous pouvez gérer vos clés API depuis votre';
@@ -35,7 +38,6 @@ $_MODULE['<{prestastripe}prestashop>prestastripe_f3b6fcb05309d03b971b4ce615b3fb1
 $_MODULE['<{prestastripe}prestashop>prestastripe_9e1b86f849fb4e07ee707025047b4830'] = 'Clé publiable de test Stripe';
 $_MODULE['<{prestastripe}prestashop>prestastripe_c8aaea74fa5aa61678196755c8ce0be1'] = 'Veuillez noter que si le module est en mode test, vous pouvez cliquer sur l\'un des logos de Carte Bancaire (VISA, MasterCard, etc.)';
 $_MODULE['<{prestastripe}prestashop>prestastripe_9f4c40c079049be218aed14ad373a294'] = 'dans la page de paiement pour générer un échantillon de numéro de carte bancaire et effectuer les tests.';
-$_MODULE['<{prestastripe}prestashop>prestastripe_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{prestastripe}prestashop>prestastripe_2b660da0c521cc6bc51a188bc9f7d084'] = 'Choisissez une commande que vous souhaitez rembourser';
 $_MODULE['<{prestastripe}prestashop>prestastripe_24e85d1e652b3681994e9cae2cc1f35a'] = 'ID de paiement Stripe';
 $_MODULE['<{prestastripe}prestashop>prestastripe_da7f0502c71be869d7faf804434c7b81'] = 'Pour effectuer un remboursement, renseignez l\'ID de commande ci-dessous. Vous pouvez trouver cet ID dans la page \"Transactions\".';
@@ -106,6 +108,18 @@ $_MODULE['<{prestastripe}prestashop>order-confirmation_9e36368a8a4c53d31f327850c
 $_MODULE['<{prestastripe}prestashop>order-confirmation_47e22e4e4e37b6346412aae1d89c103c'] = ', vous allez prochainement recevoir un mail de confirmation.';
 $_MODULE['<{prestastripe}prestashop>order-confirmation_978dec2eec7a6d7350ceefbbb6b1e1b1'] = 'Nous vous remercions de votre confiance.';
 $_MODULE['<{prestastripe}prestashop>payment_7be6771ad1d21093769df474d9ba0b9b'] = 'Réglez par carte bancaire avec';
+$_MODULE['<{prestastripe}prestashop>payment_d4f45a60fdbab45b0f4ade6119bcbc6c'] = 'Le numéro de carte saisi est erroné.';
+$_MODULE['<{prestastripe}prestashop>payment_c2e80d5cd8223fcefb534a16f0708d92'] = 'Le numéro de carte saisi n\'est pas valide.';
+$_MODULE['<{prestastripe}prestashop>payment_5aa324d04977b3724fa0a41fdcab6b32'] = 'Le mois d\'expiration saisi n\'est pas valide.';
+$_MODULE['<{prestastripe}prestashop>payment_4cf01a79c8c4433d4f94e77b4c207c74'] = 'L\'année d\'expiration saisie n\'est pas valide.';
+$_MODULE['<{prestastripe}prestashop>payment_7a65d7882b5e64c05921a818c0f27974'] = 'Le CVC saisi n\'est pas valide.';
+$_MODULE['<{prestastripe}prestashop>payment_0dbe3b8619a4e422c6bdd08cbc2ef465'] = 'La carte utilisée a expiré.';
+$_MODULE['<{prestastripe}prestashop>payment_07c071435d9ef43b0b0e7538df9da053'] = 'Le CVC saisi est incorrect.';
+$_MODULE['<{prestastripe}prestashop>payment_3d0c22b9a18a883ca03578e767ac3245'] = 'Le code postal saisi est incorrect.';
+$_MODULE['<{prestastripe}prestashop>payment_77dffa1da8fcdd645163bfa9beeb743f'] = 'Votre carte a été refusée.';
+$_MODULE['<{prestastripe}prestashop>payment_edd9cc9325ca4d19ef82d7602559b823'] = 'Le client que vous essayez de débiter n\'a pas de carte associée.';
+$_MODULE['<{prestastripe}prestashop>payment_a884efe555b298bf04a8363ea9981931'] = 'Une erreur s\'est produite lors du traitement de la carte.';
+$_MODULE['<{prestastripe}prestashop>payment_f5e80e3a50db981883e3be92725823b6'] = 'Limite d\'utilisation de l\'API atteinte. Contactez-nous si vous rencontrez régulièrement cette erreur.';
 $_MODULE['<{prestastripe}prestashop>payment_4d45dda9e5e627fc945732e529f08c36'] = 'Transaction en cours, merci de patienter.';
 $_MODULE['<{prestastripe}prestashop>payment_931d3a3ad177dd96a28c9642fec11b01'] = 'Numéro de carte';
 $_MODULE['<{prestastripe}prestashop>payment_19067b1c605a0acf55c0c165784895d1'] = 'Porteur de la carte';
