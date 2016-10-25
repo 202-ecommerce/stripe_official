@@ -166,3 +166,8 @@ label[for=secure_all], label[for=secure_only] {
 	width: 370px;
 	box-sizing: content-box;
 }
+#section-shape-4 input[name=submit_secure] {
+    position: absolute;
+    right: 26px;
+    margin-top: -15px;
+}
