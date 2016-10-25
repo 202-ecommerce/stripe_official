@@ -701,13 +701,14 @@ class PrestaStripe extends PaymentModule
             } else {
                 $cardHolderName = $params['cardHolderName'];
             }
+
             $charge = \Stripe\Charge::create(
                 array(
                     "amount" => $params['amount'], // amount in cents, again
                     "currency" => $params['currency'],
                     "source" => $params['token'],
                     "shipping" => array("address" => array("city" => $address_delivery->city,
-                        "country" => $address_delivery->country, "line1" => $address_delivery->address1,
+                        "country" => $this->context->country->iso_code, "line1" => $address_delivery->address1,
                         "line2" => $address_delivery->address2, "postal_code" => $address_delivery->postcode,
                         "state" => $state_delivery), "name" => $cardHolderName),
                 )
@@ -867,7 +868,7 @@ class PrestaStripe extends PaymentModule
             $amount = $this->context->cart->getOrderTotal();
             $currency = $this->context->currency->iso_code;
             $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
-            if (!$secure_mode_all && $amount > 50) {
+            if (!$secure_mode_all && $amount >= 50) {
                 $secure_mode_all = 1;
             }
 

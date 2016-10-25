@@ -150,3 +150,9 @@
     border-bottom: none;
     text-decoration: none;
 }
+
+label[for=secure_all], label[for=secure_only] {
+	width: inherit;
+	float: none;
+	text-align: left;
+}
