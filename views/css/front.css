@@ -27,7 +27,9 @@ a.stripe-card-cvc-info div.cvc-info {
 a.stripe-card-cvc-info:hover div.cvc-info { display: block; }
 div.cvc-info:hover { cursor: default; }
 #stripe-payment-form img.cc-icon { border: #CCCCCC solid 1px; float: left; margin-right: 5px; }
-.block-left { display: inline-block; float: left; margin-right: 10px; }
+.block-left {
+	display: inline-block; float: left; margin-right: 30px;
+}
 img.disable { opacity: 0.3; }
 img.enable { opacity: 1; }
 #stripe-payment-form-cc .stripe-submit-button-cc { margin-left: 5px; }

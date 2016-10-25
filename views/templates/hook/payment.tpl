@@ -45,18 +45,18 @@
 			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
 				<div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div><a name="stripe_error" style="display:none"></a>
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
-                <div>
-				<label>{l s='Card Number' mod='prestastripe'}</label><br />
-				<input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
-                <img style="margin-left: -57px;" class="payment-ok" src="/img/admin/enabled.gif">
-                <img style="margin-left: -57px;" class="payment-ko" src="/img/admin/disabled.gif">
-                </div>
-                <br />
+
                 <div>
 				<label>{l s='Cardholder Name' mod='prestastripe'}</label><br />
         <input type="text" style="width: 200px;" autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
                 <img class="payment-ok" src="/img/admin/enabled.gif">
                 <img class="payment-ko" src="/img/admin/disabled.gif">
+                </div>
+                <div>
+                    <label>{l s='Card Number' mod='prestastripe'}</label><br />
+                    <input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
+                    <img style="margin-left: -57px;" class="payment-ok" src="/img/admin/enabled.gif">
+                    <img style="margin-left: -57px;" class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
 				<div class="block-left">
 					<label>{l s='Card Type' mod='prestastripe'}</label><br />
@@ -70,7 +70,31 @@
 					<img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
 					<img class="cc-icon disable"  id="diners"     rel="Diners"     alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-diners.png" />
 				</div>
-				<div class="block-left">
+                <br />
+                <div class="block-left">
+                <label>{l s='Expiration (MM/YYYY)' mod='prestastripe'}</label><br />
+                <select id="month" name="month" data-stripe="exp-month" class="stripe-card-expiry-month">
+                    <option value="01">{l s='January' mod='prestastripe'}</option>
+                    <option value="02">{l s='February' mod='prestastripe'}</option>
+                    <option value="03">{l s='March' mod='prestastripe'}</option>
+                    <option value="04">{l s='April' mod='prestastripe'}</option>
+                    <option value="05">{l s='May' mod='prestastripe'}</option>
+                    <option value="06">{l s='June' mod='prestastripe'}</option>
+                    <option value="07">{l s='July' mod='prestastripe'}</option>
+                    <option value="08">{l s='August' mod='prestastripe'}</option>
+                    <option value="09">{l s='September' mod='prestastripe'}</option>
+                    <option value="10">{l s='October' mod='prestastripe'}</option>
+                    <option value="11">{l s='November' mod='prestastripe'}</option>
+                    <option value="12">{l s='December' mod='prestastripe'}</option>
+                </select>
+                <span> / </span>
+                <select id="year" name="year" data-stripe="exp-year" class="stripe-card-expiry-year">
+                    {for $n_pp_year={'Y'|date} to {'Y'|date}+9}
+                        <option value="{$n_pp_year|escape:'htmlall':'UTF-8'}">{$n_pp_year|escape:'htmlall':'UTF-8'}</option>
+                    {/for}
+                </select>
+                </div>
+				<div>
 					<label>{l s='CVC' mod='prestastripe'}</label><br />
 					<input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
                     <img class="payment-ok" src="/img/admin/enabled.gif">
@@ -83,27 +107,7 @@
 					</a>
 				</div>
 				<div class="clear"></div>
-				<label>{l s='Expiration (MM/YYYY)' mod='prestastripe'}</label><br />
-				<select id="month" name="month" data-stripe="exp-month" class="stripe-card-expiry-month">
-					<option value="01">{l s='January' mod='prestastripe'}</option>
-					<option value="02">{l s='February' mod='prestastripe'}</option>
-					<option value="03">{l s='March' mod='prestastripe'}</option>
-					<option value="04">{l s='April' mod='prestastripe'}</option>
-					<option value="05">{l s='May' mod='prestastripe'}</option>
-					<option value="06">{l s='June' mod='prestastripe'}</option>
-					<option value="07">{l s='July' mod='prestastripe'}</option>
-					<option value="08">{l s='August' mod='prestastripe'}</option>
-					<option value="09">{l s='September' mod='prestastripe'}</option>
-					<option value="10">{l s='October' mod='prestastripe'}</option>
-					<option value="11">{l s='November' mod='prestastripe'}</option>
-					<option value="12">{l s='December' mod='prestastripe'}</option>
-				</select>
-				<span> / </span>
-				<select id="year" name="year" data-stripe="exp-year" class="stripe-card-expiry-year">
-				{for $n_pp_year={'Y'|date} to {'Y'|date}+9}
-					<option value="{$n_pp_year|escape:'htmlall':'UTF-8'}">{$n_pp_year|escape:'htmlall':'UTF-8'}</option>
-				{/for}
-				</select>
+
 				<br />
 				<button type="submit" class="stripe-submit-button">{l s='Submit Payment' mod='prestastripe'}</button>
 			</form>
