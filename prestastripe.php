@@ -67,7 +67,7 @@ class PrestaStripe extends PaymentModule
     {
         $this->name = 'prestastripe';
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.2';
+        $this->version = '1.2.0';
         $this->module_key = '1aaea58011ea45f7fe2fee243a920384';
         $this->author = 'PrestaShop';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
