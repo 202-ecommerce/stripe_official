@@ -402,12 +402,12 @@ class PrestaStripe extends PaymentModule
                     'badge' => $this->getBadgesClass(),
                 ),
             ),
-            'logo' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/logo.png'
+            'logo' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png'
         );
 
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
-        $this->context->controller->addJs($this->_path.'/views/js/PSTabs.js');
+        $this->context->smarty->assign('new_base_dir', $this->_path);
         $this->context->controller->addJs($this->_path.'/views/js/faq.js');
         $this->context->controller->addCss($this->_path.'/views/css/started.css');
         $this->context->controller->addCss($this->_path.'/views/css/tabs.css');
@@ -919,12 +919,12 @@ class PrestaStripe extends PaymentModule
                         array(
                             'id' => 'secure_all',
                             'value' => 1,
-                            'label' => $this->l('Apply 3D secure for all transactions'),
+                            'label' => $this->l('Request 3D-Secure authentication on all charges'),
                         ),
                         array(
                             'id' => 'secure_only',
                             'value' => 0,
-                            'label' => $this->l('Apply 3D secure only for the transactions more 50 euro'),
+                            'label' => $this->l('Request 3D-Secure authentication on charges above 50 EUR/USD/GBP only'),
                         )
                     ),
                 ),

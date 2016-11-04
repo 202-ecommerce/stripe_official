@@ -160,14 +160,15 @@ label[for=secure_all], label[for=secure_only] {
 	display: inline-block;
 	margin:0;
 	vertical-align: top;
-	margin-top: 4px;
+	margin-top: 2px;
+	margin-right: 5px;
 }
 #section-shape-4 .margin-form {
-	width: 370px;
+	width: 387px;
 	box-sizing: content-box;
 }
 #section-shape-4 input[name=submit_secure] {
     position: absolute;
     right: 26px;
-    margin-top: -15px;
+    margin-top: -30px;
 }

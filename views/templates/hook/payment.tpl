@@ -26,7 +26,11 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
 		<div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
-			<h3 class="stripe_title"><img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/secure-icon.png" />{l s='Pay by credit card with ' mod='prestastripe'}<img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/logo.png" width="110px"/></h3>
+			<h3 class="stripe_title">
+                <!--<img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/secure-icon.png" />-->
+                {l s='Pay by card' mod='prestastripe'}
+                <!--<img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/logo.png" width="110px"/>-->
+            </h3>
 			{* Classic Credit card form *}
             <input type="hidden" id="stripe-incorrect_number" value="{l s='The card number is incorrect.' mod='prestastripe'}"></input>
             <input type="hidden" id="stripe-invalid_number" value="{l s='The card number is not a valid credit card number.' mod='prestastripe'}"></input>
@@ -47,18 +51,18 @@
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
 
                 <div>
-				<label>{l s='Cardholder Name' mod='prestastripe'}</label><br />
-        <input type="text" style="width: 200px;" autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+				<label>{l s='Cardholder\'s Name' mod='prestastripe'}</label>  <label class="required"> </label><br />
+        <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
                 <img class="payment-ok" src="/img/admin/enabled.gif">
                 <img class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
                 <div>
-                    <label>{l s='Card Number' mod='prestastripe'}</label><br />
+                    <label>{l s='Card Number' mod='prestastripe'}</label>  <label class="required"> </label><br />
                     <input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
                     <img style="margin-left: -57px;" class="payment-ok" src="/img/admin/enabled.gif">
                     <img style="margin-left: -57px;" class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
-				<div class="block-left">
+				<!--<div class="block-left">
 					<label>{l s='Card Type' mod='prestastripe'}</label><br />
 					{if $mode == 1}
 						<p>{l s='Click on any of the credit card buttons below in order to fill automatically the required fields to submit a test payment.' mod='prestastripe'}</p>
@@ -70,10 +74,12 @@
 					<img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
 					<img class="cc-icon disable"  id="diners"     rel="Diners"     alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-diners.png" />
 				</div>
-                <br />
+                <br />-->
                 <div class="block-left">
-                <label>{l s='Expiration (MM/YYYY)' mod='prestastripe'}</label><br />
-                <select id="month" name="month" data-stripe="exp-month" class="stripe-card-expiry-month">
+                <label>{l s='Expiry date' mod='prestastripe'}</label>  <label class="required"> </label><br />
+                <input type="text" size="7" autocomplete="off" id="card_expiry" class="stripe-card-expiry" placeholder="MM/YY"/>
+
+                 <!--   <select id="month" name="month" data-stripe="exp-month" class="stripe-card-expiry-month">
                     <option value="01">{l s='January' mod='prestastripe'}</option>
                     <option value="02">{l s='February' mod='prestastripe'}</option>
                     <option value="03">{l s='March' mod='prestastripe'}</option>
@@ -92,15 +98,14 @@
                     {for $n_pp_year={'Y'|date} to {'Y'|date}+9}
                         <option value="{$n_pp_year|escape:'htmlall':'UTF-8'}">{$n_pp_year|escape:'htmlall':'UTF-8'}</option>
                     {/for}
-                </select>
+                </select>-->
                 </div>
 				<div>
-					<label>{l s='CVC' mod='prestastripe'}</label><br />
+					<label>{l s='CVC/CVV' mod='prestastripe'}</label>  <label class="required"> </label><br />
 					<input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
                     <img class="payment-ok" src="/img/admin/enabled.gif">
                     <img class="payment-ko" src="/img/admin/disabled.gif">
                     <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
-						{l s='What\'s this?' mod='prestastripe'}
 						<div class="cvc-info">
 						{l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='prestastripe'}
 						</div>
@@ -108,8 +113,13 @@
 				</div>
 				<div class="clear"></div>
 
-				<br />
-				<button type="submit" class="stripe-submit-button">{l s='Submit Payment' mod='prestastripe'}</button>
+				<button type="submit" class="stripe-submit-button">
+                    <img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/secure-icon.png" width="15px"/>
+                    {l s='Buy now' mod='prestastripe'}
+                </button>
+
+                <div class="clear"></div>
+                <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/powered_by_stripe.png"/>
 			</form>
 			<div id="stripe-translations">
 				<span id="stripe-wrong-cvc">{l s='Wrong CVC.' mod='prestastripe'}</span>
@@ -172,9 +182,27 @@ function cc_format(value) {
     }
 }
 
+function ce_format(value) {
+    var v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    var matches = v.match(/\d{2,4}/g);
+    var match = matches && matches[0] || '';
+    var parts = [];
+    for (i=0, len=match.length; i<len; i+=2) {
+        parts.push(match.substring(i, i+2));
+    }
+    if (parts.length) {
+        return parts.join('/');
+    } else {
+        return value;
+    }
+}
 
 
 $(document).ready(function() {
+
+    document.getElementById('card_expiry').oninput = function() {
+        this.value = ce_format(this.value);
+    }
 
     document.getElementById('card_number').oninput = function() {
         this.value = cc_format(this.value);
@@ -278,9 +306,18 @@ $(document).ready(function() {
         $('#stripe-payment-form').hide();
         $('#stripe-ajax-loader').show();
 
+        exp_month = $('.stripe-card-expiry').val();
+        exp_month_calc = exp_month.substring(0, 2);
+        exp_year = $('.stripe-card-expiry').val();
+        exp_year_calc = "20" + exp_year.substring(3);
 
-
-        Stripe.card.createToken($form, function (status, response) {
+        Stripe.card.createToken({
+            number: $('.stripe-card-number').val(),
+            cvc: $('.stripe-card-cvc').val(),
+            exp_month: exp_month_calc,
+            exp_year: exp_year_calc,
+            name: $('.stripe-name').val()
+        }, function (status, response) {
             var $form = $('#stripe-payment-form');
             if (response.error) {
                 // Show error on the form
@@ -313,7 +350,7 @@ $(document).ready(function() {
                     function callbackFunction3D(result) {
                         if (result.status == "succeeded") {
                             // Send the token back to the server so that it can charge the card
-                            createCharge();
+                            createCharge(result);
                         } else {
                             $('#stripe-ajax-loader').hide();
                             $('#stripe-payment-form').show();
@@ -326,14 +363,16 @@ $(document).ready(function() {
                     createCharge();
                 }
 
-                function createCharge() {
-
+                function createCharge(result) {
+                    if (typeof(result) == "undefined") {
+                        result = response;
+                    }
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
                         url: baseDir + 'modules/prestastripe/ajax.php',
                         data: {
-                            stripeToken: response.id,
+                            stripeToken: result.id,
                             cardType: lookupCardType($('.stripe-card-number').val()),
                             cardHolderName: $('.stripe-name').val(),
                         },

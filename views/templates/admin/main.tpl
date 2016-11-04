@@ -61,10 +61,17 @@
   </div>
 
 </div>
-<script>
- (function() {
-   [].slice.call(document.querySelectorAll('.tabs')).forEach(function(el) {
-	 new PSTabs(el);
-   });
- })();
+<script type="text/javascript">
+	var Translation = [];
+	Translation[0] = "{l s='3D-Secure (Verified by VISA, MasterCard SecureCode™) is a system that is used to verify a customer’s identity before an online purchase can be completed, so that merchants can reduce fraud.' mod='prestastripe'}";
+	Translation[1] = "{l s='With 3D-Secure, customers are redirected to a page provided by their bank, where they are prompted to enter an additional password before their card can be charged.' mod='prestastripe'}";
+	Translation[2] = "{l s='You can learn more about 3D-Secure on our website: https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode' mod='prestastripe'}";
+</script>
+<script type="text/javascript" src="{$new_base_dir|escape:'htmlall':'UTF-8'}views/js/PSTabs.js"></script>
+<script type="text/javascript">
+		(function() {
+		[].slice.call(document.querySelectorAll('.tabs')).forEach(function(el) {
+			new PSTabs(el);
+		});
+	})();
 </script>

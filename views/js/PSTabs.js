@@ -71,4 +71,9 @@
 
 	// add to global namespace
 	window.PSTabs = PSTabs;
+
+	var div_3d = '<div class="commit_3d">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'</div>';
+
+	$('#fieldset_0_3 .panel-heading').after(div_3d);
+	$('#section-shape-4 #fieldset_0 legend').after('<div class="margin-form commit_3d_15">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'</div>')
 })(window);
