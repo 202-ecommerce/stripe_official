@@ -30,7 +30,7 @@ a.stripe-card-cvc-info:hover div.cvc-info { display: block; }
 div.cvc-info:hover { cursor: default; }
 #stripe-payment-form img.cc-icon { border: #CCCCCC solid 1px; float: left; margin-right: 5px; }
 .block-left {
-    display: inline-block; float: left; margin-right: 20px;
+	display: inline-block; float: left; margin-right: 6px;
 }
 img.disable { opacity: 0.3; }
 img.enable { opacity: 1; }
@@ -88,10 +88,10 @@ a#stripe_error { display: none; }
     width: 210px;
 }
 #stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
-    width:95px;
-    max-width: 95px;
-    text-align: center;
-    padding: 3px 1px !important;
+	width:102px;
+	max-width: 102px;
+	text-align: center;
+	padding: 3px 1px !important;
 }
 .powered_stripe {
     float:right !important;

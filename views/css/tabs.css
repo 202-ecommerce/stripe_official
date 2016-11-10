@@ -21,11 +21,10 @@
 
 .tabs-logo {
 	display: block;
-	padding: 10px 15px;
-	width: 200px;
-	text-align: center;
-	margin-left: auto;
-	margin-right: auto;
+	padding: 0;
+	width: 218px;
+	text-align: left;
+	margin-left: -22px;
 }
 
 .content-wrap section.content-current {

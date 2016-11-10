@@ -67,15 +67,15 @@ $(document).ready(function() {
 
 	/* Refund Option */
 	var value = 0;
-	value = $('input[name=_PS_STRIPE_refund_mode]:checked', '#configuration_form_2').val();
+	value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
 
 	if (value == 1)
 		$("#refund_amount").parent().parent().hide();
 	else
 		$("#refund_amount").parent().parent().show();
 
-	$('#configuration_form_2 input').on('change', function() {
-		value = $('input[name=_PS_STRIPE_refund_mode]:checked', '#configuration_form_2').val();
+	$('#configuration_form_1 input').on('change', function() {
+		value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
 
 		if (value == 1)
 			$("#refund_amount").parent().parent().hide();

@@ -372,7 +372,7 @@ class PrestaStripe extends PaymentModule
                     )),
                 ),
                 array(
-                    'name' => $this->l('Transactions'),
+                    'name' => $this->l('Payments'),
                     'icon' => 'icon-credit-card',
                     'value' => $content[2],
                     'badge' => $this->getBadgesClass(),
@@ -527,15 +527,8 @@ class PrestaStripe extends PaymentModule
                 $this->errors['refund'] = $this->l('This Stipe ID doesn\'t exist, please check it again');
                 Configuration::updateValue(self::_PS_STRIPE_.'refund_id', '');
             }
-        }
 
-        if (Tools::isSubmit('submit_refund_action')) {
             $amount = null;
-            $refund_id = Configuration::get(self::_PS_STRIPE_.'refund_id');
-            if (!empty($refund_id)) {
-                $refund = Db::getInstance()->ExecuteS('SELECT *	FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
-            }
-
             $mode = Tools::getValue(self::_PS_STRIPE_.'refund_mode');
             if ($mode == 0) {
                 $amount = Tools::getValue(self::_PS_STRIPE_.'refund_amount');
@@ -543,6 +536,7 @@ class PrestaStripe extends PaymentModule
 
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
         }
+
     }
 
     /*
@@ -1104,9 +1098,37 @@ class PrestaStripe extends PaymentModule
                 array(
                     'type' => 'text',
                     'label' => $this->l('Stripe Payment ID'),
-                    'desc' => '<strong>'.$this->l('To process a refund, input the order ID below. The order ID can be located in the Transaction page.').'</strong>',
+                    'desc' => '<strong>'.$this->l('To process a refund, please input Stripe’s payment ID below, which can be found in the « Payments » tab of this plugin').'</strong>',
                     'name' => self::_PS_STRIPE_.'refund_id',
                     'class' => 'fixed-width-xxl',
+                    'required' => true
+                ),
+                array(
+                    'type' => 'radio',
+                    'desc' => '<strong>'.$this->l('Refunds take 5 to 10 days to appear on your customers statement').'</strong>',
+                    'name' => self::_PS_STRIPE_.'refund_mode',
+                    'size' => 50,
+                    'values' => array(
+                        array(
+                            'id' => 'active_on_refund',
+                            'value' => 1,
+                            'label' => $this->l('Full refund')
+                        ),
+                        array(
+                            'id' => 'active_off_refund',
+                            'value' => 0,
+                            'label' => $this->l('Partial Refund')
+                        )
+                    ),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Amount'),
+                    'desc' => $this->l('Please, enter an amount your want to refund'),
+                    'name' => self::_PS_STRIPE_.'refund_amount',
+                    'size' => 20,
+                    'id' => 'refund_amount',
+                    'class' => 'fixed-width-sm',
                     'required' => true
                 ),
             ),
@@ -1116,48 +1138,6 @@ class PrestaStripe extends PaymentModule
             ),
         );
         $this->refund = 1;
-        if ($this->refund) {
-            $fields_form1[1]['form'] = array(
-                'legend' => array(
-                    'title' => $this->l('Choose an Order you want to Refund'),
-                ),
-                'input' => array(
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('Choose a refund'),
-                        'name' => self::_PS_STRIPE_.'refund_mode',
-                        'size' => 50,
-                        'values' => array(
-                            array(
-                                'id' => 'active_on_refund',
-                                'value' => 1,
-                                'label' => $this->l('Total Refund')
-                            ),
-                            array(
-                                'id' => 'active_off_refund',
-                                'value' => 0,
-                                'label' => $this->l('Partial Refund')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Amount'),
-                        'desc' => $this->l('Please, enter an amount your want to refund'),
-                        'name' => self::_PS_STRIPE_.'refund_amount',
-                        'size' => 20,
-                        'id' => 'refund_amount',
-                        'class' => 'fixed-width-sm',
-                        'required' => true
-                    ),
-                ),
-                'submit' => array(
-                    'title' => $this->l('Submit'),
-                    'name' => 'submit_refund_action',
-                    'class' => 'btn btn-default pull-right button',
-                ),
-            );
-        }
 
         $submit_action = 'submit_refund_id';
         $fields_value = array_merge($fields_value1, array(

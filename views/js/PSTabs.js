@@ -72,8 +72,8 @@
 	// add to global namespace
 	window.PSTabs = PSTabs;
 
-	var div_3d = '<div class="commit_3d">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'</div>';
+	var div_3d = '<div class="commit_3d">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'<a href="https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode" target="_blank">https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode</a></div>';
 
-	$('#fieldset_0_3 .panel-heading').after(div_3d);
-	$('#section-shape-4 #fieldset_0 legend').after('<div class="margin-form commit_3d_15">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'</div>')
+	$('#fieldset_0_2 .panel-heading').after(div_3d);
+	$('#section-shape-4 #fieldset_0 legend').after('<div class="margin-form commit_3d_15">- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'<a href="https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode" target="_blank">https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode</a></div>');
 })(window);

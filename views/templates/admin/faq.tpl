@@ -63,13 +63,17 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='For most countries, Stripe charges 2.9% + 30c per successful charge, or less based on your volume.' mod='prestastripe'}
+                    {l s='For European companies, Stripe charges (per successful transaction): ' mod='prestastripe'}<br>
+                    - {l s='1.4% + €0.25/£0.20 with a European card ' mod='prestastripe'}<br>
+                    - {l s='2.9% + €0.25/£0.20 with a non-European card' mod='prestastripe'}<br>
+                    {l s='Stripe has no setup fees, no monthly fees, no validation fees, no refund fees, and no card storage fees. There’s no additional fee for failed charges or refunds.' mod='prestastripe'}<br>
                 </p>
 
                 <p>
-                    {l s='But there are different exceptions, so we invite you to consult' mod='prestastripe'}
-                    <a href="http://stripe.com/pricing" target="_blank">http://stripe.com/pricing</a>
-                    {l s='and select your country on the list at the bottom left of the page.' mod='prestastripe'}
+                    {l s='If you’d like to learn more about our simple pricing, please check our website: ' mod='prestastripe'}
+                    <a href="http://stripe.com/pricing" target="_blank">http://stripe.com/pricing</a><br>
+                    {l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='prestastripe'}
+                    <a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='prestastripe'}</a>
                 </p>
             </div>
         </li>
@@ -104,21 +108,6 @@
             </div>
         </li>
 
-        <li class="faq-item">
-            <span class="faq-trigger">{l s='What are the Transaction and Refund tabs useful for?' mod='prestastripe'}</span>
-            <span class="expand pull-right">+</span>
-            <div class="faq-content">
-                <p>
-                    {l s='In the Transactions tab, all transactions processed with Stripe will be displayed with the date, ID, Name of the client, card' mod='prestastripe'}
-                    {l s='information, amount paid, balance and result.' mod='prestastripe'}
-                </p>
 
-                <p>
-                    {l s='In the Refund tab, you will be able to process a total or partial refund to orders of your choice. You only need to fill in the' mod='prestastripe'}
-                    {l s='order Stripe payment ID located in the Transactions tab. Click on Request Refund button, then choose “Total Refund” or “Partial' mod='prestastripe'}
-                    {l s='Refund” with the desired refund amount and click on the Submit button.' mod='prestastripe'}
-                </p>
-            </div>
-        </li>
 	  </ul>
 </div>
