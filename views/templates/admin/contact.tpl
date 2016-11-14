@@ -28,10 +28,10 @@
 	<b>{l s='Thanks for choosing Stripe as your payment gateway. ' mod='stripe_official'}</b>
 	<br><br>
 	{l s='If you have any question related to Stripe and this plugin, feel free to: ' mod='stripe_official'}<br>
-	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blanck' href="https://support.stripe.com">https://support.stripe.com</a><br>
-	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blanck' href="https://support.stripe.com/email">https://support.stripe.com/email</a><br><br>
-	{l s='If you believe the problem you have is related to this specific plugin, please reach out to our support team via Addon’s ' mod='stripe_official'}
-	<a target='_blanck' href="http://addons.prestashop.com/contact-form.php?{$url_track|escape:'htmlall':'UTF-8'}">{l s='contact form.' mod='stripe_official'}</a>
+	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com">https://support.stripe.com</a><br>
+	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com/email">https://support.stripe.com/email</a><br><br>
+	{l s='If you believe the problem you have is related to this specific plugin, please reach out to our support team via' mod='stripe_official'} 
+	<a target='_blanck' href="http://addons.prestashop.com/contact-form.php?{$url_track|escape:'htmlall':'UTF-8'}">{l s='Addon\'s contact form.' mod='stripe_official'}</a>
 	<br><br>
 	<!--{l s='To save you time, before you contact us:' mod='stripe_official'}<br>
 	- {l s='make sure you have read the documentation well.' mod='stripe_official'}<br>

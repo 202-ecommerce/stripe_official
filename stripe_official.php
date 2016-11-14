@@ -1100,14 +1100,14 @@ class Stripe_official extends PaymentModule
                 array(
                     'type' => 'text',
                     'label' => $this->l('Stripe Payment ID'),
-                    'desc' => '<strong>'.$this->l('To process a refund, please input Stripe’s payment ID below, which can be found in the « Payments » tab of this plugin').'</strong>',
+                    'desc' => '<i>'.$this->l('To process a refund, please input Stripe’s payment ID below, which can be found in the « Payments » tab of this plugin').'</i>',
                     'name' => self::_PS_STRIPE_.'refund_id',
                     'class' => 'fixed-width-xxl',
                     'required' => true
                 ),
                 array(
                     'type' => 'radio',
-                    'desc' => '<strong>'.$this->l('Refunds take 5 to 10 days to appear on your customers statement').'</strong>',
+                    'desc' => '<i>'.$this->l('Refunds take 5 to 10 days to appear on your customer\'s statement').'</i>',
                     'name' => self::_PS_STRIPE_.'refund_mode',
                     'size' => 50,
                     'values' => array(

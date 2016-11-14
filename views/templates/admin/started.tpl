@@ -32,16 +32,14 @@
 		 <div class="stripe-module-col1 floatRight"></div>
 		 <div class="stripe-module-col2">
 		 	<div class="stripe-module-col1inner">
-			  	- <span><a href="https://dashboard.stripe.com/register" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes ' mod='prestastripe'}</a></span>
+			 	- <span><a href="https://dashboard.stripe.com/register" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes ' mod='prestastripe'}</a></span>
 				{l s=' and immediately start accepting payments via Visa, MasterCard and American Express (no additional
-				   contract/merchant ID needed from your bank)' mod='prestastripe'}<br>
-				- <span>{l s='Improve your conversion rate  ' mod='prestastripe'}</span>
+				   contract/merchant ID needed from your bank)' mod='prestastripe'}.<br>
+				- <span>{l s='Improve your conversion rate' mod='prestastripe'}</span>
 				{l s=' by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your
 				own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
-				- <span>{l s='Keep you fraud under control ' mod='stripe_official'}</span>
-				{l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
-				<a target="_blank" href="https://stripe.com/radar">{l s='Stripe Radar' mod='stripe_official'}</a>
-				{l s=', our suite of anti-fraud tools.' mod='stripe_official'}<br>
+				- <span>{l s='Keep you fraud under control' mod='stripe_official'}</span> {l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
+				<a target="_blank" href="https://stripe.com/radar">{l s='Stripe Radar' mod='stripe_official'}</a>{l s=', our suite of anti-fraud tools.' mod='stripe_official'}<br>
 				- <span>{l s='Easily refund ' mod='stripe_official'}</span>
 				{l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
 				- {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
@@ -60,7 +58,7 @@
 				<p>{l s='If you’d like to learn more about our simple pricing, please check our website: ' mod='stripe_official'}
 				<a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a></p><br>
 				<p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
-					<a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch.' mod='stripe_official'}</a></p>
+					<a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.</p>
 			</div>
 
 
