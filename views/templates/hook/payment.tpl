@@ -18,98 +18,98 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*   @author PrestaShop SA <contact@prestashop.com>
-*   @copyright  2007-2016 PrestaShop SA
-*   @license        http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*   International Registered Trademark & Property of PrestaShop SA
+*	@author PrestaShop SA <contact@prestashop.com>
+*	@copyright	2007-2016 PrestaShop SA
+*	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
+*	International Registered Trademark & Property of PrestaShop SA
 *}
 <div class="row">
-    <div class="col-xs-12">
-        <div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
+	<div class="col-xs-12">
+		<div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
 
-            {* Classic Credit card form *}
-            <input type="hidden" id="stripe-incorrect_number" value="{l s='The card number is incorrect.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-invalid_number" value="{l s='The card number is not a valid credit card number.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-invalid_expiry_month" value="{l s='The card\'s expiration month is invalid.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-invalid_expiry_year" value="{l s='The card\'s expiration year is invalid.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-invalid_cvc" value="{l s='The card\'s security code is invalid.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-expired_card" value="{l s='The card has expired.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-incorrect_cvc" value="{l s='The card\'s security code is incorrect.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-incorrect_zip" value="{l s='The card\'s zip code failed validation.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-card_declined" value="{l s='The card was declined.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-missing" value="{l s='There is no card on a customer that is being charged.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-processing_error" value="{l s='An error occurred while processing the car.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-rate_limit" value="{l s='An error occurred due to requests hitting the API too quickly. Please let us know if you\'re consistently running into this error.' mod='prestastripe'}"></input>
-            <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='prestastripe'}"></input>
+			{* Classic Credit card form *}
+            <input type="hidden" id="stripe-incorrect_number" value="{l s='The card number is incorrect.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-invalid_number" value="{l s='The card number is not a valid credit card number.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-invalid_expiry_month" value="{l s='The card\'s expiration month is invalid.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-invalid_expiry_year" value="{l s='The card\'s expiration year is invalid.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-invalid_cvc" value="{l s='The card\'s security code is invalid.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-expired_card" value="{l s='The card has expired.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-incorrect_cvc" value="{l s='The card\'s security code is incorrect.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-incorrect_zip" value="{l s='The card\'s zip code failed validation.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-card_declined" value="{l s='The card was declined.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-missing" value="{l s='There is no card on a customer that is being charged.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-processing_error" value="{l s='An error occurred while processing the car.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-rate_limit" value="{l s='An error occurred due to requests hitting the API too quickly. Please let us know if you\'re consistently running into this error.' mod='stripe_official'}"></input>
+            <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}"></input>
 
-            <div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='prestastripe'}</div>
-            <form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
-                <h3 class="stripe_title">{l s='Pay by card' mod='prestastripe'}</h3>
+			<div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
+                <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
                 <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div><a name="stripe_error" style="display:none"></a>
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
 
                 <div>
-                <label>{l s='Cardholder\'s Name' mod='prestastripe'}</label>  <label class="required"> </label><br />
+				<label>{l s='Cardholder\'s Name' mod='stripe_official'}</label>  <label class="required"> </label><br />
         <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
                 <img class="payment-ok" src="/img/admin/enabled.gif">
                 <img class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
                 <div>
-                    <label>{l s='Card Number' mod='prestastripe'}</label>  <label class="required"> </label><br />
+                    <label>{l s='Card Number' mod='stripe_official'}</label>  <label class="required"> </label><br />
                     <input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
                     <img style="margin-left: -57px;" class="payment-ok" src="/img/admin/enabled.gif">
                     <img style="margin-left: -57px;" class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
-                <!--<div class="block-left">
-                    <label>{l s='Card Type' mod='prestastripe'}</label><br />
-                    {if $mode == 1}
-                        <p>{l s='Click on any of the credit card buttons below in order to fill automatically the required fields to submit a test payment.' mod='prestastripe'}</p>
-                    {/if}
-                    <img class="cc-icon disable"  id="visa"       rel="Visa"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-visa.png" />
-                    <img class="cc-icon disable"  id="mastercard" rel="MasterCard" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-mastercard.png" />
-                    <img class="cc-icon disable"  id="discover"   rel="Discover"   alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-discover.png" />
-                    <img class="cc-icon disable"  id="amex"       rel="Amex"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-amex.png" />
-                    <img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
-                    <img class="cc-icon disable"  id="diners"     rel="Diners"     alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-diners.png" />
-                </div>
+				<!--<div class="block-left">
+					<label>{l s='Card Type' mod='stripe_official'}</label><br />
+					{if $mode == 1}
+						<p>{l s='Click on any of the credit card buttons below in order to fill automatically the required fields to submit a test payment.' mod='stripe_official'}</p>
+					{/if}
+					<img class="cc-icon disable"  id="visa"       rel="Visa"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-visa.png" />
+					<img class="cc-icon disable"  id="mastercard" rel="MasterCard" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-mastercard.png" />
+					<img class="cc-icon disable"  id="discover"   rel="Discover"   alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-discover.png" />
+					<img class="cc-icon disable"  id="amex"       rel="Amex"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-amex.png" />
+					<img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
+					<img class="cc-icon disable"  id="diners"     rel="Diners"     alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-diners.png" />
+				</div>
                 <br />-->
                 <div class="block-left">
-                <label>{l s='Expiry date' mod='prestastripe'}</label>  <label class="required"> </label><br />
+                <label>{l s='Expiry date' mod='stripe_official'}</label>  <label class="required"> </label><br />
                 <input type="text" size="7" autocomplete="off" id="card_expiry" class="stripe-card-expiry" maxlength = 5 placeholder="MM/YY"/>
 
 
                 </div>
-                <div>
-                    <label>{l s='CVC/CVV' mod='prestastripe'}</label>  <label class="required"> </label><br />
-                    <input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
+				<div>
+					<label>{l s='CVC/CVV' mod='stripe_official'}</label>  <label class="required"> </label><br />
+					<input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
                     <img class="payment-ok" src="/img/admin/enabled.gif">
                     <img class="payment-ko" src="/img/admin/disabled.gif">
                     <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
-                        <div class="cvc-info">
-                        {l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='prestastripe'}
-                        </div>
-                    </a>
-                </div>
-                <div class="clear"></div>
+						<div class="cvc-info">
+						{l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='stripe_official'}
+						</div>
+					</a>
+				</div>
+				<div class="clear"></div>
 
-                <button type="submit" class="stripe-submit-button">
+				<button type="submit" class="stripe-submit-button">
                     <img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/lock-locked.png"/>
-                    {l s='Buy now' mod='prestastripe'}
+                    {l s='Buy now' mod='stripe_official'}
                 </button>
 
                 <div class="clear"></div>
                 <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/powered_by_stripe.png"/>
-            </form>
-            <div id="stripe-translations">
-                <span id="stripe-wrong-cvc">{l s='Wrong CVC.' mod='prestastripe'}</span>
-                <span id="stripe-wrong-expiry">{l s='Wrong Credit Card Expiry date.' mod='prestastripe'}</span>
-                <span id="stripe-wrong-card">{l s='Wrong Credit Card number.' mod='prestastripe'}</span>
-                <span id="stripe-please-fix">{l s='Please fix it and submit your payment again.' mod='prestastripe'}</span>
-                <span id="stripe-card-del">{l s='Your Credit Card has been successfully deleted, please enter a new Credit Card:' mod='prestastripe'}</span>
-                <span id="stripe-card-del-error">{l s='An error occured while trying to delete this Credit card. Please contact us.' mod='prestastripe'}</span>
-            </div>
-        </div>
-    </div>
+			</form>
+			<div id="stripe-translations">
+				<span id="stripe-wrong-cvc">{l s='Wrong CVC.' mod='stripe_official'}</span>
+				<span id="stripe-wrong-expiry">{l s='Wrong Credit Card Expiry date.' mod='stripe_official'}</span>
+				<span id="stripe-wrong-card">{l s='Wrong Credit Card number.' mod='stripe_official'}</span>
+				<span id="stripe-please-fix">{l s='Please fix it and submit your payment again.' mod='stripe_official'}</span>
+				<span id="stripe-card-del">{l s='Your Credit Card has been successfully deleted, please enter a new Credit Card:' mod='stripe_official'}</span>
+				<span id="stripe-card-del-error">{l s='An error occured while trying to delete this Credit card. Please contact us.' mod='stripe_official'}</span>
+			</div>
+		</div>
+	</div>
 </div>
 <div id="result_3d";"></div>
 
@@ -215,7 +215,7 @@ $(document).ready(function() {
             }
 
             var card_logo = document.createElement('img');
-            card_logo.src = baseDir + 'modules/prestastripe/views/img/cc-' + cardType.toLowerCase() +'.png';
+            card_logo.src = baseDir + 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
             card_logo.id = "img-"+cardType;
             card_logo.className = "img-card";
             $(card_logo).insertAfter('.stripe-card-number');
@@ -306,7 +306,7 @@ $(document).ready(function() {
                     err_msg = response.error.message;
                 $form.find('.stripe-payment-errors').text(err_msg).fadeIn(1000);
             } else {
-                if (secure_mode) {
+                if (secure_mode || response.three_d_secure.supported == "required") {
                     Stripe.threeDSecure.create({
                         card: response.id,
                         amount: amount_ttl,
@@ -319,7 +319,7 @@ $(document).ready(function() {
                                 width: '100%'
                             });
                         } else if (response.status == "succeeded") {
-                            createCharge();
+                            createCharge(response);
                         } else if (response.status == "failed") {
                             var cardType = Stripe.card.cardType($('.stripe-card-number').val());
                             if (cardType == "American Express") {
@@ -357,7 +357,7 @@ $(document).ready(function() {
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        url: baseDir + 'modules/prestastripe/ajax.php',
+                        url: baseDir + 'modules/stripe_official/ajax.php',
                         data: {
                             stripeToken: result.id,
                             cardType: lookupCardType($('.stripe-card-number').val()),

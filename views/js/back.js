@@ -90,4 +90,6 @@ $(document).ready(function() {
 			$('.table').html(response);
 		});
 	});
+
+
 });

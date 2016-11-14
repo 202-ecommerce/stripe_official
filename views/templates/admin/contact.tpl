@@ -23,22 +23,22 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<h3>{l s='Prestashop Addons' mod='prestastripe'}</h3>
+<h3>{l s='Prestashop Addons' mod='stripe_official'}</h3>
 <div class="form-group">
-	<b>{l s='Thanks for choosing Stripe as your payment gateway. ' mod='prestastripe'}</b>
+	<b>{l s='Thanks for choosing Stripe as your payment gateway. ' mod='stripe_official'}</b>
 	<br><br>
-	{l s='If you have any question related to Stripe and this plugin, feel free to: ' mod='prestastripe'}<br>
-	- {l s='Check our support website: ' mod='prestastripe'}<a target='_blanck' href="https://support.stripe.com">https://support.stripe.com</a><br>
-	- {l s='Directly contact our support team: ' mod='prestastripe'}<a target='_blanck' href="https://support.stripe.com/email">https://support.stripe.com/email</a><br><br>
-	{l s='If you believe the problem you have is related to this specific plugin, please reach out to our support team via Addon’s ' mod='prestastripe'}
-	<a target='_blanck' href="http://addons.prestashop.com/contact-form.php?{$url_track|escape:'htmlall':'UTF-8'}">{l s='contact form.' mod='prestastripe'}</a>
+	{l s='If you have any question related to Stripe and this plugin, feel free to: ' mod='stripe_official'}<br>
+	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blanck' href="https://support.stripe.com">https://support.stripe.com</a><br>
+	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blanck' href="https://support.stripe.com/email">https://support.stripe.com/email</a><br><br>
+	{l s='If you believe the problem you have is related to this specific plugin, please reach out to our support team via Addonâ€™s ' mod='stripe_official'}
+	<a target='_blanck' href="http://addons.prestashop.com/contact-form.php?{$url_track|escape:'htmlall':'UTF-8'}">{l s='contact form.' mod='stripe_official'}</a>
 	<br><br>
-	<!--{l s='To save you time, before you contact us:' mod='prestastripe'}<br>
-	- {l s='make sure you have read the documentation well.' mod='prestastripe'}<br>
-	- {l s='in the event you would be contacting us via the form, do not hesitate to give us your first message, maximum of details on' mod='prestastripe'}
-	{l s='the problem and its origins (screenshots, reproduce actions to find the bug, etc. ..)' mod='prestastripe'}	<br><br>
-	{l s='This module has been developped by PrestaShop and can only be sold through' mod='prestastripe'}
+	<!--{l s='To save you time, before you contact us:' mod='stripe_official'}<br>
+	- {l s='make sure you have read the documentation well.' mod='stripe_official'}<br>
+	- {l s='in the event you would be contacting us via the form, do not hesitate to give us your first message, maximum of details on' mod='stripe_official'}
+	{l s='the problem and its origins (screenshots, reproduce actions to find the bug, etc. ..)' mod='stripe_official'}	<br><br>
+	{l s='This module has been developped by PrestaShop and can only be sold through' mod='stripe_official'}
 	<a target='_blanck' href="http://addons.prestashop.com/index.php?{$url_track|escape:"url":"UTF-8"}">addons.prestashop.com</a>.
 	<br><br>
-	{l s='The PrestaShop Addons Team' mod='prestastripe'}<br>-->
+	{l s='The PrestaShop Addons Team' mod='stripe_official'}<br>-->
 </div>

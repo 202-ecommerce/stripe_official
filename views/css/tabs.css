@@ -22,9 +22,10 @@
 .tabs-logo {
 	display: block;
 	padding: 0;
-	width: 218px;
+	width: 100%;
 	text-align: left;
-	margin-left: -22px;
+	margin: 0 auto;
+	max-width: 250px;
 }
 
 .content-wrap section.content-current {

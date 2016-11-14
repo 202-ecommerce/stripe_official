@@ -25,13 +25,13 @@
 *}
  <table class="table">
 	<tr>
-		<th>{l s='Date (last update)' mod='prestastripe'}</th>
-	   	<th>{l s='Stripe Payment ID' mod='prestastripe'}</th>
-	   	<th>{l s='Name' mod='prestastripe'}</th>
-      <th>{l s='Card type' mod='prestastripe'}</th>
-	   	<th>{l s='Amount Paid' mod='prestastripe'}</th>
-	   	<th>{l s='Balance' mod='prestastripe'}</th>
-	   	<th>{l s='Result' mod='prestastripe'}</th>
+		<th>{l s='Date (last update)' mod='stripe_official'}</th>
+	   	<th>{l s='Stripe Payment ID' mod='stripe_official'}</th>
+	   	<th>{l s='Name' mod='stripe_official'}</th>
+      <th>{l s='Card type' mod='stripe_official'}</th>
+	   	<th>{l s='Amount Paid' mod='stripe_official'}</th>
+	   	<th>{l s='Balance' mod='stripe_official'}</th>
+	   	<th>{l s='Result' mod='stripe_official'}</th>
 	</tr>
 	{foreach from=$tenta key=k item=v}
 	<tr>

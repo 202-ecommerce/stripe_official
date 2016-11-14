@@ -24,6 +24,6 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<p><b>{l s='Congratulations, your order has been placed and will be processed soon.' mod='prestastripe'}</b><br /><br />
-{l s='Your order reference is' mod='prestastripe'} <b>{$stripe_order_reference|escape:'htmlall':'UTF-8'}</b>{l s=', you should receive a confirmation e-mail shortly.' mod='prestastripe'}<br /><br />
-{l s='We appreciate your business.' mod='prestastripe'}<br /><br /></p>
+<p><b>{l s='Congratulations, your order has been placed and will be processed soon.' mod='stripe_official'}</b><br /><br />
+{l s='Your order reference is' mod='stripe_official'} <b>{$stripe_order_reference|escape:'htmlall':'UTF-8'}</b>{l s=', you should receive a confirmation e-mail shortly.' mod='stripe_official'}<br /><br />
+{l s='We appreciate your business.' mod='stripe_official'}<br /><br /></p>

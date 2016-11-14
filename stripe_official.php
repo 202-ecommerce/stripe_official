@@ -19,7 +19,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PrestaStripe extends PaymentModule
+class Stripe_official extends PaymentModule
 {
     /* status */
     const _FLAG_NULL_ = 0;
@@ -65,9 +65,9 @@ class PrestaStripe extends PaymentModule
 
     public function __construct()
     {
-        $this->name = 'prestastripe';
+        $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.2.0';
+        $this->version = '1.1.2';
         $this->module_key = '1aaea58011ea45f7fe2fee243a920384';
         $this->author = 'PrestaShop';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
@@ -404,6 +404,8 @@ class PrestaStripe extends PaymentModule
             ),
             'logo' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png'
         );
+
+
 
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
@@ -918,7 +920,7 @@ class PrestaStripe extends PaymentModule
                         array(
                             'id' => 'secure_only',
                             'value' => 0,
-                            'label' => $this->l('Request 3D-Secure authentication on charges above 50 EUR/USD/GBP only'),
+                            'label' => $this->l('Request 3D-Secure authentication on chargesÂ above 50 EUR/USD/GBP only'),
                         )
                     ),
                 ),
@@ -1098,7 +1100,7 @@ class PrestaStripe extends PaymentModule
                 array(
                     'type' => 'text',
                     'label' => $this->l('Stripe Payment ID'),
-                    'desc' => '<strong>'.$this->l('To process a refund, please input Stripe’s payment ID below, which can be found in the « Payments » tab of this plugin').'</strong>',
+                    'desc' => '<strong>'.$this->l('To process a refund, please input Stripeâ€™s payment ID below, which can be found in the Â«Â PaymentsÂ Â» tab of this plugin').'</strong>',
                     'name' => self::_PS_STRIPE_.'refund_id',
                     'class' => 'fixed-width-xxl',
                     'required' => true

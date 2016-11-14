@@ -22,7 +22,7 @@ if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
 require dirname(__FILE__).'/../../config/config.inc.php';
 require dirname(__FILE__).'/../../init.php';
 
-$stripe = Module::getInstanceByName('prestastripe');
+$stripe = Module::getInstanceByName('stripe_official');
 
 /* Refresh Button Back Office on Transaction */
 if ($stripe && $stripe->active) {

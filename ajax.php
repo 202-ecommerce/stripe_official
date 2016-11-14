@@ -19,9 +19,9 @@ if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')) {
 
 include dirname(__FILE__).'/../../config/config.inc.php';
 include dirname(__FILE__).'/../../init.php';
-include dirname(__FILE__).'/prestastripe.php';
+include dirname(__FILE__).'/stripe_official.php';
 
-$stripe = Module::getInstanceByName('prestastripe');
+$stripe = Module::getInstanceByName('stripe_official');
 
 if ($stripe && $stripe->active) {
     $context = Context::getContext();

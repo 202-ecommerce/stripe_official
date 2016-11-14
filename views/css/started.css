@@ -1,4 +1,4 @@
-.stripe-module-wrapper { clear: both; margin: 0px auto; min-width: 930px; overflow: hidden; }
+.stripe-module-wrapper { clear: both; margin: 0px auto;  overflow: hidden; }
 .stripe-module-header { clear: both; margin-bottom: 10px; padding-top: 15px; overflow: hidden; }
 .stripe-module-header img.stripe-logo { float: left; margin: 0px 70px 0px 0px; }
 .stripe-module-header span.stripe-module-intro { color: #008CDD; display: block; float: left; font-size: 18px; height: 61px; line-height: 24px; margin: 0px 35px 0px 0px; padding: 11px 0px 0px 20px; }
