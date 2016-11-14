@@ -343,10 +343,10 @@ class Stripe_official extends PaymentModule
             $this->displaySomething(),
             $this->displayForm(),
             $this->displayTransaction(),
+            $this->displaySecure(),
             $this->displayRefundForm(),
             $this->displayFAQ(),
-            $this->displayContact(),
-            $this->displaySecure(),
+            $this->displayContact() 
         );
 
         $tab_contents = array(
@@ -380,25 +380,25 @@ class Stripe_official extends PaymentModule
                 array(
                     'name' => $this->l('3D secure'),
                     'icon' => 'icon-credit-card',
-                    'value' => $content[6],
+                    'value' => $content[3],
                     'badge' => $this->getBadgesClass(),
                 ),
                 array(
                     'name' => $this->l('Refund'),
                     'icon' => 'icon-ticket',
-                    'value' => $content[3],
+                    'value' => $content[4],
                     'badge' => $this->getBadgesClass(),
                 ),
                 array(
                     'name' => $this->l('FAQ'),
                     'icon' => 'icon-question',
-                    'value' => $content[4],
+                    'value' => $content[5],
                     'badge' => $this->getBadgesClass(),
                 ),
                 array(
                     'name' => $this->l('Contact'),
                     'icon' => 'icon-envelope',
-                    'value' => $content[5],
+                    'value' => $content[6],
                     'badge' => $this->getBadgesClass(),
                 ),
             ),
@@ -936,7 +936,7 @@ class Stripe_official extends PaymentModule
             self::_PS_STRIPE_.'secure' => Configuration::get(self::_PS_STRIPE_.'secure'),
         ));
 
-        return $this->renderGenericForm($fields_form, $fields_value, "section-shape-4", $submit_action);
+        return $this->renderGenericForm($fields_form, $fields_value, $this->getSectionShape(), $submit_action);
     }
 
     /*
@@ -1187,7 +1187,7 @@ class Stripe_official extends PaymentModule
 
             $this->context->smarty->assign('tenta', $tenta);
             $output .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
-            $output .= $this->renderGenericForm($fields_form1, $fields_value1, "section-shape-3", $submit_action1);
+            $output .= $this->renderGenericForm($fields_form1, $fields_value1, $this->getSectionShape(), $submit_action1);
         }
 
         return $output;
