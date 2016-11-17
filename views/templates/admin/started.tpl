@@ -26,16 +26,16 @@
 
 <div class="stripe-module-wrapper">
 	<div class="stripe-module-header">
-	   <span class="stripe-module-intro">{l s='Beautiful, smart payment forms to improve your conversion rate on your PrestaShop website' mod='prestastripe'}</span>
+	   <span class="stripe-module-intro">{l s='Beautiful, smart payment forms to improve your conversion rate on your PrestaShop website' mod='stripe_official'}</span>
 	</div>
 	<div class="stripe-module-wrap">
 		 <div class="stripe-module-col1 floatRight"></div>
 		 <div class="stripe-module-col2">
 		 	<div class="stripe-module-col1inner">
-			 	- <span><a href="https://dashboard.stripe.com/register" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes ' mod='prestastripe'}</a></span>
+			 	- <span><a href="https://dashboard.stripe.com/register" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a></span>
 				{l s=' and immediately start accepting payments via Visa, MasterCard and American Express (no additional
-				   contract/merchant ID needed from your bank)' mod='prestastripe'}.<br>
-				- <span>{l s='Improve your conversion rate' mod='prestastripe'}</span>
+				   contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
+				- <span>{l s='Improve your conversion rate' mod='stripe_official'}</span>
 				{l s=' by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your
 				own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
 				- <span>{l s='Keep you fraud under control' mod='stripe_official'}</span> {l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
@@ -44,6 +44,8 @@
 				{l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
 				- {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
 				<span>{l s='135+ currencies.' mod='stripe_official'}</span><br><br>
+				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:50%;">
+				<br><br>
 				<p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
 				<a target="_blank" href="https://stripe.com/fr">www.stripe.com</a></p>
 				<br>

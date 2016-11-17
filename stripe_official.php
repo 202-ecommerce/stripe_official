@@ -1281,7 +1281,7 @@ class Stripe_official extends PaymentModule
      */
     private function getSectionShape()
     {
-        return 'section-shape-'.(int)$this->section_shape++;
+        return 'stripe_step_'.(int)$this->section_shape++;
     }
 
     /*

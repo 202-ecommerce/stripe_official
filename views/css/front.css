@@ -1,13 +1,13 @@
 div.payment_module { padding-bottom: 35px;     margin-bottom: 10px; text-transform: none; }
 .stripe_title img { float: none; margin-right: 8px; margin-top: -2px; vertical-align: middle; }
 #stripe-payment-form {    margin: 0 auto;}
-#stripe-payment-form label { display: inline-block; margin-bottom: 4px; }
+#stripe-payment-form label { display: inline-block; margin-bottom: 4px; font-size: 14px;}
 #stripe-payment-form label.lowercase { text-transform: none; }
 #stripe-payment-form input[type="text"], #stripe-payment-form select {
-	border: #CCCCCC solid 1px; margin-bottom: 15px; padding: 3px;     box-sizing: border-box;
+	border: #CCCCCC solid 1px; margin-bottom: 15px; padding: 3px;     box-sizing: border-box; font-size: 15px;
 }
 #stripe-payment-form input[type="checkbox"] { margin-bottom: 15px; }
-
+#stripe-payment-form .img-card {width: 33px;     margin-bottom: 2px;}
 #stripe-payment-form input.stripe-card-cvc {  }
 #stripe-form a { display: inline; position: relative; }
 a.stripe-card-cvc-info { font-style: italic; }
@@ -106,4 +106,20 @@ h3.stripe_title {
 	font-size: 17px;
 	font-weight: bold;
 	color: #000;
+}
+#stripe-ajax-loader {
+	width: fit-content;
+	margin: auto;
+	margin-top: 15px;
+}
+#modal_stripe {
+	width: 600px;
+	margin: auto;
+	margin-top: 80px;
+	padding: 30px;
+	border-radius: 6px;
+	box-shadow: 0 5px 15px rgba(0,0,0,.5);
+	border: 1px solid rgba(0,0,0,.2);
+	-webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+	background: white;
 }

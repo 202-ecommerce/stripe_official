@@ -111,11 +111,12 @@
 		</div>
 	</div>
 </div>
-<div id="result_3d";"></div>
+<div id="modal_stripe"  class="modal" style="display: none">
+            <div id="result_3d"> </div></div>
 
 
-
-
+<script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.the-modal.js"></script>
+<link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
 var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
 var currency = "{$currency|escape:'htmlall':'UTF-8'}";
@@ -223,7 +224,7 @@ $(document).ready(function() {
             if (ps_version) {
                 $('#img-'+cardType).css({
                     float: 'none',
-                    'margin-bottom': '-6px'
+                    'margin-bottom': '-5px'
                 });
             }
 
@@ -235,24 +236,12 @@ $(document).ready(function() {
         }
     }
 
-    if (ps_version) {
+   /* if (ps_version) {
         $('.payment-ko, .payment-ok').css({
             float: 'none',
             'margin-bottom': '-4px'
         });
-    }
-
-    $('.stripe-name').on('focusout', function(){
-        if($(this).val().length > 0){
-            $(this).parent().find('.payment-ko').hide();
-            $(this).parent().find('.payment-ok').show();
-        }else{
-            $(this).parent().find('.payment-ok').hide();
-            $(this).parent().find('.payment-ko').show();
-        }
-    });
-
-
+    }*/
 
     // Get Stripe public key
     var StripePubKey = $('#stripe-publishable-key').val();
@@ -306,13 +295,14 @@ $(document).ready(function() {
                     err_msg = response.error.message;
                 $form.find('.stripe-payment-errors').text(err_msg).fadeIn(1000);
             } else {
-                if (secure_mode || response.three_d_secure.supported == "required") {
+                if (secure_mode || response.card.three_d_secure.supported == "required") {
                     Stripe.threeDSecure.create({
                         card: response.id,
                         amount: amount_ttl,
                         currency: currency,
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
+                            $('#modal_stripe').modal({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
                             Stripe.threeDSecure.createIframe(response.redirect_url, result_3d, callbackFunction3D);
                             $('#result_3d iframe').css({
                                 height: '400px',
@@ -335,6 +325,7 @@ $(document).ready(function() {
                         //return false; exit;
                     });
                     function callbackFunction3D(result) {
+                        $('#modal_stripe').modal().close();
                         if (result.status == "succeeded") {
                             // Send the token back to the server so that it can charge the card
                             createCharge(result);

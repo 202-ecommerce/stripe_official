@@ -34,7 +34,7 @@
 
 	PSTabs.prototype._init = function() {
 		// get current index
-		this.index = Number(document.URL.substring(document.URL.indexOf("#section-shape-") + 15));
+		this.index = Number(document.URL.substring(document.URL.indexOf("#stripe_step_") + 13));
 		// tabs elems
 		this.tabs = [].slice.call(this.el.querySelectorAll('nav > a'));
 		// content items

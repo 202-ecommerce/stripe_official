@@ -33,8 +33,7 @@
 	<nav class="list-group categorieList">
 	  {foreach from=$tab_contents.contents key=tab_nbr item=content}
 		<a class="list-group-item migration-tab"
-		   id="section-shape-{$tab_nbr + 1|intval}"
-		   href="#section-shape-{$tab_nbr + 1|intval}">
+		   href="#stripe_step_{$tab_nbr + 1|intval}">
 
 		  {if isset($content.icon) && $content.icon != false}
 			<i class="{$content.icon|escape:"htmlall":"UTF-8"} pstab-icon"></i>

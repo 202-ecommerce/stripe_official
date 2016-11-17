@@ -1,13 +1,13 @@
 .stripe-module-wrapper { clear: both; margin: 0px auto;  overflow: hidden; }
 .stripe-module-header { clear: both; margin-bottom: 10px; padding-top: 15px; overflow: hidden; }
 .stripe-module-header img.stripe-logo { float: left; margin: 0px 70px 0px 0px; }
-.stripe-module-header span.stripe-module-intro { color: #008CDD; display: block; float: left; font-size: 18px; height: 61px; line-height: 24px; margin: 0px 35px 0px 0px; padding: 11px 0px 0px 20px; }
+.stripe-module-header span.stripe-module-intro { color: #008CDD; display: block; float: left; font-size: 26px; text-align: center; line-height: 34px; margin: 0px 35px 0px 0px; padding: 11px 0px 0px 20px; }
 .stripe-module-header a.stripe-module-create-btn { background: url(../img/bg_btn-blue.png) left top no-repeat; color: #FFF; display: inline-block; font-size: 16px; font-weight: bold; height: 35px; line-height: 33px; margin: 16px 0px 0px 0px; padding: 0px 0px 0px 20px; text-shadow: 0px -1px 0px #03609E; }
 .stripe-module-header a.stripe-module-create-btn span { background: url(../img/bg_btn-blue.png) right bottom no-repeat; display: block; height: 35px; margin: 0px -20px 0px 0px; padding: 0px 20px 0px 0px; }
 
-.stripe-module-wrap { width: 90%; background-color: #F7FBFF; border: #C3D9EF solid 1px; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; clear: both; margin: 0px 0px 15px 0px; overflow: hidden; padding: 15px; }
+.stripe-module-wrap { width: 98%; background-color: #F7FBFF; border: #C3D9EF solid 1px; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; clear: both; margin: 0px 0px 15px 0px; overflow: hidden; padding: 15px; }
 .stripe-module-col1 { float: right; margin: 0px; overflow: hidden; width: 320px; }
-.stripe-module-col2 { margin: 0px 35px 0px 0px; overflow: hidden; min-width: 563px; }
+.stripe-module-col2 { margin: 0px 15px 0px 0px; overflow: hidden;  }
 .stripe-module-col1inner { float: left; margin: 0px 10px 15px 10px; overflow: hidden; width: 98%;     line-height: 22px;
     font-size: 12px;}
 .stripe-module-col2inner { clear: both; margin: 0px; padding-top: 20px; }
