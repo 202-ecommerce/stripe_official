@@ -38,7 +38,7 @@
 		<td>{$v.date|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.id_stripe|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.name|escape:'htmlall':'UTF-8'}</td>
-		<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$v.type|escape:'htmlall':'UTF-8'}.png" alt="card type" /></td>
+		<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$v.type|escape:'htmlall':'UTF-8'}.png" alt="card type" style="width:43px;"/></td>
 		<td>{$v.amount|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.refund|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		{if $v.result == 2}

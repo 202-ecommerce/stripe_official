@@ -74,7 +74,7 @@ $(document).ready(function() {
 	else
 		$("#refund_amount").parent().parent().show();
 
-	$('#configuration_form_1 input').on('change', function() {
+	$('input[name=_PS_STRIPE_refund_mode]').on('change', function() {
 		value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
 
 		if (value == 1)

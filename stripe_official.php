@@ -962,7 +962,7 @@ class Stripe_official extends PaymentModule
                     'label' => $this->l('Test mode'),
                     'name' => self::_PS_STRIPE_.'mode',
                     'desc' => $this->l('You can manage your API keys from your ')
-                    .'<a href="https://dashboard.stripe.com/account" target="_blank">'.$this->l('account').'</a>',
+                    .'<a href="https://dashboard.stripe.com/account" target="_blank"> '.$this->l('account').'</a>',
                         'size' => 50,
                         'values' => array(
                             array(
@@ -1008,8 +1008,6 @@ class Stripe_official extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Stripe Test Publishable Key'),
                         'name' => self::_PS_STRIPE_.'test_publishable',
-                        'desc' => $this->l('Please note that if the module is in test mode, you are able to click any of the credit card buttons (VISA, MasterCard, etc.) ').'<br/>'
-                        .$this->l('in the payment page to generate a sample credit card number for testing purposes.'),
                             'id' => 'test_public_key',
                             'class' => 'fixed-width-xxl',
                             'size' => 20,
@@ -1220,6 +1218,9 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
+        $link = new Link();
+        $return_url = $link->getModuleLink('stripe_official').'#stripe_step_2';
+        $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
     }
 

@@ -41,7 +41,7 @@
             <input type="hidden" id="stripe-processing_error" value="{l s='An error occurred while processing the car.' mod='stripe_official'}"></input>
             <input type="hidden" id="stripe-rate_limit" value="{l s='An error occurred due to requests hitting the API too quickly. Please let us know if you\'re consistently running into this error.' mod='stripe_official'}"></input>
             <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}"></input>
-
+            <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}"></input>
 			<div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
 			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
                 <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
@@ -193,13 +193,6 @@ $(document).ready(function() {
         this.value = cc_format(this.value);
 
         cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
-      /*  if (cardNmb) {
-            $(this).parent().find('.payment-ko').hide();
-            $(this).parent().find('.payment-ok').show();
-        } else {
-            $(this).parent().find('.payment-ok').hide();
-            $(this).parent().find('.payment-ko').show();
-        }*/
 
         var cardType = Stripe.card.cardType(this.value);
         if (cardType != "Unknown") {
@@ -236,22 +229,23 @@ $(document).ready(function() {
         }
     }
 
-   /* if (ps_version) {
-        $('.payment-ko, .payment-ok').css({
-            float: 'none',
-            'margin-bottom': '-4px'
-        });
-    }*/
 
     // Get Stripe public key
     var StripePubKey = $('#stripe-publishable-key').val();
-    Stripe.setPublishableKey(StripePubKey);
+    if (StripePubKey) {
+        Stripe.setPublishableKey(StripePubKey);
+    }
 
 
 
     $('#stripe-payment-form').submit(function (event) {
 
         var $form = $(this);
+        if (!StripePubKey) {
+            $('.stripe-payment-errors').show();
+            $form.find('.stripe-payment-errors').text($('#stripe-no_api_key').val()).fadeIn(1000);
+            return false;
+        }
         var cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
         var cvcNmb = Stripe.card.validateCVC($('.stripe-card-cvc').val());
         if (cvcNmb == false) {

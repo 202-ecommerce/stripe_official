@@ -23,13 +23,12 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<h3>{l s='Prestashop Addons' mod='stripe_official'}</h3>
+<h3>{l s='Thanks for choosing Stripe.' mod='stripe_official'}</h3>
 <div class="form-group">
-	<b>{l s='Thanks for choosing Stripe as your payment gateway. ' mod='stripe_official'}</b>
-	<br><br>
+	<br>
 	{l s='If you have any question related to Stripe and this plugin, feel free to: ' mod='stripe_official'}<br>
-	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com">https://support.stripe.com</a><br>
-	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com/email">https://support.stripe.com/email</a><br><br>
+	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com"> https://support.stripe.com</a><br>
+	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com/email"> https://support.stripe.com/email</a><br><br>
 	{l s='If you believe the problem you have is related to this specific plugin, please reach out to our support team via' mod='stripe_official'} 
 	<a target='_blanck' href="http://addons.prestashop.com/contact-form.php?{$url_track|escape:'htmlall':'UTF-8'}">{l s='Addons contact form.' mod='stripe_official'}</a>
 	<br><br>
