@@ -349,6 +349,12 @@ class Stripe_official extends PaymentModule
             $this->displayContact() 
         );
 
+        if ($_SERVER['HTTPS'] == "on") {
+            $domain = Tools::getShopDomainSsl(true, true);
+        } else {
+            $domain = Tools::getShopDomain(true, true);
+        }
+
         $tab_contents = array(
             'title' => $this->l('UPS tracking'),
             'contents' => array(
@@ -402,7 +408,7 @@ class Stripe_official extends PaymentModule
                     'badge' => $this->getBadgesClass(),
                 ),
             ),
-            'logo' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png'
+            'logo' => $domain.__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png'
         );
 
 
@@ -962,7 +968,7 @@ class Stripe_official extends PaymentModule
                     'label' => $this->l('Test mode'),
                     'name' => self::_PS_STRIPE_.'mode',
                     'desc' => $this->l('You can manage your API keys from your ')
-                    .' <a href="https://dashboard.stripe.com/account" target="_blank">'.$this->l('account').'</a>',
+                    .' <a href="https://dashboard.stripe.com/account/apikeys" target="_blank">'.$this->l('account').'</a>',
                         'size' => 50,
                         'values' => array(
                             array(
@@ -1218,8 +1224,7 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
-        $link = new Link();
-        $return_url = $link->getModuleLink('stripe_official').'#stripe_step_2';
+        $return_url = urlencode(str_replace('index.php', '', $_SERVER['SCRIPT_URI']).$this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
         $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
     }
