@@ -32,7 +32,7 @@
 		 <div class="stripe-module-col1 floatRight"></div>
 		 <div class="stripe-module-col2">
 		 	<div class="stripe-module-col1inner">
-			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a></span>
+			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a></span>
 				{l s=' and immediately start accepting payments via Visa, MasterCard and American Express (no additional
 				   contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
 				<div class="connect_btn">
