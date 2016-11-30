@@ -26,7 +26,7 @@
 
 <div class="stripe-module-wrapper">
 	<div class="stripe-module-header">
-	   <span class="stripe-module-intro">{l s='Improve your conversion rate an securely charge your customers with Stripe, the easiest payment platform' mod='stripe_official'}</span>
+	   <span class="stripe-module-intro">{l s='Improve your conversion rate and securely charge your customers with Stripe, the easiest payment platform' mod='stripe_official'}</span>
 	</div>
 	<div class="stripe-module-wrap">
 		 <div class="stripe-module-col1 floatRight"></div>
@@ -47,7 +47,7 @@
 				{l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
 				- {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
 				<span>{l s='135+ currencies.' mod='stripe_official'}</span><br><br>
-				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:50%;">
+				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:100%;">
 				<br><br>
 				<p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
 				<a target="_blank" href="https://stripe.com/fr">www.stripe.com</a></p>
