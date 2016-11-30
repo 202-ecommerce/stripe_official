@@ -26,23 +26,21 @@
 
 <div class="stripe-module-wrapper">
 	<div class="stripe-module-header">
-	   <span class="stripe-module-intro">{l s='Beautiful, smart payment forms to improve your conversion rate on your PrestaShop website' mod='stripe_official'}</span>
+	   <span class="stripe-module-intro">{l s='Improve your conversion rate an securely charge your customers with Stripe, the easiest payment platform' mod='stripe_official'}</span>
 	</div>
 	<div class="stripe-module-wrap">
 		 <div class="stripe-module-col1 floatRight"></div>
 		 <div class="stripe-module-col2">
 		 	<div class="stripe-module-col1inner">
-			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a></span>
-				{l s=' and immediately start accepting payments via Visa, MasterCard and American Express (no additional
-				   contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
+			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a> </span>
+				{l s='and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
 				<div class="connect_btn">
 					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect">
 						<span>{l s='Connect with Stripe' mod='stripe_official'}</span>
 					</a>
 				</div>
-				- <span>{l s='Improve your conversion rate' mod='stripe_official'}</span>
-				{l s=' by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your
-				own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
+				- <span>{l s='Improve your conversion rate' mod='stripe_official'} </span>
+				{l s='by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
 				- <span>{l s='Keep your fraud under control' mod='stripe_official'}</span> {l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
 				<a target="_blank" href="https://stripe.com/radar">{l s='Stripe Radar' mod='stripe_official'}</a>{l s=', our suite of anti-fraud tools.' mod='stripe_official'}<br>
 				- <span>{l s='Easily refund ' mod='stripe_official'}</span>

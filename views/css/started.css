@@ -94,6 +94,10 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
     user-select: none;
 }
 
+.stripe-connect:hover, .stripe-connect:focus, .stripe-connect:active {
+    text-decoration: none !important;
+}
+
 .stripe-connect span {
     display: block;
     position: relative;
