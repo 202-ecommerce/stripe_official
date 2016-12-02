@@ -202,21 +202,6 @@ class Stripe_official extends PaymentModule
         return '';
     }
 
-    public function displayInformation($msg)
-    {
-        if ($msg) {
-            return '<div class="'.(version_compare(_PS_VERSION_, '1.6', '>=') ? 'alert ' : '').'alert-info info">'.$msg.'</div>';
-        }
-        return $msg;
-    }
-
-    public function displayWarning($msg)
-    {
-        if ($msg) {
-            return '<div class="'.(version_compare(_PS_VERSION_, '1.6', '>=') ? 'alert ' : '').'alert-warning warn">'.$msg.'</div>';
-        }
-        return $msg;
-    }
 
     /*
      ** @method: showHeadMessages
@@ -1073,11 +1058,11 @@ class Stripe_official extends PaymentModule
             ));
         }
 
+
         $this->context->smarty->assign('tenta', $tenta);
-        if ($refresh == 0) {
-            $html = '<div class="col-lg-2" style="float:right"><a class="close refresh"><i class="process-icon-refresh" style="font-size:1em"></i></a></div>';
-            $html .= '<script>var validate = "'.$this->_path.'";</script>';
-        }
+        $this->context->smarty->assign('refresh', $refresh);
+        $this->context->smarty->assign('path', $this->_path);
+
         $html .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
 
         return $html;
