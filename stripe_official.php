@@ -950,7 +950,7 @@ class Stripe_official extends PaymentModule
             'input' => array(
                 array(
                     'type' => $type,
-                    'label' => $this->l('Test mode'),
+                    'label' => $this->l('Test'),
                     'name' => self::_PS_STRIPE_.'mode',
                     'desc' => $this->l('You can manage your API keys from your ')
                     .' <a href="https://dashboard.stripe.com/account/apikeys" target="_blank">'.$this->l('account').'</a>',
