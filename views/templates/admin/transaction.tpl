@@ -23,7 +23,11 @@
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
- <table class="table">
+{if $refresh == 0}
+	<div class="col-lg-2" style="float:right"><a class="close refresh"><i class="process-icon-refresh" style="font-size:1em"></i></a></div>
+	<script>var validate = "{$path|escape:'htmlall':'UTF-8'}";</script>
+{/if}
+<table class="table">
 	<tr>
 		<th>{l s='Date (last update)' mod='stripe_official'}</th>
 	   	<th>{l s='Stripe Payment ID' mod='stripe_official'}</th>
