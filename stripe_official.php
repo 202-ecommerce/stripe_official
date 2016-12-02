@@ -872,10 +872,10 @@ class Stripe_official extends PaymentModule
                     'ps_version15' => $ps_version15,
                     'baseDir' => __PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
+                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                 )
             );
             $html = '';
-            $html .= '<script>var mode = "'.Configuration::get(self::_PS_STRIPE_.'mode').'";</script>';
             $html .= $this->display(__FILE__, 'views/templates/hook/payment.tpl');
 
             return $html;
