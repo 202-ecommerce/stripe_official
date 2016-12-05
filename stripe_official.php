@@ -13,7 +13,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-require_once dirname(__FILE__).'/sdk/stripe/init.php';
+require_once dirname(__FILE__).'/libraries/sdk/stripe/init.php';
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -277,7 +277,7 @@ class Stripe_official extends PaymentModule
             foreach ($keys as $key) {
                 if (isset($this->errors[$key])) {
                     $class |= self::_FLAG_ERROR_;
-                } else if (isset($this->warnings[$key])) {
+                } elseif (isset($this->warnings[$key])) {
                     $class |= self::_FLAG_WARNING_;
                 } else {
                     $class |= self::_FLAG_SUCCESS_;
@@ -286,9 +286,9 @@ class Stripe_official extends PaymentModule
 
             if ($class & self::_FLAG_ERROR_) {
                 return 'tab-error';
-            } else if ($class & self::_FLAG_WARNING_) {
+            } elseif ($class & self::_FLAG_WARNING_) {
                 return 'tab-warning';
-            } else if ($class & self::_FLAG_SUCCESS_) {
+            } elseif ($class & self::_FLAG_SUCCESS_) {
                 return 'tab-success';
             }
         }
@@ -331,7 +331,7 @@ class Stripe_official extends PaymentModule
             $this->displaySecure(),
             $this->displayRefundForm(),
             $this->displayFAQ(),
-            $this->displayContact() 
+            $this->displayContact()
         );
 
         if ($_SERVER['HTTPS'] == "on") {
@@ -429,7 +429,7 @@ class Stripe_official extends PaymentModule
         return false;
     }
 
-    public function retrieveAccount($secret_key, $publishable_key = '', $log = 0)
+    public function retrieveAccount($secret_key)
     {
         \Stripe\Stripe::setApiKey($secret_key);
         try {
@@ -637,7 +637,7 @@ class Stripe_official extends PaymentModule
             if ($state == 2) {
                 /* Refund State */
                 $order->setCurrentState(7);
-            } else if ($state == 3) {
+            } elseif ($state == 3) {
                 /* Partial Refund State */
                 $order->setCurrentState(Configuration::get(self::_PS_STRIPE_.'partial_refund_state'));
             }
@@ -705,7 +705,7 @@ class Stripe_official extends PaymentModule
             $this->l(Tools);
 
             $refund = $params['amount'];
-            $this->addTentative($e->getMessage(), $params['cardHolderName'], $params['type'], $params['amount'], $params['amount'], $params['currency'], 0, (int)$this->context->cart->id);
+            $this->addTentative($e->getMessage(), $params['cardHolderName'], $params['type'], $refund, $refund, $params['currency'], 0, (int)$this->context->cart->id);
             die(Tools::jsonEncode(array(
                 'code' => '0',
                 'msg' => $e->getMessage(),
@@ -786,7 +786,7 @@ class Stripe_official extends PaymentModule
 
         if ($type == 'American Express') {
             $type = 'amex';
-        } else if ($type == 'Diners Club') {
+        } elseif ($type == 'Diners Club') {
             $type = 'diners';
         }
 
@@ -836,7 +836,7 @@ class Stripe_official extends PaymentModule
 
     public function hookHeader()
     {
-        $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
+      //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
         $this->context->controller->addJs('https://js.stripe.com/v2/');
 
@@ -1036,9 +1036,9 @@ class Stripe_official extends PaymentModule
         foreach ($orders as $order) {
             if ($order['result'] == 0) {
                 $result = 'n';
-            } else if ($order['result'] == 1) {
+            } elseif ($order['result'] == 1) {
                 $result = '';
-            } else if ($order['result'] == 2) {
+            } elseif ($order['result'] == 2) {
                 $result = 2;
             } else {
                 $result = 3;
@@ -1152,9 +1152,9 @@ class Stripe_official extends PaymentModule
             foreach ($orders as $order) {
                 if ($order['result'] == 0) {
                     $result = 'n';
-                } else if ($order['result'] == 1) {
+                } elseif ($order['result'] == 1) {
                     $result = '';
-                } else if ($order['result'] == 2) {
+                } elseif ($order['result'] == 2) {
                     $result = 2;
                 } else {
                     $result = 3;
