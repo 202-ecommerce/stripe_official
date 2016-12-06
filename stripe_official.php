@@ -701,17 +701,12 @@ class Stripe_official extends PaymentModule
                 )
             );
         } catch (\Stripe\Error\Card $e) {
-            // The card has been declined
-            $this->l(Tools);
-
             $refund = $params['amount'];
             $this->addTentative($e->getMessage(), $params['cardHolderName'], $params['type'], $refund, $refund, $params['currency'], 0, (int)$this->context->cart->id);
             die(Tools::jsonEncode(array(
                 'code' => '0',
                 'msg' => $e->getMessage(),
             )));
-        } catch (Exception $e) {
-            var_dump($e);
         }
         if ($charge->status == 'succeeded' && $charge->object == 'charge' && $charge->id) {
             /* The payment was approved */

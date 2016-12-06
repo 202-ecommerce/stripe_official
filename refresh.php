@@ -21,7 +21,9 @@ if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
 
 require dirname(__FILE__).'/../../config/config.inc.php';
 require dirname(__FILE__).'/../../init.php';
-
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 $stripe = Module::getInstanceByName('stripe_official');
 
 /* Refresh Button Back Office on Transaction */
