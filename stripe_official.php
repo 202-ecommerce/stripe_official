@@ -1073,7 +1073,6 @@ class Stripe_official extends PaymentModule
         $fields_form = array();
         $fields_value = array();
 
-        $fields_form1 = array();
         $fields_value1 = array();
 
         $fields_form[1]['form'] = array(
@@ -1128,10 +1127,6 @@ class Stripe_official extends PaymentModule
         $submit_action = 'submit_refund_id';
         $fields_value = array_merge($fields_value1, array(
             self::_PS_STRIPE_.'refund_id' => Configuration::get(self::_PS_STRIPE_.'refund_id'),
-        ));
-
-        $submit_action1 = 'submit_refund_action';
-        $fields_value1 = array_merge($fields_value1, array(
             self::_PS_STRIPE_.'refund_mode' => Configuration::get(self::_PS_STRIPE_.'refund_mode'),
             self::_PS_STRIPE_.'refund_amount' => Configuration::get(self::_PS_STRIPE_.'refund_amount'),
         ));
@@ -1171,8 +1166,7 @@ class Stripe_official extends PaymentModule
 
             $this->context->smarty->assign('tenta', $tenta);
             $output .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
-            $output .= $this->renderGenericForm($fields_form1, $fields_value1, $this->getSectionShape(), $submit_action1);
-        }
+         }
 
         return $output;
     }
