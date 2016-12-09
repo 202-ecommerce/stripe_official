@@ -334,7 +334,7 @@ class Stripe_official extends PaymentModule
             $this->displayContact()
         );
 
-        if ($_SERVER['HTTPS'] == "on") {
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
             $domain = Tools::getShopDomainSsl(true, true);
         } else {
             $domain = Tools::getShopDomain(true, true);
@@ -1166,7 +1166,7 @@ class Stripe_official extends PaymentModule
 
             $this->context->smarty->assign('tenta', $tenta);
             $output .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
-         }
+        }
 
         return $output;
     }
