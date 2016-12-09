@@ -28,5 +28,5 @@ $stripe = Module::getInstanceByName('stripe_official');
 
 /* Refresh Button Back Office on Transaction */
 if ($stripe && $stripe->active) {
-    echo $stripe->displayTransaction(1);
+    echo $stripe->displayTransaction(1, Tools::getValue('token'));
 }

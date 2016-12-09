@@ -1021,46 +1021,50 @@ class Stripe_official extends PaymentModule
     /*
      ** Display All Stripe transactions
      */
-    public function displayTransaction($refresh = 0)
+    public function displayTransaction($refresh = 0, $token_ajax = null)
     {
-        $this->getSectionShape();
-        $orders = Db::getInstance()->ExecuteS('SELECT *	FROM '._DB_PREFIX_.'stripe_payment ORDER BY date_add DESC');
-        $tenta = array();
-        $html = '';
+        $token = Tools::getAdminTokenLite('AdminModules');
+        if ($token == $token_ajax || $refresh == 0) {
+            $this->getSectionShape();
+            $orders = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment ORDER BY date_add DESC');
+            $tenta = array();
+            $html = '';
 
-        foreach ($orders as $order) {
-            if ($order['result'] == 0) {
-                $result = 'n';
-            } elseif ($order['result'] == 1) {
-                $result = '';
-            } elseif ($order['result'] == 2) {
-                $result = 2;
-            } else {
-                $result = 3;
+            foreach ($orders as $order) {
+                if ($order['result'] == 0) {
+                    $result = 'n';
+                } elseif ($order['result'] == 1) {
+                    $result = '';
+                } elseif ($order['result'] == 2) {
+                    $result = 2;
+                } else {
+                    $result = 3;
+                }
+
+                $refund = Tools::safeOutput($order['amount']) - Tools::safeOutput($order['refund']);
+                array_push($tenta, array(
+                    'date' => Tools::safeOutput($order['date_add']),
+                    'last_digits' => Tools::safeOutput($order['last4']),
+                    'type' => Tools::strtolower($order['type']),
+                    'amount' => Tools::safeOutput($order['amount']),
+                    'currency' => Tools::safeOutput(Tools::strtoupper($order['currency'])),
+                    'refund' => $refund,
+                    'id_stripe' => Tools::safeOutput($order['id_stripe']),
+                    'name' => Tools::safeOutput($order['name']),
+                    'result' => $result
+                ));
             }
 
-            $refund = Tools::safeOutput($order['amount']) - Tools::safeOutput($order['refund']);
-            array_push($tenta, array(
-                'date' => Tools::safeOutput($order['date_add']),
-                'last_digits' => Tools::safeOutput($order['last4']),
-                'type' => Tools::strtolower($order['type']),
-                'amount' => Tools::safeOutput($order['amount']),
-                'currency' => Tools::safeOutput(Tools::strtoupper($order['currency'])),
-                'refund' => $refund,
-                'id_stripe' => Tools::safeOutput($order['id_stripe']),
-                'name' => Tools::safeOutput($order['name']),
-                'result' => $result
-            ));
+
+            $this->context->smarty->assign('tenta', $tenta);
+            $this->context->smarty->assign('refresh', $refresh);
+            $this->context->smarty->assign('path', Tools::getShopDomainSsl(true, true).$this->_path);
+
+            $html .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
+
+            return $html;
         }
 
-
-        $this->context->smarty->assign('tenta', $tenta);
-        $this->context->smarty->assign('refresh', $refresh);
-        $this->context->smarty->assign('path', $this->_path);
-
-        $html .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
-
-        return $html;
     }
 
     /*

@@ -84,12 +84,13 @@ $(document).ready(function() {
 	});
 
 	$('.process-icon-refresh').click(function(){
-		$.ajax({
-			url: validate + 'refresh.php',
-		}).done(function(response) {
-			$('.table').html(response);
-		});
-	});
+        $.ajax({
+            url: validate + 'refresh.php',
+            data: {'token' : token}
+        }).done(function(response) {
+            $('.table').html(response);
+        });
+    });
 
 
 });
