@@ -86,7 +86,8 @@ $(document).ready(function() {
 	$('.process-icon-refresh').click(function(){
         $.ajax({
             url: validate + 'refresh.php',
-            data: {'token' : token}
+            data: {'token_stripe' : token_stripe,
+            'id_employee' : id_employee}
         }).done(function(response) {
             $('.table').html(response);
         });

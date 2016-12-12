@@ -1021,10 +1021,17 @@ class Stripe_official extends PaymentModule
     /*
      ** Display All Stripe transactions
      */
-    public function displayTransaction($refresh = 0, $token_ajax = null)
+    public function displayTransaction($refresh = 0, $token_ajax = null, $id_employee = null)
     {
-        $token = Tools::getAdminTokenLite('AdminModules');
-        if ($token == $token_ajax || $refresh == 0) {
+
+        $token_module = '';
+        if ($token_ajax && $id_employee) {
+            $employee = new Employee($id_employee);
+            $this->context->employee = $employee;
+            $token_module = Tools::getAdminTokenLite('AdminModules', $this->context);
+        }
+
+        if ($token_module == $token_ajax || $refresh == 0) {
             $this->getSectionShape();
             $orders = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment ORDER BY date_add DESC');
             $tenta = array();
@@ -1058,6 +1065,8 @@ class Stripe_official extends PaymentModule
 
             $this->context->smarty->assign('tenta', $tenta);
             $this->context->smarty->assign('refresh', $refresh);
+            $this->context->smarty->assign('token_stripe', Tools::getAdminTokenLite('AdminModules'));
+            $this->context->smarty->assign('id_employee', $this->context->employee->id);
             $this->context->smarty->assign('path', Tools::getShopDomainSsl(true, true).$this->_path);
 
             $html .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');

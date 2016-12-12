@@ -25,7 +25,11 @@
 *}
 {if $refresh == 0}
 	<div class="col-lg-2" style="float:right"><a class="close refresh"><i class="process-icon-refresh" style="font-size:1em"></i></a></div>
-	<script>var validate = "{$path|escape:'htmlall':'UTF-8'}";</script>
+	<script>
+        var validate = "{$path|escape:'htmlall':'UTF-8'}";
+        var id_employee = "{$id_employee|escape:'htmlall':'UTF-8'}";
+        var token_stripe = "{$token_stripe|escape:'htmlall':'UTF-8'}";
+    </script>
 {/if}
 <table class="table">
 	<tr>
