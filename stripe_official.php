@@ -1211,7 +1211,11 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
-        $return_url = urlencode(str_replace('index.php', '', $_SERVER['SCRIPT_URI']).$this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        if (isset($_SERVER['SCRIPT_URI'])) {
+            $return_url = urlencode(str_replace('index.php', '', $_SERVER['SCRIPT_URI']).$this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        } else {
+            $return_url = urlencode($this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        }
         $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
     }

@@ -53,7 +53,7 @@
   <div class="col-md-10">
 	<div class="content-wrap panel">
 	  {foreach from=$tab_contents.contents key=tab_nbr item=content}
-		<section id="section-shape-{$tab_nbr + 1|intval}">{$content.value|escape:"entity":"UTF-8"}</section>
+		<section id="section-shape-{$tab_nbr + 1|intval}">{$content.value|escape:"UTF-8"}</section>
 		  <!--html code generated-->
 	  {/foreach}
 	</div>
