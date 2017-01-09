@@ -292,7 +292,7 @@ $(document).ready(function() {
                     err_msg = response.error.message;
                 $form.find('.stripe-payment-errors').text(err_msg).fadeIn(1000);
             } else {
-                if (secure_mode || response.card.three_d_secure.supported == "required") {
+                if (secure_mode || typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure.supported == "required") {
                     Stripe.threeDSecure.create({
                         card: response.id,
                         amount: amount_ttl,
