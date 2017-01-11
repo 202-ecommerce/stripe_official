@@ -1,3 +1,28 @@
+{*
+* 2007-2016 PrestaShop
+*
+
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*	@author PrestaShop SA <contact@prestashop.com>
+*	@copyright	2007-2016 PrestaShop SA
+*	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
+*	International Registered Trademark & Property of PrestaShop SA
+*}
 <div class="row">
   <div class="col-xs-12">
     <div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
@@ -17,7 +42,7 @@
         <input type="hidden" id="stripe-rate_limit" value="{l s='An error occurred due to requests hitting the API too quickly. Please let us know if you\'re consistently running into this error.' mod='stripe_official'}">
         <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}">
         <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}">
-        <div id="stripe-ajax-loader"><img src="{$module_dir}views/img/ajax-loader.gif" alt="" />; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+        <div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
         <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
         <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div>
         <a name="stripe_error" style="display:none"></a>

@@ -990,7 +990,6 @@ class Stripe_official extends PaymentModule
      */
     public function displayTransaction($refresh = 0, $token_ajax = null, $id_employee = null)
     {
-
         $token_module = '';
         if ($token_ajax && $id_employee) {
             $employee = new Employee($id_employee);
@@ -1341,11 +1340,12 @@ class Stripe_official extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
+        $payment_options = array();
         $embeddedOption = new PaymentOption();
         $embeddedOption->setCallToActionText($this->l('Pay Stripe'))
                        ->setForm($this->generateForm())
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'));
-        $payment_options[] = $embeddedOption;             
+        $payment_options[] = $embeddedOption;
         return $payment_options;
 
     }
