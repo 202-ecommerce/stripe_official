@@ -1,8 +1,20 @@
 div.payment_module { padding-bottom: 35px;     margin-bottom: 10px; text-transform: none; }
 .stripe_title img { float: none; margin-right: 8px; margin-top: -2px; vertical-align: middle; }
 #stripe-payment-form {    margin: 0 auto;}
-#stripe-payment-form label { display: inline-block; margin-bottom: 4px; font-size: 14px;}
+#stripe-payment-form label { display: inline-block !important; margin-bottom: 4px; font-size: 14px; font-weight: bold;}
 #stripe-payment-form label.lowercase { text-transform: none; }
+#stripe-payment-form label.required:before {
+	color: red;
+	content: "*";
+	font-size: 14px;
+	position: relative;
+	line-height: 12px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	/* display: block; */
+	float: initial;
+}
 #stripe-payment-form input[type="text"], #stripe-payment-form select {
 	border: #CCCCCC solid 1px; margin-bottom: 15px; padding: 3px;     box-sizing: border-box; font-size: 15px;
 }

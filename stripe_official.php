@@ -13,11 +13,13 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-require_once dirname(__FILE__).'/libraries/sdk/stripe/init.php';
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once dirname(__FILE__).'/libraries/sdk/stripe/init.php';
+
+use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 class Stripe_official extends PaymentModule
 {
@@ -69,11 +71,11 @@ class Stripe_official extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '1.2.1';
         $this->author = '202 ecommerce';
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
-        $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
         $this->display = 'view';
-
+        $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        $this->currencies = true;
         /* curl check */
         if (is_callable('curl_init') === false) {
             $this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
@@ -125,8 +127,17 @@ class Stripe_official extends PaymentModule
             return false;
         }
 
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            if (!$this->registerHook('paymentOptions')) {
+                return false;
+            }
+        } else {
+            if (!$this->registerHook('payment')) {
+                return false;
+            }
+        }
+
         return parent::install()
-            && $this->registerHook('payment')
             && $this->registerHook('header')
             && $this->registerHook('orderConfirmation')
             && $this->registerHook('adminOrder')
@@ -541,6 +552,7 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
+
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->errors[] = $this->l('A SSL certificate is required to process credit card payments using Stripe. Please consult the FAQ.');
@@ -708,16 +720,17 @@ class Stripe_official extends PaymentModule
                 'msg' => $e->getMessage(),
             )));
         }
+
         if ($charge->status == 'succeeded' && $charge->object == 'charge' && $charge->id) {
             /* The payment was approved */
             $message = 'Stripe Transaction ID: '.$charge->id;
-            try {
+
                 $paid = $this->isZeroDecimalCurrency($params['currency']) ? $params['amount'] : $params['amount'] / 100;
                 /* Add transaction on Prestashop back Office (Order) */
-                $this->validateOrder(
+                parent::validateOrder(
                     (int)$this->context->cart->id,
                     (int)Configuration::get('PS_OS_PAYMENT'),
-                    $paid,
+                    (float)$paid,
                     $this->l('Payment by Stripe'),
                     $message,
                     array(),
@@ -725,9 +738,7 @@ class Stripe_official extends PaymentModule
                     false,
                     $this->context->customer->secure_key
                 );
-            } catch (PrestaShopException $e) {
-                $this->_error[] = (string)$e->getMessage();
-            }
+
 
             /* Add transaction on database */
             $this->addTentative(
@@ -823,59 +834,15 @@ class Stripe_official extends PaymentModule
      */
     public function hookOrderConfirmation($params)
     {
-        $this->context->smarty->assign('stripe_order_reference', pSQL($params['objOrder']->reference));
-        if ($params['objOrder']->module == $this->name) {
+        $this->context->smarty->assign('stripe_order_reference', pSQL($params['order']->reference));
+        if ($params['order']->module == $this->name) {
             return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
         }
     }
 
-    public function hookHeader()
-    {
-      //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
-        $this->context->controller->addJs('https://js.stripe.com/v2/');
 
-    }
 
-    /*
-     ** Hook Stripe Payment
-     */
-    public function hookPayment()
-    {
-        if (Configuration::get('PS_SSL_ENABLED')) {
-            $ps_version15 = 0;
-            if (version_compare(_PS_VERSION_, '1.6', '<')) {
-                $ps_version15 = 1;
-            }
-            $amount = $this->context->cart->getOrderTotal();
-            $currency = $this->context->currency->iso_code;
-            $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
-            if (!$secure_mode_all && $amount >= 50) {
-                $secure_mode_all = 1;
-            }
 
-            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-
-            $this->context->smarty->assign(
-                array(
-                    'publishableKey' => $this->getPublishableKey(),
-                    'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                    'onePageCheckoutEnabled' => Configuration::get('PS_ORDER_PROCESS_TYPE'),
-                    'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency' => $currency,
-                    'amount_ttl' => $amount,
-                    'ps_version15' => $ps_version15,
-                    'baseDir' => __PS_BASE_URI__,
-                    'secure_mode' => $secure_mode_all,
-                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                )
-            );
-            $html = '';
-            $html .= $this->display(__FILE__, 'views/templates/hook/payment.tpl');
-
-            return $html;
-        }
-    }
 
     /*
      ** @Method: displaySecure
@@ -1211,8 +1178,8 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
-        if (isset($_SERVER['SCRIPT_URI'])) {
-            $return_url = urlencode(str_replace('index.php', '', $_SERVER['SCRIPT_URI']).$this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        if (isset($_SERVER['SCRIPT_URI']) && isset($_SERVER['QUERY_STRING'])) {
+            $return_url = urlencode($_SERVER['SCRIPT_URI'].'&'.$_SERVER['QUERY_STRING'].'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
         } else {
             $return_url = urlencode($this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
         }
@@ -1370,5 +1337,101 @@ class Stripe_official extends PaymentModule
         } else {
             return Configuration::get(self::_PS_STRIPE_.'publishable');
         }
+    }
+
+    public function hookPaymentOptions($params)
+    {
+        $embeddedOption = new PaymentOption();
+        $embeddedOption->setCallToActionText($this->l('Pay Stripe'))
+                       ->setForm($this->generateForm())
+                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'));
+        $payment_options[] = $embeddedOption;             
+        return $payment_options;
+
+    }
+
+    /*
+  ** Hook Stripe Payment
+  */
+    public function hookPayment()
+    {
+        if (Configuration::get('PS_SSL_ENABLED')) {
+
+            $ps_version15 = 0;
+            if (version_compare(_PS_VERSION_, '1.6', '<')) {
+                $ps_version15 = 1;
+            }
+            $amount = $this->context->cart->getOrderTotal();
+            $currency = $this->context->currency->iso_code;
+            $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
+            if (!$secure_mode_all && $amount >= 50) {
+                $secure_mode_all = 1;
+            }
+
+            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+
+            $this->context->smarty->assign(
+                array(
+                    'publishableKey' => $this->getPublishableKey(),
+                    'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                    'onePageCheckoutEnabled' => Configuration::get('PS_ORDER_PROCESS_TYPE'),
+                    'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                    'currency' => $currency,
+                    'amount_ttl' => $amount,
+                    'ps_version15' => $ps_version15,
+                    'baseDir' => __PS_BASE_URI__,
+                    'secure_mode' => $secure_mode_all,
+                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                )
+            );
+            $html = '';
+            $html .= $this->display(__FILE__, 'views/templates/hook/payment.tpl');
+
+            return $html;
+        }
+    }
+
+    public function hookHeader()
+    {
+
+        //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
+        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        $this->context->controller->addJs('https://js.stripe.com/v2/');
+
+    }
+
+    protected function generateForm()
+    {
+        if (Configuration::get('PS_SSL_ENABLED')) {
+            $ps_version17 = 0;
+            if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+                $ps_version17 = 1;
+            }
+            $amount = $this->context->cart->getOrderTotal();
+            $currency = $this->context->currency->iso_code;
+            $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
+            if (!$secure_mode_all && $amount >= 50) {
+                $secure_mode_all = 1;
+            }
+
+            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+
+            $this->context->smarty->assign(
+                array(
+                    'publishableKey' => $this->getPublishableKey(),
+                    'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                    'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                    'currency' => $currency,
+                    'amount_ttl' => $amount,
+                    'ps_version17' => $ps_version17,
+                    'ps_version15' => 0,
+                    'baseDir' => __PS_BASE_URI__,
+                    'secure_mode' => $secure_mode_all,
+                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                    'module_dir' => $this->_path,
+                )
+            );
+        }
+        return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
     }
 }
