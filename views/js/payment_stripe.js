@@ -246,8 +246,6 @@ $(document).ready(function() {
                         success: function(data) {
                             if (data.code == '1') {
                                 // Charge ok : redirect the customer to order confirmation page
-                                console.log('test charge');
-                                console.log(data);
                                 location.replace(data.url);
                             } else {
                                 //  Charge ko

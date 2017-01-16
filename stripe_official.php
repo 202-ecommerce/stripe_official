@@ -127,6 +127,21 @@ class Stripe_official extends PaymentModule
             return false;
         }
 
+        if (!parent::install()) {
+            return false;
+        }
+        if (!$this->registerHook('header')
+            || !$this->registerHook('orderConfirmation')
+            || !$this->registerHook('adminOrder')) {
+            return false;
+        }
+        if (!Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)) {
+            return false;
+        }
+        $this->createStripePayment();
+
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             if (!$this->registerHook('paymentOptions')) {
                 return false;
@@ -137,14 +152,7 @@ class Stripe_official extends PaymentModule
             }
         }
 
-        return parent::install()
-            && $this->registerHook('header')
-            && $this->registerHook('orderConfirmation')
-            && $this->registerHook('adminOrder')
-            && Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
-            && Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
-            && Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)
-            && $this->createStripePayment();
+        return true;
     }
 
     public function uninstall()
@@ -176,6 +184,7 @@ class Stripe_official extends PaymentModule
             `refund` varchar(255) NOT NULL,
             `currency` varchar(255) NOT NULL,
             `result` tinyint(4) NOT NULL,
+            `state` tinyint(4) NOT NULL,
             `date_add` datetime NOT NULL,
             PRIMARY KEY (`id_payment`),
            KEY `id_cart` (`id_cart`)
@@ -705,6 +714,7 @@ class Stripe_official extends PaymentModule
                 array(
                     "amount" => $params['amount'], // amount in cents, again
                     "currency" => $params['currency'],
+                    "description" => $this->context->customer->email,
                     "source" => $params['token'],
                     "shipping" => array("address" => array("city" => $address_delivery->city,
                         "country" => $this->context->country->iso_code, "line1" => $address_delivery->address1,
@@ -823,9 +833,9 @@ class Stripe_official extends PaymentModule
         /* Add request on Database */
         Db::getInstance()->Execute(
             'INSERT INTO '._DB_PREFIX_
-            .'stripe_payment (id_stripe, name, id_cart, type, amount, refund, currency, result, date_add)
+            .'stripe_payment (id_stripe, name, id_cart, type, amount, refund, currency, result, state, date_add)
             VALUES ("'.pSQL($id_stripe).'", "'.pSQL($name).'", \''.(int)$id_cart.'\', "'.pSQL(Tools::strtolower($type)).'", "'
-            .pSQL($amount).'", "'.pSQL($refund).'", "'.pSQL(Tools::strtolower($currency)).'", '.(int)$result.', NOW())'
+            .pSQL($amount).'", "'.pSQL($refund).'", "'.pSQL(Tools::strtolower($currency)).'", '.(int)$result.', '.(int)Configuration::get(self::_PS_STRIPE_.'mode').', NOW())'
         );
     }
 
@@ -912,7 +922,7 @@ class Stripe_official extends PaymentModule
             'input' => array(
                 array(
                     'type' => $type,
-                    'label' => $this->l('Test'),
+                    'label' => $this->l('Mode'),
                     'name' => self::_PS_STRIPE_.'mode',
                     'desc' => $this->l('You can manage your API keys from your ')
                     .' <a href="https://dashboard.stripe.com/account/apikeys" target="_blank">'.$this->l('account').'</a>',
@@ -1024,7 +1034,8 @@ class Stripe_official extends PaymentModule
                     'refund' => $refund,
                     'id_stripe' => Tools::safeOutput($order['id_stripe']),
                     'name' => Tools::safeOutput($order['name']),
-                    'result' => $result
+                    'result' => $result,
+                    'state' => Tools::safeOutput($order['state']) ? $this->l('Test') : $this->l('Live'),
                 ));
             }
 
