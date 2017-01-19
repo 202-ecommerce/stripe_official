@@ -40,6 +40,7 @@
 	   	<th>{l s='Amount Paid' mod='stripe_official'}</th>
 	   	<th>{l s='Balance' mod='stripe_official'}</th>
 	   	<th>{l s='Result' mod='stripe_official'}</th>
+		<th>{l s='State' mod='stripe_official'}</th>
 	</tr>
 	{foreach from=$tenta key=k item=v}
 	<tr>
@@ -56,6 +57,7 @@
 		{else}
 			<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/{$v.result|escape:'htmlall':'UTF-8'}ok.gif" alt="result" /></td>
 		{/if}
+		<td class="uppercase">{$v.state|escape:'htmlall':'UTF-8'}</td>
 	</tr>
 	{/foreach}
 </table>

@@ -67,7 +67,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.2.1';
+        $this->version = '1.2.2';
         $this->author = '202 ecommerce';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
@@ -165,6 +165,7 @@ class Stripe_official extends PaymentModule
             `refund` varchar(255) NOT NULL,
             `currency` varchar(255) NOT NULL,
             `result` tinyint(4) NOT NULL,
+            `state` tinyint(4) NOT NULL,
             `date_add` datetime NOT NULL,
             PRIMARY KEY (`id_payment`),
            KEY `id_cart` (`id_cart`)
@@ -741,6 +742,11 @@ class Stripe_official extends PaymentModule
                 (int)$this->context->cart->id
             );
             $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+            $ch = \Stripe\Charge::retrieve($charge->id);
+            $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
+            $ch->save();
+
             /* Ajax redirection Order Confirmation */
             die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
@@ -812,9 +818,9 @@ class Stripe_official extends PaymentModule
         /* Add request on Database */
         Db::getInstance()->Execute(
             'INSERT INTO '._DB_PREFIX_
-            .'stripe_payment (id_stripe, name, id_cart, type, amount, refund, currency, result, date_add)
+            .'stripe_payment (id_stripe, name, id_cart, type, amount, refund, currency, result, state, date_add)
             VALUES ("'.pSQL($id_stripe).'", "'.pSQL($name).'", \''.(int)$id_cart.'\', "'.pSQL(Tools::strtolower($type)).'", "'
-            .pSQL($amount).'", "'.pSQL($refund).'", "'.pSQL(Tools::strtolower($currency)).'", '.(int)$result.', NOW())'
+            .pSQL($amount).'", "'.pSQL($refund).'", "'.pSQL(Tools::strtolower($currency)).'", '.(int)$result.', '.(int)Configuration::get(self::_PS_STRIPE_.'mode').', NOW())'
         );
     }
 
@@ -855,6 +861,15 @@ class Stripe_official extends PaymentModule
             }
 
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+            $address_delivery = new Address($this->context->cart->id_address_delivery);
+
+            $billing_address = array(
+                'line1' => $address_delivery->address1,
+                'line2' => $address_delivery->address2,
+                'city' => $address_delivery->city,
+                'zip_code' => $address_delivery->postcode,
+                'country' => $address_delivery->country,
+            );
 
             $this->context->smarty->assign(
                 array(
@@ -868,6 +883,7 @@ class Stripe_official extends PaymentModule
                     'baseDir' => __PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
                     'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                    'billing_address' => Tools::jsonEncode($billing_address),
                 )
             );
             $html = '';
@@ -945,7 +961,7 @@ class Stripe_official extends PaymentModule
             'input' => array(
                 array(
                     'type' => $type,
-                    'label' => $this->l('Test'),
+                    'label' => $this->l('Mode'),
                     'name' => self::_PS_STRIPE_.'mode',
                     'desc' => $this->l('You can manage your API keys from your ')
                     .' <a href="https://dashboard.stripe.com/account/apikeys" target="_blank">'.$this->l('account').'</a>',
@@ -1058,7 +1074,8 @@ class Stripe_official extends PaymentModule
                     'refund' => $refund,
                     'id_stripe' => Tools::safeOutput($order['id_stripe']),
                     'name' => Tools::safeOutput($order['name']),
-                    'result' => $result
+                    'result' => $result,
+                    'state' => Tools::safeOutput($order['state']) ? $this->l('Test') : $this->l('Live'),
                 ));
             }
 
@@ -1211,8 +1228,8 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
-        if (isset($_SERVER['SCRIPT_URI'])) {
-            $return_url = urlencode(str_replace('index.php', '', $_SERVER['SCRIPT_URI']).$this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        if (isset($_SERVER['SCRIPT_URI']) && isset($_SERVER['QUERY_STRING'])) {
+            $return_url = urlencode($_SERVER['SCRIPT_URI'].'&'.$_SERVER['QUERY_STRING'].'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
         } else {
             $return_url = urlencode($this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
         }

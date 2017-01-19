@@ -128,6 +128,7 @@ var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
 if (ps_version) {
     var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
 }
+var billing_address = {$billing_address nofilter};
 {literal}
 function lookupCardType(number)
 {
@@ -277,7 +278,12 @@ $(document).ready(function() {
             cvc: $('.stripe-card-cvc').val(),
             exp_month: exp_month_calc,
             exp_year: exp_year_calc,
-            name: $('.stripe-name').val()
+            name: $('.stripe-name').val(),
+            address_line1: billing_address.line1,
+            address_line2: billing_address.line2,
+            address_city: billing_address.city,
+            address_zip: billing_address.zip_code,
+            address_country: billing_address.country
         }, function (status, response) {
             var $form = $('#stripe-payment-form');
 
@@ -299,7 +305,7 @@ $(document).ready(function() {
                         currency: currency,
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
-                            $('#modal_stripe').modal({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
+                            $('#modal_stripe').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
                             Stripe.threeDSecure.createIframe(response.redirect_url, result_3d, callbackFunction3D);
                             $('#result_3d iframe').css({
                                 height: '400px',
@@ -322,7 +328,7 @@ $(document).ready(function() {
                         //return false; exit;
                     });
                     function callbackFunction3D(result) {
-                        $('#modal_stripe').modal().close();
+                        $('#modal_stripe').modalStripe().close();
                         if (result.status == "succeeded") {
                             // Send the token back to the server so that it can charge the card
                             createCharge(result);
