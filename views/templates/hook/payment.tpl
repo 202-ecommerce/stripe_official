@@ -23,7 +23,7 @@
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="row">
+<div class="row stripe-payment">
   <div class="col-xs-12">
     <div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
       <input type="hidden" id="stripe-incorrect_number" value="{l s='The card number is incorrect.' mod='stripe_official'}">
@@ -76,23 +76,18 @@
 </div>
 <div id="modal_stripe"  class="modal" style="display: none">
   <div id="result_3d"> </div></div>
-{if isset($ps_version17)}
   <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
   <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/front.css" type="text/css" media="all">
-{/if}
 <script type="text/javascript" async defer src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/payment_stripe.js"></script>
 <script type="text/javascript" async defer src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.the-modal.js"></script>
 <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
   var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
-  var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
-  var ps_version17 = {$ps_version17|escape:'htmlall':'UTF-8'};
   var currency = "{$currency|escape:'htmlall':'UTF-8'}";
   var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
   var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
-  if (ps_version || ps_version17) {
-    var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
-  }
+  var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
+  var billing_address = {$billing_address|escape nofilter};
 
   {literal}
 

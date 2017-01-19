@@ -53,6 +53,8 @@ function cc_format(value) {
 
 $(document).ready(function() {
 
+    $('.stripe-payment').parent().prev().find('input[name=payment-option]').addClass('stripe-official');
+
     //Put our input DOM element into a jQuery Object
     var jqDate = document.getElementById('card_expiry');
 
@@ -101,13 +103,6 @@ $(document).ready(function() {
             card_logo.className = "img-card";
             $(card_logo).insertAfter('.stripe-card-number');
             $('#img-'+cardType).css({'margin-left': '-34px'});
-            if (ps_version) {
-                $('#img-'+cardType).css({
-                    float: 'none',
-                    'margin-bottom': '-5px'
-                });
-            }
-
         } else {
             if ($('.img-card').length > 0) {
                 $('.img-card').remove();
@@ -125,10 +120,12 @@ $(document).ready(function() {
 
 
     $('#payment-confirmation button').click(function (event) {
-        $('#stripe-payment-form').submit();
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
+        if ($('input[name=payment-option]:checked').hasClass('stripe-official')) {
+            $('#stripe-payment-form').submit();
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
     });
 
 
@@ -168,7 +165,12 @@ $(document).ready(function() {
             cvc: $('.stripe-card-cvc').val(),
             exp_month: exp_month_calc,
             exp_year: exp_year_calc,
-            name: $('.stripe-name').val()
+            name: $('.stripe-name').val(),
+            address_line1: billing_address.line1,
+            address_line2: billing_address.line2,
+            address_city: billing_address.city,
+            address_zip: billing_address.zip_code,
+            address_country: billing_address.country
         }, function (status, response) {
             var $form = $('#stripe-payment-form');
 
@@ -190,7 +192,7 @@ $(document).ready(function() {
                         currency: currency,
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
-                            $('#modal_stripe').modal({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
+                            $('#modal_stripe').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
                             Stripe.threeDSecure.createIframe(response.redirect_url, result_3d, callbackFunction3D);
                             $('#result_3d iframe').css({
                                 height: '400px',
@@ -214,7 +216,7 @@ $(document).ready(function() {
                         //return false; exit;
                     });
                     function callbackFunction3D(result) {
-                        $('#modal_stripe').modal().close();
+                        $('#modal_stripe').modalStripe().close();
                         if (result.status == "succeeded") {
                             // Send the token back to the server so that it can charge the card
                             createCharge(result);

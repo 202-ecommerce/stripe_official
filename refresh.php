@@ -13,11 +13,6 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-if (version_compare(_PS_VERSION_, '1.7', '<')) {
-    global $useSSL;
-    $useSSL = true;
-}
-
 if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
     || !file_exists(dirname(__FILE__).'/../../init.php')
 ) {

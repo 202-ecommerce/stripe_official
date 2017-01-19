@@ -74,7 +74,7 @@ class Stripe_official extends PaymentModule
         $this->bootstrap = true;
         $this->display = 'view';
         $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->currencies = true;
         /* curl check */
         if (is_callable('curl_init') === false) {
@@ -117,21 +117,13 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::_PS_STRIPE_.'partial_refund_state', $order_state->id);
         }
 
-        /* Check PHP version for namespace */
-        if (version_compare(phpversion(), '5.3.0', '<')) {
-            // php version isn't high enough
-            $this->_errors[] = $this->l(
-                'You\'re php version isn\'t high enough to use '. $this->meta_title.
-                ' ,please contact your hosting provider to upgrade it'
-            );
-            return false;
-        }
 
         if (!parent::install()) {
             return false;
         }
         if (!$this->registerHook('header')
             || !$this->registerHook('orderConfirmation')
+            || !$this->registerHook('paymentOptions')
             || !$this->registerHook('adminOrder')) {
             return false;
         }
@@ -141,16 +133,6 @@ class Stripe_official extends PaymentModule
             return false;
         }
         $this->createStripePayment();
-
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            if (!$this->registerHook('paymentOptions')) {
-                return false;
-            }
-        } else {
-            if (!$this->registerHook('payment')) {
-                return false;
-            }
-        }
 
         return true;
     }
@@ -417,20 +399,13 @@ class Stripe_official extends PaymentModule
         );
 
 
-
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
         $this->context->smarty->assign('new_base_dir', $this->_path);
         $this->context->controller->addJs($this->_path.'/views/js/faq.js');
         $this->context->controller->addCss($this->_path.'/views/css/started.css');
         $this->context->controller->addCss($this->_path.'/views/css/tabs.css');
-
-        if (version_compare(_PS_VERSION_, '1.6', '<')) {
-            $this->context->controller->addJs($this->_path.'/views/js/back_1.5.js');
-            $this->loadAssetCompatibility();
-        } else {
-            $this->context->controller->addJs($this->_path.'/views/js/back.js');
-        }
+        $this->context->controller->addJs($this->_path.'/views/js/back.js');
 
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
     }
@@ -714,7 +689,6 @@ class Stripe_official extends PaymentModule
                 array(
                     "amount" => $params['amount'], // amount in cents, again
                     "currency" => $params['currency'],
-                    "description" => $this->context->customer->email,
                     "source" => $params['token'],
                     "shipping" => array("address" => array("city" => $address_delivery->city,
                         "country" => $this->context->country->iso_code, "line1" => $address_delivery->address1,
@@ -762,6 +736,11 @@ class Stripe_official extends PaymentModule
                 (int)$this->context->cart->id
             );
             $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+            $ch = \Stripe\Charge::retrieve($charge->id);
+            $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
+            $ch->save();
+
             /* Ajax redirection Order Confirmation */
             die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
@@ -911,10 +890,6 @@ class Stripe_official extends PaymentModule
         $fields_value = array();
         $type = 'switch';
 
-        if (version_compare(_PS_VERSION_, '1.6', '<')) {
-            $type = 'radio';
-        }
-
         $fields_form[0]['form'] = array(
             'legend' => array(
                 'title' => $this->l('Stripe log in'),
@@ -931,12 +906,12 @@ class Stripe_official extends PaymentModule
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->l('Test'),
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->l('Live'),
                             )
                         ),
                     ),
@@ -1361,46 +1336,6 @@ class Stripe_official extends PaymentModule
 
     }
 
-    /*
-  ** Hook Stripe Payment
-  */
-    public function hookPayment()
-    {
-        if (Configuration::get('PS_SSL_ENABLED')) {
-
-            $ps_version15 = 0;
-            if (version_compare(_PS_VERSION_, '1.6', '<')) {
-                $ps_version15 = 1;
-            }
-            $amount = $this->context->cart->getOrderTotal();
-            $currency = $this->context->currency->iso_code;
-            $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
-            if (!$secure_mode_all && $amount >= 50) {
-                $secure_mode_all = 1;
-            }
-
-            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-
-            $this->context->smarty->assign(
-                array(
-                    'publishableKey' => $this->getPublishableKey(),
-                    'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                    'onePageCheckoutEnabled' => Configuration::get('PS_ORDER_PROCESS_TYPE'),
-                    'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency' => $currency,
-                    'amount_ttl' => $amount,
-                    'ps_version15' => $ps_version15,
-                    'baseDir' => __PS_BASE_URI__,
-                    'secure_mode' => $secure_mode_all,
-                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                )
-            );
-            $html = '';
-            $html .= $this->display(__FILE__, 'views/templates/hook/payment.tpl');
-
-            return $html;
-        }
-    }
 
     public function hookHeader()
     {
@@ -1414,10 +1349,7 @@ class Stripe_official extends PaymentModule
     protected function generateForm()
     {
         if (Configuration::get('PS_SSL_ENABLED')) {
-            $ps_version17 = 0;
-            if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-                $ps_version17 = 1;
-            }
+
             $amount = $this->context->cart->getOrderTotal();
             $currency = $this->context->currency->iso_code;
             $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
@@ -1426,6 +1358,15 @@ class Stripe_official extends PaymentModule
             }
 
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+            $address_delivery = new Address($this->context->cart->id_address_delivery);
+
+            $billing_address = array(
+                'line1' => $address_delivery->address1,
+                'line2' => $address_delivery->address2,
+                'city' => $address_delivery->city,
+                'zip_code' => $address_delivery->postcode,
+                'country' => $address_delivery->country,
+            );
 
             $this->context->smarty->assign(
                 array(
@@ -1434,12 +1375,11 @@ class Stripe_official extends PaymentModule
                     'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
                     'currency' => $currency,
                     'amount_ttl' => $amount,
-                    'ps_version17' => $ps_version17,
-                    'ps_version15' => 0,
                     'baseDir' => __PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
                     'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'module_dir' => $this->_path,
+                    'billing_address' => Tools::jsonEncode($billing_address),
                 )
             );
         }

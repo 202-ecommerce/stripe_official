@@ -155,7 +155,7 @@
 
                 // close modal if opened
                 if($('.'+localOptions.overlayClass).length) {
-                    $.modal().close();
+                    $.modalStripe().close();
                 }
 
                 var overlay = $('<div/>').addClass(localOptions.overlayClass).prependTo('body');
@@ -177,7 +177,7 @@
                 if(localOptions.closeOnEsc) {
                     $(document).bind('keyup.'+pluginNamespace, function(e){
                         if(e.keyCode === 27) {
-                            $.modal().close(localOptions);
+                            $.modalStripe().close(localOptions);
                         }
                     });
                 }
@@ -185,7 +185,7 @@
                 if(localOptions.closeOnOverlayClick) {
                     $('.' + localOptions.overlayClass).on('click.' + pluginNamespace, function(e){
                         if (e.target.className == localOptions.overlayClass){
-                            $.modal().close(localOptions);
+                            $.modalStripe().close(localOptions);
                         }
                     });
                 }
@@ -255,11 +255,11 @@
         };
     }
 
-    $.modal = function(options){
+    $.modalStripe = function(options){
         return init($(), options);
     };
 
-    $.fn.modal = function(options) {
+    $.fn.modalStripe = function(options) {
         return init(this, options);
     };
 
