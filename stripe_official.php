@@ -1163,10 +1163,14 @@ class Stripe_official extends PaymentModule
     public function displaySomething()
     {
         $this->getSectionShape();
-        if (isset($_SERVER['SCRIPT_URI']) && isset($_SERVER['QUERY_STRING'])) {
-            $return_url = urlencode($_SERVER['SCRIPT_URI'].'&'.$_SERVER['QUERY_STRING'].'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+        $return_url = '';
+        if (Configuration::get('PS_SSL_ENABLED')) {
+            $domain = Tools::getShopDomainSsl(true);
         } else {
-            $return_url = urlencode($this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#stripe_step_2');
+            $domain = Tools::getShopDomain(true);
+        }
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $return_url = urlencode($domain.$_SERVER['REQUEST_URI'].'#stripe_step_2');
         }
         $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
