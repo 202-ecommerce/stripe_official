@@ -695,6 +695,7 @@ class Stripe_official extends PaymentModule
                     "amount" => $params['amount'], // amount in cents, again
                     "currency" => $params['currency'],
                     "source" => $params['token'],
+                    "description" => $this->context->customer->email,
                     "shipping" => array("address" => array("city" => $address_delivery->city,
                         "country" => $this->context->country->iso_code, "line1" => $address_delivery->address1,
                         "line2" => $address_delivery->address2, "postal_code" => $address_delivery->postcode,
