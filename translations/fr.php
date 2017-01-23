@@ -47,6 +47,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_c985a711556e2edf5cac28dfb
 $_MODULE['<{stripe_official}prestashop>stripe_official_b2f40690858b404ed10e62bdf422c704'] = 'Montant';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f3b5fc873bba0e14e0d8d9851408b2a3'] = 'Veuillez renseigner le montant que vous souhaitez rembourser';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f87db45e2887d485ca31ffae186faae9'] = 'Demander un remboursement';
+$_MODULE['<{stripe_official}prestashop>stripe_official_84c81d9eaa6fb0cb63ca3d412884f2c7'] = 'Payer avec Stripe';
 $_MODULE['<{stripe_official}prestashop>contact_52b2d0df08dfa9115a4cb2469ed3bf21'] = 'Merci d\'avoir choisi Stripe.';
 $_MODULE['<{stripe_official}prestashop>contact_e55eea1044f937876a5415173032c31f'] = 'Si vous avez la moindre question au sujet de Stripe ou de ce module, nous vous invitons à :';
 $_MODULE['<{stripe_official}prestashop>contact_f6e21368460de645de03624e7a148025'] = 'Consulter notre site web :';
