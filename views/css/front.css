@@ -95,6 +95,7 @@ a#stripe_error { display: none; }
 #stripe-replace-card, #stripe-delete-card { border: none; padding: 0; cursor: pointer; }
 #stripe-payment-form {
 	width: 228px;
+	margin-top:15px;
 }
 #stripe-payment-form .stripe-name, #stripe-payment-form .stripe-card-number, #stripe-payment-form .stripe-submit-button {
 	width: 210px;
