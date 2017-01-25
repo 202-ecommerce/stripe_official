@@ -34,6 +34,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_9e1b86f849fb4e07ee7070250
 $_MODULE['<{stripe_official}prestashop>stripe_official_c8aaea74fa5aa61678196755c8ce0be1'] = 'Als de module in testmodus loopt, kunt u op één van de Creditcard logo\'s klikken (VISA, MasterCard, enz.)';
 $_MODULE['<{stripe_official}prestashop>stripe_official_9f4c40c079049be218aed14ad373a294'] = 'op de betaalpagina, om een proef-creditcardnummer te genereren en tests uit te voeren.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_c9cc8cce247e49bae79f15173ce97354'] = 'Opslaan';
+$_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Mit Karte bezahlen';
 $_MODULE['<{stripe_official}prestashop>stripe_official_2b660da0c521cc6bc51a188bc9f7d084'] = 'Kies een bestelling die u wilt terugbetalen';
 $_MODULE['<{stripe_official}prestashop>stripe_official_24e85d1e652b3681994e9cae2cc1f35a'] = 'Betaal-ID Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_da7f0502c71be869d7faf804434c7b81'] = 'Om een terugbetaling uit te voeren, de ID van de bestelling hieronder invullen.  U vindt de ID op de pagina \'Transacties\'.';
