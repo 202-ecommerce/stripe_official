@@ -36,6 +36,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_2b660da0c521cc6bc51a188bc
 $_MODULE['<{stripe_official}prestashop>stripe_official_24e85d1e652b3681994e9cae2cc1f35a'] = 'Stripe Zahlungs-ID';
 $_MODULE['<{stripe_official}prestashop>stripe_official_c985a711556e2edf5cac28dfbdb43ff0'] = 'Teilrückerstattung';
 $_MODULE['<{stripe_official}prestashop>stripe_official_b2f40690858b404ed10e62bdf422c704'] = 'Wert';
+$_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Mit Karte bezahlen';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f3b5fc873bba0e14e0d8d9851408b2a3'] = 'Bitte geben Sie den Wert ein, den Sie zurückerstatten möchten ';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f87db45e2887d485ca31ffae186faae9'] = 'Rückerstattung beantragen';
 $_MODULE['<{stripe_official}prestashop>contact_7b3c61e9446620d8aa80f473a661254f'] = 'Um keine Zeit zu verlieren, tun Sie bitte Folgendes, bevor Sie uns kontaktieren:';

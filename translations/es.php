@@ -47,6 +47,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_c985a711556e2edf5cac28dfb
 $_MODULE['<{stripe_official}prestashop>stripe_official_b2f40690858b404ed10e62bdf422c704'] = 'Importe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f3b5fc873bba0e14e0d8d9851408b2a3'] = 'Por favor, introduce el importe que deseas reembolsar';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f87db45e2887d485ca31ffae186faae9'] = 'Solicita un reembolso';
+$_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Paga con tarjeta';
 $_MODULE['<{stripe_official}prestashop>contact_52b2d0df08dfa9115a4cb2469ed3bf21'] = 'Gracias por elegir Stripe.';
 $_MODULE['<{stripe_official}prestashop>contact_e55eea1044f937876a5415173032c31f'] = 'Si tienes alguna pregunta relacionada con Stripe y este plugin: ';
 $_MODULE['<{stripe_official}prestashop>contact_f6e21368460de645de03624e7a148025'] = 'Dirígete a nuestra página de soporte: ';
