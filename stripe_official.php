@@ -1333,8 +1333,9 @@ class Stripe_official extends PaymentModule
     {
         $payment_options = array();
         $embeddedOption = new PaymentOption();
-        $embeddedOption->setCallToActionText($this->l('Pay by Stripe'))
-                       ->setForm($this->generateForm());
+        $embeddedOption->setCallToActionText($this->l('Pay by card'))
+                       ->setForm($this->generateForm())
+                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo-payment.png'));
         $payment_options[] = $embeddedOption;
         return $payment_options;
     }
