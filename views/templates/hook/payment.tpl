@@ -51,7 +51,7 @@
           <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
         </div>
         <div>
-          <label>{l s='Card Number' mod='stripe_official'}</label>  <label class="required"> </label><br />
+          <label>{l s='Card Number ' mod='stripe_official'}</label>  <label class="required"> </label><br />
           <input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
         </div>
         <div class="block-left">
