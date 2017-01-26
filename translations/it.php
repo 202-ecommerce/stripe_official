@@ -29,6 +29,9 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_c73d1f3012568e027aa5492f0
 $_MODULE['<{stripe_official}prestashop>stripe_official_8021e9b84a99aa7c9b01b1ba5197392d'] = 'Richiedere l\'autenticazione 3D Secure solo sui pagamenti superiori a 50 EUR/USD/GBP';
 $_MODULE['<{stripe_official}prestashop>stripe_official_c9cc8cce247e49bae79f15173ce97354'] = 'Salvare';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d43ffab03011327dd0d4de14611446a1'] = 'Connessione Stripe';
+$_MODULE['<{stripe_official}prestashop>stripe_official_650be61892bf690026089544abbd9d26'] = 'Modalità';
+$_MODULE['<{stripe_official}prestashop>stripe_official_0cbc6611f5540bd0809a388dc95a615b'] = 'Test';
+$_MODULE['<{stripe_official}prestashop>stripe_official_955ad3298db330b5ee880c2c9e6f23a0'] = 'Live';
 $_MODULE['<{stripe_official}prestashop>stripe_official_e6b4e6bc91b34f5f320be5123da415cf'] = 'Chiave segreta Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_541d39980f5838cf6a50c07e4e5c45c9'] = 'Chiave pubblicabile Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_f3b6fcb05309d03b971b4ce615b3fb10'] = 'Chiave segreta di prova Stripe';
@@ -79,6 +82,8 @@ $_MODULE['<{stripe_official}prestashop>faq_f01890d94e891fea9814d9cb72af63c7'] = 
 $_MODULE['<{stripe_official}prestashop>faq_87b7c1b45682b2c2a4da2cafd5843bcb'] = 'Come posso effettuare dei pagamenti di prova sul mio sito usando il gateway di pagamento Stripe?';
 $_MODULE['<{stripe_official}prestashop>faq_d1cf1324509da874c3d15690b311e34c'] = 'Quando è attiva la modalità di prova, puoi cliccare sul pulsante di qualsiasi carta di credito (loghi di VISA, MasterCard, etc.) nella';
 $_MODULE['<{stripe_official}prestashop>faq_66d42b84b51bfae54f89dbabc536ee00'] = 'pagina di pagamento per generare un numero di carta di credito da usare nei test.';
+$_MODULE['<{stripe_official}prestashop>main_098f6bcd4621d373cade4e832627b4f6'] = 'Test';
+$_MODULE['<{stripe_official}prestashop>main_d0dbe915091d400bd8ee7f27f0791303'] = 'Live';
 $_MODULE['<{stripe_official}prestashop>main_bdabcc28e4169448fcc782ca756bea4c'] = 'Ora che hai creato il tuo account Stripe, è necessario inserire qui sotto le chiavi API sia in modalità test che live.';
 $_MODULE['<{stripe_official}prestashop>main_41c8072350d4faf9302b322198f49839'] = 'Puoi trovare e gestire queste chiavi API nel tuo';
 $_MODULE['<{stripe_official}prestashop>main_dc7161be3dbf2250c8954e560cc35060'] = 'dashboard Stripe';
@@ -118,6 +123,7 @@ $_MODULE['<{stripe_official}prestashop>transaction_5735196b42849ae4fe6adac3ae14c
 $_MODULE['<{stripe_official}prestashop>transaction_388fd2767ba1fd2296f536425d106de3'] = 'Importo pagato';
 $_MODULE['<{stripe_official}prestashop>transaction_99a808d8d16122d70e44bd7f709d30fb'] = 'Resto da pagare';
 $_MODULE['<{stripe_official}prestashop>transaction_8eea62084ca7e541d918e823422bd82e'] = 'Risultato';
+$_MODULE['<{stripe_official}prestashop>transaction_650be61892bf690026089544abbd9d26'] = 'Modalità';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_3380b659ba0a8b01af98dbe7494c0706'] = 'Congratulazioni, l\'ordine è stato completato e verrà elaborato al più presto';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_9e36368a8a4c53d31f327850c8bcdbe5'] = 'Il riferimento dell\'ordine è';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_47e22e4e4e37b6346412aae1d89c103c'] = ', riceverai presto un\'e-mail di conferma.';
