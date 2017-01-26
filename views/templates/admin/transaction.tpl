@@ -40,7 +40,7 @@
 	   	<th>{l s='Amount Paid' mod='stripe_official'}</th>
 	   	<th>{l s='Balance' mod='stripe_official'}</th>
 	   	<th>{l s='Result' mod='stripe_official'}</th>
-		<th>{l s='State' mod='stripe_official'}</th>
+		<th>{l s='Mode' mod='stripe_official'}</th>
 	</tr>
 	{foreach from=$tenta key=k item=v}
 	<tr>

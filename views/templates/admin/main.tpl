@@ -64,7 +64,8 @@
 	var stripe_test_mode = "{l s='test' mod='stripe_official'}";
 	var live = "{l s='live' mod='stripe_official'}";
 	var conf_mode_description1 = "{l s='Now that you have created your Stripe account, you have to enter below your API keys in both test and live mode.' mod='stripe_official'}";
-	var conf_mode_description2 = "{l s='These API keys can be found and managed from your Stripe account' mod='stripe_official'}";
+	var conf_mode_description2 = "{l s='These API keys can be found and managed from your Stripe' mod='stripe_official'}";
+    var conf_mode_description3 = "{l s='dashboard' mod='stripe_official'}";
 	var Translation = [];
 	Translation[0] = "{l s='3D-Secure (Verified by VISA, MasterCard SecureCode™) is a system that is used to verify a customer’s identity before an online purchase can be completed, so that merchants can reduce fraud.' mod='stripe_official'}";
 	Translation[1] = "{l s='With 3D-Secure, customers are redirected to a page provided by their bank, where they are prompted to enter an additional password before their card can be charged.' mod='stripe_official'}";
