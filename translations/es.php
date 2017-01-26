@@ -83,6 +83,8 @@ $_MODULE['<{stripe_official}prestashop>faq_f01890d94e891fea9814d9cb72af63c7'] = 
 $_MODULE['<{stripe_official}prestashop>faq_87b7c1b45682b2c2a4da2cafd5843bcb'] = '¿Cómo puedo hacer pagos de prueba en mi tienda mediante la pasarela de pagos Stripe?';
 $_MODULE['<{stripe_official}prestashop>faq_d1cf1324509da874c3d15690b311e34c'] = 'Cuando el módulo está en el modo Test, puedes hacer clic en el botón de cualquier tarjeta de crédito (logos de VISA, MasterCard, etc.) de la';
 $_MODULE['<{stripe_official}prestashop>faq_66d42b84b51bfae54f89dbabc536ee00'] = 'página de pago para generar un número de tarjeta de crédito de muestra con fines de prueba.';
+$_MODULE['<{stripe_official}prestashop>main_098f6bcd4621d373cade4e832627b4f6'] = 'Test';
+$_MODULE['<{stripe_official}prestashop>main_d0dbe915091d400bd8ee7f27f0791303'] = 'Live';
 $_MODULE['<{stripe_official}prestashop>main_9772536a89afaad6ebb31ff63a617f81'] = '3D Secure (Verified by Visa, MasterCard SecureCode) es un sistema que sirve para verificar la identidad de un cliente antes de que pueda completar la compra, para ayudar a los vendedores a reducir el fraude.';
 $_MODULE['<{stripe_official}prestashop>main_c7b219645f1fc0db5623237c149c6e2b'] = 'Con 3D Secure, los clientes son redireccionados a la página segura de su banco, donde se les pedirá una contraseña adicional para autorizar la compra. ';
 $_MODULE['<{stripe_official}prestashop>main_1bb1625040ded5523a6234287b0c48f3'] = 'Puedes descubrir más sobre 3D Secure en nuestra página web: ';
@@ -122,6 +124,7 @@ $_MODULE['<{stripe_official}prestashop>transaction_5735196b42849ae4fe6adac3ae14c
 $_MODULE['<{stripe_official}prestashop>transaction_388fd2767ba1fd2296f536425d106de3'] = 'Importe pagado';
 $_MODULE['<{stripe_official}prestashop>transaction_99a808d8d16122d70e44bd7f709d30fb'] = 'Importe pendiente de pago';
 $_MODULE['<{stripe_official}prestashop>transaction_8eea62084ca7e541d918e823422bd82e'] = 'Resultado';
+$_MODULE['<{stripe_official}prestashop>transaction_650be61892bf690026089544abbd9d26'] = 'Modo';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_3380b659ba0a8b01af98dbe7494c0706'] = 'Enhorabuena, tu pedido se ha completado y será procesado en breve.';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_9e36368a8a4c53d31f327850c8bcdbe5'] = 'La referencia de tu pedido es';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_47e22e4e4e37b6346412aae1d89c103c'] = ',en breve recibirás un correo electrónico de confirmación.';

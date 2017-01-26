@@ -30,6 +30,9 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_8021e9b84a99aa7c9b01b1ba5
 $_MODULE['<{stripe_official}prestashop>stripe_official_c9cc8cce247e49bae79f15173ce97354'] = 'Salvare';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d43ffab03011327dd0d4de14611446a1'] = 'Connessione Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_9e543c36303b7ea64edefe0cbdab0f2e'] = 'Puoi gestire le chiavi API dal tuo';
+$_MODULE['<{stripe_official}prestashop>stripe_official_650be61892bf690026089544abbd9d26'] = 'Modalità';
+$_MODULE['<{stripe_official}prestashop>stripe_official_0cbc6611f5540bd0809a388dc95a615b'] = 'Test';
+$_MODULE['<{stripe_official}prestashop>stripe_official_955ad3298db330b5ee880c2c9e6f23a0'] = 'Live';
 $_MODULE['<{stripe_official}prestashop>stripe_official_e268443e43d93dab7ebef303bbe9642f'] = 'account';
 $_MODULE['<{stripe_official}prestashop>stripe_official_e6b4e6bc91b34f5f320be5123da415cf'] = 'Chiave segreta Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_541d39980f5838cf6a50c07e4e5c45c9'] = 'Chiave pubblicabile Stripe';
@@ -80,6 +83,8 @@ $_MODULE['<{stripe_official}prestashop>faq_f01890d94e891fea9814d9cb72af63c7'] = 
 $_MODULE['<{stripe_official}prestashop>faq_87b7c1b45682b2c2a4da2cafd5843bcb'] = 'Come posso effettuare dei pagamenti di prova sul mio sito usando il gateway di pagamento Stripe?';
 $_MODULE['<{stripe_official}prestashop>faq_d1cf1324509da874c3d15690b311e34c'] = 'Quando è attiva la modalità di prova, puoi cliccare sul pulsante di qualsiasi carta di credito (loghi di VISA, MasterCard, etc.) nella';
 $_MODULE['<{stripe_official}prestashop>faq_66d42b84b51bfae54f89dbabc536ee00'] = 'pagina di pagamento per generare un numero di carta di credito da usare nei test.';
+$_MODULE['<{stripe_official}prestashop>main_098f6bcd4621d373cade4e832627b4f6'] = 'Test';
+$_MODULE['<{stripe_official}prestashop>main_d0dbe915091d400bd8ee7f27f0791303'] = 'Live';
 $_MODULE['<{stripe_official}prestashop>main_9772536a89afaad6ebb31ff63a617f81'] = '3D Secure (Verified by VISA, MasterCard SecureCode ™) è un sistema utilizzato per verificare l\'identità del cliente prima di finalizzare l\'acquisto online, e che aiuta i commercianti a ridurre le frodi online.';
 $_MODULE['<{stripe_official}prestashop>main_c7b219645f1fc0db5623237c149c6e2b'] = 'Con 3D Secure, i clienti vengono reindirizzati su una pagina della loro banca, sulla quale viene richiesto di inserire una password supplementare prima di convalidare il pagamento.';
 $_MODULE['<{stripe_official}prestashop>main_1bb1625040ded5523a6234287b0c48f3'] = 'Per saperne di più sul 3D Secure, consulta il nostro sito web:';
@@ -119,6 +124,7 @@ $_MODULE['<{stripe_official}prestashop>transaction_5735196b42849ae4fe6adac3ae14c
 $_MODULE['<{stripe_official}prestashop>transaction_388fd2767ba1fd2296f536425d106de3'] = 'Importo pagato';
 $_MODULE['<{stripe_official}prestashop>transaction_99a808d8d16122d70e44bd7f709d30fb'] = 'Resto da pagare';
 $_MODULE['<{stripe_official}prestashop>transaction_8eea62084ca7e541d918e823422bd82e'] = 'Risultato';
+$_MODULE['<{stripe_official}prestashop>transaction_650be61892bf690026089544abbd9d26'] = 'Modalità';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_3380b659ba0a8b01af98dbe7494c0706'] = 'Congratulazioni, l\'ordine è stato completato e verrà elaborato al più presto';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_9e36368a8a4c53d31f327850c8bcdbe5'] = 'Il riferimento dell\'ordine è';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_47e22e4e4e37b6346412aae1d89c103c'] = ', riceverai presto un\'e-mail di conferma.';
