@@ -12,5 +12,15 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+global $useSSL;
+$useSSL = true;
+if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
+    || !file_exists(dirname(__FILE__).'/../../init.php')
+) {
+    die('ko');
+}
+require dirname(__FILE__).'/../../config/config.inc.php';
+require dirname(__FILE__).'/../../init.php';
+$stripe = Module::getInstanceByName('stripe_official');
 
-print_r("The verification process is complete and that the window will close shortly");
+print_r($stripe->l('The verification process is complete and that the window will close shortly'));

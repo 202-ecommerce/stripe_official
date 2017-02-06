@@ -234,6 +234,7 @@ $(document).ready(function() {
                                         createCharge(source);
                                     } else if (source.status == "failed") {
                                         $('#result_3d iframe').remove();
+                                        $('#modal_stripe').modalStripe().close();
                                         $('#stripe-ajax-loader').hide();
                                         $('#stripe-payment-form').show();
                                         $('.stripe-payment-errors').show();
