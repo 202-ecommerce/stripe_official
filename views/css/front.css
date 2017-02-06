@@ -127,6 +127,7 @@ h3.stripe_title {
 }
 #modal_stripe {
 	width: 600px;
+	height: 500px;
 	margin: auto;
 	margin-top: 80px;
 	padding: 30px;

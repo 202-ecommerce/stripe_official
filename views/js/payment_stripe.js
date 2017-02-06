@@ -233,7 +233,7 @@ $(document).ready(function() {
                                     if (source.status == "chargeable") {
                                         createCharge(source);
                                     } else if (source.status == "failed") {
-                                        $('#modal_stripe').modalStripe().close();
+                                        $('#result_3d iframe').remove();
                                         $('#stripe-ajax-loader').hide();
                                         $('#stripe-payment-form').show();
                                         $('.stripe-payment-errors').show();
