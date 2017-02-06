@@ -69,7 +69,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.0';
+        $this->version = '1.4.0';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';
@@ -679,6 +679,7 @@ class Stripe_official extends PaymentModule
 
             $address_delivery = new Address($this->context->cart->id_address_delivery);
             $state_delivery = State::getNameById($address_delivery->id_state);
+
             if (!$params['cardHolderName'] || $params['cardHolderName'] == '') {
                 $cardHolderName = $this->context->customer->firstname.' '.$this->context->customer->lastname;
             } else {
@@ -728,8 +729,8 @@ class Stripe_official extends PaymentModule
             /* Add transaction on database */
             $this->addTentative(
                 $charge->id,
-                $charge->source->name,
-                $charge->source->brand,
+                $charge->source->owner->name,
+                $params['type'],
                 $charge->amount,
                 0,
                 $charge->currency,
@@ -742,19 +743,25 @@ class Stripe_official extends PaymentModule
             $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
             $ch->save();
 
+            if (Configuration::get('PS_SSL_ENABLED')) {
+                $domain = Tools::getShopDomainSsl(true);
+            } else {
+                $domain = Tools::getShopDomain(true);
+            }
+
             /* Ajax redirection Order Confirmation */
             die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
                 'code' => '1',
-                'url' => __PS_BASE_URI__.'index.php?controller=order-confirmation&id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
+                'url' => $domain.'/index.php?controller=order-confirmation&id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
             )));
         } else {
             /* The payment was declined */
             /* Add transaction on database */
             $this->addTentative(
                 $charge->id,
-                $charge->source->name,
-                $charge->source->brand,
+                $charge->source->owner->name,
+                $params['type'],
                 $charge->amount,
                 0,
                 $charge->currency,
@@ -1369,7 +1376,15 @@ class Stripe_official extends PaymentModule
                 'city' => $address_delivery->city,
                 'zip_code' => $address_delivery->postcode,
                 'country' => $address_delivery->country,
+                'phone' => $address_delivery->phone,
+                'email' => $this->context->customer->email,
             );
+
+            if (Configuration::get('PS_SSL_ENABLED')) {
+                $domain = Tools::getShopDomainSsl(true);
+            } else {
+                $domain = Tools::getShopDomain(true);
+            }
 
             $this->context->smarty->assign(
                 array(
@@ -1378,7 +1393,7 @@ class Stripe_official extends PaymentModule
                     'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
                     'currency' => $currency,
                     'amount_ttl' => $amount,
-                    'baseDir' => __PS_BASE_URI__,
+                    'baseDir' => $domain,
                     'secure_mode' => $secure_mode_all,
                     'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'module_dir' => $this->_path,
