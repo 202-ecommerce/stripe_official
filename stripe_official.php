@@ -67,7 +67,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.0';
+        $this->version = '1.4.0';
         $this->author = '202 ecommerce';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
@@ -1204,7 +1204,8 @@ class Stripe_official extends PaymentModule
                     'refund' => $refund,
                     'id_stripe' => Tools::safeOutput($order['id_stripe']),
                     'name' => Tools::safeOutput($order['name']),
-                    'result' => $result
+                    'result' => $result,
+                    'state' => Tools::safeOutput($order['state']) ? $this->l('Test') : $this->l('Live'),
                 ));
             }
 
