@@ -77,39 +77,41 @@ $(document).ready(function() {
         }
     });
 
+    if (document.getElementById('card_number') != null) {
+        document.getElementById('card_number').oninput = function() {
+            this.value = cc_format(this.value);
 
-    document.getElementById('card_number').oninput = function() {
-        this.value = cc_format(this.value);
+            cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
 
-        cardNmb = Stripe.card.validateCardNumber($('.stripe-card-number').val());
+            var cardType = Stripe.card.cardType(this.value);
+            if (cardType != "Unknown") {
+                if (cardType == "American Express")
+                    cardType = "amex";
+                if (cardType == "Diners Club")
+                    cardType = "diners";
+                if ($('.img-card').length > 0) {
+                    if ($('#img-'+cardType).length > 0) {
+                        return false;
+                    } else {
+                        $('.img-card').remove();
+                    }
+                }
 
-        var cardType = Stripe.card.cardType(this.value);
-        if (cardType != "Unknown") {
-            if (cardType == "American Express")
-                cardType = "amex";
-            if (cardType == "Diners Club")
-                cardType = "diners";
-            if ($('.img-card').length > 0) {
-                if ($('#img-'+cardType).length > 0) {
-                    return false;
-                } else {
+                var card_logo = document.createElement('img');
+                card_logo.src = 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
+                card_logo.id = "img-"+cardType;
+                card_logo.className = "img-card";
+                $(card_logo).insertAfter('.stripe-card-number');
+                $('#img-'+cardType).css({'margin-left': '-34px'});
+            } else {
+                if ($('.img-card').length > 0) {
                     $('.img-card').remove();
                 }
-            }
 
-            var card_logo = document.createElement('img');
-            card_logo.src = 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
-            card_logo.id = "img-"+cardType;
-            card_logo.className = "img-card";
-            $(card_logo).insertAfter('.stripe-card-number');
-            $('#img-'+cardType).css({'margin-left': '-34px'});
-        } else {
-            if ($('.img-card').length > 0) {
-                $('.img-card').remove();
             }
-
         }
     }
+
 
 
     // Get Stripe public key
@@ -318,7 +320,7 @@ $(document).ready(function() {
 
     /* Test Mode All Card enable */
     var cards = ["visa", "mastercard", "discover", "amex", "jcb", "diners"];
-    if (mode == 1) {
+    if (typeof mode != 'undefined' && mode == 1) {
         $.each(cards, function(data) {
             $('#' + cards[data]).addClass('enable');
         });
@@ -353,14 +355,6 @@ $(document).ready(function() {
             $('.cc-icon:not(.disable)').addClass('disable');
         }
     });
-
-    // TODO : Seems useless ...
-    /*$('#stripe-payment-form-cc').submit(function (event) {
-     $('.stripe-payment-errors').hide();
-     $('#stripe-payment-form-cc').hide();
-     $('#stripe-ajax-loader').show();
-     $('.stripe-submit-button-cc').attr('disabled', 'disabled'); /* Disable the submit button to prevent repeated clicks */
-    /*});
 
      /* Catch callback errors */
     if ($('.stripe-payment-errors').text()) {

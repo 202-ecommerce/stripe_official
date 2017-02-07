@@ -75,11 +75,6 @@
 </div>
 <div id="modal_stripe"  class="modal" style="display: none">
   <div id="result_3d"> </div></div>
-  <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-  <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/front.css" type="text/css" media="all">
-<script type="text/javascript" async defer src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/payment_stripe.js"></script>
-<script type="text/javascript" async defer src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.the-modal.js"></script>
-<link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
   var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
   var currency = "{$currency|escape:'htmlall':'UTF-8'}";

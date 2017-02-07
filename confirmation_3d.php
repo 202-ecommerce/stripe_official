@@ -17,10 +17,10 @@ $useSSL = true;
 if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
     || !file_exists(dirname(__FILE__).'/../../init.php')
 ) {
-    die('ko');
+    exit;
 }
 require dirname(__FILE__).'/../../config/config.inc.php';
 require dirname(__FILE__).'/../../init.php';
 $stripe = Module::getInstanceByName('stripe_official');
 
-print_r($stripe->l('The verification process is complete and that the window will close shortly'));
+print_r($stripe->l('The verification process is complete and the window will close shortly'));
