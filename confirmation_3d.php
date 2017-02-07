@@ -12,26 +12,15 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
-
 global $useSSL;
 $useSSL = true;
 if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
     || !file_exists(dirname(__FILE__).'/../../init.php')
 ) {
-    die('ko');
-}
-
-require dirname(__FILE__).'/../../config/config.inc.php';
-require dirname(__FILE__).'/../../init.php';
-if (!defined('_PS_VERSION_')) {
     exit;
 }
-
+require dirname(__FILE__).'/../../config/config.inc.php';
+require dirname(__FILE__).'/../../init.php';
 $stripe = Module::getInstanceByName('stripe_official');
 
-if (Tools::getValue('token_stripe')) {
-    /* Refresh Button Back Office on Transaction */
-    if ($stripe && $stripe->active) {
-        echo $stripe->displayTransaction(1, Tools::getValue('token_stripe'), Tools::getValue('id_employee'));
-    }
-}
+print_r($stripe->l('The verification process is complete and the window will close shortly'));
