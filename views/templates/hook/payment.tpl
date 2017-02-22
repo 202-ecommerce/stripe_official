@@ -82,7 +82,7 @@
 <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
   var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
-  var currency = "{$currency|escape:'htmlall':'UTF-8'}";
+  var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
   var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
   var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
   var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";

@@ -189,7 +189,7 @@ $(document).ready(function() {
                     Stripe.threeDSecure.create({
                         card: response.id,
                         amount: amount_ttl,
-                        currency: currency,
+                        currency: currency_stripe,
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
                             $('#modal_stripe').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();

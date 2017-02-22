@@ -69,7 +69,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.0';
+        $this->version = '1.3.1';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';
@@ -1376,7 +1376,7 @@ class Stripe_official extends PaymentModule
                     'publishableKey' => $this->getPublishableKey(),
                     'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency' => $currency,
+                    'currency_stripe' => $currency,
                     'amount_ttl' => $amount,
                     'baseDir' => __PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
