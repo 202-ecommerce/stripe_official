@@ -122,7 +122,7 @@
 <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
 var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
-var currency = "{$currency|escape:'htmlall':'UTF-8'}";
+var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
 var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
 var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
 if (ps_version) {
@@ -302,7 +302,7 @@ $(document).ready(function() {
                     Stripe.threeDSecure.create({
                         card: response.id,
                         amount: amount_ttl,
-                        currency: currency,
+                        currency: currency_stripe,
                     }, function (status, response) {
                         if (response.status == "redirect_pending") {
                             $('#modal_stripe').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();

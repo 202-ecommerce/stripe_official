@@ -67,7 +67,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.0';
+        $this->version = '1.3.1';
         $this->author = '202 ecommerce';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
@@ -878,7 +878,7 @@ class Stripe_official extends PaymentModule
                     'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'onePageCheckoutEnabled' => Configuration::get('PS_ORDER_PROCESS_TYPE'),
                     'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency' => $currency,
+                    'currency_stripe' => $currency,
                     'amount_ttl' => $amount,
                     'ps_version15' => $ps_version15,
                     'baseDir' => __PS_BASE_URI__,
