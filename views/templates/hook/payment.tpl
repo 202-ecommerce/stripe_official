@@ -206,6 +206,12 @@ $(document).ready(function() {
                 cardType = "diners";
             if ($('.img-card').length > 0) {
                 if ($('#img-'+cardType).length > 0) {
+                    setTimeout(function(){
+                        card_input = document.getElementById('card_number');
+                        var strLength = card_input.value.length;
+                        card_input.focus();
+                        card_input.setSelectionRange(strLength, strLength);
+                    }, 0);
                     return false;
                 } else {
                     $('.img-card').remove();
