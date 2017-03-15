@@ -28,7 +28,7 @@
 	<br>
 	{l s='If you have any question related to Stripe and this plugin, feel free to: ' mod='stripe_official'}<br>
 	- {l s='Check our support website: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com"> https://support.stripe.com</a><br>
-	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com/email"> https://support.stripe.com/email</a><
+	- {l s='Directly contact our support team: ' mod='stripe_official'}<a target='_blank' href="https://support.stripe.com/email"> https://support.stripe.com/email</a>
 	<br><br>
 	<!--{l s='To save you time, before you contact us:' mod='stripe_official'}<br>
 	- {l s='make sure you have read the documentation well.' mod='stripe_official'}<br>
