@@ -51,8 +51,6 @@ $_MODULE['<{stripe_official}prestashop>contact_52b2d0df08dfa9115a4cb2469ed3bf21'
 $_MODULE['<{stripe_official}prestashop>contact_e55eea1044f937876a5415173032c31f'] = 'Si tienes alguna pregunta relacionada con Stripe y este plugin: ';
 $_MODULE['<{stripe_official}prestashop>contact_f6e21368460de645de03624e7a148025'] = 'Dirígete a nuestra página de soporte: ';
 $_MODULE['<{stripe_official}prestashop>contact_a77f67c389033937aceb04eadfb78c8e'] = 'Ponte en contacto directamente con nuestro equipo de soporte:';
-$_MODULE['<{stripe_official}prestashop>contact_9369a9db7412113bea6054c346a9b675'] = 'Si crees que el problema que tienes está relacionado con este plugin en específico, por favor ponte en contacto con nuestro equipo a través de';
-$_MODULE['<{stripe_official}prestashop>contact_e89484f946e8a295228c90ed5d19c7d6'] = 'el formulario de contacto de Addons.';
 $_MODULE['<{stripe_official}prestashop>contact_7b3c61e9446620d8aa80f473a661254f'] = 'Para ahorrarte tiempo, antes de contactar con nosotros:';
 $_MODULE['<{stripe_official}prestashop>contact_daae45c1eac42703c8a20065a4ff03c2'] = 'asegúrate de haber leído bien toda la documentación.';
 $_MODULE['<{stripe_official}prestashop>contact_2eef2110b43c169850fed6ca5bd019c5'] = 'para todo contacto a través del formulario, envía cuanta información puedas sobre';
