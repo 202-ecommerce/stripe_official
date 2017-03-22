@@ -1350,11 +1350,11 @@ class Stripe_official extends PaymentModule
     public function hookHeader()
     {
         if (Tools::getValue('controller') == "order") {
-            $this->context->controller->registerStylesheet($this->name.'-frontcss', $this->_path.'/views/css/front.css');
+            $this->context->controller->registerStylesheet($this->name.'-frontcss', '/modules/'.$this->name.'/views/css/front.css');
             $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
-            $this->context->controller->registerJavascript($this->name.'-paymentjs', $this->_path.'/views/js/payment_stripe.js');
-            $this->context->controller->registerJavascript($this->name.'-modaljs', $this->_path.'/views/js/jquery.the-modal.js');
-            $this->context->controller->registerStylesheet($this->name.'-modalcss', $this->_path.'/views/css/the-modal.css');
+            $this->context->controller->registerJavascript($this->name.'-paymentjs', '/modules/'.$this->name.'/views/js/payment_stripe.js');
+            $this->context->controller->registerJavascript($this->name.'-modaljs', '/modules/'.$this->name.'/views/js/jquery.the-modal.js');
+            $this->context->controller->registerStylesheet($this->name.'-modalcss', '/modules/'.$this->name.'/views/css/the-modal.css');
         }
     }
 
