@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2015 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2015 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -1342,11 +1342,13 @@ class Stripe_official extends PaymentModule
 
     public function hookHeader()
     {
-
-        //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
-        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
-        $this->context->controller->addJs('https://js.stripe.com/v2/');
-
+        if (Tools::getValue('controller') == "order") {
+            $this->context->controller->registerStylesheet($this->name.'-frontcss', '/modules/'.$this->name.'/views/css/front.css');
+            $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
+            $this->context->controller->registerJavascript($this->name.'-paymentjs', '/modules/'.$this->name.'/views/js/payment_stripe.js');
+            $this->context->controller->registerJavascript($this->name.'-modaljs', '/modules/'.$this->name.'/views/js/jquery.the-modal.js');
+            $this->context->controller->registerStylesheet($this->name.'-modalcss', '/modules/'.$this->name.'/views/css/the-modal.css');
+        }
     }
 
     protected function generateForm()
@@ -1376,7 +1378,7 @@ class Stripe_official extends PaymentModule
                     'publishableKey' => $this->getPublishableKey(),
                     'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency_stripe' => $currency,
+                    'currency' => $currency,
                     'amount_ttl' => $amount,
                     'baseDir' => __PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
