@@ -28,7 +28,14 @@ a.stripe-card-cvc-info div.cvc-info {
 }
 a.stripe-card-cvc-info:hover div.cvc-info { display: block; }
 div.cvc-info:hover { cursor: default; }
-#stripe-payment-form img.cc-icon { border: #CCCCCC solid 1px; float: left; margin-right: 5px; }
+#stripe-payment-form img.cc-icon { 
+    float: left;
+    margin-right: 5px;
+    width: 31px;
+}
+#stripe-payment-form h3 {
+    padding-bottom: 10px;
+}
 .block-left {
 	display: inline-block; float: left; margin-right: 6px;
 }
@@ -94,8 +101,8 @@ a#stripe_error { display: none; }
 	padding: 3px 1px !important;
 }
 .powered_stripe {
-	float:right !important;
-	margin-right: 18px !important;
+	margin-right: 7px !important;
+    height: 22px !important;
 }
 .stripe-submit-button img {
 	width:12px;

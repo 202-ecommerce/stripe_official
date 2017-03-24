@@ -26,8 +26,10 @@
 <script type="text/javascript">
     var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
 </script>
+{if !$ps_version15}
 <div class="row">
 	<div class="col-xs-12">
+    {/if}
 		<div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
 
 			{* Classic Credit card form *}
@@ -47,7 +49,18 @@
             <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}">
 			<div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
 			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
+
                 <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
+
+                <img class="cc-icon disable"  id="visa"       rel="Visa"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-visa.png" />
+                <img class="cc-icon disable"  id="mastercard" rel="MasterCard" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-mastercard.png" />
+                <img class="cc-icon disable"  id="amex"       rel="Amex"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-amex.png" />
+                {if $country_merchant == "us"}
+                <img class="cc-icon disable"  id="discover"   rel="Discover"   alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-discover.png" />
+                <img class="cc-icon disable"  id="diners"     rel="Diners"     alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-diners.png" />
+                <img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
+                {/if}<br><br>
+
                 <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div><a name="stripe_error" style="display:none"></a>
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
 
@@ -101,6 +114,8 @@
                 </button>
 
                 <div class="clear"></div>
+                <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/verified_by_visa.png"/>
+                <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/mastercard_securecode.png"/>
                 <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/powered_by_stripe.png"/>
 			</form>
 			<div id="stripe-translations">
@@ -112,8 +127,11 @@
 				<span id="stripe-card-del-error">{l s='An error occured while trying to delete this Credit card. Please contact us.' mod='stripe_official'}</span>
 			</div>
 		</div>
-	</div>
+
+{if !$ps_version15}
+    </div>
 </div>
+{/if}
 <div id="modal_stripe"  class="modal" style="display: none">
             <div id="result_3d"> </div></div>
 
@@ -219,7 +237,10 @@ $(document).ready(function() {
             }
 
             var card_logo = document.createElement('img');
-            card_logo.src = baseDir + 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
+            if (ps_version)
+                card_logo.src = baseDir + '/modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
+            else
+                card_logo.src = baseDir + 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
             card_logo.id = "img-"+cardType;
             card_logo.className = "img-card";
             $(card_logo).insertAfter('.stripe-card-number');

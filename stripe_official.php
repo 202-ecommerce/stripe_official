@@ -876,7 +876,7 @@ class Stripe_official extends PaymentModule
                 'city' => $address_delivery->city,
                 'zip_code' => $address_delivery->postcode,
                 'country' => $address_delivery->country,
-                'phone' => $address_delivery->phone,
+                'phone' => $address_delivery->phone_mobile ? $address_delivery->phone_mobile : $address_delivery->phone,
                 'email' => $this->context->customer->email,
             );
 
@@ -885,6 +885,8 @@ class Stripe_official extends PaymentModule
             } else {
                 $domain = Tools::getShopDomain(true);
             }
+
+            $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
             $this->context->smarty->assign(
                 array(
@@ -899,6 +901,7 @@ class Stripe_official extends PaymentModule
                     'secure_mode' => $secure_mode_all,
                     'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'billing_address' => Tools::jsonEncode($billing_address),
+                    'country_merchant' => Tools::strtolower($default_country->iso_code),
                 )
             );
             $html = '';
@@ -984,12 +987,12 @@ class Stripe_official extends PaymentModule
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->l('Test'),
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->l('Live'),
                             )
                         ),
                     ),
