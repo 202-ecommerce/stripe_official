@@ -126,6 +126,13 @@ $(document).ready(function() {
         Stripe.setPublishableKey(StripePubKey);
     }
 
+    $('#stripe-payment-form input').keydown(function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
 
     $('#payment-confirmation button').click(function (event) {
         if ($('input[name=payment-option]:checked').hasClass('stripe-official')) {

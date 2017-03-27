@@ -107,8 +107,8 @@ a#stripe_error { display: none; }
 	padding: 3px 1px !important;
 }
 .powered_stripe {
-	float:right !important;
-	margin-right: 18px !important;
+	margin-right: 7px !important;
+	height: 22px !important;
 }
 .stripe-submit-button img {
 	width:12px;
