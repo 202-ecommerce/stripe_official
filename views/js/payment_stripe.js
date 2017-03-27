@@ -242,8 +242,12 @@ if (document.getElementById('card_number') != null) {
 
     }
 
-
-
+    $('#stripe-payment-form input').keydown(function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
 
 
     $('#payment-confirmation button').click(function (event) {

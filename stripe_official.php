@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2015 PrestaShop SA
+ * @copyright 2007-2017 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -1125,7 +1125,8 @@ class Stripe_official extends PaymentModule
                     'refund' => $refund,
                     'id_stripe' => Tools::safeOutput($order['id_stripe']),
                     'name' => Tools::safeOutput($order['name']),
-                    'result' => $result
+                    'result' => $result,
+                    'state' => Tools::safeOutput($order['state']) ? $this->l('Test') : $this->l('Live'),
                 ));
             }
 
@@ -1332,9 +1333,15 @@ class Stripe_official extends PaymentModule
     {
         $payment_options = array();
         $embeddedOption = new PaymentOption();
+        $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+        if (Tools::strtolower($default_country->iso_code) == 'us') {
+            $cc_img = 'cc_merged.png';
+        } else {
+            $cc_img = 'logo-payment.png';
+        }
         $embeddedOption->setCallToActionText($this->l('Pay by card'))
                        ->setForm($this->generateForm())
-                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo-payment.png'));
+                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
         return $payment_options;
     }
