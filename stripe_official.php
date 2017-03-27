@@ -1385,7 +1385,7 @@ class Stripe_official extends PaymentModule
                 'city' => $address_delivery->city,
                 'zip_code' => $address_delivery->postcode,
                 'country' => $address_delivery->country,
-                'phone' => $address_delivery->phone,
+                'phone' => $address_delivery->phone ? $address_delivery->phone : $address_delivery->phone_mobile,
                 'email' => $this->context->customer->email,
             );
 
