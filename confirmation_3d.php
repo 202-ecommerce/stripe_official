@@ -23,4 +23,4 @@ require dirname(__FILE__).'/../../config/config.inc.php';
 require dirname(__FILE__).'/../../init.php';
 $stripe = Module::getInstanceByName('stripe_official');
 
-print_r($stripe->l('The verification process is complete and the window will close shortly'));
+print_r($stripe->l('The verification process is now complete. This window will close shortly.'));
