@@ -22,5 +22,9 @@ if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')
 require dirname(__FILE__).'/../../config/config.inc.php';
 require dirname(__FILE__).'/../../init.php';
 $stripe = Module::getInstanceByName('stripe_official');
-
-print_r($stripe->l('The verification process is now complete. This window will close shortly.'));
+$lang_iso_code = Context::getContext()->language->iso_code;
+if ($lang_iso_code == "fr") {
+    print_r("L'authentification 3D-Secure a réussi. Cette fenêtre va bientôt se fermer.");
+} else {
+    print_r("The verification process is now complete. This window will close shortly.");
+}
