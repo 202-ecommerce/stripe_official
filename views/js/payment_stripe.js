@@ -165,7 +165,7 @@ $(document).ready(function() {
             return false;
         }
         /* Disable the submit button to prevent repeated clicks */
-        $('.stripe-submit-button').attr('disabled', 'disabled');
+        $('#payment-confirmation button[type=submit]').attr('disabled', 'disabled');
         $('.stripe-payment-errors').hide();
         $('#stripe-payment-form').hide();
         $('#stripe-ajax-loader').show();
@@ -202,14 +202,14 @@ $(document).ready(function() {
                 // Show error on the form
                 $('#stripe-ajax-loader').hide();
                 $('#stripe-payment-form').show();
-                $('.stripe-submit-button').removeAttr('disabled');
+                $('#payment-confirmation button[type=submit]').removeAttr('disabled');
 
                 var err_msg = $('#stripe-'+response.error.code).val();
                 if (!err_msg || err_msg == "undefined" || err_msg == '')
                     err_msg = response.error.message;
                 $form.find('.stripe-payment-errors').text(err_msg).fadeIn(1000);
             } else {
-                if (secure_mode || (typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure == "required")) {
+                if (secure_mode && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
                     Stripe.source.create({
                         type: 'three_d_secure',
                         amount: amount_ttl,
@@ -246,6 +246,7 @@ $(document).ready(function() {
                                 response.client_secret,
                                 function(status, source) {
                                     if (source.status == "chargeable") {
+                                        $('#modal_stripe').modalStripe().close();
                                         createCharge(source);
                                     } else if (source.status == "failed") {
                                         $('#result_3d iframe').remove();
@@ -254,11 +255,12 @@ $(document).ready(function() {
                                         $('#stripe-payment-form').show();
                                         $('.stripe-payment-errors').show();
                                         $form.find('.stripe-payment-errors').text($('#stripe-card_declined').val()).fadeIn(1000);
-                                        $('.stripe-submit-button').removeAttr('disabled');
+                                        $('#payment-confirmation button[type=submit]').removeAttr('disabled');
                                     }
                                 }
                             );
                         } else if (response.status == "chargeable") {
+                            $('#modal_stripe').modalStripe().close();
                             createCharge(response);
                         } else if (response.status == "failed") {
                             var cardType = Stripe.card.cardType($('.stripe-card-number').val());
@@ -269,7 +271,7 @@ $(document).ready(function() {
                                 $('#stripe-payment-form').show();
                                 $('.stripe-payment-errors').show();
                                 $form.find('.stripe-payment-errors').text($('#stripe-3d_declined').val()).fadeIn(1000);
-                                $('.stripe-submit-button').removeAttr('disabled');
+                                $('#payment-confirmation button[type=submit]').removeAttr('disabled');
                             }
                         }
                     });
@@ -303,7 +305,7 @@ $(document).ready(function() {
                                 $('#stripe-payment-form').show();
                                 $('.stripe-payment-errors').show();
                                 $('.stripe-payment-errors').text(data.msg).fadeIn(1000);
-                                $('.stripe-submit-button').removeAttr('disabled');
+                                $('#payment-confirmation button[type=submit]').removeAttr('disabled');
                             }
                         },
                         error: function(err) {
@@ -312,7 +314,7 @@ $(document).ready(function() {
                             $('#stripe-payment-form').show();
                             $('.stripe-payment-errors').show();
                             $('.stripe-payment-errors').text('An error occured during the request. Please contact us').fadeIn(1000);
-                            $('.stripe-submit-button').removeAttr('disabled');
+                            $('#payment-confirmation button[type=submit]').removeAttr('disabled');
                         }
                     });
                 }
