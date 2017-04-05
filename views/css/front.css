@@ -1,4 +1,4 @@
-div.payment_module { padding-bottom: 35px;     margin-bottom: 10px; text-transform: none; }
+div.payment_module { margin-bottom: 10px; text-transform: none; }
 .stripe_title img { float: none; margin-right: 8px; margin-top: -2px; vertical-align: middle; }
 #stripe-payment-form {    margin: 0 auto;}
 #stripe-payment-form label { display: inline-block !important; margin-bottom: 4px; font-size: 14px; font-weight: bold;}
