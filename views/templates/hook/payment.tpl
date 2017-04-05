@@ -48,7 +48,7 @@
             <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}">
             <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}">
 			<div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
-			<form action="#" id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
+			<form id="stripe-payment-form"{if isset($stripe_save_tokens_ask) && $stripe_save_tokens_ask && isset($stripe_credit_card)} style="display: none;"{/if}>
 
                 <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
 
@@ -61,7 +61,7 @@
                 <img class="cc-icon disable"  id="jcb"        rel="Jcb"        alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-jcb.png" />
                 {/if}<br><br>
 
-                <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div><a name="stripe_error" style="display:none"></a>
+                <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div>
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
 
                 <div>
@@ -100,18 +100,18 @@
 					<input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
                     <img class="payment-ok" src="/img/admin/enabled.gif">
                     <img class="payment-ko" src="/img/admin/disabled.gif">
-                    <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
+                   <!-- <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
 						<div class="cvc-info">
 						{l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='stripe_official'}
 						</div>
-					</a>
+					</a>-->
 				</div>
 				<div class="clear"></div>
 
-				<button type="submit" class="stripe-submit-button">
-                    <img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/lock-locked.png"/>
-                    {l s='Buy now' mod='stripe_official'}
-                </button>
+				<input type="submit" class="stripe-submit-button" value="{l s='Buy now' mod='stripe_official'}" />
+                    <!--<img alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/lock-locked.png"/>-->
+
+
 
                 <div class="clear"></div>
                 <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/verified_by_visa.png"/>
@@ -334,7 +334,7 @@ $(document).ready(function() {
                     err_msg = response.error.message;
                 $form.find('.stripe-payment-errors').text(err_msg).fadeIn(1000);
             } else {
-                if (secure_mode || (typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure == "required")) {
+                if (secure_mode && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
                     Stripe.source.create({
                         type: 'three_d_secure',
                         amount: amount_ttl,
@@ -371,6 +371,7 @@ $(document).ready(function() {
                                     response.client_secret,
                                     function(status, source) {
                                         if (source.status == "chargeable") {
+                                            $('#modal_stripe').modalStripe().close();
                                             createCharge(source);
                                         } else if (source.status == "failed") {
                                             $('#result_3d iframe').remove();

@@ -95,6 +95,15 @@ a#stripe_error { display: none; }
 #stripe-payment-form .stripe-name, #stripe-payment-form .stripe-card-number, #stripe-payment-form .stripe-submit-button {
 	width: 210px;
 }
+#stripe-payment-form .stripe-submit-button {
+	background-image: url('../img/lock-locked.png');
+	background-size: 12px 17px;
+	background-repeat: no-repeat;
+	background-position: 7px;
+}
+#stripe-payment-form .stripe-submit-button:hover {
+	background-position: 7px;
+}
 #stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
 	width:102px;
 	max-width: 102px;
@@ -130,4 +139,18 @@ h3.stripe_title {
 	border: 1px solid rgba(0,0,0,.2);
 	-webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
 	background: white;
+}
+
+@media (max-width: 764px) {
+	#modal_stripe {
+		width: 90%;
+		margin: auto;
+		margin-top: 80px;
+		padding: 30px;
+		border-radius: 6px;
+		box-shadow: 0 5px 15px rgba(0,0,0,.5);
+		border: 1px solid rgba(0,0,0,.2);
+		-webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+		background: white;
+	}
 }

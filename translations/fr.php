@@ -2,6 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
+$_MODULE['<{stripe_official}prestashop>confirmation_3d_e28d3f4f6abc24b4dd636a43cfcd3842'] = 'L\'authentification 3D-Secure a réussi. Cette fenêtre va bientôt se fermer.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Pour pouvoir utiliser ce module, merci d\'activer cURL (extension PHP)';
 $_MODULE['<{stripe_official}prestashop>stripe_official_ce7566d1d08cc094b74cf283cf9c56a5'] = 'Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_7349826060a4851f4835aade49af34c7'] = 'Module Stripe officiel';
