@@ -25,6 +25,12 @@ $stripe = Module::getInstanceByName('stripe_official');
 $lang_iso_code = Context::getContext()->language->iso_code;
 if ($lang_iso_code == "fr") {
     print_r("L'authentification 3D-Secure a réussi. Cette fenêtre va bientôt se fermer.");
+} elseif ($lang_iso_code == "it") {
+    print_r("Il processo di verifica è ora completo. Questa finestra si chiuderà a breve.");
+} elseif ($lang_iso_code == "de") {
+    print_r("Der Verifizierungsprozess ist nun vollendet. Dieses Fenster wird in Kürze geschlossen.");
+} elseif ($lang_iso_code == "es") {
+    print_r("El proceso de verificación ha sido completado. Esta ventana se cerrará en breve.");
 } else {
     print_r("The verification process is now complete. This window will close shortly.");
 }
