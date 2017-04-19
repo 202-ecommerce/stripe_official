@@ -84,7 +84,7 @@
   var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
   var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
   var billing_address = {$billing_address|escape nofilter};
-
+  var module_dir = "{$module_dir|escape:'htmlall':'UTF-8'}";
   {literal}
 
 </script>

@@ -69,7 +69,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.0';
+        $this->version = '1.4.1';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';

@@ -104,7 +104,7 @@ $(document).ready(function() {
                 }
 
                 var card_logo = document.createElement('img');
-                card_logo.src = 'modules/stripe_official/views/img/cc-' + cardType.toLowerCase() +'.png';
+                card_logo.src = module_dir+'views/img/cc-' + cardType.toLowerCase() +'.png';
                 card_logo.id = "img-"+cardType;
                 card_logo.className = "img-card";
                 $(card_logo).insertAfter('.stripe-card-number');
@@ -192,7 +192,6 @@ $(document).ready(function() {
                     country: billing_address.country
                 },
                 name: $('.stripe-name').val(),
-                phone: billing_address.phone,
                 email: billing_address.email,
             }
         }, function (status, response) {
@@ -226,7 +225,6 @@ $(document).ready(function() {
                                 country: billing_address.country
                             },
                             name: $('.stripe-name').val(),
-                            phone: billing_address.phone,
                             email: billing_address.email,
                         },
                         redirect: {
