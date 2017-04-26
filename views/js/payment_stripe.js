@@ -51,7 +51,10 @@ function cc_format(value) {
 
 
 
-$(document).ready(function() {
+var stripe_isInit = false;
+
+function initStripeOfficial() {
+    stripe_isInit = true;
 
     $('.stripe-payment').parent().prev().find('input[name=payment-option]').addClass('stripe-official');
 
@@ -377,4 +380,10 @@ $(document).ready(function() {
     $('#stripe-payment-form input').keypress(function () {
         $('.stripe-payment-errors').fadeOut(500);
     });
+};
+
+$(document).ready(function() {
+    if (!stripe_isInit) {
+        initStripeOfficial();
+    }
 });
