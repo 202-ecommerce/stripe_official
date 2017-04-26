@@ -69,7 +69,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';
@@ -743,17 +743,11 @@ class Stripe_official extends PaymentModule
             $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
             $ch->save();
 
-            if (Configuration::get('PS_SSL_ENABLED')) {
-                $domain = Tools::getShopDomainSsl(true);
-            } else {
-                $domain = Tools::getShopDomain(true);
-            }
-
             /* Ajax redirection Order Confirmation */
             die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
                 'code' => '1',
-                'url' => $domain.'/index.php?controller=order-confirmation&id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
+                'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
             )));
         } else {
             /* The payment was declined */
@@ -1368,16 +1362,17 @@ class Stripe_official extends PaymentModule
     protected function generateForm()
     {
         if (Configuration::get('PS_SSL_ENABLED')) {
+            $context = $this->context;
 
-            $amount = $this->context->cart->getOrderTotal();
-            $currency = $this->context->currency->iso_code;
+            $amount = $context->cart->getOrderTotal();
+            $currency = $context->currency->iso_code;
             $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
             if (!$secure_mode_all && $amount >= 50) {
                 $secure_mode_all = 1;
             }
 
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-            $address_delivery = new Address($this->context->cart->id_address_delivery);
+            $address_delivery = new Address($context->cart->id_address_delivery);
 
             $billing_address = array(
                 'line1' => $address_delivery->address1,
@@ -1389,12 +1384,8 @@ class Stripe_official extends PaymentModule
                 'email' => $this->context->customer->email,
             );
 
-            if (Configuration::get('PS_SSL_ENABLED')) {
-                $domain = Tools::getShopDomainSsl(true);
-            } else {
-                $domain = Tools::getShopDomain(true);
-            }
-
+            $domain = $context->link->getBaseLink($context->shop->id, true);
+     
             $this->context->smarty->assign(
                 array(
                     'publishableKey' => $this->getPublishableKey(),
