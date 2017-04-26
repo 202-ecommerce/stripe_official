@@ -111,8 +111,8 @@ a#stripe_error { display: none; }
 	padding: 3px 1px !important;
 }
 .powered_stripe {
-	margin-right: 7px !important;
-    height: 22px !important;
+	margin-right: 6px !important;
+    height: 21px !important;
 }
 .stripe-submit-button img {
 	width:12px;

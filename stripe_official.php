@@ -67,7 +67,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.0';
+        $this->version = '1.4.1';
         $this->author = '202 ecommerce';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
@@ -748,17 +748,12 @@ class Stripe_official extends PaymentModule
             $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
             $ch->save();
 
-            if (Configuration::get('PS_SSL_ENABLED')) {
-                $domain = Tools::getShopDomainSsl(true);
-            } else {
-                $domain = Tools::getShopDomain(true);
-            }
 
             /* Ajax redirection Order Confirmation */
             die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
                 'code' => '1',
-                'url' => $domain.'/index.php?controller=order-confirmation&id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
+                'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
             )));
         } else {
             /* The payment was declined */
@@ -880,11 +875,7 @@ class Stripe_official extends PaymentModule
                 'email' => $this->context->customer->email,
             );
 
-            if (Configuration::get('PS_SSL_ENABLED')) {
-                $domain = Tools::getShopDomainSsl(true);
-            } else {
-                $domain = Tools::getShopDomain(true);
-            }
+            $domain = $context->link->getBaseLink($context->shop->id, true);
 
             $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
