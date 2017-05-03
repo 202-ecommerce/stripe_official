@@ -1384,7 +1384,7 @@ class Stripe_official extends PaymentModule
                 'email' => $this->context->customer->email,
             );
 
-            $domain = $context->link->getBaseLink($context->shop->id, true);
+            $domain = $context->link->getPageLink('index', true);
      
             $this->context->smarty->assign(
                 array(
