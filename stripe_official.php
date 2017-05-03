@@ -875,7 +875,9 @@ class Stripe_official extends PaymentModule
                 'email' => $this->context->customer->email,
             );
 
-            $domain = $context->link->getBaseLink($context->shop->id, true);
+            $context = $this->context;
+
+            $domain = $context->link->getPageLink('index', true);
 
             $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 

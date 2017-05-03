@@ -186,7 +186,10 @@ function cc_format(value) {
 
 
 
-$(document).ready(function() {
+var stripe_isInit = false;
+
+function initStripeOfficial() {
+    stripe_isInit = true;
 
     //Put our input DOM element into a jQuery Object
     var jqDate = document.getElementById('card_expiry');
@@ -300,15 +303,13 @@ $(document).ready(function() {
         exp_year = $('.stripe-card-expiry').val();
         exp_year_calc = "20" + exp_year.substring(3);
 
-        Stripe.source.create({
-            type: 'card',
-            card: {
-                number: $('.stripe-card-number').val(),
+        var card_info  = {number: $('.stripe-card-number').val(),
                 cvc: $('.stripe-card-cvc').val(),
                 exp_month: exp_month_calc,
                 exp_year: exp_year_calc,
-            },
-            owner: {
+        };
+
+        var owner_info = {
                 address: {
                     line1: billing_address.line1,
                     line2: billing_address.line2,
@@ -319,8 +320,18 @@ $(document).ready(function() {
                 name: $('.stripe-name').val(),
                 phone: billing_address.phone,
                 email: billing_address.email,
+        };
+
+        for (var key in owner_info) {
+            if (key == 'phone' && (!owner_info.phone || owner_info.phone == "" || owner_info.phone == "undefined")) {
+                delete owner_info.phone;
             }
-        }, function (status, response) {
+        }
+
+        var card_source = {type: 'card', card: card_info, owner: owner_info};
+
+        Stripe.source.create(card_source
+            , function (status, response) {
             var $form = $('#stripe-payment-form');
 
             if (response.error) {
@@ -342,18 +353,7 @@ $(document).ready(function() {
                         three_d_secure: {
                             card: response.id
                         },
-                        owner: {
-                            address: {
-                                line1: billing_address.line1,
-                                line2: billing_address.line2,
-                                city: billing_address.city,
-                                postal_code: billing_address.zip_code,
-                                country: billing_address.country
-                            },
-                            name: $('.stripe-name').val(),
-                            phone: billing_address.phone,
-                            email: billing_address.email,
-                        },
+                        owner: owner_info,
                         redirect: {
                             return_url: baseDir+"/modules/stripe_official/confirmation_3d.php"
                         }
@@ -505,6 +505,12 @@ $(document).ready(function() {
   $('#stripe-payment-form input').keypress(function () {
     $('.stripe-payment-errors').fadeOut(500); 
   });
+};
+
+$(document).ready(function() {
+    if (!stripe_isInit) {
+        initStripeOfficial();
+    }
 });
 </script>
 {/literal}
