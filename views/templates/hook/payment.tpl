@@ -355,7 +355,7 @@ function initStripeOfficial() {
                         },
                         owner: owner_info,
                         redirect: {
-                            return_url: baseDir+"/modules/stripe_official/confirmation_3d.php"
+                            return_url: baseDir+"modules/stripe_official/confirmation_3d.php"
                         }
                     }, function (status, response) {
 
@@ -413,7 +413,7 @@ function initStripeOfficial() {
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        url: baseDir + '/modules/stripe_official/ajax.php',
+                        url: baseDir + 'modules/stripe_official/ajax.php',
                         data: {
                             stripeToken: result.id,
                             cardType: lookupCardType($('.stripe-card-number').val()),

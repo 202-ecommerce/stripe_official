@@ -875,9 +875,11 @@ class Stripe_official extends PaymentModule
                 'email' => $this->context->customer->email,
             );
 
-            $context = $this->context;
-
-            $domain = $context->link->getPageLink('index', true);
+            if (Configuration::get('PS_SSL_ENABLED')) {                                 
+                $domain = Tools::getShopDomainSsl(true);
+            } else {
+                $domain = Tools::getShopDomain(true);
+            }
 
             $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
@@ -890,7 +892,7 @@ class Stripe_official extends PaymentModule
                     'currency_stripe' => $currency,
                     'amount_ttl' => $amount,
                     'ps_version15' => $ps_version15,
-                    'baseDir' => $domain,
+                    'baseDir' => $domain.__PS_BASE_URI__,
                     'secure_mode' => $secure_mode_all,
                     'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
                     'billing_address' => Tools::jsonEncode($billing_address),
