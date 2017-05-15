@@ -88,7 +88,7 @@ $_MODULE['<{stripe_official}prestashop>payment_f5e80e3a50db981883e3be92725823b6'
 $_MODULE['<{stripe_official}prestashop>payment_3827a9a0e85149e4dc055723bfd1d767'] = 'Die Karte unterstützt kein 3-D Secure. ';
 $_MODULE['<{stripe_official}prestashop>payment_b4e7a2b1b448374142b13f92954bfa1b'] = 'Es ist ein Fehler mit Ihren API Keys aufgetreten. Wenn Sie der Administrator dieser Website sind, gehen Sie bitte auf den \"Connection\" Tab Ihres Plug-in. ';
 $_MODULE['<{stripe_official}prestashop>payment_4d45dda9e5e627fc945732e529f08c36'] = 'Transaktion wird ausgeführt, bitte haben Sie noch etwas Geduld.';
-$_MODULE['<{stripe_official}prestashop>payment_cc21116ce900f38c0691823ab193b9a3'] = 'Mit Karte bezahlen';
+$_MODULE['<{stripe_official}prestashop>payment_cc21116ce900f38c0691823ab193b9a3'] = 'Met kaart betalen';
 $_MODULE['<{stripe_official}prestashop>payment_d9a3493a581e1b2900c5eb45dcb0dc02'] = 'Name des Karteninhabers';
 $_MODULE['<{stripe_official}prestashop>payment_931d3a3ad177dd96a28c9642fec11b01'] = 'Kreditkartennummer';
 $_MODULE['<{stripe_official}prestashop>payment_379c80c789f0f3e0165b5e6d5df839ca'] = 'Art der Karte';
