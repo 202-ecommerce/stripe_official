@@ -30,7 +30,7 @@
 <div class="row">
 	<div class="col-xs-12">
     {/if}
-		<div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
+		<div class="payment_module cart-stripe-official" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
 
 			{* Classic Credit card form *}
             <input type="hidden" id="stripe-incorrect_number" value="{l s='The card number is incorrect.' mod='stripe_official'}">
@@ -62,11 +62,11 @@
                 {/if}<br><br>
 
                 <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div>
-        <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+                <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
 
                 <div>
 				<label>{l s='Cardholder\'s Name' mod='stripe_official'}</label>  <label class="required"> </label><br />
-        <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+                <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
                 <img class="payment-ok" src="/img/admin/enabled.gif">
                 <img class="payment-ko" src="/img/admin/disabled.gif">
                 </div>
@@ -139,6 +139,7 @@
 <script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.the-modal.js"></script>
 <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
+var ajaxUrlStripe = "{$ajaxUrlStripe|escape:'htmlall':'UTF-8'}";
 var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
 var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
 var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
@@ -413,7 +414,7 @@ function initStripeOfficial() {
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        url: baseDir + 'modules/stripe_official/ajax.php',
+                        url: ajaxUrlStripe,
                         data: {
                             stripeToken: result.id,
                             cardType: lookupCardType($('.stripe-card-number').val()),
