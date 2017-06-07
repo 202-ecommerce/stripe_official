@@ -290,7 +290,7 @@ function initStripeOfficial() {
                     $.ajax({
                         type: 'POST',
                         dataType: 'json',
-                        url: baseDir + '/modules/stripe_official/ajax.php',
+                        url: ajaxUrlStripe,
                         data: {
                             stripeToken: result.id,
                             cardType: lookupCardType($('.stripe-card-number').val()),

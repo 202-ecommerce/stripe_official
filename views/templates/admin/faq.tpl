@@ -25,6 +25,25 @@
 *}
 
 <div class="clearfix"></div>
+<h3><i class="icon-info-sign"></i> {l s='THANKS FOR CHOOSING STRIPE' mod='stripe_official'}</h3>
+<div class="form-group">
+    <br>
+    {l s='If you run into any issue after having installed this plugin, please first read our below FAQ and make sure :' mod='stripe_official'}
+    <br>
+    <ol type="1">
+        <li>{l s='You have entered your API keys in the “Connection” tab of the Stripe module (we recommend checking that there is no space in the field).' mod='stripe_official'}</li>
+        <li>{l s='You are using test cards in Test mode and live cards in Live mode.' mod='stripe_official'}</li>
+        <li>{l s='If you’ve recently updated the module, you have refreshed your cache.' mod='stripe_official'}</li>
+        <li>{l s='You’re not using any other plugin that could impact payments.' mod='stripe_official'}</li>
+    </ol>
+    <br>
+    {l s='You can also check out our support website:' mod='stripe_official'}
+    <a href="https://support.stripe.com" target="_blank">https://support.stripe.com</a>
+    <br>
+    {l s='If you have any additional question or remaining issue related to Stripe and this plugin, please contact our support team:' mod='stripe_official'}
+    <a href="https://support.stripe.com/email" target="_blank">https://support.stripe.com/email</a>
+</div>
+
 <h3><i class="icon-info-sign"></i> {l s='Frequently Asked Questions' mod='stripe_official'}</h3>
  <div class="faq items">
 
