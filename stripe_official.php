@@ -1071,7 +1071,7 @@ class Stripe_official extends PaymentModule
 
         $fields_form[0]['form'] = array(
             'legend' => array(
-                'title' => $this->l('Stripe log in'),
+                'title' => $this->l('Cards payments'),
             ),
             'input' => array(
                 array(

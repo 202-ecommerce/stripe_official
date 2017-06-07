@@ -38,7 +38,7 @@
     <br>
     {l s='You can also check out our support website:' mod='stripe_official'}
     <a href="https://support.stripe.com" target="_blank">https://support.stripe.com</a>
-    <br>
+    <br><br>
     {l s='If you have any additional question or remaining issue related to Stripe and this plugin, please contact our support team:' mod='stripe_official'}
     <a href="https://support.stripe.com/email" target="_blank">https://support.stripe.com/email</a>
 </div>

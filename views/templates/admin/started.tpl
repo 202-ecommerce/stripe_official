@@ -54,15 +54,12 @@
 				<br>
 				<p><span>{l s='How much does Stripe cost?' mod='stripe_official'}</span></p>
 				<p>
-					{l s='Stripe has not setup fees, no monthly fees and no storage fees. There’s no additional fee for failed charges.' mod='stripe_official'}<br>
+					{l s='Stripe has not setup fees, no monthly fees and no storage fees.' mod='stripe_official'}<br>
+					{l s='There’s no additional fee for failed charges.' mod='stripe_official'}<br><br>
 					{l s='For European companies, Stripe charges (per successful transaction) :' mod='stripe_official'}<br>
 					- {l s='1.4% + €0.25/£0.20 with a European card' mod='stripe_official'}<br>
 					- {l s='2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
-					{l s='Stripe has no setup fees, no monthly fees, no validation fees, no refund fees, and no card storage fees. ' mod='stripe_official'}<br>
-					{l s='There’s no additional fee for failed charges or refunds.' mod='stripe_official'}
-				</p><br>
-				<p>{l s='For other payment methods, non-European merchants pricing and additional information, please check our website: ' mod='stripe_official'}
-				<a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a></p><br>
+					{l s='For other payment methods, non-European merchants pricing and additional information, please check our website:' mod='stripe_official'} <a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a>.</p><br>
 				<p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
 					<a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.</p>
 				<div class="connect_btn">

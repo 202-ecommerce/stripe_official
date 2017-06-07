@@ -31,7 +31,7 @@
 		<ul>
 			<li>{l s='Toggle the button above to Test Mode.' mod='stripe_official'}</li>
 			<li>{l s='To perform test payments, you can use test card numbers available in our' mod='stripe_official'}
-			<a target="_blank" href="www.stripe.com/docs/testing">{l s='documentation.' mod='stripe_official'}</a></li>
+			<a target="_blank" href="http://www.stripe.com/docs/testing">{l s='documentation.' mod='stripe_official'}</a></li>
 			<li>{l s='In Test Mode, you can not run live charges.' mod='stripe_official'}</li>
 		</ul>
 		<p><b>{l s='Using Stripe Live' mod='stripe_official'}</b></p>
