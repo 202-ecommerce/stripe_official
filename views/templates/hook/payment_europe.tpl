@@ -78,4 +78,5 @@
     var stripe_country_iso_code = "{$stripe_country_iso_code|escape:'htmlall':'UTF-8'}";
     var ajaxUrlStripe = "{$ajaxUrlStripe}";
     var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
+    var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
 </script>

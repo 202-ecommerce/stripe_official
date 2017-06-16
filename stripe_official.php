@@ -719,6 +719,125 @@ class Stripe_official extends PaymentModule
         return in_array($currency, $zeroDecimalCurrencies);
     }
 
+    public function createOrder($charge, $params)
+    {
+        if (($charge->status == 'succeeded' && $charge->object == 'charge' && $charge->id)
+            || ($charge->status == 'pending' && $charge->object == 'charge' && $charge->id && $params['type'] == 'sofort')) {
+            /* The payment was approved */
+            $message = 'Stripe Transaction ID: '.$charge->id;
+            $secure_key = isset($params['secureKey']) ? $params['secureKey'] : false;
+            try {
+                $paid = $this->isZeroDecimalCurrency($params['currency']) ? $params['amount'] : $params['amount'] / 100;
+                /* Add transaction on Prestashop back Office (Order) */
+                if ($params['type'] == 'sofort' && $charge->status == 'pending') {
+                    $status = Configuration::get('STRIPE_OS_SOFORT_WAITING');
+                } else {
+                    $status = Configuration::get('PS_OS_PAYMENT');
+                }
+                $this->validateOrder(
+                    (int)$charge->metadata->cart_id,
+                    (int)$status,
+                    $paid,
+                    $this->l('Payment by Stripe'),
+                    $message,
+                    array(),
+                    null,
+                    false,
+                    $secure_key
+                );
+            } catch (PrestaShopException $e) {
+                $this->_error[] = (string)$e->getMessage();
+            }
+
+            /* Add transaction on database */
+            if ($params['type'] == 'sofort' && $charge->status == 'pending') {
+                $result = 0;
+            } else {
+                $result = 1;
+            }
+            $this->addTentative(
+                $charge->id,
+                $charge->source->owner->name,
+                $params['type'],
+                $charge->amount,
+                0,
+                $charge->currency,
+                $result,
+                (int)$charge->metadata->cart_id
+            );
+            $id_order = Order::getOrderByCartId($params['cart_id']);
+
+            $ch = \Stripe\Charge::retrieve($charge->id);
+            $ch->description = "Order id: ".$id_order." - ".$params['carHolderEmail'];
+            $ch->save();
+            
+            /* Ajax redirection Order Confirmation */
+            die(Tools::jsonEncode(array(
+                'chargeObject' => $charge,
+                'code' => '1',
+                'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$charge->metadata->cart_id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$secure_key,
+            )));
+
+
+        } else {
+            $this->addTentative(
+                $charge->id,
+                $charge->source->owner->name,
+                $params['type'],
+                $charge->amount,
+                0,
+                $charge->currency,
+                0,
+                (int)$params['cart_id']
+            );
+            die(Tools::jsonEncode(array(
+                'code' => '0',
+                'msg' => $this->l('Payment declined. Unknown error, please use another card or contact us.'),
+            )));
+        }
+    }
+
+
+    public function chargeWebhook(array $params)
+    {
+        if (!$this->retrieveAccount($this->getSecretKey(), '', 1)) {
+            die(Tools::jsonEncode(array('code' => '0', 'msg' => $this->l('Invalid Stripe credentials, please check your configuration.'))));
+        }
+        try {
+            // Create the charge on Stripe's servers - this will charge the user's card
+            \Stripe\Stripe::setApiKey($this->getSecretKey());
+            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+
+            $cart = new Cart($params['cart_id']);
+            $address_delivery = new Address($cart->id_address_delivery);
+            $state_delivery = State::getNameById($address_delivery->id_state);
+            $cardHolderName = $params['cardHolderName'];
+
+            $charge = \Stripe\Charge::create(
+                array(
+                    "amount" => $params['amount'], // amount in cents, again
+                    "currency" => $params['currency'],
+                    "source" => $params['token'],
+                    "description" => $params['carHolderEmail'],
+                    "shipping" => array("address" => array("city" => $address_delivery->city,
+                        "country" => Country::getIsoById($address_delivery->id_country), "line1" => $address_delivery->address1,
+                        "line2" => $address_delivery->address2, "postal_code" => $address_delivery->postcode,
+                        "state" => $state_delivery), "name" => $cardHolderName),
+                    "metadata" => array("cart_id" => $params['cart_id'])
+                )
+            );
+        } catch (\Stripe\Error\Card $e) {
+            $refund = $params['amount'];
+            $this->addTentative($e->getMessage(), $params['cardHolderName'], $params['type'], $refund, $refund, $params['currency'], 0, (int)$params['cart_id']);
+            die(Tools::jsonEncode(array(
+                'code' => '0',
+                'msg' => $e->getMessage(),
+            )));
+        }
+
+        $this->createOrder($charge, $params);
+    }
+
     public function chargev2(array $params)
     {
         if (!$this->retrieveAccount($this->getSecretKey(), '', 1)) {
@@ -760,80 +879,10 @@ class Stripe_official extends PaymentModule
                 'msg' => $e->getMessage(),
             )));
         }
-        if (($charge->status == 'succeeded' && $charge->object == 'charge' && $charge->id)
-            || ($charge->status == 'pending' && $charge->object == 'charge' && $charge->id && $params['type'] == 'sofort')) {
-            /* The payment was approved */
-            $message = 'Stripe Transaction ID: '.$charge->id;
-            try {
-                $paid = $this->isZeroDecimalCurrency($params['currency']) ? $params['amount'] : $params['amount'] / 100;
-                /* Add transaction on Prestashop back Office (Order) */
-                if ($params['type'] == 'sofort' && $charge->status == 'pending') {
-                    $status = Configuration::get('STRIPE_OS_SOFORT_WAITING');
-                } else {
-                    $status = Configuration::get('PS_OS_PAYMENT');
-                }
-                $this->validateOrder(
-                    (int)$this->context->cart->id,
-                    (int)$status,
-                    $paid,
-                    $this->l('Payment by Stripe'),
-                    $message,
-                    array(),
-                    null,
-                    false,
-                    $this->context->customer->secure_key
-                );
-            } catch (PrestaShopException $e) {
-                $this->_error[] = (string)$e->getMessage();
-            }
-
-            /* Add transaction on database */
-            if ($params['type'] == 'sofort' && $charge->status == 'pending') {
-                $result = 0;
-            } else {
-                $result = 1;
-            }
-            $this->addTentative(
-                $charge->id,
-                $charge->source->owner->name,
-                $params['type'],
-                $charge->amount,
-                0,
-                $charge->currency,
-                $result,
-                (int)$this->context->cart->id
-            );
-            $id_order = Order::getOrderByCartId($this->context->cart->id);
-
-            $ch = \Stripe\Charge::retrieve($charge->id);
-            $ch->description = "Order id: ".$id_order." - ".$this->context->customer->email;
-            $ch->save();
-
-
-            /* Ajax redirection Order Confirmation */
-            die(Tools::jsonEncode(array(
-                'chargeObject' => $charge,
-                'code' => '1',
-                'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$this->context->cart->id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key,
-            )));
-        } else {
-            /* The payment was declined */
-            /* Add transaction on database */
-            $this->addTentative(
-                $charge->id,
-                $charge->source->owner->name,
-                $params['type'],
-                $charge->amount,
-                0,
-                $charge->currency,
-                0,
-                (int)$this->context->cart->id
-            );
-            die(Tools::jsonEncode(array(
-                'code' => '0',
-                'msg' => $this->l('Payment declined. Unknown error, please use another card or contact us.'),
-            )));
-        }
+        $params['cart_id'] = $this->context->cart->id;
+        $params['carHolderEmail'] = $this->context->customer->email;
+        $params['secureKey'] =  $this->context->customer->secure_key;
+        $this->createOrder($charge, $params);
     }
 
     /*
@@ -972,6 +1021,7 @@ class Stripe_official extends PaymentModule
                     'billing_address' => Tools::jsonEncode($billing_address),
                     'country_merchant' => Tools::strtolower($default_country->iso_code),
                     'ajaxUrlStripe' => $ajax_link,
+                    'stripe_customer_email' => $this->context->customer->email,
                 )
             );
             $html = '';

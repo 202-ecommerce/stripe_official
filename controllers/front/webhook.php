@@ -13,7 +13,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-
+require_once dirname(__FILE__).'/../../libraries/sdk/stripe/init.php';
 
 class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 {
@@ -21,36 +21,40 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
 
-        if (Tools::getValue('_PS_STRIPE_mode') == 1) {
+        if (Configuration::get('_PS_STRIPE_mode') == 1) {
             $secret_key = Configuration::get('_PS_STRIPE_test_key');
         } else {
             $secret_key = Configuration::get('_PS_STRIPE_key');
         }
-        \Stripe\Stripe::setApiKey($secret_key);
 
+        try {
+            \Stripe\Stripe::setApiKey($secret_key);
+        } catch (Exception $e) {
+            print_r($e->getMessage());die;
+        }
+        // Retrieve the request's body and parse it as JSON
         $input = @file_get_contents("php://input");
         $event_json = json_decode($input);
+        try {
+            \Stripe\Event::retrieve($event_json->id);
+        } catch (Exception $e) {
+            print_r($e->getMessage());die;
+        }
 
-
-
-        // Retrieve the request's body and parse it as JSON
-
-        $file = fopen('log.txt', "w+");
-        fwrite($file, print_r($event_json, true).'\n');
-        fclose($file);
         http_response_code(200);
-        if ($event_json) {
-            //TODO: check events charge.succeeded or charge.failed Sofort
 
+        if ($event_json) {
             if ($event_json->type == "charge.canceled" || $event_json->type == "charge.failed") {
                 $payment_type = $event_json->data->object->source->type;
                 $id_payment = $event_json->data->object->id;
-                $stripe_payment = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($id_payment).'"');
-                if ($stripe_payment) {
-                    $id_order = Order::getOrderByCartId($stripe_payment['id_cart']);
-                    $order = new Order($id_order);
-                    if (Validate::isLoadedObject($order)) {
-                        $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
+                if ($payment_type == 'sofort') {
+                    $stripe_payment = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE `id_stripe` = "' . pSQL($id_payment) . '"');
+                    if ($stripe_payment) {
+                        $id_order = Order::getOrderByCartId($stripe_payment['id_cart']);
+                        $order = new Order($id_order);
+                        if (Validate::isLoadedObject($order)) {
+                            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
+                        }
                     }
                 }
             }
@@ -70,29 +74,23 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             if ($event_json->type == "source.chargeable") {
                 $payment_type = $event_json->data->object->type;
                 if (in_array($payment_type, array('ideal', 'bancontact', 'giropay', 'sofort'))) {
-                    // TODO: create charge and commande
-                    /* $stripe = Module::getInstanceByName('stripe_official');
-                     $params = array(
-                         'token' => $event_json->data->object->id,
-                         'amount' => $event_json->data->object->amount,
-                         'currency' => $event_json->data->object->currency,
-                         'cardHolderName' => $event_json->data->object->owner->name,
-                         'type' => $payment_type,
-                     );
-                     $stripe->chargev2($params);*/
+                    $source = \Stripe\Source::retrieve($event_json->data->object->id);
+                    if ($source->status != "chargeable") {
+                        die($this->l('Source is not in state chargeable'));
+                    }
+                    $stripe = Module::getInstanceByName('stripe_official');
+                    $params = array(
+                        'token' => $event_json->data->object->id,
+                        'amount' => $event_json->data->object->amount,
+                        'currency' => $event_json->data->object->currency,
+                        'cardHolderName' => $event_json->data->object->owner->name,
+                        'cart_id' => $event_json->data->object->metadata->cart_id,
+                        'carHolderEmail' => $event_json->data->object->metadata->email,
+                        'type' => $event_json->data->object->source->type,
+                    );
+                    $stripe->chargeWebhook($params);
                 }
-
             }
-
         }
-
-
-
     }
-
-
 }
-
-
-
-

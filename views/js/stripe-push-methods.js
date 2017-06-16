@@ -44,6 +44,10 @@ function initStripeOfficialGiropay() {
             type: method_stripe,
             amount: amount_ttl,
             currency: currency_stripe,
+            metadata: {
+                cart_id: stripe_cart_id,
+                email: stripe_customer_email,
+            },
             owner: {
                 name: stripe_customer_name,
             },
@@ -97,6 +101,7 @@ function initStripeOfficialGiropay() {
             data: {
                 stripeToken: result.id,
                 cardType: result.type,
+                cardHolderName: result.owner.name,
             },
             success: function(data) {
                 if (data.code == '1') {
