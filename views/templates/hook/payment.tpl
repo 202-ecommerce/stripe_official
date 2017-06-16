@@ -144,6 +144,7 @@ var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
 var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
 var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
 var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
+var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
 if (ps_version) {
     var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
 }

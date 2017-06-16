@@ -15,7 +15,7 @@
 
 
 
-class stripe_officialstripeWebhookModuleFrontController extends ModuleFrontController
+class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 {
 
     public function postProcess()
@@ -71,15 +71,15 @@ class stripe_officialstripeWebhookModuleFrontController extends ModuleFrontContr
                 $payment_type = $event_json->data->object->type;
                 if (in_array($payment_type, array('ideal', 'bancontact', 'giropay', 'sofort'))) {
                     // TODO: create charge and commande
-                   /* $stripe = Module::getInstanceByName('stripe_official');
-                    $params = array(
-                        'token' => $event_json->data->object->id,
-                        'amount' => $event_json->data->object->amount,
-                        'currency' => $event_json->data->object->currency,
-                        'cardHolderName' => $event_json->data->object->owner->name,
-                        'type' => $payment_type,
-                    );
-                    $stripe->chargev2($params);*/
+                    /* $stripe = Module::getInstanceByName('stripe_official');
+                     $params = array(
+                         'token' => $event_json->data->object->id,
+                         'amount' => $event_json->data->object->amount,
+                         'currency' => $event_json->data->object->currency,
+                         'cardHolderName' => $event_json->data->object->owner->name,
+                         'type' => $payment_type,
+                     );
+                     $stripe->chargev2($params);*/
                 }
 
             }

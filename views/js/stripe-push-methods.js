@@ -24,7 +24,6 @@ function initStripeOfficialGiropay() {
 
     $(document).on('click', '.stripe-europe-payments', function(e){
         // Get Stripe public key
-        var StripePubKey = $('#stripe-publishable-key').val();
         if (StripePubKey) {
             Stripe.setPublishableKey(StripePubKey);
         }
@@ -66,7 +65,6 @@ function initStripeOfficialGiropay() {
     });
 
     if (stripe_source && stripe_client_secret) {
-        var StripePubKey = $('#stripe-publishable-key').val();
         if (StripePubKey) {
             Stripe.setPublishableKey(StripePubKey);
         }

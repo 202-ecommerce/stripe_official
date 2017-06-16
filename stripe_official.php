@@ -514,6 +514,10 @@ class Stripe_official extends PaymentModule
                 }
                 Configuration::updateValue(self::_PS_STRIPE_.'mode', Tools::getValue(self::_PS_STRIPE_.'mode'));
             }
+            Configuration::updateValue('STRIPE_ENABLE_IDEAL', Tools::getValue('ideal'));
+            Configuration::updateValue('STRIPE_ENABLE_SOFORT', Tools::getValue('sofort'));
+            Configuration::updateValue('STRIPE_ENABLE_GIROPAY', Tools::getValue('giropay'));
+            Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', Tools::getValue('bancontact'));
         }
     }
 
@@ -614,12 +618,7 @@ class Stripe_official extends PaymentModule
 
     private function _postProcess()
     {
-        if (Tools::isSubmit('submit_payment_methods')) {
-            Configuration::updateValue('STRIPE_ENABLE_IDEAL', Tools::getValue('ideal'));
-            Configuration::updateValue('STRIPE_ENABLE_SOFORT', Tools::getValue('sofort'));
-            Configuration::updateValue('STRIPE_ENABLE_GIROPAY', Tools::getValue('giropay'));
-            Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', Tools::getValue('bancontact'));
-        }
+
 
     }
 
@@ -1144,12 +1143,12 @@ class Stripe_official extends PaymentModule
             self::_PS_STRIPE_.'test_key' => Configuration::get(self::_PS_STRIPE_.'test_key'),
             self::_PS_STRIPE_.'test_publishable' => Configuration::get(self::_PS_STRIPE_.'test_publishable'),
         ));
-        $this->context->smarty->assign('path', $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'#'.$this->getSectionShape());
         $this->context->smarty->assign(array(
             'ideal' => Configuration::get('STRIPE_ENABLE_IDEAL'),
             'sofort' => Configuration::get('STRIPE_ENABLE_SOFORT'),
             'giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
             'bancontact' => Configuration::get('STRIPE_ENABLE_BANCONTACT'),
+            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
 
         if (version_compare(_PS_VERSION_, '1.6', '<')) {
