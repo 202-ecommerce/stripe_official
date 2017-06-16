@@ -24,15 +24,14 @@
 *}
 <br>
 <style type="text/css">
-    .conf-methods label {
+    #conf-payment-methods label {
         width: fit-content;
     }
+    #conf-payment-methods {
+        padding: 20px;
+    }
 </style>
-<fieldset class="conf-methods" style="    padding-left: 15px;">
-    <form method="post" action="{$path|escape:'htmlall':'UTF-8'}">
-        <legend>
-            {l s='Configuration payment methods' mod='stripe_official'}
-        </legend>
+<div id="conf-payment-methods">
         <p><b>{l s='Testing Stripe' mod='stripe_official'}</b></p>
         <ul>
             <li>- {l s='Toggle the button above to Test Mode.' mod='stripe_official'}</li>
@@ -95,9 +94,4 @@
                 <a target="_blank" href="https://dashboard.stripe.com/account/payments/settings">{l s='Stripe dashboard.' mod='stripe_official'}</a>
             </li>
         </ol>
-        <div class="margin-form">
-            <button type="submit" value="1" id="submit_payment_methods" name="submit_payment_methods" class="btn btn-default pull-right button"> {l s='Save' mod='stripe_official'}
-            </button>
-        </div>
-    </form>
-</fieldset>
+</div>
