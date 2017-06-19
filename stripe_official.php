@@ -957,6 +957,8 @@ class Stripe_official extends PaymentModule
       //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
         if (in_array($context->controller->php_self, array('order', 'order-opc'))) {
             $context->controller->addCSS($this->_path.'/views/css/front.css');
+
+            $context->controller->addJs('https://js.stripe.com/v3/');
             $context->controller->addJs('https://js.stripe.com/v2/');
 
             if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {

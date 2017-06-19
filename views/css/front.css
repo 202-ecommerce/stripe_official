@@ -7,7 +7,7 @@ div.payment_module.cart-stripe-official { padding-bottom: 35px;     margin-botto
 	border: #CCCCCC solid 1px; margin-bottom: 15px; padding: 3px;     box-sizing: border-box; font-size: 15px;
 }
 #stripe-payment-form input[type="checkbox"] { margin-bottom: 15px; }
-#stripe-payment-form .img-card {width: 33px;     margin-bottom: 2px;}
+
 #stripe-payment-form input.stripe-card-cvc {  }
 #stripe-form a { display: inline; position: relative; }
 a.stripe-card-cvc-info { font-style: italic; }
@@ -61,7 +61,7 @@ img.enable { opacity: 1; }
 	text-decoration:none;
 	background-position: left -50px
 }
-div.stripe-payment-errors {
+div.stripe-payment-errors, #stripe-payment-form #card-errors {
 	margin: 0 0 10px 0;
 	padding: 10px;
 	border: 1px solid #900;
@@ -104,12 +104,7 @@ a#stripe_error { display: none; }
 #stripe-payment-form .stripe-submit-button:hover {
 	background-position: 7px;
 }
-#stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
-	width:102px;
-	max-width: 102px;
-	text-align: center;
-	padding: 3px 1px !important;
-}
+
 .powered_stripe {
 	margin-right: 6px !important;
     height: 21px !important;
@@ -154,7 +149,7 @@ h3.stripe_title {
 		background: white;
 	}
 }
-#modal_stripe_waiting {
+#modal_stripe_waiting, #modal-stripe-error {
 	height: 124px;
 	width: 341px;
 	background: white;
@@ -190,3 +185,27 @@ h3.stripe_title {
 	position: relative;
 	background: #fbfbfb;
 }
+
+#cardNumber-element, #cardCvc-element, #cardExpiry-element {
+	border: #CCCCCC solid 1px;
+	margin-bottom: 15px;
+	padding: 3px;
+	box-sizing: border-box;
+	font-size: 15px;
+	width: 210px;
+	background-color: #ffffff;
+}
+#cardNumber-element {
+	width: 210px;
+}
+#cardCvc-element, #cardExpiry-element {
+	width:102px;
+	max-width: 102px;
+}
+#stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
+	width:102px;
+	max-width: 102px;
+	float: left;
+	padding: 3px 1px !important;
+}
+#stripe-payment-form .img-card {width: 33px;     margin-top: -77px;}

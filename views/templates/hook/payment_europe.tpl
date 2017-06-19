@@ -29,8 +29,7 @@
             <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-giropay.png" alt="{l s='Pay by Giropay' mod='stripe_official'}" />
             {l s='Pay by Giropay' mod='stripe_official'}
         </a>
-        <p class="stripe-payment-europe-errors-giropay"></p>
-        <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+        <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
     </div>
 {/if}
 {if $stripe_bancontact}
@@ -39,8 +38,7 @@
             <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-bancontact.png" alt="{l s='Pay by Bancontact' mod='stripe_official'}" />
             {l s='Pay by Bancontact' mod='stripe_official'}
         </a>
-        <p class="stripe-payment-europe-errors-bancontact"></p>
-        <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+        <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
     </div>
 {/if}
 {if $stripe_ideal}
@@ -49,8 +47,7 @@
             <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-ideal.png" alt="{l s='Pay by iDeal' mod='stripe_official'}" />
             {l s='Pay by iDeal' mod='stripe_official'}
         </a>
-        <p class="stripe-payment-europe-errors-ideal"></p>
-        <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+        <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
     </div>
 {/if}
 {if $stripe_sofort && $show_sofort}
@@ -59,10 +56,16 @@
             <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
             {l s='Pay by SOFORT' mod='stripe_official'}
         </a>
-    <p class="stripe-payment-europe-errors-sofort"></p>
-    <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+    <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
     </div>
 {/if}
+
+<div id="modal-stripe-error" class="modal" style="display: none">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <p class="stripe-payment-europe-errors"></p>
+</div>
 <div id="modal_stripe_waiting"  class="modal" style="display: none">
     <div id="stripe-ajax-loader-europe"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
 </div>
@@ -79,4 +82,5 @@
     var ajaxUrlStripe = "{$ajaxUrlStripe}";
     var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
     var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
+    var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
 </script>

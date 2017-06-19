@@ -24,8 +24,8 @@ function initStripeOfficialGiropay() {
 
     $(document).on('click', '.stripe-europe-payments', function(e){
         // Get Stripe public key
-        if (StripePubKey) {
-            Stripe.setPublishableKey(StripePubKey);
+        if (StripePubKey && typeof stripe_v3 !== 'object') {
+            var stripe_v3 = Stripe(StripePubKey);
         }
         var method_stripe = $(this).attr('data-method');
         e.preventDefault();
@@ -56,19 +56,19 @@ function initStripeOfficialGiropay() {
             }
         };
         source_params[method_stripe] = method_info;
-        Stripe.source.create(source_params, function (status, response) {
-            if (response.status == "pending") {
-                window.location.replace(response.redirect.url);
+        stripe_v3.createSource(source_params).then(function(response) {
+            if (response.error) {
+                $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
+                $('.stripe-payment-europe-errors').show().text(response.error.message).fadeIn(1000);
+                $('#modal-stripe-error').parent().css({'z-index': 90000000000});
             } else {
-                $('.stripe-payment-europe-errors-'+method_stripe).show();
-                $('.stripe-payment-europe-errors-'+method_stripe).text(response.error.message).fadeIn(1000);
+                window.location.replace(response.source.redirect.url);
             }
-
-
         });
     });
 
-    if (stripe_source && stripe_client_secret) {
+    if (typeof stripe_source != "undefined" && stripe_source != ""
+        && typeof stripe_client_secret != "undefined" && stripe_client_secret != "") {
         if (StripePubKey) {
             Stripe.setPublishableKey(StripePubKey);
         }
@@ -79,8 +79,9 @@ function initStripeOfficialGiropay() {
                 if (source.status == "chargeable") {
                     createCharge(source);
                 } else if (source.status == "failed") {
-                    $('.stripe-payment-europe-errors-'+source.type).show();
-                    $('.stripe-payment-europe-errors-'+source.type).text(data.msg).fadeIn(1000);
+                    $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
+                    $('#modal-stripe-error').parent().css({'z-index': 90000000000});
+                    $('.stripe-payment-europe-errors').show().text(bank_payment_declined).fadeIn(1000);
                 }
             }
         );
@@ -110,18 +111,23 @@ function initStripeOfficialGiropay() {
                 } else {
                     $('#modal_stripe_waiting').modalStripe().close();
                     //  Charge ko
-                    $('.stripe-payment-europe-errors-'+result.type).show();
-                    $('.stripe-payment-europe-errors-'+result.type).text(data.msg).fadeIn(1000);
+                    $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
+                    $('#modal-stripe-error').parent().css({'z-index': 90000000000});
+                    $('.stripe-payment-europe-errors').show().text(data.msg).fadeIn(1000);
                 }
             },
             error: function(err) {
                 $('#modal_stripe_waiting').modalStripe().close();
                 // AJAX ko
-                $('.stripe-payment-europe-errors-'+result.type).show();
-                $('.stripe-payment-europe-errors-'+result.type).text(stripe_error_msg).fadeIn(1000);
+                $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
+                $('#modal-stripe-error').parent().css({'z-index': 90000000000});
+                $('.stripe-payment-europe-errors').show().text(stripe_error_msg).fadeIn(1000);
             }
         });
     }
 
+    $('#modal-stripe-error .close').click(function() {
+        $('#modal-stripe-error').modalStripe().close();
+    });
 
 }
