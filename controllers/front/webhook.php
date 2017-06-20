@@ -55,6 +55,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                         if (Validate::isLoadedObject($order)) {
                             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
                         }
+                        Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 0 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
                     }
                 }
             }
@@ -63,10 +64,12 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $id_payment = $event_json->data->object->id;
                 if ($payment_type == 'sofort') {
                     $stripe_payment = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($id_payment).'"');
-                    if ($stripe_payment['result'] == 0) {
+                    if ($stripe_payment['result'] == Stripe_official::_PENDING_SOFORT_) {
                         $id_order = Order::getOrderByCartId($stripe_payment['id_cart']);
                         $order = new Order($id_order);
-                        $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                        if (Validate::isLoadedObject($order)) {
+                            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                        }
                         Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 1 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
                     }
                 }
@@ -86,7 +89,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                         'cardHolderName' => $event_json->data->object->owner->name,
                         'cart_id' => $event_json->data->object->metadata->cart_id,
                         'carHolderEmail' => $event_json->data->object->metadata->email,
-                        'type' => $event_json->data->object->source->type,
+                        'type' => $event_json->data->object->type,
                     );
                     $stripe->chargeWebhook($params);
                 }

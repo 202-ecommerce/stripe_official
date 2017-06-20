@@ -51,9 +51,11 @@
 		<td>{$v.amount|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.refund|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		{if $v.result == 2}
-			<td>Refund</td>
+			<td>{l s='Refund' mod='stripe_official'}</td>
 		{elseif $v.result == 3}
-			<td>Partial Refund</td>
+			<td>{l s='Partial Refund' mod='stripe_official'}</td>
+		{elseif $v.result == 4}
+			<td>{l s='Waiting' mod='stripe_official'}</td>
 		{else}
 			<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/{$v.result|escape:'htmlall':'UTF-8'}ok.gif" alt="result" /></td>
 		{/if}

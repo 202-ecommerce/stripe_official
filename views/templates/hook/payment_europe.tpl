@@ -26,7 +26,7 @@
 {if $stripe_giropay}
     <div class="payment_module stripe-europe-payments" data-method="giropay">
         <a href="" title="{l s='Pay by Giropay' mod='stripe_official'}">
-            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-giropay.png" alt="{l s='Pay by Giropay' mod='stripe_official'}" />
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/giropay.png" alt="{l s='Pay by Giropay' mod='stripe_official'}" />
             {l s='Pay by Giropay' mod='stripe_official'}
         </a>
         <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
@@ -35,7 +35,7 @@
 {if $stripe_bancontact}
     <div class="payment_module stripe-europe-payments" data-method="bancontact">
         <a href="" title="{l s='Pay by Bancontact' mod='stripe_official'}">
-            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-bancontact.png" alt="{l s='Pay by Bancontact' mod='stripe_official'}" />
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/bancontact.png" alt="{l s='Pay by Bancontact' mod='stripe_official'}" />
             {l s='Pay by Bancontact' mod='stripe_official'}
         </a>
         <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
@@ -44,7 +44,7 @@
 {if $stripe_ideal}
     <div class="payment_module stripe-europe-payments" data-method="ideal">
         <a href="" title="{l s='Pay by iDeal' mod='stripe_official'}">
-            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-ideal.png" alt="{l s='Pay by iDeal' mod='stripe_official'}" />
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ideal.png" alt="{l s='Pay by iDeal' mod='stripe_official'}" />
             {l s='Pay by iDeal' mod='stripe_official'}
         </a>
         <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
@@ -53,7 +53,7 @@
 {if $stripe_sofort && $show_sofort}
     <div class="payment_module stripe-europe-payments" data-method="sofort">
         <a href="" title="{l s='Pay by SOFORT' mod='stripe_official'}">
-            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
             {l s='Pay by SOFORT' mod='stripe_official'}
         </a>
     <p><input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/></p>
@@ -67,7 +67,7 @@
     <p class="stripe-payment-europe-errors"></p>
 </div>
 <div id="modal_stripe_waiting"  class="modal" style="display: none">
-    <div id="stripe-ajax-loader-europe"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+    <div id="stripe-ajax-loader-europe"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp;<br><br>{l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
 </div>
 <script type="text/javascript">
     var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
@@ -77,7 +77,7 @@
     var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
     var stripe_customer_name = "{$customer_name|escape:'htmlall':'UTF-8'}";
     var stripe_cart_id = {$stripe_cart_id|escape:'htmlall':'UTF-8'};
-    var stripe_order_url = "{$stripe_order_url|escape:'htmlall':'UTF-8'}";
+    var stripe_order_url = "{$stripe_order_url}";
     var stripe_country_iso_code = "{$stripe_country_iso_code|escape:'htmlall':'UTF-8'}";
     var ajaxUrlStripe = "{$ajaxUrlStripe}";
     var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";

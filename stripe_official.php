@@ -34,6 +34,7 @@ class Stripe_official extends PaymentModule
     const _FLAG_MAIL_ = 8;
     const _FLAG_NO_FLUSH__ = 16;
     const _FLAG_FLUSH__ = 32;
+    const _PENDING_SOFORT_ = 4;
 
     /* Stripe Pre fix */
     const _PS_STRIPE_ = '_PS_STRIPE_';
@@ -751,7 +752,7 @@ class Stripe_official extends PaymentModule
 
             /* Add transaction on database */
             if ($params['type'] == 'sofort' && $charge->status == 'pending') {
-                $result = 0;
+                $result = self::_PENDING_SOFORT_;
             } else {
                 $result = 1;
             }
@@ -964,9 +965,12 @@ class Stripe_official extends PaymentModule
             if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {
                 $context->controller->addJS($this->_path.'/views/js/stripe-push-methods.js');
             }
+
+            if (version_compare(_PS_VERSION_, '1.6', '<')) {
+                $context->controller->addCSS($this->_path.'/views/css/front_15.css');
+            }
         }
     }
-
     /*
      ** Hook Stripe Payment
      */
@@ -1038,7 +1042,7 @@ class Stripe_official extends PaymentModule
                 $iso_country = Country::getIsoById($address_invoice->id_country);
                 $this->context->smarty->assign(
                     array(
-                        'stripe_order_url' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc'):$this->context->link->getPageLink('order'),
+                        'stripe_order_url' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc'):$this->context->link->getPageLink('order').'&step=3',
                         'stripe_cart_id' => $this->context->cart->id,
                         'stripe_ideal' => Configuration::get('STRIPE_ENABLE_IDEAL'),
                         'stripe_giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
@@ -1237,6 +1241,8 @@ class Stripe_official extends PaymentModule
                     $result = '';
                 } elseif ($order['result'] == 2) {
                     $result = 2;
+                } elseif ($order['result'] == self::_PENDING_SOFORT_) {
+                    $result = 4;
                 } else {
                     $result = 3;
                 }

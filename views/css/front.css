@@ -169,6 +169,7 @@ h3.stripe_title {
 .stripe-europe-payments img {
 	width:86px;
 	height:49px;
+	margin-right: 20px;
 }
 .stripe-europe-payments a {
 	display: block;
@@ -180,7 +181,7 @@ h3.stripe_title {
 	line-height: 23px;
 	color: #333;
 	font-weight: bold;
-	padding: 33px 40px 34px 99px;
+	padding: 28px 40px 28px 20px;
 	letter-spacing: -1px;
 	position: relative;
 	background: #fbfbfb;
@@ -209,3 +210,6 @@ h3.stripe_title {
 	padding: 3px 1px !important;
 }
 #stripe-payment-form .img-card {width: 33px;     margin-top: -77px;}
+#stripe-ajax-loader-europe {
+    text-align: center;
+}
