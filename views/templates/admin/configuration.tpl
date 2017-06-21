@@ -64,10 +64,10 @@
 					</li>
 					<li>{l s='Click on “Add Endpoint” and copy/paste this URL in the “URL to be called” field:' mod='stripe_official'} {$url_webhhoks}</li>
 					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}<br>
-						<img src="/modules/stripe_official//views/img/cc-visa.png">
+						<img class="img-example1" src="/modules/stripe_official//views/img/example1.png">
 					</li>
 					<li>{l s='Ultimately, your webhook dashboard page should look like this:' mod='stripe_official'}<br>
-						<img src="/modules/stripe_official//views/img/cc-visa.png"><br>
+						<img class="img-example2" src="/modules/stripe_official//views/img/example2.png">
 					</li>
 				</ul>
 			</li>
