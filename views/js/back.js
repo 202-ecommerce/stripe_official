@@ -18,7 +18,6 @@ $(document).ready(function() {
 	//rename switch fiels value labels
 	$('label[for=_PS_STRIPE_mode_on]').html(stripe_test_mode);
 	$('label[for=_PS_STRIPE_mode_off]').html(live);
-	$('#section-shape-2 .form-group').first().prepend('<br>'+cards_payments_translation+'<br><br>');
 	$('#section-shape-2 .form-group').first().append(conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.stripe.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.');
 
 	$('#section-shape-2 .panel .form-wrapper').append($('#conf-payment-methods'));

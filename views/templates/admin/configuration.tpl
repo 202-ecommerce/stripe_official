@@ -63,7 +63,9 @@
 						 <a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
 					</li>
 					<li>{l s='Click on “Add Endpoint” and copy/paste this URL in the “URL to be called” field:' mod='stripe_official'} {$url_webhhoks}</li>
-					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}<br>
+					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}</li>
+					<li>{l s='Set the "Filter event" radio button to "Send all event types"' mod='stripe_official'}</li>
+					<li>{l s='Click on "Add endpoint"' mod='stripe_official'}<br>
 						<img class="img-example1" src="/modules/stripe_official//views/img/example1.png">
 					</li>
 					<li>{l s='Ultimately, your webhook dashboard page should look like this:' mod='stripe_official'}<br>
@@ -76,6 +78,6 @@
 				<a target="_blank" href="https://dashboard.stripe.com/account/payments/settings">{l s='Stripe dashboard.' mod='stripe_official'}</a>
 			</li>
 			<p>{l s='After clicking “Activate”, the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
-				{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 30 minutes.' mod='stripe_official'}</p>
+				{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 10 minutes.' mod='stripe_official'}</p>
 		</ol>
 </div>

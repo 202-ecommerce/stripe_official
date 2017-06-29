@@ -17,7 +17,6 @@ $(document).ready(function() {
 
     $('#section-shape-2 legend').after('<br><p style="padding-left:15px;">'+cards_payments_translation+'</p><br><br>');
 
-    $('#section-shape-2 .margin-form').first().append('<p>'+conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.stripe.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.</p>');
 
     $('#section-shape-2 #fieldset_0 .margin-form').last().before($('#conf-payment-methods'));
     /* Css Radio Connection button 1.5 */

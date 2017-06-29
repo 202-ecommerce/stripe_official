@@ -1042,7 +1042,7 @@ class Stripe_official extends PaymentModule
                 $iso_country = Country::getIsoById($address_invoice->id_country);
                 $this->context->smarty->assign(
                     array(
-                        'stripe_order_url' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc'):$this->context->link->getPageLink('order').'&step=3',
+                        'stripe_order_url' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc'):$this->context->link->getPageLink('order', true, null, array('step'=>3)),
                         'stripe_cart_id' => $this->context->cart->id,
                         'stripe_ideal' => Configuration::get('STRIPE_ENABLE_IDEAL'),
                         'stripe_giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
@@ -1125,9 +1125,6 @@ class Stripe_official extends PaymentModule
         }
 
         $fields_form[0]['form'] = array(
-            'legend' => array(
-                'title' => $this->l('Cards payments'),
-            ),
             'input' => array(
                 array(
                     'type' => $type,
@@ -1147,49 +1144,49 @@ class Stripe_official extends PaymentModule
                                 'label' => $this->l('Live'),
                             )
                         ),
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Stripe Secrey Key'),
-                        'name' => self::_PS_STRIPE_.'key',
-                        'size' => 20,
-                        'id' => 'secret_key',
-                        'class' => 'fixed-width-xxl',
-                        'required' => true
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Stripe Publishable Key'),
-                        'name' => self::_PS_STRIPE_.'publishable',
-                        'id' => 'public_key',
-                        'class' => 'fixed-width-xxl',
-                        'size' => 20,
-                        'required' => true
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Stripe Test Secrey Key'),
-                        'name' => self::_PS_STRIPE_.'test_key',
-                        'id' => 'test_secret_key',
-                        'size' => 20,
-                        'class' => 'fixed-width-xxl',
-                        'required' => true
-                    ),
-                    array(
-                        'type' => 'text',
-                        'label' => $this->l('Stripe Test Publishable Key'),
-                        'name' => self::_PS_STRIPE_.'test_publishable',
-                            'id' => 'test_public_key',
-                            'class' => 'fixed-width-xxl',
-                            'size' => 20,
-                            'required' => true
-                        ),
-                    ),
-                    'submit' => array(
-                        'title' => $this->l('Save'),
-                        'class' => 'btn btn-default pull-right button',
-                    ),
-                );
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Stripe Publishable Key'),
+                    'name' => self::_PS_STRIPE_.'publishable',
+                    'id' => 'public_key',
+                    'class' => 'fixed-width-xxl',
+                    'size' => 20,
+                    'required' => true
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Stripe Secrey Key'),
+                    'name' => self::_PS_STRIPE_.'key',
+                    'size' => 20,
+                    'id' => 'secret_key',
+                    'class' => 'fixed-width-xxl',
+                    'required' => true
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Stripe Test Publishable Key'),
+                    'name' => self::_PS_STRIPE_.'test_publishable',
+                    'id' => 'test_public_key',
+                    'class' => 'fixed-width-xxl',
+                    'size' => 20,
+                    'required' => true
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Stripe Test Secrey Key'),
+                    'name' => self::_PS_STRIPE_.'test_key',
+                    'id' => 'test_secret_key',
+                    'size' => 20,
+                    'class' => 'fixed-width-xxl',
+                    'required' => true
+                ),
+            ),
+            'submit' => array(
+                'title' => $this->l('Save'),
+                'class' => 'btn btn-default pull-right button',
+            ),
+        );
 
         $submit_action = 'submit_login';
         $fields_value = array_merge($fields_value, array(
