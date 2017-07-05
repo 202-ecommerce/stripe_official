@@ -19,6 +19,13 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
      * @see FrontController::initContent()
      */
     public $display_column_left = false;
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->ssl = true;
+    }
+
     public function initContent()
     {
 
