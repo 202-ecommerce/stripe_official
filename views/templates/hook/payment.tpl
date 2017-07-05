@@ -41,32 +41,50 @@
       <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}">
       <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}">
       <div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" /> {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
-      <form action="#" id="stripe-payment-form">
-        {* Classic Credit card form *}
+      <form id="stripe-payment-form" action="#">
+
+        <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
+
+
         <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div>
-        <a name="stripe_error" style="display:none"></a>
+
+        <!-- Used to display Element errors -->
+        <div id="card-errors" role="alert"></div>
+
+
         <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
-        <div>
-          <label>{l s='Cardholder\'s Name' mod='stripe_official'}</label>  <label class="required"> </label><br />
-          <input type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
-        </div>
-        <div>
-          <label>{l s='Card Number ' mod='stripe_official'}</label>  <label class="required"> </label><br />
-          <input type="text" size="20" autocomplete="off" class="stripe-card-number" id="card_number" data-stripe="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
-        </div>
-        <div class="block-left">
-          <label>{l s='Expiry date' mod='stripe_official'}</label>  <label class="required"> </label><br />
-          <input type="text" size="7" autocomplete="off" id="card_expiry" class="stripe-card-expiry" maxlength = 5 placeholder="MM/YY"/>
-        </div>
-        <div>
-          <label>{l s='CVC/CVV' mod='stripe_official'}</label>  <label class="required"> </label><br />
-          <input type="text" size="7" autocomplete="off" data-stripe="cvc" class="stripe-card-cvc" placeholder="&#9679;&#9679;&#9679;"/>
-          <a href="javascript:void(0)" class="stripe-card-cvc-info" style="border: none;">
-            <div class="cvc-info">
-              {l s='The CVC (Card Validation Code) is a 3 or 4 digit code on the reverse side of Visa, MasterCard and Discover cards and on the front of American Express cards.' mod='stripe_official'}
+
+        <div class="form-row">
+          <label for="card-element">
+            {l s='Cardholder\'s Name' mod='stripe_official'}
+          </label><label class="required"> </label>
+          <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+          <label for="card-element">
+            {l s='Card Number' mod='stripe_official'}
+          </label><label class="required"> </label>
+          <div id="cardNumber-element">
+            <!-- a Stripe Element will be inserted here. -->
+          </div>
+          <div class="block-left stripe-card-expiry">
+            <label for="card-element">
+              {l s='Expiry date' mod='stripe_official'}
+            </label><label class="required"> </label>
+            <div id="cardExpiry-element">
+              <!-- a Stripe Element will be inserted here. -->
             </div>
-          </a>
+          </div>
+          <div class="stripe-card-cvc">
+            <label for="card-element">
+              {l s='CVC/CVV' mod='stripe_official'}
+            </label><label class="required"> </label>
+            <div id="cardCvc-element">
+              <!-- a Stripe Element will be inserted here. -->
+            </div>
+          </div>
+
         </div>
+
+
         <div class="clear"></div>
         <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/verified_by_visa.png"/>
         <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/mastercard_securecode.png"/>
@@ -79,13 +97,14 @@
   <div id="result_3d"> </div></div>
 <script type="text/javascript">
   var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
-  var currency = "{$currency|escape:'htmlall':'UTF-8'}";
+  var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
   var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
   var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
   var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
   var billing_address = {$billing_address|escape nofilter};
   var module_dir = "{$module_dir|escape:'htmlall':'UTF-8'}";
   var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
+  var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
   {literal}
 
 </script>

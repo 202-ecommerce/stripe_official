@@ -26,8 +26,22 @@
 <script>
     var stripe_payment_error = "{$stripe_error|escape:'htmlall':'UTF-8'}";
     var stripe_type_error = "{$payment_error_type|escape:'htmlall':'UTF-8'}";
+
+
+    var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
+    var stripe_failed = "{$stripe_failed|escape:'htmlall':'UTF-8'}";
+    var stripe_err_msg = "{$stripe_err_msg|escape:'htmlall':'UTF-8'}";
+    var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
+    var stripe_customer_name = "{$customer_name|escape:'htmlall':'UTF-8'}";
+    var stripe_cart_id = {$stripe_cart_id|escape:'htmlall':'UTF-8'};
+    var stripe_order_url = "{$stripe_order_url|escape nofilter}";
+    var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
+    var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
+    var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
+    var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
 </script>
-<div class="stripe-error payment-error-{$payment_method|escape:'htmlall':'UTF-8'}"></div>
-<div id="modal_stripe_waiting"  class="modal" style="display: none">
-    <div id="stripe-ajax-loader-europe"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" />&nbsp; {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+
+<div id="modal-stripe-error" class="modal" style="display: none">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <p class="stripe-payment-europe-errors"></p>
 </div>

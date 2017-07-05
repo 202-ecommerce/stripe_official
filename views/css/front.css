@@ -19,7 +19,7 @@ div.payment_module.cart-stripe-official { padding-bottom: 35px;     margin-botto
 	border: #CCCCCC solid 1px; margin-bottom: 15px; padding: 3px;     box-sizing: border-box; font-size: 15px;
 }
 #stripe-payment-form input[type="checkbox"] { margin-bottom: 15px; }
-#stripe-payment-form .img-card {width: 33px;     margin-bottom: 2px;}
+
 #stripe-payment-form input.stripe-card-cvc {  }
 #stripe-form a { display: inline; position: relative; }
 a.stripe-card-cvc-info { font-style: italic; }
@@ -65,7 +65,7 @@ img.enable { opacity: 1; }
 	text-decoration:none;
 	background-position: left -50px
 }
-div.stripe-payment-errors {
+div.stripe-payment-errors, #stripe-payment-form #card-errors {
 	margin: 0 0 10px 0;
 	padding: 10px;
 	border: 1px solid #900;
@@ -99,12 +99,6 @@ a#stripe_error { display: none; }
 }
 #stripe-payment-form .stripe-name, #stripe-payment-form .stripe-card-number, #stripe-payment-form .stripe-submit-button {
 	width: 210px;
-}
-#stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
-	width:102px;
-	max-width: 102px;
-	text-align: center;
-	padding: 3px 1px !important;
 }
 .powered_stripe {
 	margin-right: 6px !important;
@@ -160,8 +154,7 @@ div.payment_module {
         background: white;
     }
 }
-
-#modal_stripe_waiting {
+#modal_stripe_waiting, #modal-stripe-error {
 	height: 124px;
 	width: 341px;
 	background: white;
@@ -181,6 +174,7 @@ div.payment_module {
 .stripe-europe-payments img {
 	width:86px;
 	height:49px;
+	margin-right: 20px;
 }
 .stripe-europe-payments a {
 	display: block;
@@ -192,17 +186,36 @@ div.payment_module {
 	line-height: 23px;
 	color: #333;
 	font-weight: bold;
-	padding: 33px 40px 34px 99px;
+	padding: 28px 40px 28px 20px;
 	letter-spacing: -1px;
 	position: relative;
 	background: #fbfbfb;
 }
-.stripe-error {
-	margin: 0 0 10px 0;
-	padding: 10px;
-	border: 1px solid #900;
-	color: #900;
-	font-size: 13px;
-	background: #FCC;
-	width: 50%;
+
+#cardNumber-element, #cardCvc-element, #cardExpiry-element {
+	border: #CCCCCC solid 1px;
+	margin-bottom: 15px;
+	padding: 3px;
+	box-sizing: border-box;
+	font-size: 15px;
+	width: 210px;
+	background-color: #ffffff;
+}
+#cardNumber-element {
+	width: 210px;
+}
+#cardCvc-element, #cardExpiry-element {
+	width:102px;
+	max-width: 102px;
+}
+#stripe-payment-form .stripe-card-cvc, #stripe-payment-form .stripe-card-expiry {
+	width:102px;
+	max-width: 102px;
+	float: left;
+	padding: 3px 1px !important;
+	text-align: left;
+}
+#stripe-payment-form .img-card {width: 33px;     margin-top: -77px;}
+#stripe-ajax-loader-europe {
+	text-align: center;
 }

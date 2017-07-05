@@ -14,16 +14,12 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-class Stripe_officialValidationModuleFrontController extends ModuleFrontController
+class stripe_officialValidationModuleFrontController extends ModuleFrontController
 {
-    public $ssl = true;
-    private $stripe;
-
     public function __construct()
     {
         parent::__construct();
-        $this->context = Context::getContext();
-        $this->stripe = Module::getInstanceByName('stripe_official');
+        $this->ssl = true;
     }
 
     /**
@@ -31,63 +27,31 @@ class Stripe_officialValidationModuleFrontController extends ModuleFrontControll
      */
     public function initContent()
     {
+
         parent::initContent();
-
-        if ($this->stripe && $this->stripe->active) {
-            $this->context = Context::getContext();
-
-            /* Loading current billing address from PrestaShop */
-            if (!isset($this->context->cart->id)
-                || empty($this->context->cart->id)
-                || !isset($this->context->cart->id_address_invoice)
-                || empty($this->context->cart->id_address_invoice)
-            ) {
-                die('No active shopping cart');
-            }
-
-            $amount = $this->context->cart->getOrderTotal();
-
-            // @see: https://support.stripe.com/questions/which-zero-decimal-currencies-does-stripe-support
-            $zeroDecimalCurrencies = array(
-                'BIF',
-                'CLP',
-                'DJF',
-                'GNF',
-                'JPY',
-                'KMF',
-                'KRW',
-                'MGA',
-                'PYG',
-                'RWF',
-                'VND',
-                'VUV',
-                'XAF',
-                'XOF',
-                'XPF'
-            );
-
-            if (!in_array($this->context->currency->iso_code, $zeroDecimalCurrencies)) {
-                $amount *= 100;
-            }
-
-            $params = array(
-                'token' => Tools::getValue('stripeToken'),
-                'amount' => $amount,
-                'currency' => $this->context->currency->iso_code,
-                'cardHolderName' => Tools::getValue('cardHolderName'),
-                'type' => Tools::getValue('stripe_method'),
-            );
-
-            if (isset($params['token']) && !empty($params['token'])) {
-                $result = $this->stripe->chargev2($params);
-                if ($result['code']) {
-                    Tools::redirect($result['url']);
-                } else {
-                    Tools::redirect('index.php?controller=order&stripe_error='.$result['msg'].'&type='.$result['type']);
-                }
-            } else {
-                Tools::redirect('index.php?controller=order&stripe_error='.$this->stripe->l('An error occured during the request. Please contact us').'&type='.$params['type']);
-            }
+        $stripe_client_secret = Tools::getValue('client_secret');
+        $stripe_source = Tools::getValue('source');
+        if (Configuration::get('_PS_STRIPE_mode') == 1) {
+            $pubKey = Configuration::get('_PS_STRIPE_test_publishable');
+        } else {
+            $pubKey = Configuration::get('_PS_STRIPE_publishable');
         }
+        $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed'=>true)):$this->context->link->getPageLink('order', true, null, array('step'=>3, 'stripe_failed'=>true));
+        Context::getContext()->smarty->assign(array(
+            'stripe_source' => $stripe_source,
+            'stripe_client_secret' => $stripe_client_secret,
+            'publishableKey' => $pubKey,
+            'ajaxUrlStripe' => Context::getContext()->link->getModuleLink('stripe_official', 'ajax', array(), true),
+            'module_dir' => _PS_MODULE_DIR_,
+            'return_order_page' => $order_page,
+        ));
+        Context::getContext()->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
+        Context::getContext()->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
+        Context::getContext()->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
+        Context::getContext()->controller->registerStylesheet('stripe_official-frontcss', 'modules/stripe_official/views/css/front.css');
+        Context::getContext()->controller->registerStylesheet('stripe_official-modal', 'modules/stripe_official/views/css/the-modal.css');
+
+        $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
+
     }
 }
