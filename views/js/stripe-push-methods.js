@@ -32,7 +32,7 @@ function initStripeOfficialGiropay() {
         e.stopPropagation();
         if (method_stripe == 'sofort') {
             var method_info  = {
-                country: 'IT',
+                country: stripe_country_iso_code,
                 statement_descriptor: 'Prestashop cart id '+stripe_cart_id,
             };
         } else {
@@ -67,63 +67,13 @@ function initStripeOfficialGiropay() {
         });
     });
 
-    if (typeof stripe_source != "undefined" && stripe_source != ""
-        && typeof stripe_client_secret != "undefined" && stripe_client_secret != "") {
-        if (StripePubKey) {
-            Stripe.setPublishableKey(StripePubKey);
-        }
-        Stripe.source.poll(
-            stripe_source,
-            stripe_client_secret,
-            function(status, source) {
-                if (source.status == "chargeable") {
-                    createCharge(source);
-                } else if (source.status == "failed") {
-                    $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
-                    $('#modal-stripe-error').parent().css({'z-index': 90000000000});
-                    $('.stripe-payment-europe-errors').show().text(bank_payment_declined).fadeIn(1000);
-                }
-            }
-        );
-    }
-
-    function createCharge(result) {
-        if (typeof(result) == "undefined") {
-            result = response;
-        }
-
-        $('#modal_stripe_waiting').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
-        $('#modal_stripe_waiting').parent().css({'z-index': 90000000000});
-        $('#stripe-ajax-loader-europe').show();
-        $.ajax({
-            type: 'POST',
-            dataType: 'json',
-            url: ajaxUrlStripe,
-            data: {
-                stripeToken: result.id,
-                cardType: result.type,
-                cardHolderName: result.owner.name,
-            },
-            success: function(data) {
-                if (data.code == '1') {
-                    // Charge ok : redirect the customer to order confirmation page
-                    location.replace(data.url);
-                } else {
-                    $('#modal_stripe_waiting').modalStripe().close();
-                    //  Charge ko
-                    $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
-                    $('#modal-stripe-error').parent().css({'z-index': 90000000000});
-                    $('.stripe-payment-europe-errors').show().text(data.msg).fadeIn(1000);
-                }
-            },
-            error: function(err) {
-                $('#modal_stripe_waiting').modalStripe().close();
-                // AJAX ko
-                $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
-                $('#modal-stripe-error').parent().css({'z-index': 90000000000});
-                $('.stripe-payment-europe-errors').show().text(stripe_error_msg).fadeIn(1000);
-            }
-        });
+    if (typeof stripe_failed != "undefined" && stripe_failed) {
+        $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
+        $('#modal-stripe-error').parent().css({'z-index': 90000000000});
+        if (stripe_err_msg)
+            $('.stripe-payment-europe-errors').show().text(stripe_err_msg).fadeIn(1000);
+        else
+            $('.stripe-payment-europe-errors').show().text(stripe_error_msg).fadeIn(1000);
     }
 
     $('#modal-stripe-error .close').click(function() {

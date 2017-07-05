@@ -78,20 +78,36 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $payment_type = $event_json->data->object->type;
                 if (in_array($payment_type, array('ideal', 'bancontact', 'giropay', 'sofort'))) {
                     $source = \Stripe\Source::retrieve($event_json->data->object->id);
-                    if ($source->status != "chargeable") {
-                        die($this->l('Source is not in state chargeable'));
-                    }
                     $stripe = Module::getInstanceByName('stripe_official');
-                    $params = array(
-                        'token' => $event_json->data->object->id,
-                        'amount' => $event_json->data->object->amount,
-                        'currency' => $event_json->data->object->currency,
-                        'cardHolderName' => $event_json->data->object->owner->name,
-                        'cart_id' => $event_json->data->object->metadata->cart_id,
-                        'carHolderEmail' => $event_json->data->object->metadata->email,
-                        'type' => $event_json->data->object->type,
-                    );
-                    $stripe->chargeWebhook($params);
+                    if ($source->status != "chargeable") {
+                        die($stripe->l('Source is not in state chargeable'));
+                    }
+                    $cart_id = $event_json->data->object->metadata->cart_id;
+                    $count = 0;
+                    $found = false;
+                    while ($count < 10) {
+                        $id_order = Order::getOrderByCartId($cart_id);
+                        if ($id_order) {
+                            $found = true;
+                            break;
+                        }
+                        $count++;
+                        usleep(500000);
+                    }
+                    if (!$found) {
+                        $params = array(
+                            'token' => $event_json->data->object->id,
+                            'amount' => $event_json->data->object->amount,
+                            'currency' => $event_json->data->object->currency,
+                            'cardHolderName' => $event_json->data->object->owner->name,
+                            'cart_id' => $cart_id,
+                            'carHolderEmail' => $event_json->data->object->metadata->email,
+                            'type' => $event_json->data->object->type,
+                        );
+                        $stripe->chargeWebhook($params);
+                    } else {
+                        die($stripe->l('Order is already created'));
+                    }
                 }
             }
         }

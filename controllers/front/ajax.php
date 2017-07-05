@@ -36,6 +36,26 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
         if ($this->stripe && $this->stripe->active) {
             $this->context = Context::getContext();
 
+            if(Tools::getValue('checkOrder')) {
+                $cart_id = Tools::getValue('cart_id');
+                $link = Context::getContext()->link;
+                $stripe_payment = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE `id_cart` = ' . (int)$cart_id);
+                $id_order = Order::getOrderByCartId($cart_id);
+                if ($stripe_payment && ($stripe_payment['result'] == 1 || $stripe_payment['result'] == Stripe_official::_PENDING_SOFORT_)) {
+                    if ($id_order) {
+                        $url = ($link->getPageLink('order-confirmation', true).'?id_cart='.(int)$cart_id.'&id_module='.(int)$this->stripe->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key);
+                        die(Tools::jsonEncode(array('confirmation_url' => $url)));
+                    } else {
+                        die('continue');
+                    }
+                } else if ($stripe_payment && $stripe_payment['result'] == 0) {
+                    $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed'=>true)):$this->context->link->getPageLink('order', true, null, array('step'=>3, 'stripe_failed'=>true));
+                    die(Tools::jsonEncode(array('error_url' => $order_page)));
+                } else {
+                    die('continue');
+                }
+            }
+
             /* Loading current billing address from PrestaShop */
             if (!isset($this->context->cart->id)
                 || empty($this->context->cart->id)

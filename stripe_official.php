@@ -1042,16 +1042,16 @@ class Stripe_official extends PaymentModule
                 $iso_country = Country::getIsoById($address_invoice->id_country);
                 $this->context->smarty->assign(
                     array(
-                        'stripe_order_url' => Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc'):$this->context->link->getPageLink('order', true, null, array('step'=>3)),
+                        'stripe_order_url' => $context->link->getModuleLink('stripe_official', 'validation', array(), true),
                         'stripe_cart_id' => $this->context->cart->id,
                         'stripe_ideal' => Configuration::get('STRIPE_ENABLE_IDEAL'),
                         'stripe_giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
                         'stripe_bancontact' => Configuration::get('STRIPE_ENABLE_BANCONTACT'),
                         'stripe_sofort' => Configuration::get('STRIPE_ENABLE_SOFORT'),
-                        'stripe_client_secret' => Tools::getValue('client_secret') ? Tools::getValue('client_secret') : '',
-                        'stripe_source' => Tools::getValue('source') ? Tools::getValue('source') : '',
                         'stripe_country_iso_code' => $iso_country,
-                        'show_sofort' => in_array($iso_country, array('AT', 'BE', 'DE', 'NL', 'ES', 'IT', 'FR'))
+                        'show_sofort' => in_array($iso_country, array('AT', 'BE', 'DE', 'NL', 'ES', 'IT')),
+                        'stripe_failed' => Tools::getValue('stripe_failed'),
+                        'stripe_err_msg' => Tools::getValue('stripe_err_msg'),
                     )
                 );
                 $html .= $this->display(__FILE__, 'views/templates/hook/payment_europe.tpl');
