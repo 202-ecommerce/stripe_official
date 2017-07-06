@@ -15,7 +15,7 @@
 
 $(document).ready(function() {
 
-    $('#section-shape-2 legend').after('<br><p style="padding-left:15px;">'+cards_payments_translation+'</p><br><br>');
+    $('#section-shape-2 fieldset').prepend('<br><br>');
 
 
     $('#section-shape-2 #fieldset_0 .margin-form').last().before($('#conf-payment-methods'));

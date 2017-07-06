@@ -970,6 +970,13 @@ class Stripe_official extends PaymentModule
                 $context->controller->addCSS($this->_path.'/views/css/front_15.css');
             }
         }
+        if (version_compare(_PS_VERSION_, '1.6', '<') && Tools::getValue('module') == $this->name && Tools::getValue('controller') == "validation") {
+            $context->controller->addJs('https://js.stripe.com/v2/');
+            $context->controller->addJS($this->_path.'/views/js/jquery.the-modal.js');
+            $context->controller->addCSS($this->_path.'/views/css/the-modal.css', 'all');
+            $context->controller->addCSS($this->_path.'/views/css/front.css', 'all');
+            $context->controller->addJS($this->_path.'/views/js/payment_validation.js');
+        }
     }
     /*
      ** Hook Stripe Payment
