@@ -44,6 +44,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         http_response_code(200);
 
         if ($event_json) {
+            if ($event_json->data->object->metadata->verification_url != Configuration::get('PS_SHOP_DOMAIN')) {
+                die('This order have been done on other site');
+            }
             if ($event_json->type == "charge.canceled" || $event_json->type == "charge.failed") {
                 $payment_type = $event_json->data->object->source->type;
                 $id_payment = $event_json->data->object->id;
@@ -71,6 +74,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
                         }
                         Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 1 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
+                    } else {
+                        die('Payment is not in state pending');
                     }
                 }
             }
@@ -110,6 +115,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                     }
                 }
             }
+            die('ok');
         }
     }
 }

@@ -57,6 +57,7 @@ function initStripeOfficialGiropay() {
             metadata: {
                 cart_id: stripe_cart_id,
                 email: stripe_customer_email,
+                verification_url: verification_url,
             },
             owner: {
                 name: stripe_customer_name,

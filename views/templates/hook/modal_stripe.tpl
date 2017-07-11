@@ -39,6 +39,8 @@
     var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
     var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
     var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
+    var verification_url = "{$verification_url|escape:'htmlall':'UTF-8'}";
+
 </script>
 
 <div id="modal-stripe-error" class="modal" style="display: none">

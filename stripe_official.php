@@ -822,7 +822,10 @@ class Stripe_official extends PaymentModule
                         "country" => Country::getIsoById($address_delivery->id_country), "line1" => $address_delivery->address1,
                         "line2" => $address_delivery->address2, "postal_code" => $address_delivery->postcode,
                         "state" => $state_delivery), "name" => $cardHolderName),
-                    "metadata" => array("cart_id" => $params['cart_id'])
+                    "metadata" => array(
+                        "cart_id" => $params['cart_id'],
+                        "verification_url" => Configuration::get('PS_SHOP_DOMAIN'),
+                    )
                 )
             );
         } catch (\Stripe\Error\Card $e) {
@@ -867,7 +870,10 @@ class Stripe_official extends PaymentModule
                         "country" => $this->context->country->iso_code, "line1" => $address_delivery->address1,
                         "line2" => $address_delivery->address2, "postal_code" => $address_delivery->postcode,
                         "state" => $state_delivery), "name" => $cardHolderName),
-                    "metadata" => array("cart_id" => $this->context->cart->id)
+                    "metadata" => array(
+                        "cart_id" => $this->context->cart->id,
+                        "verification_url" => Configuration::get('PS_SHOP_DOMAIN'),
+                    )
                 )
             );
         } catch (\Stripe\Error\Card $e) {
