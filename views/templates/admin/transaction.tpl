@@ -36,7 +36,7 @@
 		<th>{l s='Date (last update)' mod='stripe_official'}</th>
 	   	<th>{l s='Stripe Payment ID' mod='stripe_official'}</th>
 	   	<th>{l s='Name' mod='stripe_official'}</th>
-      <th>{l s='Card type' mod='stripe_official'}</th>
+      <th>{l s='Payment method' mod='stripe_official'}</th>
 	   	<th>{l s='Amount Paid' mod='stripe_official'}</th>
 	   	<th>{l s='Balance' mod='stripe_official'}</th>
 	   	<th>{l s='Result' mod='stripe_official'}</th>
@@ -47,13 +47,15 @@
 		<td>{$v.date|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.id_stripe|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.name|escape:'htmlall':'UTF-8'}</td>
-		<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$v.type|escape:'htmlall':'UTF-8'}.png" alt="card type" style="width:43px;"/></td>
+		<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$v.type|escape:'htmlall':'UTF-8'}.png" alt="payment method" style="width:43px;"/></td>
 		<td>{$v.amount|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		<td>{$v.refund|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
 		{if $v.result == 2}
-			<td>Refund</td>
+			<td>{l s='Refund' mod='stripe_official'}</td>
 		{elseif $v.result == 3}
-			<td>Partial Refund</td>
+			<td>{l s='Partial Refund' mod='stripe_official'}</td>
+		{elseif $v.result == 4}
+			<td>{l s='Waiting' mod='stripe_official'}</td>
 		{else}
 			<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/{$v.result|escape:'htmlall':'UTF-8'}ok.gif" alt="result" /></td>
 		{/if}

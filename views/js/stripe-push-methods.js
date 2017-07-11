@@ -22,9 +22,6 @@ $(document).ready(function() {
 function initStripeOfficialGiropay() {
     stripePayment_isInit = true;
 
-   //  var err_msg_payment = $('.payment-error-'+stripe_type_error).text(stripe_payment_error);
-
-    //$('input[name=payment-option][data-module-name='+stripe_type_error+']').closest('.payment-option').after(err_msg_payment);
 
     var stripe_submit_button = document.getElementById('payment-confirmation');
     stripe_submit_button.addEventListener('click', function (e) {
@@ -41,15 +38,6 @@ function initStripeOfficialGiropay() {
         if (StripePubKey && typeof stripe_v3 !== 'object') {
             var stripe_v3 = Stripe(StripePubKey);
         }
-        //var method_stripe = $('input[name=stripe_method]').val();
-        //$('input[name=stripe_method]').parent().addClass(method_stripe);
-        // Get Stripe public key
-
-        /*var stripe_cart_id = $('input[name=stripe_cart_id]').val();
-        var stripe_customer_email = $('input[name=stripe_customer_email]').val();
-        var stripe_customer_name = $('input[name=stripe_customer_name]').val();
-        var stripe_order_url = $('input[name=stripe_order_url]').val();
-        var amount_ttl = $('input[name=amount_ttl]').val();*/
 
 
         if (method_stripe == 'sofort') {

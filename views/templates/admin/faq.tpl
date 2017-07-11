@@ -39,11 +39,12 @@
     <br>
     {l s='You can also check out our support website:' mod='stripe_official'}
     <a href="https://support.stripe.com" target="_blank">https://support.stripe.com</a>
-    <br>
+    <br><br>
     {l s='If you have any additional question or remaining issue related to Stripe and this plugin, please contact our support team:' mod='stripe_official'}
     <a href="https://support.stripe.com/email" target="_blank">https://support.stripe.com/email</a>
 </div>
 
+<div class="clearfix"></div>
 <h3><i class="icon-info-sign"></i> {l s='Frequently Asked Questions' mod='stripe_official'}</h3>
  <div class="faq items">
 

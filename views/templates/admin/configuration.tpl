@@ -22,16 +22,12 @@
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
-<div class="panel">
-	<form method="post" action="{$path|escape:'htmlall':'UTF-8'}">
-		<div class="panel-heading">
-			{l s='Configuration payment methods' mod='stripe_official'}
-		</div><br>
+<div id="conf-payment-methods">
 		<p><b>{l s='Testing Stripe' mod='stripe_official'}</b></p>
 		<ul>
 			<li>{l s='Toggle the button above to Test Mode.' mod='stripe_official'}</li>
 			<li>{l s='To perform test payments, you can use test card numbers available in our' mod='stripe_official'}
-			<a target="_blank" href="www.stripe.com/docs/testing">{l s='documentation.' mod='stripe_official'}</a></li>
+			<a target="_blank" href="http://www.stripe.com/docs/testing">{l s='documentation.' mod='stripe_official'}</a></li>
 			<li>{l s='In Test Mode, you can not run live charges.' mod='stripe_official'}</li>
 		</ul>
 		<p><b>{l s='Using Stripe Live' mod='stripe_official'}</b></p>
@@ -61,27 +57,27 @@
 			</li>
 			<li>
 				{l s='To track correctly charges performed with these payment methods, you’ll need to add a “webhook”. A webhook is a way to be notified when an event (such as a successful payment) happens on your website.' mod='stripe_official'}
+				<br><br>
 				<ul>
 					<li>{l s='Go on the webhook page of your Stripe dashboard:' mod='stripe_official'}
-						 <a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
+						<a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
 					</li>
-					<li>{l s='Click on “Add Endpoint” and copy/paste this URL in the “URL to be called” field:' mod='stripe_official'} http://iuliia-1619.work.202-ecommerce.com</li>
-					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}<br>
-						<img src="/modules/stripe_official//views/img/cc-visa.png">
+					<li>{l s='Click on “Add Endpoint” and copy/paste this URL in the “URL to be called” field:' mod='stripe_official'} {$url_webhhoks}</li>
+					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}</li>
+					<li>{l s='Set the "Filter event" radio button to "Send all event types"' mod='stripe_official'}</li>
+					<li>{l s='Click on "Add endpoint"' mod='stripe_official'}<br>
+						<img class="img-example1" src="/modules/stripe_official//views/img/example1.png">
 					</li>
 					<li>{l s='Ultimately, your webhook dashboard page should look like this:' mod='stripe_official'}<br>
-						<img src="/modules/stripe_official//views/img/cc-visa.png"><br>
+						<img class="img-example2" src="/modules/stripe_official//views/img/example2.png">
 					</li>
 				</ul>
 			</li>
+			<br>
 			<li>{l s='Activate these payment methods on your' mod='stripe_official'}
 				<a target="_blank" href="https://dashboard.stripe.com/account/payments/settings">{l s='Stripe dashboard.' mod='stripe_official'}</a>
 			</li>
+			<p>{l s='After clicking “Activate”, the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
+				{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 10 minutes.' mod='stripe_official'}</p>
 		</ol>
-		<div class="panel-footer">
-			<button type="submit" value="1" id="submit_payment_methods" name="submit_payment_methods" class="btn btn-default pull-right button">
-				<i class="process-icon-save"></i> {l s='Save' mod='stripe_official'}
-			</button>
-		</div>
-	</form>
 </div>

@@ -122,25 +122,32 @@ class Stripe_official extends PaymentModule
         if (!parent::install()) {
             return false;
         }
+
+        if (!Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)
+            || !Configuration::updateValue('STRIPE_ENABLE_IDEAL', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0)) {
+                 return false;
+        }
+
         if (!$this->registerHook('header')
             || !$this->registerHook('orderConfirmation')
             || !$this->registerHook('paymentOptions')
             || !$this->registerHook('adminOrder')) {
             return false;
         }
+
+        if (!$this->createStripePayment()) {
+            return false;
+        }
+        
         if (!$this->installOrderState()) {
             return false;
         }
-        if (!Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
-            || !Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
-            || !Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)
-            || Configuration::updateValue('STRIPE_ENABLE_IDEAL', 0)
-            || Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
-            || Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
-            || Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0)) {
-                 return false;
-        }
-        $this->createStripePayment();
+
 
         return true;
     }
