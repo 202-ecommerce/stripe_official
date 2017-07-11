@@ -74,6 +74,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
                         }
                         Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 1 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
+                    } else {
+                        die('Payment is not in state pending');
                     }
                 }
             }
@@ -113,6 +115,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                     }
                 }
             }
+            die('ok');
         }
     }
 }
