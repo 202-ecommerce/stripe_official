@@ -79,4 +79,5 @@
     var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
     var stripe_failed = "{$stripe_failed|escape:'htmlall':'UTF-8'}";
     var stripe_err_msg = "{$stripe_err_msg|escape:'htmlall':'UTF-8'}";
+    var verification_url = "{$verification_url|escape:'htmlall':'UTF-8'}";
 </script>
