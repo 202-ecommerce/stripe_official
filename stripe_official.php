@@ -1504,69 +1504,10 @@ class Stripe_official extends PaymentModule
                     $payment_option = new PaymentOption();
                     $payment_option->setCallToActionText($this->l('Pay by '.Tools::strtoupper($method)))
                         ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$method.'.png'))
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/cc-'.$method.'.png'))
                         ->setModuleName($method)
                         ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/modal_stripe.tpl'));
                     $payment_options[] = $payment_option;
-                   /* $externalOption = new PaymentOption();
-                    $externalOption->setCallToActionText($this->l('Pay by '.Tools::strtoupper($method)))
-                        ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
-                        ->setModuleName($method)
-                        ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/modal_stripe.tpl'))
-                        ->setInputs(array(
-                            'stripe_method' => array(
-                                'name' =>'stripe_method',
-                                'type' =>'hidden',
-                                'value' =>$method,
-                            ),
-                            'stripe_order_url' => array(
-                                'name' =>'stripe_order_url',
-                                'type' =>'hidden',
-                                'value' =>$this->context->link->getPageLink('order'),
-                            ),
-                            'stripe_country_iso_code' => array(
-                                'name' =>'stripe_country_iso_code',
-                                'type' =>'hidden',
-                                'value' =>$iso_country,
-                            ),
-                            'stripe_cart_id' => array(
-                                'name' =>'stripe_cart_id',
-                                'type' =>'hidden',
-                                'value' =>$this->context->cart->id,
-                            ),
-                            'publishableKey' => array(
-                                'name' =>'publishableKey',
-                                'type' =>'hidden',
-                                'value' =>$this->getPublishableKey(),
-                            ),
-                            'customer_name' => array(
-                                'name' =>'customer_name',
-                                'type' =>'hidden',
-                                'value' =>$this->context->customer->firstname.' '.$this->context->customer->lastname,
-                            ),
-                            'amount_ttl' => array(
-                                'name' =>'amount_ttl',
-                                'type' =>'hidden',
-                                'value' =>$amount,
-                            ),
-                            'stripe_client_secret' => array(
-                                'name' =>'stripe_client_secret',
-                                'type' =>'hidden',
-                                'value' =>Tools::getValue('client_secret') ? Tools::getValue('client_secret') : '',
-                            ),
-                            'stripe_source' => array(
-                                'name' =>'stripe_source',
-                                'type' =>'hidden',
-                                'value' =>Tools::getValue('source') ? Tools::getValue('source') : '',
-                            ),
-                            'stripeToken' => array(
-                                'name' =>'stripeToken',
-                                'type' =>'hidden',
-                                'value' =>'',
-                            ),
-                        ))
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$method.'.png'));
-                    $payment_options[] = $externalOption;*/
                 }
             }
         }
@@ -1623,14 +1564,6 @@ class Stripe_official extends PaymentModule
                 $context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
             }
         }
-
-       /* if (Tools::getValue('controller') == 'validation' && Tools::getValue('module') == $this->name) {
-            $context->controller->registerJavascript($this->name.'-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
-            $context->controller->registerJavascript($this->name.'-payment_validation', 'modules/stripe_official/views/js/payment_validation.js');
-            $context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
-            $context->controller->registerStylesheet($this->name.'-frontcss', 'modules/stripe_official/views/css/front.css');
-            $context->controller->registerStylesheet($this->name.'-frontcss', 'modules/stripe_official/views/css/the-modal.css');
-        }*/
     }
 
     protected function generateFormStripe()
