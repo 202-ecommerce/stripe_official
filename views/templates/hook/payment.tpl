@@ -105,6 +105,7 @@
   var module_dir = "{$module_dir|escape:'htmlall':'UTF-8'}";
   var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
   var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
+  var stripeLanguageIso = "{$stripeLanguageIso|escape:'htmlall':'UTF-8'}";
   {literal}
 
 </script>

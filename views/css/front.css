@@ -72,6 +72,7 @@ div.stripe-payment-errors, #stripe-payment-form #card-errors {
 	color: #900;
 	font-size: 13px;
 	background: #FCC;
+	width: 210px;
 	display: none;
 }
 

@@ -1498,6 +1498,7 @@ class Stripe_official extends PaymentModule
                             'payment_method' => $method,
                             'stripe_failed' => Tools::getValue('stripe_failed'),
                             'stripe_err_msg' => Tools::getValue('stripe_err_msg'),
+                            'verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
                         )
                     );
 
@@ -1605,7 +1606,8 @@ class Stripe_official extends PaymentModule
                     'module_dir' => $this->_path,
                     'billing_address' => Tools::jsonEncode($billing_address),
                     'ajaxUrlStripe' => $ajax_link,
-                    'amount_ttl' => $amount
+                    'amount_ttl' => $amount,
+                    'stripeLanguageIso' => $this->context->language->iso_code,
                 )
             );
         }
