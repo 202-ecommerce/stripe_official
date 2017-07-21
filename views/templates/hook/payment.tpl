@@ -133,6 +133,7 @@ var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
 var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
 var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
 var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
+var stripeLanguageIso = "{$stripeLanguageIso|escape:'htmlall':'UTF-8'}";
 if (ps_version) {
     var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
 }
@@ -152,7 +153,7 @@ if (StripePubKey && typeof stripe_v3 !== 'object') {
 function initStripeOfficial() {
     stripe_isInit = true;
     // create elements
-    var elements = stripe_v3.elements();
+    var elements = stripe_v3.elements({locale:stripeLanguageIso});
     var card = elements.create('cardNumber', {
         style: {
             base: {
@@ -214,7 +215,32 @@ function initStripeOfficial() {
             $('.cc-icon').removeClass('enable');
             $('.cc-icon:not(.disable)').addClass('disable');
         }
+        setOutcome(event);
     });
+
+
+
+    expire.addEventListener('change', function(event) {
+        setOutcome(event);
+    });
+
+    cvc.addEventListener('change', function(event) {
+        setOutcome(event);
+    });
+
+    function setOutcome(result) {
+
+        $form = $('#stripe-payment-form');
+        if (result.error) {
+             $('.stripe-payment-errors').show();
+             $form.find('.stripe-payment-errors').text(result.error.message).fadeIn(1000);
+        } else {
+             $('.stripe-payment-errors').hide();
+             $form.find('.stripe-payment-errors').text()
+        }
+    }
+
+
 
 
 

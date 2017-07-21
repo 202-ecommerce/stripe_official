@@ -63,6 +63,7 @@ img.enable { opacity: 1; }
 }
 div.stripe-payment-errors, #stripe-payment-form #card-errors {
 	margin: 0 0 10px 0;
+	width: 210px;
 	padding: 10px;
 	border: 1px solid #900;
 	color: #900;

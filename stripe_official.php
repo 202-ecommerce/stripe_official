@@ -1041,6 +1041,7 @@ class Stripe_official extends PaymentModule
                     'country_merchant' => Tools::strtolower($default_country->iso_code),
                     'ajaxUrlStripe' => $ajax_link,
                     'stripe_customer_email' => $this->context->customer->email,
+                    'stripeLanguageIso' => $this->context->language->iso_code,
                 )
             );
             $html = '';
