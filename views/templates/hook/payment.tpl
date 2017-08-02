@@ -127,7 +127,7 @@
 <script type="text/javascript" src="{$module_dir|escape:'htmlall':'UTF-8'}views/js/jquery.the-modal.js"></script>
 <link rel="stylesheet" href="{$module_dir|escape:'htmlall':'UTF-8'}views/css/the-modal.css" type="text/css" media="all">
 <script type="text/javascript">
-var ajaxUrlStripe = "{$ajaxUrlStripe|escape:'htmlall':'UTF-8'}";
+var ajaxUrlStripe = "{$ajaxUrlStripe nofilter}";
 var ps_version = {$ps_version15|escape:'htmlall':'UTF-8'};
 var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
 var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
@@ -280,7 +280,6 @@ function initStripeOfficial() {
         $('#stripe-ajax-loader').show();
 
         stripe_v3.createSource(card, {owner: owner_info}).then(function(result) {
-            console.log(result);
             if (result.error) {
                 $('#stripe-payment-form').show();
                 $('#stripe-ajax-loader').hide();
