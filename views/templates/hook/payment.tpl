@@ -170,6 +170,7 @@ function initStripeOfficial() {
     expire.mount('#cardExpiry-element');
 
     card.addEventListener('change', function(event) {
+        setOutcome(event);
         cardType = event.brand;
         if (cardType != "unknown") {
             if (cardType == "American Express")
@@ -215,7 +216,6 @@ function initStripeOfficial() {
             $('.cc-icon').removeClass('enable');
             $('.cc-icon:not(.disable)').addClass('disable');
         }
-        setOutcome(event);
     });
 
 
@@ -232,11 +232,11 @@ function initStripeOfficial() {
 
         $form = $('#stripe-payment-form');
         if (result.error) {
-             $('.stripe-payment-errors').show();
-             $form.find('.stripe-payment-errors').text(result.error.message).fadeIn(1000);
+             $('#card-errors').show();
+             $form.find('#card-errors').text(result.error.message).fadeIn(1000);
         } else {
-             $('.stripe-payment-errors').hide();
-             $form.find('.stripe-payment-errors').text()
+             $('#card-errors').hide();
+             $form.find('#card-errors').text()
         }
     }
 
@@ -249,8 +249,8 @@ function initStripeOfficial() {
 
         var $form = $(this);
         if (!StripePubKey) {
-            $('.stripe-payment-errors').show();
-            $form.find('.stripe-payment-errors').text($('#stripe-no_api_key').val()).fadeIn(1000);
+            $('#card-errors').show();
+            $form.find('#card-errors').text($('#stripe-no_api_key').val()).fadeIn(1000);
             return false;
         }
 
@@ -275,7 +275,7 @@ function initStripeOfficial() {
 
         /* Disable the submit button to prevent repeated clicks */
        // $('.stripe-submit-button').attr('disabled', 'disabled');
-        $('.stripe-payment-errors').hide();
+        $('#card-errors').hide();
         $('#stripe-payment-form').hide();
         $('#stripe-ajax-loader').show();
 
@@ -337,8 +337,8 @@ function initStripeOfficial() {
                                 $('#modal_stripe').modalStripe().close();
                                 $('#stripe-ajax-loader').hide();
                                 $('#stripe-payment-form').show();
-                                $('.stripe-payment-errors').show();
-                                $form.find('.stripe-payment-errors').text($('#stripe-card_declined').val()).fadeIn(1000);
+                                $('#card-errors').show();
+                                $form.find('#card-errors').text($('#stripe-card_declined').val()).fadeIn(1000);
                             }
                         }
                 );
@@ -351,8 +351,8 @@ function initStripeOfficial() {
                 } else {
                     $('#stripe-ajax-loader').hide();
                     $('#stripe-payment-form').show();
-                    $('.stripe-payment-errors').show();
-                    $form.find('.stripe-payment-errors').text($('#stripe-3d_declined').val()).fadeIn(1000);
+                    $('#card-errors').show();
+                    $form.find('#card-errors').text($('#stripe-3d_declined').val()).fadeIn(1000);
                 }
             }
         }
@@ -380,8 +380,8 @@ function initStripeOfficial() {
                         //  Charge ko
                         $('#stripe-ajax-loader').hide();
                         $('#stripe-payment-form').show();
-                        $('.stripe-payment-errors').show();
-                        $('.stripe-payment-errors').text(data.msg).fadeIn(1000);
+                        $('#card-errors').show();
+                        $('#card-errors').text(data.msg).fadeIn(1000);
                         $('.stripe-submit-button').removeAttr('disabled');
                     }
                 },
@@ -389,8 +389,8 @@ function initStripeOfficial() {
                     // AJAX ko
                     $('#stripe-ajax-loader').hide();
                     $('#stripe-payment-form').show();
-                    $('.stripe-payment-errors').show();
-                    $('.stripe-payment-errors').text('An error occured during the request. Please contact us').fadeIn(1000);
+                    $('#card-errors').show();
+                    $('#card-errors').text('An error occured during the request. Please contact us').fadeIn(1000);
                     $('.stripe-submit-button').removeAttr('disabled');
                 }
             });
@@ -412,12 +412,12 @@ function initStripeOfficial() {
 
 
   /* Catch callback errors */
-  if ($('.stripe-payment-errors').text()) {
-    $('.stripe-payment-errors').fadeIn(1000);
+  if ($('#card-errors').text()) {
+    $('#card-errors').fadeIn(1000);
   }
 
   $('#stripe-payment-form input').keypress(function () {
-    $('.stripe-payment-errors').fadeOut(500); 
+    $('#card-errors').fadeOut(500);
   });
 };
 
