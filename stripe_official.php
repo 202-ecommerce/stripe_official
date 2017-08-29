@@ -1054,6 +1054,11 @@ class Stripe_official extends PaymentModule
                 || Configuration::get('STRIPE_ENABLE_SOFORT'))) {
                 $address_invoice = new Address($this->context->cart->id_address_invoice);
                 $iso_country = Country::getIsoById($address_invoice->id_country);
+                $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
+                foreach ($iso_countries as $iso) {
+                    $id_country = Country::getByIso($iso);
+                    $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
+                }
                 $this->context->smarty->assign(
                     array(
                         'stripe_order_url' => $context->link->getModuleLink('stripe_official', 'validation', array(), true),
@@ -1063,7 +1068,7 @@ class Stripe_official extends PaymentModule
                         'stripe_bancontact' => Configuration::get('STRIPE_ENABLE_BANCONTACT'),
                         'stripe_sofort' => Configuration::get('STRIPE_ENABLE_SOFORT'),
                         'stripe_country_iso_code' => $iso_country,
-                        'show_sofort' => in_array($iso_country, array('AT', 'BE', 'DE', 'NL', 'ES', 'IT')),
+                        'sofort_available_countries' => $available_countries,
                         'stripe_failed' => Tools::getValue('stripe_failed'),
                         'stripe_err_msg' => Tools::getValue('stripe_err_msg'),
                         'verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
