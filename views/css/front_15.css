@@ -18,3 +18,14 @@
 .stripe-europe-payments img {
 	height: 45px;
 }
+#sofort_available_countries .modal-header, #modal-stripe-error .modal-header {
+    right: 20px;
+    position: absolute;
+}
+#sofort_available_countries .btn {
+    padding: 8px;
+}
+.sofort-payment a {
+    background: none;
+    border:none;
+}
