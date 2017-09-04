@@ -1469,18 +1469,23 @@ class Stripe_official extends PaymentModule
         $payment_options[] = $embeddedOption;
         if ($this->context->currency->iso_code == "EUR") {
             $address_invoice = new Address($this->context->cart->id_address_invoice);
-            $iso_country = Country::getIsoById($address_invoice->id_country);
             $amount = $this->context->cart->getOrderTotal();
             $currency = $this->context->currency->iso_code;
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
             $methods = array('ideal', 'sofort', 'bancontact', 'giropay');
+            $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+
+            $iso_country = Country::getIsoById($address_invoice->id_country);
+            $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
+            foreach ($iso_countries as $iso) {
+                $id_country = Country::getByIso($iso);
+                $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
+            }
+
             foreach ($methods as $method) {
                 if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) {
-                    if ($method == 'sofort' && !in_array($iso_country, array('AT', 'BE', 'DE', 'NL', 'ES', 'IT', 'FR'))) {
-                        continue;
-                    }
 
-                    $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+
 
                     $this->context->smarty->assign(
                         array(
@@ -1501,6 +1506,15 @@ class Stripe_official extends PaymentModule
                             'verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
                         )
                     );
+
+                    if ($method == 'sofort') {
+                            $this->context->smarty->assign(
+                            array(
+                                'stripe_country_iso_code' => $iso_country,
+                                'sofort_available_countries' => $available_countries,
+                            )
+                        );
+                    }
 
                     $payment_option = new PaymentOption();
                     $payment_option->setCallToActionText($this->l('Pay by '.Tools::strtoupper($method)))

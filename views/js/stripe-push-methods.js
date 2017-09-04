@@ -42,7 +42,7 @@ function initStripeOfficialGiropay() {
 
         if (method_stripe == 'sofort') {
             var method_info  = {
-                country: 'IT',
+                country: $('#sofort_country').val(),
                 statement_descriptor: 'Prestashop cart id '+stripe_cart_id,
             };
         } else {
