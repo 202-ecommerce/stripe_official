@@ -73,7 +73,7 @@
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
-    <div class="title">{l s='Choose country of your bank :' mod='stripe_official'}</div>
+    <div class="title">{l s='Choose your bank country :' mod='stripe_official'}</div>
     <select id="sofort_country">
         {foreach from=$sofort_available_countries item=country key=iso}
             <option value="{$iso|escape:'htmlall':'UTF-8'}" {if $iso == $stripe_country_iso_code} selected="selected"{/if}>{$country|escape:'htmlall':'UTF-8'}</option>
