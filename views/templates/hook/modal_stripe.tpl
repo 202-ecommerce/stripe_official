@@ -44,7 +44,7 @@
 </script>
 {if $payment_method == 'sofort'}
 <div id="sofort_available_countries">
-    <div class="title"><b>{l s='Choose country of your bank :' mod='stripe_official'}</b></div><br>
+    <div class="title"><b>{l s='Choose your bank country:' mod='stripe_official'}</b></div><br>
     <select id="sofort_country">
         {foreach from=$sofort_available_countries item=country key=iso}
             <option value="{$iso|escape:'htmlall':'UTF-8'}" {if $iso == $stripe_country_iso_code} selected="selected"{/if}>{$country|escape:'htmlall':'UTF-8'}</option>
