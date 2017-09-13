@@ -1,5 +1,5 @@
 /**
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 * DISCLAIMER
 *
@@ -8,12 +8,19 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 * @author    PrestaShop SA <contact@prestashop.com>
-* @copyright 2007-2016 PrestaShop SA
+* @copyright 2007-2017 PrestaShop SA
 * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
 * International Registered Trademark & Property of PrestaShop SA
 */
 
 $(document).ready(function() {
+
+	//rename switch fiels value labels
+	$('label[for=_PS_STRIPE_mode_on]').html(stripe_test_mode);
+	$('label[for=_PS_STRIPE_mode_off]').html(live);
+	$('#section-shape-2 .form-group').first().append(conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.stripe.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.');
+
+	$('#section-shape-2 .panel .form-wrapper').append($('#conf-payment-methods'));
 
 	// multistore
 	var old = $('.bootstrap.panel');

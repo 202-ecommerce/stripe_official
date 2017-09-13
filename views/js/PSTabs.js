@@ -72,8 +72,8 @@
 	// add to global namespace
 	window.PSTabs = PSTabs;
 
-	var div_3d = Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'<a href="https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode" target="_blank">https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode</a></div>';
+	var div_3d = '- ' + Translation[3]+' </br>- '+Translation[0]+' </br>- '+Translation[1]+' </br>- '+Translation[2]+'<a href="https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode" target="_blank">https://support.stripe.com/questions/does-stripe-support-3d-secure-verified-by-visa-mastercard-securecode</a></div>';
 
-	$('#section-shape-4 .panel-heading').after('<div class="commit_3d">- '+ div_3d);
-	$('#section-shape-4 legend').after('<div class="margin-form commit_3d_15">- '+div_3d);
+	$('#section-shape-4 .panel-heading').after('<div class="commit_3d"> '+ div_3d);
+	$('#section-shape-4 legend').after('<div class="margin-form commit_3d_15"> '+div_3d);
 })(window);

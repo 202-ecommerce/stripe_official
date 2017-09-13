@@ -1,5 +1,5 @@
 {*
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 
 * NOTICE OF LICENSE
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2016 PrestaShop SA
+*	@copyright	2007-2017 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
@@ -46,7 +46,7 @@
 				- <span>{l s='Easily refund ' mod='stripe_official'}</span>
 				{l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
 				- {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
-				<span>{l s='135+ currencies.' mod='stripe_official'}</span><br><br>
+				<span>{l s='135+ currencies' mod='stripe_official'}</span> {l s='and 4 local payment methods (iDEAL, Bancontact, SOFORT, Giropay).' mod='stripe_official'}<br><br>
 				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:100%;">
 				<br><br>
 				<p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
@@ -54,14 +54,12 @@
 				<br>
 				<p><span>{l s='How much does Stripe cost?' mod='stripe_official'}</span></p>
 				<p>
-					{l s='For European companies, Stripe charges (per successful transaction):' mod='stripe_official'}<br>
-					{l s='- 1.4% + €0.25/£0.20 with a European card' mod='stripe_official'}<br>
-					{l s='- 2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
-					{l s='Stripe has no setup fees, no monthly fees, no validation fees, no refund fees, and no card storage fees. ' mod='stripe_official'}<br>
-					{l s='There’s no additional fee for failed charges or refunds.' mod='stripe_official'}
-				</p><br>
-				<p>{l s='If you’d like to learn more about our simple pricing, please check our website: ' mod='stripe_official'}
-				<a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a></p><br>
+					{l s='Stripe has not setup fees, no monthly fees and no storage fees.' mod='stripe_official'}<br>
+					{l s='There’s no additional fee for failed charges.' mod='stripe_official'}<br><br>
+					{l s='For European companies, Stripe charges (per successful transaction) :' mod='stripe_official'}<br>
+					- {l s='1.4% + €0.25/£0.20 with a European card' mod='stripe_official'}<br>
+					- {l s='2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
+					{l s='For other payment methods, non-European merchants pricing and additional information, please check our website:' mod='stripe_official'} <a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a>.</p><br>
 				<p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
 					<a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.</p>
 				<div class="connect_btn">
