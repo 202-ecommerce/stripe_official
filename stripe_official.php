@@ -68,7 +68,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.5.0';
+        $this->version = '1.5.1';
         $this->author = '202 ecommerce';
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
         $this->bootstrap = true;
@@ -962,7 +962,8 @@ class Stripe_official extends PaymentModule
     {
         $context = $this->context;
       //  $opcEnabled = Configuration::get('PS_ORDER_PROCESS_TYPE');
-        if (in_array($context->controller->php_self, array('order', 'order-opc'))) {
+        if (in_array($context->controller->php_self, array('order', 'order-opc'))
+            || (Tools::getValue('controller') == "payment" && Tools::getValue('module') == "onepagecheckoutps" && Tools::getValue('pm') == "stripe_official")) {
             $context->controller->addCSS($this->_path.'/views/css/front.css');
 
             $context->controller->addJs('https://js.stripe.com/v3/');
