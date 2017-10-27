@@ -1,5 +1,5 @@
 /**
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 * DISCLAIMER
 *
@@ -8,13 +8,17 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 * @author    PrestaShop SA <contact@prestashop.com>
-* @copyright 2007-2016 PrestaShop SA
+* @copyright 2007-2017 PrestaShop SA
 * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
 * International Registered Trademark & Property of PrestaShop SA
 */
 
 $(document).ready(function() {
 
+    $('#section-shape-2 fieldset').prepend('<br><br>');
+
+
+    $('#section-shape-2 #fieldset_0 .margin-form').last().before($('#conf-payment-methods'));
     /* Css Radio Connection button 1.5 */
     $('#active_on').next().css('width', '25px');
     $('#active_off').next().css('width', '20px');
