@@ -1,0 +1,174 @@
+.tabs nav a {
+	text-decoration: none;
+	display: block;
+}
+
+.tabs nav li.tab-current a {
+	color: #fff;
+}
+
+/* Content */
+.content-wrap {
+	min-height: 455px;
+	position: relative;
+}
+
+.content-wrap section {
+	display: none;
+	margin: 0 auto;
+	padding: 1em;
+}
+
+.tabs-logo {
+	display: block;
+	padding: 0;
+	width: 100%;
+	text-align: left;
+	margin: 0 auto;
+	max-width: 250px;
+}
+
+.content-wrap section.content-current {
+	display: block;
+}
+
+.list-group-item {
+	padding: 10px 15px !important;
+}
+
+.pstab-icon {
+	width: 25px;
+	height: 25px;
+	font-size: 20px;
+	margin-right: 10px;
+ 	padding: 5px;
+	text-align: center;
+}
+
+.badge-module-tabs {
+	margin-top: 10px;
+	width: 10px;
+	height: 10px;
+	padding: 3px 3px;
+}
+
+.tab-info {
+	display: none;
+	color: #FFF;
+	padding-left: 5px;
+	background-color: #00aff0;
+	border-radius: 50%;
+}
+
+.tab-warning {
+	color: #FFF !important;
+	padding-left: 5px;
+	background-color: #f4c178;
+	border-radius: 50%;
+}
+
+.tab-success {
+	color: #FFF !important;
+	background-color: #90cb5c;
+	padding-left: 5px;
+	border-radius: 50%;
+}
+.tab-error {
+	font-weight: bold;
+	color: #FFF !important;
+	background-color: #a94442;
+	padding-left: 5px;
+	border-radius: 50%;
+}
+
+.tab-back {
+	width: 100%;
+	background-color: #ddd;
+}
+
+.faq ul.faq-items {
+    padding: 0px;
+    list-style-type: none;
+    width: 100%;
+}
+.faq ul.faq-items > li {
+    -moz-box-shadow: 0px 0px 10px -4px #BBBBBB;
+    -webkit-box-shadow: 0px 0px 10px -4px #BBBBBB;
+    -o-box-shadow: 0px 0px 10px -4px #BBBBBB;
+    box-shadow: 0px 0px 10px -4px #BBBBBB;
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#BBBBBB, Direction=180, Strength=10);
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 2px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 20px;
+    cursor: pointer;
+}
+.faq ul.faq-items > li:hover {
+    -moz-box-shadow: 0px 0px 10px -4px #555555;
+    -webkit-box-shadow: 0px 0px 10px -4px #555555;
+    -o-box-shadow: 0px 0px 10px -4px #555555;
+    box-shadow: 0px 0px 10px -4px #555555;
+    filter:progid:DXImageTransform.Microsoft.Shadow(color=#555555, Direction=180, Strength=10);
+}
+
+.faq ul.faq-items > li .faq-trigger {
+    font-size: 20px;
+    color: #00aff0;
+}
+
+.faq ul.faq-items > li .faq-trigger:hover {
+    color: #00aff0;
+    text-decoration: none;
+}
+
+.faq ul.faq-items > li .faq-trigger:active {
+    color: #00aff0;
+    text-decoration: none;
+}
+
+.faq .expand {
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.faq-content {
+    display: none;
+    padding-left: 15px;
+    padding-top: 20px;
+    line-height: 200%;
+}
+
+.faq-content a {
+    border-bottom: 1px dotted #555;
+    padding-bottom: -2px;
+    color: #555;
+    size: 16px;
+}
+.faq-content a:hover {
+    border-bottom: none;
+    text-decoration: none;
+}
+
+label[for=secure_all], label[for=secure_only] {
+	width: 345px;
+	float: none;
+	text-align: left;
+}
+#section-shape-4 #secure_all, #section-shape-4 #secure_only {
+	display: inline-block;
+	margin:0;
+	vertical-align: top;
+	margin-top: 2px;
+	margin-right: 5px;
+}
+#section-shape-4 .margin-form {
+	width: 387px;
+	box-sizing: content-box;
+}
+#section-shape-4 input[name=submit_secure] {
+    position: absolute;
+    right: 26px;
+    margin-top: -30px;
+}

@@ -1,0 +1,31 @@
+#stripe-payment-form .img-card {
+	margin-top: -38px;
+	position: absolute;
+	margin-left: 173px !important;
+}
+.stripe-europe-payments {
+	padding-top: 10px !important;
+}
+.stripe-europe-payments a {
+	border: none !important;
+	font-size: 12px !important;
+	font-weight: normal !important;
+	font: normal 14px Arial, Verdana, sans-serif !important;
+	padding: 20px 40px 29px 10px !important;
+	letter-spacing: 1px !important;
+	background: transparent !important;
+}
+.stripe-europe-payments img {
+	height: 45px;
+}
+#sofort_available_countries .modal-header, #modal-stripe-error .modal-header {
+    right: 20px;
+    position: absolute;
+}
+#sofort_available_countries .btn {
+    padding: 8px;
+}
+.sofort-payment a {
+    background: none;
+    border:none;
+}

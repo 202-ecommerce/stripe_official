@@ -1,0 +1,13 @@
+.pull-right {
+	float: right !important;
+}
+
+.list-group-item {
+  display: block;
+  font-weight: normal;
+  color: #666;
+  padding: 7px 10px;
+  border-top: 1px solid #CCCED7;
+  border-right: 1px solid #CCCED7;
+  /* padding: 10px 15px !important; */
+}
