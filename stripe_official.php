@@ -1596,15 +1596,15 @@ class Stripe_official extends PaymentModule
         }
 
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-        $address_delivery = new Address($context->cart->id_address_delivery);
+        $address_invoice = new Address($this->context->cart->id_address_invoice);
 
         $billing_address = array(
-            'line1' => $address_delivery->address1,
-            'line2' => $address_delivery->address2,
-            'city' => $address_delivery->city,
-            'zip_code' => $address_delivery->postcode,
-            'country' => $address_delivery->country,
-            'phone' => $address_delivery->phone ? $address_delivery->phone : $address_delivery->phone_mobile,
+            'line1' => $address_invoice->address1,
+            'line2' => $address_invoice->address2,
+            'city' => $address_invoice->city,
+            'zip_code' => $address_invoice->postcode,
+            'country' => $address_invoice->country,
+            'phone' => $address_invoice->phone_mobile ? $address_invoice->phone_mobile : $address_invoice->phone,
             'email' => $this->context->customer->email,
         );
 
