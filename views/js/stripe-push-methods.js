@@ -22,9 +22,12 @@ $(document).ready(function() {
 function initStripeOfficialGiropay() {
     stripePayment_isInit = true;
 
-
     var stripe_submit_button = document.getElementById('payment-confirmation');
     stripe_submit_button.addEventListener('click', function (e) {
+        
+        if (!$('input[type=radio].stripe-official').is(':checked')) {
+            return false;
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -38,7 +41,6 @@ function initStripeOfficialGiropay() {
         if (StripePubKey && typeof stripe_v3 !== 'object') {
             var stripe_v3 = Stripe(StripePubKey);
         }
-
 
         if (method_stripe == 'sofort') {
             var method_info  = {

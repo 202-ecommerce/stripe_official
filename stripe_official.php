@@ -70,7 +70,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.5.1';
+        $this->version = '1.5.2';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';
@@ -444,10 +444,10 @@ class Stripe_official extends PaymentModule
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
         $this->context->smarty->assign('new_base_dir', $this->_path);
-        $this->context->controller->addJs($this->_path.'/views/js/faq.js');
-        $this->context->controller->addCss($this->_path.'/views/css/started.css');
-        $this->context->controller->addCss($this->_path.'/views/css/tabs.css');
-        $this->context->controller->addJs($this->_path.'/views/js/back.js');
+        $this->context->controller->addJS($this->_path.'/views/js/faq.js');
+        $this->context->controller->addCSS($this->_path.'/views/css/started.css');
+        $this->context->controller->addCSS($this->_path.'/views/css/tabs.css');
+        $this->context->controller->addJS($this->_path.'/views/js/back.js');
 
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
     }
@@ -581,7 +581,6 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
-       // print_r($this->context->link->getModuleLink($this->name, 'stripeWebhook', array(), true));die;
         $this->_postProcess();
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
@@ -1455,6 +1454,12 @@ class Stripe_official extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
+        $this->context->smarty->assign('SSL', Configuration::get('PS_SSL_ENABLED'));
+        if (!Configuration::get('PS_SSL_ENABLED'))
+        {
+            return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
+        }
+
         $payment_options = array();
         $embeddedOption = new PaymentOption();
         $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
@@ -1531,12 +1536,10 @@ class Stripe_official extends PaymentModule
 
     protected  function generateHiddenForm($method)
     {
-        $context = $this->context;
-
         $amount = $this->context->cart->getOrderTotal();
         $currency = $this->context->currency->iso_code;
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-        $ajax_link = $context->link->getModuleLink('stripe_official', 'ajax', array(), true);
+        $ajax_link = $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true);
 
         $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
@@ -1583,48 +1586,47 @@ class Stripe_official extends PaymentModule
 
     protected function generateFormStripe()
     {
-        if (Configuration::get('PS_SSL_ENABLED')) {
-            $context = $this->context;
+        $context = $this->context;
 
-            $amount = $context->cart->getOrderTotal();
-            $currency = $context->currency->iso_code;
-            $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
-            if (!$secure_mode_all && $amount >= 50) {
-                $secure_mode_all = 1;
-            }
-
-            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-            $address_delivery = new Address($context->cart->id_address_delivery);
-
-            $billing_address = array(
-                'line1' => $address_delivery->address1,
-                'line2' => $address_delivery->address2,
-                'city' => $address_delivery->city,
-                'zip_code' => $address_delivery->postcode,
-                'country' => $address_delivery->country,
-                'phone' => $address_delivery->phone ? $address_delivery->phone : $address_delivery->phone_mobile,
-                'email' => $this->context->customer->email,
-            );
-
-            $domain = $context->link->getBaseLink($context->shop->id, true);
-            $ajax_link = $context->link->getModuleLink('stripe_official', 'ajax', array(), true);
-            $this->context->smarty->assign(
-                array(
-                    'publishableKey' => $this->getPublishableKey(),
-                    'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                    'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                    'currency_stripe' => $currency,
-                    'baseDir' => $domain,
-                    'secure_mode' => $secure_mode_all,
-                    'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                    'module_dir' => $this->_path,
-                    'billing_address' => Tools::jsonEncode($billing_address),
-                    'ajaxUrlStripe' => $ajax_link,
-                    'amount_ttl' => $amount,
-                    'stripeLanguageIso' => $this->context->language->iso_code,
-                )
-            );
+        $amount = $context->cart->getOrderTotal();
+        $currency = $context->currency->iso_code;
+        $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
+        if (!$secure_mode_all && $amount >= 50) {
+            $secure_mode_all = 1;
         }
+
+        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+        $address_delivery = new Address($context->cart->id_address_delivery);
+
+        $billing_address = array(
+            'line1' => $address_delivery->address1,
+            'line2' => $address_delivery->address2,
+            'city' => $address_delivery->city,
+            'zip_code' => $address_delivery->postcode,
+            'country' => $address_delivery->country,
+            'phone' => $address_delivery->phone ? $address_delivery->phone : $address_delivery->phone_mobile,
+            'email' => $this->context->customer->email,
+        );
+
+        $domain = $context->link->getBaseLink($context->shop->id, true);
+        $ajax_link = $context->link->getModuleLink('stripe_official', 'ajax', array(), true);
+        $this->context->smarty->assign(
+            array(
+                'publishableKey' => $this->getPublishableKey(),
+                'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                'currency_stripe' => $currency,
+                'baseDir' => $domain,
+                'secure_mode' => $secure_mode_all,
+                'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                'module_dir' => $this->_path,
+                'billing_address' => Tools::jsonEncode($billing_address),
+                'ajaxUrlStripe' => $ajax_link,
+                'amount_ttl' => $amount,
+                'stripeLanguageIso' => $this->context->language->iso_code,
+            )
+        );
+
         return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
     }
 }

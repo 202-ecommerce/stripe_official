@@ -23,6 +23,7 @@
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
+{if $SSL}
 <div class="row stripe-payment">
   <div class="col-xs-12">
     <div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
@@ -106,7 +107,13 @@
   var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
   var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
   var stripeLanguageIso = "{$stripeLanguageIso|escape:'htmlall':'UTF-8'}";
-  {literal}
-
 </script>
-{/literal}
+{else}
+<div class="row stripe-payment">
+  <div class="col-xs-12">
+    <div class="payment_module" style="border: 1px solid #d6d4d4; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding-left: 15px; padding-right: 15px; background: #fbfbfb;">
+      <p class="alert alert-danger">{l s='SSL is off, please activate it.' mod='stripe_official'}</p>
+    </div>
+  </div>
+</div>
+{/if}

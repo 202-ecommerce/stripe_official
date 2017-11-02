@@ -59,7 +59,7 @@ function initStripeOfficial() {
     card.addEventListener('change', function(event) {
         setOutcome(event);
         cardType = event.brand;
-        if (cardType != "unknown") {
+        if (typeof cardType != "undefined") {
             if (cardType == "American Express")
                 cardType = "amex";
             if (cardType == "Diners Club")
