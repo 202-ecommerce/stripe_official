@@ -21,7 +21,6 @@ $(document).ready(function() {
         $('#modal_stripe_waiting').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
         $('#modal_stripe_waiting').parent().css({'z-index': 90000000000});
         $('#stripe-ajax-loader-europe').show();
-
         source_chargeable = false;
         Stripe.source.poll(
             stripe_source,
@@ -59,6 +58,10 @@ $(document).ready(function() {
     }
 
     function createCharge(result) {
+        if (typeof(result) == "undefined") {
+            result = response;
+        }
+
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -73,7 +76,6 @@ $(document).ready(function() {
                     // Charge ok : redirect the customer to order confirmation page
                     location.replace(data.url);
                 } else {
-                    //  Charge ko
                     location.replace(return_order_page+'&stripe_err_msg='+data.msg);
                 }
             },

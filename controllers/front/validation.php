@@ -3,7 +3,8 @@
  * 2007-2017 PrestaShop
  *
  * DISCLAIMER
- ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
@@ -15,17 +16,15 @@
 
 class stripe_officialValidationModuleFrontController extends ModuleFrontController
 {
-    /**
-     * @see FrontController::initContent()
-     */
-    public $display_column_left = false;
-    
     public function __construct()
     {
         parent::__construct();
         $this->ssl = true;
     }
 
+    /**
+     * @see FrontController::initContent()
+     */
     public function initContent()
     {
 
@@ -46,13 +45,13 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'module_dir' => _PS_MODULE_DIR_,
             'return_order_page' => $order_page,
         ));
-        Context::getContext()->controller->addJs('https://js.stripe.com/v2/');
-        Context::getContext()->controller->addJS(_PS_MODULE_DIR_.'stripe_official/views/js/jquery.the-modal.js');
-        Context::getContext()->controller->addCSS(_PS_MODULE_DIR_.'stripe_official/views/css/the-modal.css', 'all');
-        Context::getContext()->controller->addCSS(_PS_MODULE_DIR_.'stripe_official/views/css/front.css', 'all');
-        Context::getContext()->controller->addJS(_PS_MODULE_DIR_.'stripe_official/views/js/payment_validation.js');
+        Context::getContext()->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
+        Context::getContext()->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
+        Context::getContext()->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
+        Context::getContext()->controller->registerStylesheet('stripe_official-frontcss', 'modules/stripe_official/views/css/front.css');
+        Context::getContext()->controller->registerStylesheet('stripe_official-modal', 'modules/stripe_official/views/css/the-modal.css');
 
-        return $this->setTemplate('payment_validation.tpl');
+        $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
 
     }
 }

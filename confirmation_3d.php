@@ -12,6 +12,7 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+
 global $useSSL;
 $useSSL = true;
 if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')

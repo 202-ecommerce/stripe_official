@@ -60,7 +60,7 @@
 				<br><br>
 				<ul>
 					<li>{l s='Go on the webhook page of your Stripe dashboard:' mod='stripe_official'}
-						 <a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
+						<a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
 					</li>
 					<li>{l s='Click on “Add Endpoint” and copy/paste this URL in the “URL to be called” field:' mod='stripe_official'} {$url_webhhoks}</li>
 					<li>{l s='Set the “Events to send” radion button to “Live events”' mod='stripe_official'}</li>
