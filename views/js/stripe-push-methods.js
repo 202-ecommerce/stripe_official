@@ -25,18 +25,14 @@ function initStripeOfficialGiropay() {
     var stripe_submit_button = document.getElementById('payment-confirmation');
     stripe_submit_button.addEventListener('click', function (e) {
         
-        if (!$('input[type=radio].stripe-official').is(':checked')) {
-            return false;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
         var method_stripe = $('input[name=payment-option]:checked').data('module-name');
         var methods_stripe = ["ideal", "giropay", "bancontact", "sofort"];
         if (methods_stripe.indexOf($('input[name=payment-option]:checked').data('module-name')) == -1) {
             return true;
         }
+        
+        e.preventDefault();
+        e.stopPropagation();
         
         if (StripePubKey && typeof stripe_v3 !== 'object') {
             var stripe_v3 = Stripe(StripePubKey);

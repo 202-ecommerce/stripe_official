@@ -26,8 +26,6 @@
 <script>
     var stripe_payment_error = "{$stripe_error|escape:'htmlall':'UTF-8'}";
     var stripe_type_error = "{$payment_error_type|escape:'htmlall':'UTF-8'}";
-
-
     var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
     var stripe_failed = "{$stripe_failed|escape:'htmlall':'UTF-8'}";
     var stripe_err_msg = "{$stripe_err_msg|escape:'htmlall':'UTF-8'}";
