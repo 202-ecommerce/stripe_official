@@ -1573,7 +1573,16 @@ class Stripe_official extends PaymentModule
 
     public function hookHeader()
     {
-        if ($this->context->controller->php_self == 'order') 
+        $moduleId = Module::getModuleIdByName($this->name);
+        $currencyAvailable = false;
+
+        foreach(Currency::checkPaymentCurrencies($moduleId) as $currency) {
+            if($currency['id_currency'] == $context->currency->id) {
+                $currencyAvailable = true;
+            }
+        }
+        
+        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true) 
         {
             $this->context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
             $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
