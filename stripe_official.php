@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -252,7 +252,6 @@ class Stripe_official extends PaymentModule
         }
         return '';
     }
-
 
     /*
      ** @method: showHeadMessages
@@ -616,8 +615,7 @@ class Stripe_official extends PaymentModule
 
     private function _postProcess()
     {
-
-
+        return;
     }
 
     /*
@@ -858,7 +856,7 @@ class Stripe_official extends PaymentModule
             } else {
                 $cardHolderName = $params['cardHolderName'];
             }
-
+            
             $charge = \Stripe\Charge::create(
                 array(
                     "amount" => $params['amount'], // amount in cents, again
@@ -1276,7 +1274,6 @@ class Stripe_official extends PaymentModule
         return $this->display($this->_path, 'views/templates/admin/faq.tpl');
     }
 
-
     /*
      ** @Method: displaySomething
      ** @description: just display something (it's something)
@@ -1299,7 +1296,6 @@ class Stripe_official extends PaymentModule
         $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
     }
-
 
     /*
      ** @Method: generateList
@@ -1486,6 +1482,7 @@ class Stripe_official extends PaymentModule
 
             $iso_country = Country::getIsoById($address_invoice->id_country);
             $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
+            $available_countries = array();
             
             foreach ($iso_countries as $iso) {
                 $id_country = Country::getByIso($iso);
@@ -1526,7 +1523,7 @@ class Stripe_official extends PaymentModule
                     }
 
                     $payment_option = new PaymentOption();
-                    $payment_option->setCallToActionText($this->l('Pay by '.Tools::strtoupper($method)))
+                    $payment_option->setCallToActionText($this->l('Pay by ').Tools::strtoupper($method))
                         ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/cc-'.$method.'.png'))
                         ->setModuleName($method)

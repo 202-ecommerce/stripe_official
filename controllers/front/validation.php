@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -9,7 +9,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -55,6 +55,5 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         $this->context->controller->registerStylesheet('stripe_official-modal', 'modules/stripe_official/views/css/the-modal.css');
 
         $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
-
     }
 }

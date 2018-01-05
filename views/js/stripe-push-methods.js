@@ -1,5 +1,5 @@
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,10 +8,11 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+
 stripePayment_isInit = false;
 $(document).ready(function() {
     if (!stripePayment_isInit && $('section#checkout-payment-step').hasClass('js-current-step')) {
@@ -76,7 +77,6 @@ function initStripeOfficialGiropay() {
         });
     });
 
-
     if (typeof stripe_failed != "undefined" && stripe_failed) {
         $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
         $('#modal-stripe-error').parent().css({'z-index': 90000000000});
@@ -85,7 +85,6 @@ function initStripeOfficialGiropay() {
         else
             $('.stripe-payment-europe-errors').show().text(stripe_error_msg).fadeIn(1000);
     }
-
 
     $('#modal-stripe-error .close').click(function() {
         $('#modal-stripe-error').modalStripe().close();
