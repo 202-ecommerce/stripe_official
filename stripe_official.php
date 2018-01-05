@@ -1574,7 +1574,7 @@ class Stripe_official extends PaymentModule
         $currencyAvailable = false;
 
         foreach(Currency::checkPaymentCurrencies($moduleId) as $currency) {
-            if($currency['id_currency'] == $context->currency->id) {
+            if($currency['id_currency'] == $this->context->currency->id) {
                 $currencyAvailable = true;
             }
         }
