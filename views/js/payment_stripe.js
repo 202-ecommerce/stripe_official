@@ -240,6 +240,7 @@ function initStripeOfficial() {
             if (typeof(result) == "undefined") {
                 result = response;
             }
+            
             $.ajax({
                 type: 'POST',
                 dataType: 'json',

@@ -43,8 +43,8 @@
     var stripe_client_secret = "{$stripe_client_secret}";
     var stripe_source = "{$stripe_source}";
     var StripePubKey = "{$publishableKey}";
-    var ajaxUrlStripe = "{$ajaxUrlStripe}";
-    var return_order_page = "{$return_order_page}";
+    var ajaxUrlStripe = "{$ajaxUrlStripe nofilter}";
+    var return_order_page = "{$return_order_page nofilter}";
 </script>
 
 

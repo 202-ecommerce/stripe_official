@@ -83,16 +83,16 @@
 </div>
 
 <script type="text/javascript">
-    var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
-    var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
+    var currency_stripe = "{$currency_stripe}";
+    var amount_ttl = {$amount_ttl};
     var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
-    var stripe_customer_name = "{$customer_name|escape:'htmlall':'UTF-8'}";
-    var stripe_cart_id = {$stripe_cart_id|escape:'htmlall':'UTF-8'};
-    var stripe_order_url = "{$stripe_order_url}";
-    var stripe_country_iso_code = "{$stripe_country_iso_code|escape:'htmlall':'UTF-8'}";
-    var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
-    var stripe_customer_email = "{$stripe_customer_email|escape:'htmlall':'UTF-8'}";
-    var stripe_failed = "{$stripe_failed|escape:'htmlall':'UTF-8'}";
-    var stripe_err_msg = "{$stripe_err_msg|escape:'htmlall':'UTF-8'}";
-    var verification_url = "{$verification_url|escape:'htmlall':'UTF-8'}";
+    var stripe_customer_name = "{$customer_name}";
+    var stripe_cart_id = {$stripe_cart_id};
+    var stripe_order_url = "{$stripe_order_url nofilter}";
+    var stripe_country_iso_code = "{$stripe_country_iso_code}";
+    var StripePubKey = "{$publishableKey}";
+    var stripe_customer_email = "{$stripe_customer_email}";
+    var stripe_failed = "{$stripe_failed}";
+    var stripe_err_msg = "{$stripe_err_msg}";
+    var verification_url = "{$verification_url nofilter}";
 </script>

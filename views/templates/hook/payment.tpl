@@ -95,7 +95,7 @@
   </div>
 </div>
 <div id="modal_stripe"  class="modal" style="display: none">
-<div id="result_3d"> </div></div>
+  <div id="result_3d"> </div></div>
 <script type="text/javascript">
   var mode = {$stripe_mode};
   var currency_stripe = "{$currency_stripe}";

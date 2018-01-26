@@ -31,12 +31,12 @@
     var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
     var stripe_customer_name = "{$customer_name}";
     var stripe_cart_id = {$stripe_cart_id};
-    var stripe_order_url = "{$stripe_order_url}";
-    var ajaxUrlStripe = "{$ajaxUrlStripe}";
+    var stripe_order_url = "{$stripe_order_url nofilter}";
+    var ajaxUrlStripe = "{$ajaxUrlStripe nofilter}";
     var StripePubKey = "{$publishableKey}";
     var stripe_customer_email = "{$stripe_customer_email}";
     var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
-    var verification_url = "{$verification_url}";
+    var verification_url = "{$verification_url nofilter}";
 
 </script>
 {if $payment_method == 'sofort'}
