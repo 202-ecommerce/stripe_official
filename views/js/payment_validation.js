@@ -1,5 +1,5 @@
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,10 +8,11 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+
 $(document).ready(function() {
     if (typeof stripe_source != "undefined" && stripe_source != ""
         && typeof stripe_client_secret != "undefined" && stripe_client_secret != "") {
@@ -21,7 +22,6 @@ $(document).ready(function() {
         $('#modal_stripe_waiting').modalStripe({cloning: false, closeOnOverlayClick: false, closeOnEsc: false}).open();
         $('#modal_stripe_waiting').parent().css({'z-index': 90000000000});
         $('#stripe-ajax-loader-europe').show();
-
         source_chargeable = false;
         Stripe.source.poll(
             stripe_source,
@@ -59,6 +59,10 @@ $(document).ready(function() {
     }
 
     function createCharge(result) {
+        if (typeof(result) == "undefined") {
+            result = response;
+        }
+
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -73,7 +77,6 @@ $(document).ready(function() {
                     // Charge ok : redirect the customer to order confirmation page
                     location.replace(data.url);
                 } else {
-                    //  Charge ko
                     location.replace(return_order_page+'&stripe_err_msg='+data.msg);
                 }
             },

@@ -1,7 +1,6 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
-
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Academic Free License (AFL 3.0)
@@ -19,16 +18,15 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
 <div class="tabs">
-
   <div class="sidebar navigation col-md-2">
 	{if isset($tab_contents.logo)}
-	  <img class="tabs-logo" src="{$tab_contents.logo|escape:'htmlall':'UTF-8'}"/>
+	  <img class="tabs-logo" src="{$tab_contents.logo}"/>
 	{/if}
 	<nav class="list-group categorieList">
 	  {foreach from=$tab_contents.contents key=tab_nbr item=content}
@@ -36,13 +34,13 @@
 		   href="#stripe_step_{$tab_nbr + 1|intval}">
 
 		  {if isset($content.icon) && $content.icon != false}
-			<i class="{$content.icon|escape:"htmlall":"UTF-8"} pstab-icon"></i>
+			<i class="{$content.icon} pstab-icon"></i>
 		  {/if}
 
-		  {$content.name|escape:"htmlall":"UTF-8"}
+		  {$content.name}
 
 		  {if isset($content.badge) && $content.badge != false}
-			<span class="badge-module-tabs pull-right {$content.badge|escape:"htmlall":"UTF-8"}"></span>
+			<span class="badge-module-tabs pull-right {$content.badge}"></span>
 		  {/if}
 
 		</a>
@@ -53,7 +51,7 @@
   <div class="col-md-10">
 	<div class="content-wrap panel">
 	  {foreach from=$tab_contents.contents key=tab_nbr item=content}
-		<section id="section-shape-{$tab_nbr + 1|intval}">{$content.value|escape:"UTF-8"}</section>
+		<section id="section-shape-{$tab_nbr + 1|intval}">{$content.value}</section>
 		  <!--html code generated-->
 	  {/foreach}
 	</div>
@@ -72,7 +70,7 @@
 	Translation[2] = "{l s='You can learn more about 3D-Secure on our website: ' mod='stripe_official'}";
 	Translation[3] = "{l s='For payments by Visa and MasterCard, you can add an additional layer of security by enforcing 3D-Secure authentification.' mod='stripe_official'}";
 </script>
-<script type="text/javascript" src="{$new_base_dir|escape:'htmlall':'UTF-8'}views/js/PSTabs.js"></script>
+<script type="text/javascript" src="{$new_base_dir}views/js/PSTabs.js"></script>
 <script type="text/javascript">
 		(function() {
 		[].slice.call(document.querySelectorAll('.tabs')).forEach(function(el) {

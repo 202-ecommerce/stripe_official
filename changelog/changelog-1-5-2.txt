@@ -1,0 +1,4 @@
+
+# Fix bug : dislplay payment option without SSL option
+# Fix bug : payment confirmation button do not work for other payment option 
+# Fix invoice address

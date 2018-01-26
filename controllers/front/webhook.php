@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -20,7 +20,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-
         if (Configuration::get('_PS_STRIPE_mode') == 1) {
             $secret_key = Configuration::get('_PS_STRIPE_test_key');
         } else {
@@ -30,15 +29,17 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         try {
             \Stripe\Stripe::setApiKey($secret_key);
         } catch (Exception $e) {
-            print_r($e->getMessage());die;
+            print_r($e->getMessage());
+            die();
         }
         // Retrieve the request's body and parse it as JSON
-        $input = @file_get_contents("php://input");
+        $input = @Tools::file_get_contents("php://input");
         $event_json = json_decode($input);
         try {
             \Stripe\Event::retrieve($event_json->id);
         } catch (Exception $e) {
-            print_r($e->getMessage());die;
+            print_r($e->getMessage());
+            die();
         }
 
         http_response_code(200);

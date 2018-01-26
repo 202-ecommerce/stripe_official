@@ -1,7 +1,6 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
-
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Academic Free License (AFL 3.0)
@@ -19,16 +18,17 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
+
 {if $refresh == 0}
 	<div class="col-lg-2" style="float:right"><a class="close refresh"><i class="process-icon-refresh" style="font-size:1em"></i></a></div>
 	<script>
-        var validate = "{$path|escape:'htmlall':'UTF-8'}";
-        var id_employee = "{$id_employee|escape:'htmlall':'UTF-8'}";
-        var token_stripe = "{$token_stripe|escape:'htmlall':'UTF-8'}";
+        var validate = "{$path}";
+        var id_employee = "{$id_employee}";
+        var token_stripe = "{$token_stripe}";
     </script>
 {/if}
 <table class="table">
@@ -44,12 +44,12 @@
 	</tr>
 	{foreach from=$tenta key=k item=v}
 	<tr>
-		<td>{$v.date|escape:'htmlall':'UTF-8'}</td>
-		<td>{$v.id_stripe|escape:'htmlall':'UTF-8'}</td>
-		<td>{$v.name|escape:'htmlall':'UTF-8'}</td>
-		<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$v.type|escape:'htmlall':'UTF-8'}.png" alt="payment method" style="width:43px;"/></td>
-		<td>{$v.amount|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
-		<td>{$v.refund|escape:'htmlall':'UTF-8'} {$v.currency|escape:'htmlall':'UTF-8'}</td>
+		<td>{$v.date}</td>
+		<td>{$v.id_stripe}</td>
+		<td>{$v.name}</td>
+		<td><img src="{$module_dir}/views/img/cc-{$v.type}.png" alt="payment method" style="width:43px;"/></td>
+		<td>{$v.amount} {$v.currency}</td>
+		<td>{$v.refund} {$v.currency}</td>
 		{if $v.result == 2}
 			<td>{l s='Refund' mod='stripe_official'}</td>
 		{elseif $v.result == 3}
@@ -57,9 +57,9 @@
 		{elseif $v.result == 4}
 			<td>{l s='Waiting' mod='stripe_official'}</td>
 		{else}
-			<td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/{$v.result|escape:'htmlall':'UTF-8'}ok.gif" alt="result" /></td>
+			<td><img src="{$module_dir}/views/img/{$v.result}ok.gif" alt="result" /></td>
 		{/if}
-		<td class="uppercase">{$v.state|escape:'htmlall':'UTF-8'}</td>
+		<td class="uppercase">{$v.state}</td>
 	</tr>
 	{/foreach}
 </table>
