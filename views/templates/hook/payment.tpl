@@ -1,7 +1,6 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
-
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Academic Free License (AFL 3.0)
@@ -19,10 +18,11 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
+
 {if $SSL}
 <div class="row stripe-payment">
   <div class="col-xs-12">
@@ -41,25 +41,25 @@
       <input type="hidden" id="stripe-rate_limit" value="{l s='An error occurred due to requests hitting the API too quickly. Please let us know if you\'re consistently running into this error.' mod='stripe_official'}">
       <input type="hidden" id="stripe-3d_declined" value="{l s='The card doesn\'t support 3DS.' mod='stripe_official'}">
       <input type="hidden" id="stripe-no_api_key" value="{l s='There\'s an error with your API keys. If you\'re the administrator of this website, please go on the "Connection" tab of your plugin.' mod='stripe_official'}">
-      <div id="stripe-ajax-loader"><img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ajax-loader.gif" alt="" /> {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+      <div id="stripe-ajax-loader"><img src="{$module_dir}views/img/ajax-loader.gif" alt="" /> {l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
       <form id="stripe-payment-form" action="#">
 
         <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
 
 
-        <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error|escape:'htmlall':'UTF-8'}{/if}</div>
+        <div class="stripe-payment-errors">{if isset($smarty.get.stripe_error)}{$smarty.get.stripe_error}{/if}</div>
 
         <!-- Used to display Element errors -->
         <div id="card-errors" role="alert"></div>
 
 
-        <input type="hidden" id="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+        <input type="hidden" id="stripe-publishable-key" value="{$publishableKey}"/>
 
         <div class="form-row">
           <label for="card-element">
             {l s='Cardholder\'s Name' mod='stripe_official'}
           </label><label class="required"> </label>
-          <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name|escape:'htmlall':'UTF-8'}"/>
+          <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name}"/>
           <label for="card-element">
             {l s='Card Number' mod='stripe_official'}
           </label><label class="required"> </label>
@@ -87,26 +87,26 @@
 
 
         <div class="clear"></div>
-        <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/verified_by_visa.png"/>
-        <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/mastercard_securecode.png"/>
-        <img class="powered_stripe" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/powered_by_stripe.png"/>
+        <img class="powered_stripe" alt="" src="{$module_dir}views/img/verified_by_visa.png"/>
+        <img class="powered_stripe" alt="" src="{$module_dir}views/img/mastercard_securecode.png"/>
+        <img class="powered_stripe" alt="" src="{$module_dir}views/img/powered_by_stripe.png"/>
       </form>
     </div>
   </div>
 </div>
 <div id="modal_stripe"  class="modal" style="display: none">
-  <div id="result_3d"> </div></div>
+<div id="result_3d"> </div></div>
 <script type="text/javascript">
-  var mode = {$stripe_mode|escape:'htmlall':'UTF-8'};
-  var currency_stripe = "{$currency_stripe|escape:'htmlall':'UTF-8'}";
-  var amount_ttl = {$amount_ttl|escape:'htmlall':'UTF-8'};
-  var secure_mode = {$secure_mode|escape:'htmlall':'UTF-8'};
-  var baseDir = "{$baseDir|escape:'htmlall':'UTF-8'}";
-  var billing_address = {$billing_address|escape nofilter};
-  var module_dir = "{$module_dir|escape:'htmlall':'UTF-8'}";
-  var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
-  var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
-  var stripeLanguageIso = "{$stripeLanguageIso|escape:'htmlall':'UTF-8'}";
+  var mode = {$stripe_mode};
+  var currency_stripe = "{$currency_stripe}";
+  var amount_ttl = {$amount_ttl};
+  var secure_mode = {$secure_mode};
+  var baseDir = "{$baseDir}";
+  var billing_address = {$billing_address nofilter};
+  var module_dir = "{$module_dir}";
+  var ajaxUrlStripe = "{$ajaxUrlStripe}";
+  var StripePubKey = "{$publishableKey}";
+  var stripeLanguageIso = "{$stripeLanguageIso}";
 </script>
 {else}
 <div class="row stripe-payment">

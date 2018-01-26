@@ -1,5 +1,5 @@
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,10 +8,11 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+
 stripePayment_isInit = false;
 $(document).ready(function() {
     if (!stripePayment_isInit && $('section#checkout-payment-step').hasClass('js-current-step')) {
@@ -25,18 +26,14 @@ function initStripeOfficialGiropay() {
     var stripe_submit_button = document.getElementById('payment-confirmation');
     stripe_submit_button.addEventListener('click', function (e) {
         
-        if (!$('input[type=radio].stripe-official').is(':checked')) {
-            return false;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
         var method_stripe = $('input[name=payment-option]:checked').data('module-name');
         var methods_stripe = ["ideal", "giropay", "bancontact", "sofort"];
         if (methods_stripe.indexOf($('input[name=payment-option]:checked').data('module-name')) == -1) {
             return true;
         }
+        
+        e.preventDefault();
+        e.stopPropagation();
         
         if (StripePubKey && typeof stripe_v3 !== 'object') {
             var stripe_v3 = Stripe(StripePubKey);
@@ -80,7 +77,6 @@ function initStripeOfficialGiropay() {
         });
     });
 
-
     if (typeof stripe_failed != "undefined" && stripe_failed) {
         $('#modal-stripe-error').modalStripe({cloning: true, closeOnOverlayClick: true, closeOnEsc: true}).open();
         $('#modal-stripe-error').parent().css({'z-index': 90000000000});
@@ -89,7 +85,6 @@ function initStripeOfficialGiropay() {
         else
             $('.stripe-payment-europe-errors').show().text(stripe_error_msg).fadeIn(1000);
     }
-
 
     $('#modal-stripe-error .close').click(function() {
         $('#modal-stripe-error').modalStripe().close();

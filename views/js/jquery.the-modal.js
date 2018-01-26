@@ -1,5 +1,5 @@
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,10 +8,11 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+
 ;(function($, window, document, undefined) {
     "use strict";
     /*jshint smarttabs:true*/

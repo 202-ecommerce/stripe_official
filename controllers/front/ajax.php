@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -9,7 +9,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -36,7 +36,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
         if ($this->stripe && $this->stripe->active) {
             $this->context = Context::getContext();
 
-            if(Tools::getValue('checkOrder')) {
+            if (Tools::getValue('checkOrder')) {
                 $cart_id = Tools::getValue('cart_id');
                 $link = Context::getContext()->link;
                 $stripe_payment = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE `id_cart` = ' . (int)$cart_id);
