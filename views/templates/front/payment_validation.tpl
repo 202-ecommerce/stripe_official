@@ -1,7 +1,6 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
-
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Academic Free License (AFL 3.0)
@@ -19,10 +18,11 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
+
 <head>
     {block name='head'}
         {include file='_partials/head.tpl'}
@@ -40,11 +40,11 @@
 </div>
 
 <script>
-    var stripe_client_secret = "{$stripe_client_secret|escape:'htmlall':'UTF-8'}";
-    var stripe_source = "{$stripe_source|escape:'htmlall':'UTF-8'}";
-    var StripePubKey = "{$publishableKey|escape:'htmlall':'UTF-8'}";
-    var ajaxUrlStripe = "{$ajaxUrlStripe|escape nofilter}";
-    var return_order_page = "{$return_order_page|escape nofilter}";
+    var stripe_client_secret = "{$stripe_client_secret}";
+    var stripe_source = "{$stripe_source}";
+    var StripePubKey = "{$publishableKey}";
+    var ajaxUrlStripe = "{$ajaxUrlStripe}";
+    var return_order_page = "{$return_order_page}";
 </script>
 
 

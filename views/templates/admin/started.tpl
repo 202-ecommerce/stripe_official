@@ -1,5 +1,5 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
 
 * NOTICE OF LICENSE
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
@@ -32,10 +32,10 @@
 		 <div class="stripe-module-col1 floatRight"></div>
 		 <div class="stripe-module-col2">
 		 	<div class="stripe-module-col1inner">
-			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a> </span>
+			 	- <span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a> </span>
 				{l s='and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
 				<div class="connect_btn">
-					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect">
+					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url}" class="stripe-connect">
 						<span>{l s='Connect with Stripe' mod='stripe_official'}</span>
 					</a>
 				</div>
@@ -47,7 +47,7 @@
 				{l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
 				- {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
 				<span>{l s='135+ currencies' mod='stripe_official'}</span> {l s='and 4 local payment methods (iDEAL, Bancontact, SOFORT, Giropay).' mod='stripe_official'}<br><br>
-				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:100%;">
+				<img src="{$module_dir}/views/img/started.png" style="width:100%;">
 				<br><br>
 				<p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
 				<a target="_blank" href="https://stripe.com/fr">www.stripe.com</a></p>
@@ -63,16 +63,14 @@
 				<p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
 					<a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.</p>
 				<div class="connect_btn">
-					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect">
+					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url}" class="stripe-connect">
 						<span>{l s='Connect with Stripe' mod='stripe_official'}</span>
 					</a>
 				</div>
 			</div>
-
-
 			<!--<div class="stripe-module-col2inner">
 				<h3>{l s='Accept payments worldwide using all major credit cards' mod='stripe_official'}</h3>
-				<p><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/stripe-cc.png" alt="stripe" class="stripe-cc" /><a href="https://stripe.com/signup" class="stripe-module-btn" target="_blank">
+				<p><img src="{$module_dir}/views/img/stripe-cc.png" alt="stripe" class="stripe-cc" /><a href="https://stripe.com/signup" class="stripe-module-btn" target="_blank">
 				<strong>{l s='Create a FREE Account!' mod='stripe_official'}</strong></a></p>
 			</div>-->
 		</div>

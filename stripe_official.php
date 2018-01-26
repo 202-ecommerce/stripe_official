@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -252,7 +252,6 @@ class Stripe_official extends PaymentModule
         }
         return '';
     }
-
 
     /*
      ** @method: showHeadMessages
@@ -616,8 +615,7 @@ class Stripe_official extends PaymentModule
 
     private function _postProcess()
     {
-
-
+        return;
     }
 
     /*
@@ -858,7 +856,7 @@ class Stripe_official extends PaymentModule
             } else {
                 $cardHolderName = $params['cardHolderName'];
             }
-
+            
             $charge = \Stripe\Charge::create(
                 array(
                     "amount" => $params['amount'], // amount in cents, again
@@ -1276,7 +1274,6 @@ class Stripe_official extends PaymentModule
         return $this->display($this->_path, 'views/templates/admin/faq.tpl');
     }
 
-
     /*
      ** @Method: displaySomething
      ** @description: just display something (it's something)
@@ -1299,7 +1296,6 @@ class Stripe_official extends PaymentModule
         $this->context->smarty->assign('return_url', $return_url);
         return $this->display($this->_path, 'views/templates/admin/started.tpl');
     }
-
 
     /*
      ** @Method: generateList
@@ -1455,24 +1451,28 @@ class Stripe_official extends PaymentModule
     public function hookPaymentOptions($params)
     {
         $this->context->smarty->assign('SSL', Configuration::get('PS_SSL_ENABLED'));
-        if (!Configuration::get('PS_SSL_ENABLED'))
-        {
+        
+        if (!Configuration::get('PS_SSL_ENABLED')) {
             return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
         }
 
         $payment_options = array();
         $embeddedOption = new PaymentOption();
         $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+        
         if (Tools::strtolower($default_country->iso_code) == 'us') {
             $cc_img = 'cc_merged.png';
         } else {
             $cc_img = 'logo-payment.png';
         }
+        
         $embeddedOption->setCallToActionText($this->l('Pay by card'))
                        ->setForm($this->generateFormStripe())
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
-        if ($this->context->currency->iso_code == "EUR") {
+        
+        if ($this->context->currency->iso_code == "EUR") 
+        {
             $address_invoice = new Address($this->context->cart->id_address_invoice);
             $amount = $this->context->cart->getOrderTotal();
             $currency = $this->context->currency->iso_code;
@@ -1482,16 +1482,17 @@ class Stripe_official extends PaymentModule
 
             $iso_country = Country::getIsoById($address_invoice->id_country);
             $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
+            $available_countries = array();
+            
             foreach ($iso_countries as $iso) {
                 $id_country = Country::getByIso($iso);
                 $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
             }
 
-            foreach ($methods as $method) {
-                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) {
-
-
-
+            foreach ($methods as $method) 
+            {
+                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) 
+                {
                     $this->context->smarty->assign(
                         array(
                             'publishableKey' => $this->getPublishableKey(),
@@ -1522,7 +1523,7 @@ class Stripe_official extends PaymentModule
                     }
 
                     $payment_option = new PaymentOption();
-                    $payment_option->setCallToActionText($this->l('Pay by '.Tools::strtoupper($method)))
+                    $payment_option->setCallToActionText($this->l('Pay by ').Tools::strtoupper($method))
                         ->setAction($this->context->link->getModuleLink($this->name, 'validation', array(), true))
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/cc-'.$method.'.png'))
                         ->setModuleName($method)
@@ -1569,17 +1570,26 @@ class Stripe_official extends PaymentModule
 
     public function hookHeader()
     {
-        $context = $this->context;
-        if ($context->controller->php_self == 'order') {
-            $context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
-            $context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
-            $context->controller->registerJavascript($this->name.'-stipeV3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
-            $context->controller->registerJavascript($this->name.'-paymentjs', 'modules/'.$this->name.'/views/js/payment_stripe.js');
-            $context->controller->registerJavascript($this->name.'-modaljs', 'modules/'.$this->name.'/views/js/jquery.the-modal.js');
-            $context->controller->registerStylesheet($this->name.'-modalcss', 'modules/'.$this->name.'/views/css/the-modal.css');
+        $moduleId = Module::getModuleIdByName($this->name);
+        $currencyAvailable = false;
+
+        foreach(Currency::checkPaymentCurrencies($moduleId) as $currency) {
+            if($currency['id_currency'] == $this->context->currency->id) {
+                $currencyAvailable = true;
+            }
+        }
+        
+        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true) 
+        {
+            $this->context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
+            $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
+            $this->context->controller->registerJavascript($this->name.'-stipeV3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
+            $this->context->controller->registerJavascript($this->name.'-paymentjs', 'modules/'.$this->name.'/views/js/payment_stripe.js');
+            $this->context->controller->registerJavascript($this->name.'-modaljs', 'modules/'.$this->name.'/views/js/jquery.the-modal.js');
+            $this->context->controller->registerStylesheet($this->name.'-modalcss', 'modules/'.$this->name.'/views/css/the-modal.css');
 
             if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {
-                $context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
+                $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
             }
         }
     }
@@ -1596,15 +1606,15 @@ class Stripe_official extends PaymentModule
         }
 
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-        $address_delivery = new Address($context->cart->id_address_delivery);
+        $address_invoice = new Address($this->context->cart->id_address_invoice);
 
         $billing_address = array(
-            'line1' => $address_delivery->address1,
-            'line2' => $address_delivery->address2,
-            'city' => $address_delivery->city,
-            'zip_code' => $address_delivery->postcode,
-            'country' => $address_delivery->country,
-            'phone' => $address_delivery->phone ? $address_delivery->phone : $address_delivery->phone_mobile,
+            'line1' => $address_invoice->address1,
+            'line2' => $address_invoice->address2,
+            'city' => $address_invoice->city,
+            'zip_code' => $address_invoice->postcode,
+            'country' => $address_invoice->country,
+            'phone' => $address_invoice->phone_mobile ? $address_invoice->phone_mobile : $address_invoice->phone,
             'email' => $this->context->customer->email,
         );
 
