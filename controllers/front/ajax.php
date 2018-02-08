@@ -17,14 +17,6 @@
 class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
-    private $stripe;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->context = Context::getContext();
-        $this->stripe = Module::getInstanceByName('stripe_official');
-    }
 
     /**
      * @see FrontController::initContent()
@@ -33,26 +25,31 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        if ($this->stripe && $this->stripe->active) {
-            $this->context = Context::getContext();
-
+        if ($this->module && $this->module->active) {
+var_dump(Context::getContext()->cart);
             if (Tools::getValue('checkOrder')) {
-                $cart_id = Tools::getValue('cart_id');
-                $link = Context::getContext()->link;
-                $stripe_payment = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE `id_cart` = ' . (int)$cart_id);
+                $cart_id = $this->context->cart->id;
                 $id_order = Order::getOrderByCartId($cart_id);
+                
+                $stripe_payment = Db::getInstance()->getRow("SELECT * FROM `" . _DB_PREFIX_ . "stripe_payment` WHERE `id_cart` = '" . pSQL((int)$cart_id) . "'");
+                
                 if ($stripe_payment && ($stripe_payment['result'] == 1 || $stripe_payment['result'] == Stripe_official::_PENDING_SOFORT_)) {
                     if ($id_order) {
-                        $url = ($link->getPageLink('order-confirmation', true).'?id_cart='.(int)$cart_id.'&id_module='.(int)$this->stripe->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key);
-                        die(Tools::jsonEncode(array('confirmation_url' => $url)));
+                        $url = $this->context->link->getPageLink(
+                            'order-confirmation', 
+                            true, 
+                            null, 
+                            array('id_cart' => (int)$cart_id, 'id_module' => (int)$this->module->id, 'id_order' => (int)$id_order, 'key' => $this->context->customer->secure_key)
+                        );
+                        $this->ajaxDie(Tools::jsonEncode(array('confirmation_url' => $url)));
                     } else {
-                        die('continue');
+                        $this->ajaxDie('continue');
                     }
                 } else if ($stripe_payment && $stripe_payment['result'] == 0) {
-                    $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed'=>true)):$this->context->link->getPageLink('order', true, null, array('step'=>3, 'stripe_failed'=>true));
-                    die(Tools::jsonEncode(array('error_url' => $order_page)));
+                    $order_page = $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
+                    $this->ajaxDie(Tools::jsonEncode(array('error_url' => $order_page)));
                 } else {
-                    die('continue');
+                    $this->ajaxDie('continue');
                 }
             }
 
@@ -62,7 +59,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
                 || !isset($this->context->cart->id_address_invoice)
                 || empty($this->context->cart->id_address_invoice)
             ) {
-                die('No active shopping cart');
+                $this->ajaxDie('No active shopping cart');
             }
 
             $amount = $this->context->cart->getOrderTotal();
@@ -99,9 +96,9 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
             );
 
             if (isset($params['token']) && !empty($params['token'])) {
-                $this->stripe->chargev2($params);
+                $this->module->chargev2($params);
             } else {
-                die('ko');
+                $this->ajaxDie('ko');
             }
         }
     }

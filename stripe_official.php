@@ -1470,6 +1470,11 @@ class Stripe_official extends PaymentModule
                        ->setForm($this->generateFormStripe())
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
+
+        $embeddedOption = new PaymentOption();
+        $embeddedOption->setCallToActionText($this->l('Pay by Payment request'))
+           ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/payment_request_api.tpl'));
+        $payment_options[] = $embeddedOption;
         
         if ($this->context->currency->iso_code == "EUR") 
         {
@@ -1591,6 +1596,7 @@ class Stripe_official extends PaymentModule
             if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {
                 $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
             }
+            $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
         }
     }
 
