@@ -37,7 +37,7 @@
 		<li>{l s='In Live Mode, you can not run test charges.' mod='stripe_official'}</li>
 	</ul>
 
-	<p><b>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</b></p>
+	<p><b>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT, Giropay and Payment Request API.' mod='stripe_official'}</b></p>
 	<p>{l s='These payment methods are available within this plugin for our European users only. To activate them, follow these' mod='stripe_official'}
 	<b> {l s='three steps:' mod='stripe_official'}</b></p>
 	<ol item="1">
@@ -52,9 +52,12 @@
 				<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
 				<label>{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 				<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-				<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label>
+				<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
+				<input type="checkbox" id="payment_request_api" name="payment_request_api" {if $payment_request_api}checked="checked"{/if}/>
+				<label>{l s='Activate Payment request API (generate Google Pay and Apple Pay payment bouton)' mod='stripe_official'}</label><br>
+				<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
+				<label>{l s='Activate Payment request API in product page (generate Google Pay and Apple Pay payment bouton)' mod='stripe_official'}</label>
 			</div>
-
 		</li>
 		<li>
 			{l s='To track correctly charges performed with these payment methods, you’ll need to add a “webhook”. A webhook is a way to be notified when an event (such as a successful payment) happens on your website.' mod='stripe_official'}

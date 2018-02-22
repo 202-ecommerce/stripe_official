@@ -70,7 +70,7 @@ class Stripe_official extends PaymentModule
     {
         $this->name = 'stripe_official';
         $this->tab = 'payments_gateways';
-        $this->version = '1.5.2.1';
+        $this->version = '1.6.0';
         $this->author = '202 ecommerce';
         $this->bootstrap = true;
         $this->display = 'view';
@@ -118,7 +118,6 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::_PS_STRIPE_.'partial_refund_state', $order_state->id);
         }
 
-
         if (!parent::install()) {
             return false;
         }
@@ -129,7 +128,10 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue('STRIPE_ENABLE_IDEAL', 0)
             || !Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
             || !Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
-            || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0)) {
+            || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0) 
+            || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API_IN_PRODUCT', 0)
+            || !Configuration::updateValue('STRIPE_3DS_AMOUNT', 20)) {
                  return false;
         }
 
@@ -305,7 +307,7 @@ class Stripe_official extends PaymentModule
         if (Tools::isSubmit('submitOptionsconfiguration')) {
             $prefix_len = Tools::strlen(self::_CONF_PREFIX_);
             foreach ($_POST as $key => $value) {
-                /* 	$key = sprintf('%.50s', $key); */
+                /*  $key = sprintf('%.50s', $key); */
                 if (Tools::isSubmit($key) && !strncmp($key, self::_CONF_PREFIX_, $prefix_len)) {
                     if (Configuration::hasKey($key)) {
                         Configuration::updateValue($key, Tools::getValue($key));
@@ -439,7 +441,6 @@ class Stripe_official extends PaymentModule
             'logo' => $domain.__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png'
         );
 
-
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
         $this->context->smarty->assign('new_base_dir', $this->_path);
@@ -517,6 +518,8 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue('STRIPE_ENABLE_SOFORT', Tools::getValue('sofort'));
             Configuration::updateValue('STRIPE_ENABLE_GIROPAY', Tools::getValue('giropay'));
             Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', Tools::getValue('bancontact'));
+            Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API', Tools::getValue('payment_request_api'));
+            Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API_IN_PRODUCT', Tools::getValue('product_payment'));
         }
     }
 
@@ -529,8 +532,24 @@ class Stripe_official extends PaymentModule
      */
     public function contentSecure()
     {
-        if (Tools::isSubmit('submit_secure')) {
-            Configuration::updateValue(self::_PS_STRIPE_.'secure', Tools::getValue(self::_PS_STRIPE_.'secure'));
+        
+        if (Tools::isSubmit('submit_secure')) 
+        {
+            if (Tools::getValue(self::_PS_STRIPE_.'secure') == 2)
+            {
+                if (empty(Tools::getValue('3ds_amount')))
+                    $this->errors[] = $this->l('3DS amount is empty');
+
+                if (!empty(Tools::getValue('3ds_amount')) && !Validate::isInt(Tools::getValue('3ds_amount')))
+                    $this->errors[] = $this->l('3DS amount is not valid. Excpeted integer only.');
+            }
+
+            if (!count($this->errors))
+            {
+                Configuration::updateValue(self::_PS_STRIPE_.'secure', Tools::getValue(self::_PS_STRIPE_.'secure'));
+                Configuration::updateValue('STRIPE_3DS_AMOUNT', Tools::getValue('3ds_amount'));
+            }
+            
         }
     }
 
@@ -546,7 +565,7 @@ class Stripe_official extends PaymentModule
         if (Tools::isSubmit('submit_refund_id')) {
             $refund_id = Tools::getValue(self::_PS_STRIPE_.'refund_id');
             if (!empty($refund_id)) {
-                $refund = Db::getInstance()->ExecuteS('SELECT *	FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+                $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
             } else {
                 $this->errors['refund'] = $this->l('Please make sure to put a Stripe Id');
                 return false;
@@ -580,7 +599,6 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
-        $this->_postProcess();
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->errors[] = $this->l('A SSL certificate is required to process credit card payments using Stripe. Please consult the FAQ.');
@@ -613,11 +631,6 @@ class Stripe_official extends PaymentModule
         return $html;
     }
 
-    private function _postProcess()
-    {
-        return;
-    }
-
     /*
      ** @Method: apiRefund
      ** @description: Make a Refund (charge) with Stripe
@@ -632,7 +645,7 @@ class Stripe_official extends PaymentModule
     {
         $secret_key = $this->getSecretKey();
         if ($this->retrieveAccount($secret_key, '', 1) && !empty($refund_id)) {
-            $refund = Db::getInstance()->ExecuteS('SELECT *	FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+            $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
             if ($mode == 1) { /* Total refund */
                 try {
                     $ch = \Stripe\Charge::retrieve($refund_id);
@@ -977,16 +990,25 @@ class Stripe_official extends PaymentModule
                     'desc' => $this->l(''),
                     'values' => array(
                         array(
+                            'id' => 'secure_none',
+                            'value' => 0,
+                            'label' => $this->l('No 3D-Secure authentication requested'),
+                        ),
+                        array(
                             'id' => 'secure_all',
                             'value' => 1,
                             'label' => $this->l('Request 3D-Secure authentication on all charges'),
                         ),
                         array(
-                            'id' => 'secure_only',
-                            'value' => 0,
+                            'id' => 'secure_custom',
+                            'value' => 2,
                             'label' => $this->l('Request 3D-Secure authentication on charges above 50 EUR/USD/GBP only'),
-                        )
+                        ),
                     ),
+                ),
+                array(
+                    'type' => 'text',
+                    'name' => '3ds_amount',
                 ),
             ),
             'submit' => array(
@@ -998,6 +1020,7 @@ class Stripe_official extends PaymentModule
         $submit_action = 'submit_secure';
         $fields_value = array_merge($fields_value, array(
             self::_PS_STRIPE_.'secure' => Configuration::get(self::_PS_STRIPE_.'secure'),
+            '3ds_amount' => Configuration::get('STRIPE_3DS_AMOUNT'),
         ));
 
         return $this->renderGenericForm($fields_form, $fields_value, $this->getSectionShape(), $submit_action);
@@ -1084,11 +1107,14 @@ class Stripe_official extends PaymentModule
             self::_PS_STRIPE_.'test_key' => Configuration::get(self::_PS_STRIPE_.'test_key'),
             self::_PS_STRIPE_.'test_publishable' => Configuration::get(self::_PS_STRIPE_.'test_publishable'),
         ));
+
         $this->context->smarty->assign(array(
             'ideal' => Configuration::get('STRIPE_ENABLE_IDEAL'),
             'sofort' => Configuration::get('STRIPE_ENABLE_SOFORT'),
             'giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
             'bancontact' => Configuration::get('STRIPE_ENABLE_BANCONTACT'),
+            'payment_request_api' => Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API'),
+            'product_payment' => Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API_IN_PRODUCT'),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
 
@@ -1229,7 +1255,7 @@ class Stripe_official extends PaymentModule
 
         if ($this->refund) {
             $refund_id = Tools::getValue(self::_PS_STRIPE_.'refund_id');
-            $orders = Db::getInstance()->ExecuteS('SELECT *	FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+            $orders = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
 
             $tenta = array();
 
@@ -1471,10 +1497,13 @@ class Stripe_official extends PaymentModule
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
 
-        $embeddedOption = new PaymentOption();
-        $embeddedOption->setCallToActionText($this->l('Pay by Payment request'))
-           ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/payment_request_api.tpl'));
-        $payment_options[] = $embeddedOption;
+        if (Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API'))
+        {        
+            $embeddedOption = new PaymentOption();
+            $embeddedOption->setCallToActionText($this->l('Pay with Goole Pay or Apple Pay'))
+               ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/payment_request_api.tpl'));
+            $payment_options[] = $embeddedOption;
+        }
         
         if ($this->context->currency->iso_code == "EUR") 
         {
@@ -1596,7 +1625,9 @@ class Stripe_official extends PaymentModule
             if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {
                 $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
             }
-            $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
+
+            if (Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API'))
+                $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
         }
     }
 
