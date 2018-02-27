@@ -31,7 +31,7 @@
         var token_stripe = "{$token_stripe}";
     </script>
 {/if}
-<table class="table">
+<table class="table table-transaction">
 	<tr>
 		<th>{l s='Date (last update)' mod='stripe_official'}</th>
 	   	<th>{l s='Stripe Payment ID' mod='stripe_official'}</th>

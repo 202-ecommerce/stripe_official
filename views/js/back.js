@@ -15,13 +15,6 @@
 
 $(document).ready(function() {
 
-	//rename switch fiels value labels
-	$('label[for=_PS_STRIPE_mode_on]').html(stripe_test_mode);
-	$('label[for=_PS_STRIPE_mode_off]').html(live);
-	$('#section-shape-2 .form-group').first().append(conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.stripe.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.');
-
-	$('#section-shape-2 .panel .form-wrapper').append($('#conf-payment-methods'));
-
 	// multistore
 	var old = $('.bootstrap.panel');
 	$('#content').after(old);
@@ -92,13 +85,18 @@ $(document).ready(function() {
 
 	$('.process-icon-refresh').click(function(){
         $.ajax({
-            url: validate + 'refresh.php',
+            url: transaction_refresh_url,
             data: {'token_stripe' : token_stripe,
             'id_employee' : id_employee}
         }).done(function(response) {
-            $('.table').html(response);
+            $('.table-transaction').html(response);
         });
     });
 
+	(function() {
+		[].slice.call(document.querySelectorAll('.tabs')).forEach(function(el) {
+			new PSTabs(el);
+		});
+	})();
 
 });

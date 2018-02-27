@@ -47,7 +47,6 @@ table.stripe-cc-numbers td.last { border-bottom: none; }
 table.stripe-cc-numbers td.number code { font-family: Courier; }
 
 .stripe-module-wrapper table { color: #585A69; font-size: 12px; text-shadow: 0 1px 0 #FFFFFF;}
-#content.bootstrap h3:not(.modal-title), #content.bootstrap .panel-heading { margin: 0px 0px 0px 0px }
 .commit_3d {
     margin: 10px 0;
 }

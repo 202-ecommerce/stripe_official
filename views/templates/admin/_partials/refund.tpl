@@ -1,7 +1,6 @@
 {*
 * 2007-2018 PrestaShop
 *
-
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Academic Free License (AFL 3.0)
@@ -23,6 +22,5 @@
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
-
-<form class="form-horizontal" role="form" id="apiKeySubmit" action = "{$module_link}" method="post">
-</form>
+{$refund_form}
+{include file="./transaction.tpl"}

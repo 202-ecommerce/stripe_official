@@ -82,7 +82,9 @@
               <!-- a Stripe Element will be inserted here. -->
             </div>
           </div>
+
         </div>
+
 
         <div class="clear"></div>
         <img class="powered_stripe" alt="" src="{$module_dir}views/img/verified_by_visa.png"/>
@@ -92,7 +94,6 @@
     </div>
   </div>
 </div>
-
 <div id="modal_stripe"  class="modal" style="display: none">
   <div id="result_3d"> </div></div>
 <script type="text/javascript">
@@ -103,7 +104,7 @@
   var baseDir = "{$baseDir}";
   var billing_address = {$billing_address nofilter};
   var module_dir = "{$module_dir}";
-  var ajaxUrlStripe = "{$ajaxUrlStripe nofilter}";
+  var ajaxUrlStripe = "{$ajaxUrlStripe}";
   var StripePubKey = "{$publishableKey}";
   var stripeLanguageIso = "{$stripeLanguageIso}";
 </script>
