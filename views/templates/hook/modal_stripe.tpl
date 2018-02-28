@@ -25,20 +25,17 @@
 <script>
     var stripe_payment_error = "{$stripe_error}";
     var stripe_type_error = "{$payment_error_type}";
-    var amount_ttl = {$amount_ttl};
     var stripe_failed = "{$stripe_failed}";
     var stripe_err_msg = "{$stripe_err_msg}";
     var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
     var stripe_customer_name = "{$customer_name}";
     var stripe_cart_id = {$stripe_cart_id};
     var stripe_order_url = "{$stripe_order_url}";
-    var ajaxUrlStripe = "{$ajaxUrlStripe}";
-    var StripePubKey = "{$publishableKey}";
     var stripe_customer_email = "{$stripe_customer_email}";
     var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
     var verification_url = "{$verification_url}";
-
 </script>
+
 {if $payment_method == 'sofort'}
 <div id="sofort_available_countries">
     <div class="title"><b>{l s='Choose your bank country:' mod='stripe_official'}</b></div><br>

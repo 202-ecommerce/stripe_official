@@ -1041,83 +1041,37 @@ class Stripe_official extends PaymentModule
         }
     }
 
-    protected  function generateHiddenForm($method)
-    {
-        $amount = $this->context->cart->getOrderTotal();
-        $currency = $this->context->currency->iso_code;
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-        $ajax_link = $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true);
+    // protected  function generateHiddenForm($method)
+    // {
+    //     $amount = $this->context->cart->getOrderTotal();
+    //     $currency = $this->context->currency->iso_code;
+    //     $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+    //     $ajax_link = $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true);
 
-        $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+    //     $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        $this->context->smarty->assign(
-            array(
-                'publishableKey' => $this->getPublishableKey(),
-                'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                'currency_stripe' => $currency,
-                'amount_ttl' => $amount,
-                'country_merchant' => Tools::strtolower($default_country->iso_code),
-                'ajaxUrlStripe' => $ajax_link,
-                'stripe_customer_email' => $this->context->customer->email,
-                'stripe_client_secret' => Tools::getValue('client_secret') ? Tools::getValue('client_secret') : '',
-                'stripe_source' => Tools::getValue('source') ? Tools::getValue('source') : '',
-                'stripe_order_url' => $this->context->link->getPageLink('order'),
-                'stripe_cart_id' => $this->context->cart->id,
-                'stripe_error' => Tools::getValue('stripe_error'),
-                'payment_error_type' => Tools::getValue('type'),
-                'payment_method' => $method,
-            )
-        );
+    //     $this->context->smarty->assign(
+    //         array(
+    //             'publishableKey' => $this->getPublishableKey(),
+    //             'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+    //             'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+    //             'currency_stripe' => $currency,
+    //             'amount_ttl' => $amount,
+    //             'country_merchant' => Tools::strtolower($default_country->iso_code),
+    //             'ajaxUrlStripe' => $ajax_link,
+    //             'stripe_customer_email' => $this->context->customer->email,
+    //             'stripe_client_secret' => Tools::getValue('client_secret') ? Tools::getValue('client_secret') : '',
+    //             'stripe_source' => Tools::getValue('source') ? Tools::getValue('source') : '',
+    //             'stripe_order_url' => $this->context->link->getPageLink('order'),
+    //             'stripe_cart_id' => $this->context->cart->id,
+    //             'stripe_error' => Tools::getValue('stripe_error'),
+    //             'payment_error_type' => Tools::getValue('type'),
+    //             'payment_method' => $method,
+    //         )
+    //     );
 
-        return $this->context->smarty->fetch('module:'.$this->name.'/views/templates/front/modal_stripe.tpl');
-    }
-
-    protected function generateFormStripe()
-    {
-        $context = $this->context;
-
-        $amount = $context->cart->getOrderTotal();
-        $currency = $context->currency->iso_code;
-        $secure_mode_all = Configuration::get(self::_PS_STRIPE_.'secure');
-        if (!$secure_mode_all && $amount >= 50) {
-            $secure_mode_all = 1;
-        }
-
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-        $address_invoice = new Address($this->context->cart->id_address_invoice);
-
-        $billing_address = array(
-            'line1' => $address_invoice->address1,
-            'line2' => $address_invoice->address2,
-            'city' => $address_invoice->city,
-            'zip_code' => $address_invoice->postcode,
-            'country' => $address_invoice->country,
-            'phone' => $address_invoice->phone_mobile ? $address_invoice->phone_mobile : $address_invoice->phone,
-            'email' => $this->context->customer->email,
-        );
-
-        $domain = $context->link->getBaseLink($context->shop->id, true);
-        $ajax_link = $context->link->getModuleLink('stripe_official', 'ajax', array(), true);
-        $this->context->smarty->assign(
-            array(
-                'publishableKey' => $this->getPublishableKey(),
-                'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                'currency_stripe' => $currency,
-                'baseDir' => $domain,
-                'secure_mode' => $secure_mode_all,
-                'stripe_mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                'module_dir' => $this->_path,
-                'billing_address' => Tools::jsonEncode($billing_address),
-                'ajaxUrlStripe' => $ajax_link,
-                'amount_ttl' => $amount,
-                'stripeLanguageIso' => $this->context->language->iso_code,
-            )
-        );
-
-        return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
-    }
+    //     return $this->context->smarty->fetch('module:'.$this->name.'/views/templates/front/modal_stripe.tpl');
+    // }
 
     public function hookDisplayBackOfficeHeader($params)
     {
@@ -1132,53 +1086,131 @@ class Stripe_official extends PaymentModule
     public function hookHeader()
     {
         $moduleId = Module::getModuleIdByName($this->name);
-        $currencyAvailable = false;
 
+        $currencyAvailable = false;
         foreach(Currency::checkPaymentCurrencies($moduleId) as $currency) {
-            if($currency['id_currency'] == $this->context->currency->id) {
+            if ($currency['id_currency'] == $this->context->currency->id) {
                 $currencyAvailable = true;
             }
         }
         
         if ($this->context->controller->php_self == 'order' && $currencyAvailable === true) 
         {
+            $amount = $this->context->cart->getOrderTotal();
+            $secure_mode = Configuration::get(self::_PS_STRIPE_.'secure');
+            $currency = $this->context->currency->iso_code;
+            $publishable_key = $this->getPublishableKey();
+            $language_iso = $this->context->language->iso_code;
+
+            $must_enable_3ds = false;
+            if ($amount > Configuration::get('STRIPE_3DS_AMOUNT'))
+                $must_enable_3ds = true;
+
+            $address_invoice = new Address($this->context->cart->id_address_invoice);
+
+            $billing_address = array(
+                'line1' => $address_invoice->address1,
+                'line2' => $address_invoice->address2,
+                'city' => $address_invoice->city,
+                'zip_code' => $address_invoice->postcode,
+                'country' => $address_invoice->country,
+                'phone' => $address_invoice->phone_mobile ? $address_invoice->phone_mobile : $address_invoice->phone,
+                'email' => $this->context->customer->email,
+            );
+
+            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+            
+            $js_def = array(
+                'must_enable_3ds' => $must_enable_3ds,
+                'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
+                'currency_stripe' => $currency,
+                'amount_ttl' => $amount,
+                'secure_mode' => $secure_mode,
+                'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
+                'billing_address' => Tools::jsonEncode($billing_address),
+                'module_dir' => $this->_path,
+                'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
+                'StripePubKey' => $publishable_key,
+                'stripeLanguageIso' => $language_iso,
+            );
+
+            Media::addJsDef($js_def);
+
             $this->context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
             $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
             $this->context->controller->registerJavascript($this->name.'-stipeV3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
             $this->context->controller->registerJavascript($this->name.'-paymentjs', 'modules/'.$this->name.'/views/js/payment_stripe.js');
-            $this->context->controller->registerJavascript($this->name.'-modaljs', 'modules/'.$this->name.'/views/js/jquery.the-modal.js');
-            $this->context->controller->registerStylesheet($this->name.'-modalcss', 'modules/'.$this->name.'/views/css/the-modal.css');
 
-            if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT')) {
-                $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
+            $push_methods = false;
+            if (Configuration::get('STRIPE_ENABLE_IDEAL') || Configuration::get('STRIPE_ENABLE_GIROPAY') || Configuration::get('STRIPE_ENABLE_BANCONTACT') || Configuration::get('STRIPE_ENABLE_SOFORT'))
+                $push_methods = true;
+
+            if (($secure_mode && $must_enable_3ds) || $push_methods)
+            {
+                $this->context->controller->registerJavascript($this->name.'-modaljs', 'modules/'.$this->name.'/views/js/jquery.the-modal.js');
+                $this->context->controller->registerStylesheet($this->name.'-modalcss', 'modules/'.$this->name.'/views/css/the-modal.css');
             }
+
+            if ($push_methods)
+                $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
 
             if (Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API'))
                 $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
+
+            $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
+            $address_invoice = new Address($this->context->cart->id_address_invoice);
+            
+            $iso_country = Country::getIsoById($address_invoice->id_country);
+            $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
+            
+            $available_countries = array();
+            foreach ($iso_countries as $iso) {
+                $id_country = Country::getByIso($iso);
+                $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
+            }
+
+            $smatry_vars = array(
+                'publishableKey' => $publishable_key,
+                'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                'stripeLanguageIso' => $language_iso,
+                'country_merchant' => Tools::strtolower($default_country->iso_code),
+                'stripe_customer_email' => $this->context->customer->email,
+                'stripe_order_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
+                'stripe_cart_id' => $this->context->cart->id,
+                'stripe_error' => Tools::getValue('stripe_error'),
+                'payment_error_type' => Tools::getValue('type'),
+                'stripe_failed' => Tools::getValue('stripe_failed'),
+                'stripe_err_msg' => Tools::getValue('stripe_err_msg'),
+                'verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
+                'stripe_country_iso_code' => $iso_country,
+                'sofort_available_countries' => $available_countries,
+                'SSL' => Configuration::get('PS_SSL_ENABLED'),
+            );
+
+            $this->context->smarty->assign(array_merge($js_def, $smatry_vars));
         }
     }
 
     public function hookPaymentOptions($params)
     {
-        $this->context->smarty->assign('SSL', Configuration::get('PS_SSL_ENABLED'));
+        $payment_options = array();
+        $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
         
         if (!Configuration::get('PS_SSL_ENABLED')) {
             return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
         }
-
-        $payment_options = array();
-        $embeddedOption = new PaymentOption();
-        $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
         
         if (Tools::strtolower($default_country->iso_code) == 'us') {
             $cc_img = 'cc_merged.png';
         } else {
             $cc_img = 'logo-payment.png';
         }
-        
+
+        $embeddedOption = new PaymentOption();
         $embeddedOption->setCallToActionText($this->l('Pay by card'))
-                       ->setForm($this->generateFormStripe())
-                       ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
+           ->setAdditionalInformation($this->context->smarty->fetch('module:' . $this->name . '/views/templates/hook/payment.tpl'))
+           ->setModuleName($this->name)
+           ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
 
         if (Configuration::get('STRIPE_ENABLE_PAYMENT_REQUEST_API'))
@@ -1191,54 +1223,11 @@ class Stripe_official extends PaymentModule
         
         if ($this->context->currency->iso_code == "EUR") 
         {
-            $address_invoice = new Address($this->context->cart->id_address_invoice);
-            $amount = $this->context->cart->getOrderTotal();
-            $currency = $this->context->currency->iso_code;
-            $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-            $methods = array('ideal', 'sofort', 'bancontact', 'giropay');
-            $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
-
-            $iso_country = Country::getIsoById($address_invoice->id_country);
-            $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
-            $available_countries = array();
-            
-            foreach ($iso_countries as $iso) {
-                $id_country = Country::getByIso($iso);
-                $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
-            }
-
-            foreach ($methods as $method) 
+            foreach (array('ideal', 'sofort', 'bancontact', 'giropay') as $method) 
             {
                 if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) 
                 {
-                    $this->context->smarty->assign(
-                        array(
-                            'publishableKey' => $this->getPublishableKey(),
-                            'mode' => Configuration::get(self::_PS_STRIPE_.'mode'),
-                            'customer_name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-                            'currency_stripe' => $currency,
-                            'amount_ttl' => $amount,
-                            'country_merchant' => Tools::strtolower($default_country->iso_code),
-                            'stripe_customer_email' => $this->context->customer->email,
-                            'stripe_order_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
-                            'stripe_cart_id' => $this->context->cart->id,
-                            'stripe_error' => Tools::getValue('stripe_error'),
-                            'payment_error_type' => Tools::getValue('type'),
-                            'payment_method' => $method,
-                            'stripe_failed' => Tools::getValue('stripe_failed'),
-                            'stripe_err_msg' => Tools::getValue('stripe_err_msg'),
-                            'verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
-                        )
-                    );
-
-                    if ($method == 'sofort') {
-                            $this->context->smarty->assign(
-                            array(
-                                'stripe_country_iso_code' => $iso_country,
-                                'sofort_available_countries' => $available_countries,
-                            )
-                        );
-                    }
+                    $this->context->smarty->assign('payment_method', $method);
 
                     $payment_option = new PaymentOption();
                     $payment_option->setCallToActionText($this->l('Pay by ').Tools::strtoupper($method))

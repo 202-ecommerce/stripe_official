@@ -170,7 +170,7 @@ function initStripeOfficial() {
         });
 
         function stripeSourceHandler(response) {
-            if (secure_mode && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
+            if (must_enable_3ds && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
                 stripe_v3.createSource({
                     type: 'three_d_secure',
                     amount: amount_ttl,

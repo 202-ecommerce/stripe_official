@@ -17,13 +17,11 @@
 class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
-    private $stripe;
 
     public function __construct()
     {
         parent::__construct();
         $this->context = Context::getContext();
-        $this->stripe = Module::getInstanceByName('stripe_official');
     }
 
     /**
@@ -33,7 +31,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        if ($this->stripe && $this->stripe->active) {
+        if ($this->module && $this->module->active) {
             $this->context = Context::getContext();
 
             if (Tools::getValue('checkOrder')) {
@@ -43,7 +41,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
                 $id_order = Order::getOrderByCartId($cart_id);
                 if ($stripe_payment && ($stripe_payment['result'] == 1 || $stripe_payment['result'] == Stripe_official::_PENDING_SOFORT_)) {
                     if ($id_order) {
-                        $url = ($link->getPageLink('order-confirmation', true).'?id_cart='.(int)$cart_id.'&id_module='.(int)$this->stripe->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key);
+                        $url = ($link->getPageLink('order-confirmation', true).'?id_cart='.(int)$cart_id.'&id_module='.(int)$this->module->id.'&id_order='.(int)$id_order.'&key='.$this->context->customer->secure_key);
                         die(Tools::jsonEncode(array('confirmation_url' => $url)));
                     } else {
                         die('continue');
@@ -99,7 +97,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
             );
 
             if (isset($params['token']) && !empty($params['token'])) {
-                $this->stripe->chargev2($params);
+                $this->module->chargev2($params);
             } else {
                 die('ko');
             }
