@@ -547,10 +547,10 @@ class Stripe_official extends PaymentModule
             $token_module = Tools::getAdminTokenLite('AdminModules', $this->context);
         }
 
+        $tenta = array();
         if ($token_module == $token_ajax || $refresh == 0) {
             $this->getSectionShape();
             $orders = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment ORDER BY date_add DESC');
-            $tenta = array();
             $html = '';
 
             foreach ($orders as $order) {
@@ -581,11 +581,20 @@ class Stripe_official extends PaymentModule
                 ));
             }
 
-            $this->context->smarty->assign('tenta', $tenta);
-            $this->context->smarty->assign('refresh', $refresh);
-            $this->context->smarty->assign('token_stripe', Tools::getAdminTokenLite('AdminModules'));
-            $this->context->smarty->assign('id_employee', $this->context->employee->id);
-            $this->context->smarty->assign('path', Tools::getShopDomainSsl(true, true).$this->_path);
+            $this->context->smarty->assign(array(
+                'refresh' => $refresh,
+                'token_stripe' => Tools::getAdminTokenLite('AdminModules'),
+                'id_employee' => $this->context->employee->id,
+                'path' => Tools::getShopDomainSsl(true, true).$this->_path,
+            ));
+        }
+        
+        $this->context->smarty->assign('tenta', $tenta);
+
+        if ($refresh)
+        {
+            $this->context->smarty->assign('module_dir', $this->_path);
+            return $this->fetch(_PS_MODULE_DIR_ . $this->name . '/views/templates/admin/_partials/transaction.tpl');
         }
     }
 

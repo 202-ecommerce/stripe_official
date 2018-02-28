@@ -21,8 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-
-class stripe_officialAdminAjaxTransactionController extends ModuleAdminController
+class AdminAjaxTransactionController extends ModuleAdminController
 {
 	public function AjaxProcessRefresh()
 	{
