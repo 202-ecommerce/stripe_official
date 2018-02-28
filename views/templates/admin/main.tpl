@@ -23,6 +23,7 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
+{include file="./_partials/messages.tpl"}
 <div class="tabs">
 	<div class="sidebar navigation col-md-2">
 		{if isset($logo)}
@@ -38,13 +39,13 @@
 			  	{l s='Connection' mod='stripe_official'}
 			  	<span class="badge-module-tabs pull-right {if $keys_configured === true}tab-success{else}tab-warning{/if}"></span>
 			</a>
-			<a class="list-group-item migration-tab" href="#stripe_step_3">
-			  	<i class="icon-credit-card pstab-icon"></i>
-			  	{l s='Payments' mod='stripe_official'}
-			</a>
-			<a class="list-group-item tab-current" href="#stripe_step_4">
+			<a class="list-group-item tab-current" href="#stripe_step_3">
 			  	<i class="icon-credit-card pstab-icon"></i>
 			  	{l s='3D secure' mod='stripe_official'}
+			</a>
+			<a class="list-group-item migration-tab" href="#stripe_step_4">
+			  	<i class="icon-credit-card pstab-icon"></i>
+			  	{l s='Payments' mod='stripe_official'}
 			</a>
 			<a class="list-group-item migration-tab" href="#stripe_step_5">
 			  	<i class="icon-ticket pstab-icon"></i>
@@ -66,10 +67,10 @@
 				{include file="./_partials/configuration.tpl"}
 			</section>
 			<section id="section-shape-3">
-				{include file="./_partials/transaction.tpl"}
+				{include file="./_partials/secure.tpl"}
 			</section>
 			<section id="section-shape-4">
-				{include file="./_partials/secure.tpl"}
+				{include file="./_partials/transaction.tpl"}
 			</section>
 			<section id="section-shape-5">
 				{include file="./_partials/refund.tpl"}

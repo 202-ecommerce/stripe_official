@@ -57,15 +57,13 @@ class Stripe_official extends PaymentModule
 
     public $mail = '';
 
-    public $addons_track;
-
     public $errors = array();
 
-    public $warnings = array();
+    public $warning = array();
 
-    public $infos = array();
-    
-    public $success = array();
+    public $success;
+
+    public $addons_track;
 
     public function __construct()
     {
@@ -80,7 +78,7 @@ class Stripe_official extends PaymentModule
         $this->currencies = true;
         /* curl check */
         if (is_callable('curl_init') === false) {
-            $this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
+            $this->errors[] = $this->l('To be able to use this module, please activate cURL (PHP extension).');
         }
 
         parent::__construct();
@@ -89,9 +87,6 @@ class Stripe_official extends PaymentModule
         $this->displayName = $this->l('Stripe payment module');
         $this->description = $this->l('Start accepting stripe payments today, directly from your shop!');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?', $this->name);
-        if (!Configuration::get('PS_SSL_ENABLED')) {
-            $this->warning = $this->l('You must enable SSL on the store if you want to use this module');
-        }
 
         /* Use a specific name to bypass an Order confirmation controller check */
         if (in_array(Tools::getValue('controller'), array('orderconfirmation', 'order-confirmation'))) {
@@ -123,18 +118,18 @@ class Stripe_official extends PaymentModule
             return false;
         }
 
-        // if (!Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
-        //     || !Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
-        //     || !Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)
-        //     || !Configuration::updateValue('STRIPE_ENABLE_IDEAL', 0)
-        //     || !Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
-        //     || !Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
-        //     || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0) 
-        //     || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API', 0)
-        //     || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API_IN_PRODUCT', 0)
-        //     || !Configuration::updateValue('STRIPE_3DS_AMOUNT', 20)) {
-        //          return false;
-        // }
+        if (!Configuration::updateValue(self::_PS_STRIPE_.'mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'refund_mode', 1)
+            || !Configuration::updateValue(self::_PS_STRIPE_.'secure', 1)
+            || !Configuration::updateValue('STRIPE_ENABLE_IDEAL', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0) 
+            || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_PAYMENT_REQUEST_API_IN_PRODUCT', 0)
+            || !Configuration::updateValue('STRIPE_3DS_AMOUNT', 20)) {
+                 return false;
+        }
 
         if (!$this->registerHook('header')
             || !$this->registerHook('orderConfirmation')
@@ -159,15 +154,15 @@ class Stripe_official extends PaymentModule
     public function uninstall()
     {
         /* Delete Database + Table */
-        // Db::getInstance()->Execute('DELETE FROM `'._DB_PREFIX_.'stripe_payment`');
-        // Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'stripe_payment`');
+        Db::getInstance()->Execute('DELETE FROM `'._DB_PREFIX_.'stripe_payment`');
+        Db::getInstance()->Execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.'stripe_payment`');
 
-        // return parent::uninstall()
-        //     && Configuration::updateValue(self::_PS_STRIPE_.'key', '')
-        //     && Configuration::updateValue(self::_PS_STRIPE_.'test_key', '')
-        //     && Configuration::updateValue(self::_PS_STRIPE_.'publishable', '')
-        //     && Configuration::updateValue(self::_PS_STRIPE_.'secure', '')
-        //     && Configuration::updateValue(self::_PS_STRIPE_.'test_publishable', '');
+        return parent::uninstall()
+            && Configuration::updateValue(self::_PS_STRIPE_.'key', '')
+            && Configuration::updateValue(self::_PS_STRIPE_.'test_key', '')
+            && Configuration::updateValue(self::_PS_STRIPE_.'publishable', '')
+            && Configuration::updateValue(self::_PS_STRIPE_.'secure', '')
+            && Configuration::updateValue(self::_PS_STRIPE_.'test_publishable', '');
         return true;
     }
 
@@ -229,59 +224,6 @@ class Stripe_official extends PaymentModule
         return true;
     }
 
-    private function hasErrors()
-    {
-        return !!$this->errors;
-    }
-
-    private function hasWarnings()
-    {
-        return !!$this->warnings;
-    }
-
-    private function hasInfos()
-    {
-        return !!$this->infos;
-    }
-
-    private function hasSuccess()
-    {
-        return !!$this->success;
-    }
-
-    public static function arrayAsHtmlList(array $ar = array())
-    {
-        if (!empty($ar)) {
-            return '<ul><li>'.implode('</li><li>', $ar).'</li></ul>';
-        }
-        return '';
-    }
-
-    /*
-     ** @method: showHeadMessages
-     ** @description: show errors
-     **
-     ** @arg: $key
-     ** @return: key if configuration has key else throw new exception
-     */
-    public function showHeadMessages(&$terror = '')
-    {
-        $msgs_list = array_map('array_filter', array(
-            'displayInfos' => $this->infos,
-            'displayWarning' => $this->warnings,
-            'displayError' => $this->errors,
-            'displayConfirmation' => $this->success,
-        ));
-
-        foreach ($msgs_list as $display => $msgs) {
-            if (!empty($msgs)) {
-                $terror = call_user_func(array($this, $display), '<p>Stripe</p>'.self::arrayAsHtmlList($msgs)).$terror;
-            }
-        }
-
-        return (!empty($terror) ? $terror : ($terror = $this->displayError('Unknow error(s)')));
-    }
-
     public function loadAddonTracker()
     {
         $track_query = 'utm_source=back-office&utm_medium=module&utm_campaign=back-office-%s&utm_content=%s';
@@ -303,7 +245,7 @@ class Stripe_official extends PaymentModule
             \Stripe\Account::retrieve();
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $this->errors['exception'] = $e->getMessage();
+            $this->errors[] = $e->getMessage();
             return false;
         }
         return true;
@@ -320,6 +262,7 @@ class Stripe_official extends PaymentModule
     {
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
+            $this->warning[] = $this->l('You must enable SSL on the store if you want to use this module');
             $this->errors[] = $this->l('A SSL certificate is required to process credit card payments using Stripe. Please consult the FAQ.');
         }
 
@@ -336,7 +279,7 @@ class Stripe_official extends PaymentModule
                         Configuration::updateValue(self::_PS_STRIPE_.'test_publishable', Tools::getValue(self::_PS_STRIPE_.'test_publishable'));
                     }
                 } else {
-                    $this->errors['empty'] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
                 }
                 
                 Configuration::updateValue(self::_PS_STRIPE_.'mode', Tools::getValue(self::_PS_STRIPE_.'mode'));
@@ -350,11 +293,14 @@ class Stripe_official extends PaymentModule
                         Configuration::updateValue(self::_PS_STRIPE_.'publishable', Tools::getValue(self::_PS_STRIPE_.'publishable'));
                     }
                 } else {
-                    $this->errors['empty'] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
                 }
                 
                 Configuration::updateValue(self::_PS_STRIPE_.'mode', Tools::getValue(self::_PS_STRIPE_.'mode'));
             }
+
+            if (!count($this->errors))
+                $this->success = $this->l('Data succesfuly saved.');
 
             Configuration::updateValue('STRIPE_ENABLE_IDEAL', Tools::getValue('ideal'));
             Configuration::updateValue('STRIPE_ENABLE_SOFORT', Tools::getValue('sofort'));
@@ -366,7 +312,7 @@ class Stripe_official extends PaymentModule
 
         if (!Configuration::get(self::_PS_STRIPE_.'key') && !Configuration::get(self::_PS_STRIPE_.'publishable')
             && !Configuration::get(self::_PS_STRIPE_.'test_key') && !Configuration::get(self::_PS_STRIPE_.'test_publishable')) {
-            $this->warnings['connection'] = false;
+            $this->errors[] = $this->l('Keys are empty.');
         }
 
         /* Do Secure */
@@ -374,10 +320,10 @@ class Stripe_official extends PaymentModule
         {
             if (Tools::getValue(self::_PS_STRIPE_.'secure') == 2)
             {
-                if (empty(Tools::getValue('3ds_amount')))
+                if (Tools::getValue('3ds_amount') == '')
                     $this->errors[] = $this->l('3DS amount is empty');
 
-                if (!empty(Tools::getValue('3ds_amount')) && !Validate::isInt(Tools::getValue('3ds_amount')))
+                if (Tools::getValue('3ds_amount') != '' && !Validate::isInt(Tools::getValue('3ds_amount')))
                     $this->errors[] = $this->l('3DS amount is not valid. Excpeted integer only.');
             }
 
@@ -385,6 +331,7 @@ class Stripe_official extends PaymentModule
             {
                 Configuration::updateValue(self::_PS_STRIPE_.'secure', Tools::getValue(self::_PS_STRIPE_.'secure'));
                 Configuration::updateValue('STRIPE_3DS_AMOUNT', Tools::getValue('3ds_amount'));
+                $this->success = $this->l('Data succesfuly saved.');
             }
         }
 
@@ -394,7 +341,7 @@ class Stripe_official extends PaymentModule
             if (!empty($refund_id)) {
                 $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
             } else {
-                $this->errors['refund'] = $this->l('Please make sure to put a Stripe Id');
+                $this->errors[] = $this->l('Please make sure to put a Stripe Id');
                 return false;
             }
 
@@ -403,7 +350,7 @@ class Stripe_official extends PaymentModule
                 Configuration::updateValue(self::_PS_STRIPE_.'refund_id', Tools::getValue(self::_PS_STRIPE_.'refund_id'));
             } else {
                 $this->refund = 0;
-                $this->errors['refund'] = $this->l('This Stipe ID doesn\'t exist, please check it again');
+                $this->errors[] = $this->l('This Stipe ID doesn\'t exist, please check it again');
                 Configuration::updateValue(self::_PS_STRIPE_.'refund_id', '');
             }
 
@@ -414,6 +361,9 @@ class Stripe_official extends PaymentModule
             }
 
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
+            
+            if (!count($this->errors))
+                $this->success = $this->l('Data succesfuly saved.');
         }
 
         /* generate url track */
@@ -450,9 +400,14 @@ class Stripe_official extends PaymentModule
         $this->displaySecure();
         $this->displayRefundForm();
 
-        if (!empty($this->errors) || !empty($this->warnings)) {
-            $this->showHeadMessages($html);
-        }
+        if (count($this->warning))
+            $this->context->smarty->assign('warnings', $this->displayWarning($this->warning));
+
+        if (!empty($this->success) && !count($this->errors))
+            $this->context->smarty->assign('success', $this->displayConfirmation($this->success));
+
+        if (count($this->errors))
+            $this->context->smarty->assign('errors', $this->displayError($this->errors));
 
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
     }
@@ -754,7 +709,7 @@ class Stripe_official extends PaymentModule
                     $ch->refunds->create();
                 } catch (Exception $e) {
                     // Something else happened, completely unrelated to Stripe
-                    $this->errors['exception'] = $e->getMessage();
+                    $this->errors[] = $e->getMessage();
                     return false;
                 }
 
@@ -771,7 +726,7 @@ class Stripe_official extends PaymentModule
                     $ch->refunds->create(array('amount' => $ref_amount));
                 } catch (Exception $e) {
                     // Something else happened, completely unrelated to Stripe
-                    $this->errors['exception'] = $e->getMessage();
+                    $this->errors[] = $e->getMessage();
                     return false;
                 }
 
@@ -801,9 +756,9 @@ class Stripe_official extends PaymentModule
                 /* Partial Refund State */
                 $order->setCurrentState(Configuration::get(self::_PS_STRIPE_.'partial_refund_state'));
             }
-            $this->success['refund_success'] = $this->l('Refunds processed successfully');
+            $this->success = $this->l('Refunds processed successfully');
         } else {
-            $this->errors['cred'] = $this->l('Invalid Stripe credentials, please check your configuration.');
+            $this->errors[] = $this->l('Invalid Stripe credentials, please check your configuration.');
         }
     }
 
