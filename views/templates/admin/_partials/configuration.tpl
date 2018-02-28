@@ -31,9 +31,9 @@
 				<label class="control-label col-lg-3">{l s='Mode' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<span class="switch prestashop-switch fixed-width-lg">
-						<input type="radio" name="STRIPE_MODE" id="STRIPE_MODE_ON" value="1" {if $stripe_mode == 1}checked="checked"{/if}>
+						<input type="radio" name="_PS_STRIPE_mode" id="STRIPE_MODE_ON" value="1" {if $stripe_mode == 1}checked="checked"{/if}>
 						<label for="STRIPE_MODE_ON">{l s='test' mod='stripe_official'}</label>
-						<input type="radio" name="STRIPE_MODE" id="STRIPE_MODE_OFF" value="0" {if $stripe_mode == 0}checked="checked"{/if}>
+						<input type="radio" name="_PS_STRIPE_mode" id="STRIPE_MODE_OFF" value="0" {if $stripe_mode == 0}checked="checked"{/if}>
 						<label for="STRIPE_MODE_OFF">{l s='live' mod='stripe_official'}</label>
 						<a class="slide-button btn"></a>
 					</span>
@@ -47,25 +47,25 @@
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="_PS_STRIPE_publishable" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="_PS_STRIPE_key" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Test Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_TEST_PUBLISHABLE" id="test_public_key" value="{$stripe_test_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="_PS_STRIPE_test_publishable" id="test_public_key" value="{$stripe_test_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Test Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_TEST_KEY" id="test_secret_key" value="{$stripe_test_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="_PS_STRIPE_test_key" id="test_secret_key" value="{$stripe_test_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 
