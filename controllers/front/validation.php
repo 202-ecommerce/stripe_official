@@ -31,14 +31,14 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         $stripe_client_secret = Tools::getValue('client_secret');
         $stripe_source = Tools::getValue('source');
 
-        if (Configuration::get('_PS_STRIPE_mode') == 1) {
-            $pubKey = Configuration::get('_PS_STRIPE_test_publishable');
+        if (Configuration::get('STRIPE_MODE') == 1) {
+            $pubKey = Configuration::get('STRIPE_TEST_PUBLISHABLE');
         } else {
-            $pubKey = Configuration::get('_PS_STRIPE_publishable');
+            $pubKey = Configuration::get('STRIPE_PUBLISHABLE');
         }
-        
+
         $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) : $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
-        
+
         $this->context->smarty->assign(array(
             'stripe_source' => $stripe_source,
             'stripe_client_secret' => $stripe_client_secret,
@@ -47,7 +47,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'module_dir' => _PS_MODULE_DIR_,
             'return_order_page' => $order_page,
         ));
-        
+
         $this->context->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
         $this->context->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
         $this->context->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));

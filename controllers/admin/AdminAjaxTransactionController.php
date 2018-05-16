@@ -23,11 +23,11 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminAjaxTransactionController extends ModuleAdminController
 {
-	public function AjaxProcessRefresh()
-	{
-		/* Refresh Button Back Office on Transaction */
-		if (Tools::getValue('token_stripe')) {
-		    $this->ajaxDie($this->module->displayTransaction(1, Tools::getValue('token_stripe'), Tools::getValue('id_employee')));
-		}
-	}
+    public function AjaxProcessRefresh()
+    {
+        /* Refresh Button Back Office on Transaction */
+        if (Tools::getValue('token_stripe')) {
+            $this->ajaxDie($this->module->displayTransaction(1, Tools::getValue('token_stripe'), Tools::getValue('id_employee')));
+        }
+    }
 }

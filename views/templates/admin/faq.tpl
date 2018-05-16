@@ -17,10 +17,10 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*   @author PrestaShop SA <contact@prestashop.com>
-*   @copyright  2007-2018 PrestaShop SA
-*   @license        http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*   International Registered Trademark & Property of PrestaShop SA
+*	@author PrestaShop SA <contact@prestashop.com>
+*	@copyright	2007-2018 PrestaShop SA
+*	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
+*	International Registered Trademark & Property of PrestaShop SA
 *}
 
 <div class="clearfix"></div>
@@ -46,7 +46,8 @@
 <div class="clearfix"></div>
 <h3><i class="icon-info-sign"></i> {l s='Frequently Asked Questions' mod='stripe_official'}</h3>
  <div class="faq items">
-    <ul id="basics" class="faq-items">
+
+	  <ul id="basics" class="faq-items">
         <li class="faq-item">
             <span class="faq-trigger">{l s='What are the required elements to use the module?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
@@ -126,45 +127,6 @@
             </div>
         </li>
 
-        <li class="faq-item">
-            <span class="faq-trigger">{l s='What are the required elements to use ApplePay and GooglePay?' mod='stripe_official'}</span>
-            <span class="expand pull-right">+</span>
-            <div class="faq-content">
-                <p>
-                    <h3>{l s='To use ApplePay : ' mod='stripe_official'}</h3>
-                </p>
-                <p>
-                    <h4>{l s='On IOS device' mod='stripe_official'}</h4>
-                    - {l s='Open in Safari on your device running iOS 10 or later.' mod='stripe_official'}<br/>
-                    - {l s='Make sure you have a card in your Wallet, by going to Settings -> Wallet & Apple Pay.' mod='stripe_official'}
-                    <h4>{l s='On Mac' mod='stripe_official'}</h4>
-                    - {l s='Open in Safari on your Mac running macOS Sierra or later.' mod='stripe_official'}<br/>
-                    - {l s='Make sure you have an iPhone (not an iPad; Safari doesn\'t support them yet) with a card in its Wallet paired to your Mac with Handoff. Instructions can be found on' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204681" target="blank">{l s='Apple\'s Support website.' mod='stripe_official'}</a>
-                </p>
-                <hr/>
-                <p>
-                    <h3>{l s='To use GooglePay : ' mod='stripe_official'}</h3>
-                </p>
-                <p>
-                    <h4>{l s='On Chrome' mod='stripe_official'}</h4>
-                    - {l s='Chrome 61 or newer.' mod='stripe_official'}<br/>
-                    - <a href="https://support.google.com/chrome/answer/142893?co=GENIE.Platform%3DDesktop&hl=en" target="blank">{l s='A saved payment card.' mod='stripe_official'}</a>
-                    <h4>{l s='On Chrome Mobile for Android' mod='stripe_official'}</h4>
-                    - {l s='Chrome 61 or newer.' mod='stripe_official'}<br/>
-                    - <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel" target="blank">{l s='An activated Android Pay card' mod='stripe_official'}</a> {l s='or' mod='stripe_official'} <a href="https://support.google.com/chrome/answer/142893?co=GENIE.Platform%3DAndroid&hl=en" target="blank"> {l s='a saved card.' mod='stripe_official'}</a>
-                </p>
-            </div>
-        </li>
 
-        <li class="faq-item">
-            <span class="faq-trigger">{l s='Why are ApplePay and GooglePay not displayed on my website ?' mod='stripe_official'}</span>
-            <span class="expand pull-right">+</span>
-            <div class="faq-content">
-                <p>
-                    {l s='Both ApplePay and GooglePay needs a secure https to be displayed and to be used.' mod='stripe_official'}<br/>
-                    <img src="{$module_dir}views/img/ssl_secure.png" />
-                </p>
-            </div>
-        </li>
-    </ul>
+	  </ul>
 </div>

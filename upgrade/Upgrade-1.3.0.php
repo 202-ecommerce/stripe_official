@@ -18,7 +18,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_1_3_0($module)
+function upgrade_module_1_3_0()
 {
     $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment ADD state tinyint(4) NOT NULL';
     if (!Db::getInstance()->execute($sql)) {

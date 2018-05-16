@@ -23,12 +23,16 @@
 *   International Registered Trademark & Property of PrestaShop SA
 *}
 
-{if isset($success)}
-	{$success}
-{/if}
-{if isset($warnings)}
-	{$warnings}
-{/if}
-{if isset($errors)}
-	{$errors}
+{if $product.quantity > 0}
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="request-payment">
+          <div id="payment-request-button"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal_stripe"  class="modal">
+      <div id="result_3d"></div>
+    </div>
 {/if}

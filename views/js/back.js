@@ -22,7 +22,7 @@ $(document).ready(function() {
 
 
 	var value = 0;
-	value = $('input[name=_PS_STRIPE_mode]:checked', '#configuration_form').val();
+	value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
 
 	if (value == 1)
 	{
@@ -40,7 +40,7 @@ $(document).ready(function() {
 	}
 
 	$('#configuration_form input').on('change', function() {
-		value = $('input[name=_PS_STRIPE_mode]:checked', '#configuration_form').val();
+		value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
 
 		if (value == 1)
 		{
@@ -67,15 +67,15 @@ $(document).ready(function() {
 
 	/* Refund Option */
 	var value = 0;
-	value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
+	value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 	if (value == 1)
 		$("#refund_amount").parent().parent().hide();
 	else
 		$("#refund_amount").parent().parent().show();
 
-	$('input[name=_PS_STRIPE_refund_mode]').on('change', function() {
-		value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
+	$('input[name=STRIPE_REFUND_MODE]').on('change', function() {
+		value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 		if (value == 1)
 			$("#refund_amount").parent().parent().hide();
@@ -99,4 +99,17 @@ $(document).ready(function() {
 		});
 	})();
 
+    displayPayment();
+
+    $('#googlepay, #applepay').change(function(event) {
+        displayPayment();
+    });
 });
+
+function displayPayment(){
+    if($('#googlepay').is(':checked') === true || $('#applepay').is(':checked') === true) {
+        $('#display_product_payment').show();
+    } else {
+        $('#display_product_payment').hide();
+    }
+}

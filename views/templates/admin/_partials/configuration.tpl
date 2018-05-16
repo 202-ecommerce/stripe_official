@@ -31,9 +31,9 @@
 				<label class="control-label col-lg-3">{l s='Mode' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<span class="switch prestashop-switch fixed-width-lg">
-						<input type="radio" name="_PS_STRIPE_mode" id="STRIPE_MODE_ON" value="1" {if $stripe_mode == 1}checked="checked"{/if}>
+						<input type="radio" name="STRIPE_MODE" id="STRIPE_MODE_ON" value="1" {if $stripe_mode == 1}checked="checked"{/if}>
 						<label for="STRIPE_MODE_ON">{l s='test' mod='stripe_official'}</label>
-						<input type="radio" name="_PS_STRIPE_mode" id="STRIPE_MODE_OFF" value="0" {if $stripe_mode == 0}checked="checked"{/if}>
+						<input type="radio" name="STRIPE_MODE" id="STRIPE_MODE_OFF" value="0" {if $stripe_mode == 0}checked="checked"{/if}>
 						<label for="STRIPE_MODE_OFF">{l s='live' mod='stripe_official'}</label>
 						<a class="slide-button btn"></a>
 					</span>
@@ -47,25 +47,25 @@
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="_PS_STRIPE_publishable" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="_PS_STRIPE_key" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Test Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="_PS_STRIPE_test_publishable" id="test_public_key" value="{$stripe_test_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_TEST_PUBLISHABLE" id="test_public_key" value="{$stripe_test_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Test Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="_PS_STRIPE_test_key" id="test_secret_key" value="{$stripe_test_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_TEST_KEY" id="test_secret_key" value="{$stripe_test_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 
@@ -83,7 +83,7 @@
 					<li>{l s='In Live Mode, you can not run test charges.' mod='stripe_official'}</li>
 				</ul>
 
-				<p><b>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT, Giropay and Payment Request API.' mod='stripe_official'}</b></p>
+				<p><b>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</b></p>
 				<p>{l s='These payment methods are available within this plugin for our European users only. To activate them, follow these' mod='stripe_official'}
 				<b> {l s='three steps:' mod='stripe_official'}</b></p>
 				<ol item="1">
@@ -99,20 +99,26 @@
 							<label>{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
 							<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="payment_request_api" name="payment_request_api" {if $payment_request_api}checked="checked"{/if}/>
-							<label>{l s='Activate Payment request API (generate Google Pay and Apple Pay payment bouton)' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
-							<label>{l s='Activate Payment request API in product page (generate Google Pay and Apple Pay payment bouton)' mod='stripe_official'}</label>
+							<input type="checkbox" id="applepay" name="applepay" {if $applepay}checked="checked"{/if}/>
+							<label>{l s='Activate Apple Pay' mod='stripe_official'}</label><br>
+							<input type="checkbox" id="googlepay" name="googlepay" {if $googlepay}checked="checked"{/if}/>
+							<label>{l s='Activate Google Pay' mod='stripe_official'}</label><br>
+
+							<span id="display_product_payment">
+								<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
+								<label>{l s='Activate payment in product page (Only for ApplePay and GooglePay)' mod='stripe_official'}</label>
+							</span>
 						</div>
+
 					</li>
 					<li>
 						{l s='To track correctly charges performed with these payment methods, you’ll need to add a “webhook”. A webhook is a way to be notified when an event (such as a successful payment) happens on your website.' mod='stripe_official'}
 						<br><br>
 						<ul>
 							<li>{l s='Go on the webhook page of your Stripe dashboard:' mod='stripe_official'}
-								<a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
+								 <a target="_blank" href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>
 							</li>
-							<li>{l s='Click on "Add Endpoint" and copy/paste this URL in the "URL to be called" field:' mod='stripe_official'} {$url_webhhoks}</li>
+							<li>{l s='Click on "Add Endpoint" and copy/paste this URL in the "URL to be called" field:' mod='stripe_official'} {$url_webhhoks|escape:'htmlall':'UTF-8'}</li>
 							<li>{l s='Set the "Events to send" radion button to "Live events"' mod='stripe_official'}</li>
 							<li>{l s='Set the "Filter event" radio button to "Send all event types"' mod='stripe_official'}</li>
 							<li>{l s='Click on "Add endpoint"' mod='stripe_official'}<br>

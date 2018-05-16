@@ -20,10 +20,10 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
-        if (Configuration::get('_PS_STRIPE_mode') == 1) {
-            $secret_key = Configuration::get('_PS_STRIPE_test_key');
+        if (Configuration::get('STRIPE_MODE') == 1) {
+            $secret_key = Configuration::get('STRIPE_TEST_KEY');
         } else {
-            $secret_key = Configuration::get('_PS_STRIPE_key');
+            $secret_key = Configuration::get('STRIPE_KEY');
         }
 
         try {
