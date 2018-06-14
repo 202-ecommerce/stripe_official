@@ -279,12 +279,16 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue('STRIPE_TEST_PUBLISHABLE'));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if ($this->retrieveAccount($secret_key, $publishable_key)) {
-                        Configuration::updateValue('STRIPE_TEST_KEY', $secret_key);
-                        Configuration::updateValue('STRIPE_TEST_PUBLISHABLE', $publishable_key);
+                    if (strpos($secret_key, 'test') !== false && strpos($publishable_key, 'test') !== false) {
+                        if ($this->retrieveAccount($secret_key, $publishable_key)) {
+                            Configuration::updateValue('STRIPE_TEST_KEY', $secret_key);
+                            Configuration::updateValue('STRIPE_TEST_PUBLISHABLE', $publishable_key);
+                        }
+                    } else {
+                        $this->errors[] = $this->l('mode test with API key live');
                     }
                 } else {
-                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
                 }
 
                 Configuration::updateValue('STRIPE_MODE', Tools::getValue('STRIPE_MODE'));
@@ -293,12 +297,16 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue('STRIPE_PUBLISHABLE'));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if ($this->retrieveAccount($secret_key, $publishable_key)) {
-                        Configuration::updateValue('STRIPE_KEY', $secret_key);
-                        Configuration::updateValue('STRIPE_PUBLISHABLE', $publishable_key);
+                    if (strpos($secret_key, 'live') !== false && strpos($publishable_key, 'live') !== false) {
+                        if ($this->retrieveAccount($secret_key, $publishable_key)) {
+                            Configuration::updateValue('STRIPE_KEY', $secret_key);
+                            Configuration::updateValue('STRIPE_PUBLISHABLE', $publishable_key);
+                        }
+                    } else {
+                        $this->errors['keys'] = $this->l('mode live with API key test');
                     }
                 } else {
-                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
                 }
 
                 Configuration::updateValue('STRIPE_MODE', Tools::getValue('STRIPE_MODE'));
