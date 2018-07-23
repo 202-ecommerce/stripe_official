@@ -279,12 +279,16 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue('STRIPE_TEST_PUBLISHABLE'));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if ($this->retrieveAccount($secret_key, $publishable_key)) {
-                        Configuration::updateValue('STRIPE_TEST_KEY', $secret_key);
-                        Configuration::updateValue('STRIPE_TEST_PUBLISHABLE', $publishable_key);
+                    if (strpos($secret_key, 'test') !== false && strpos($publishable_key, 'test') !== false) {
+                        if ($this->retrieveAccount($secret_key, $publishable_key)) {
+                            Configuration::updateValue('STRIPE_TEST_KEY', $secret_key);
+                            Configuration::updateValue('STRIPE_TEST_PUBLISHABLE', $publishable_key);
+                        }
+                    } else {
+                        $this->errors[] = $this->l('mode test with API key live');
                     }
                 } else {
-                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
                 }
 
                 Configuration::updateValue('STRIPE_MODE', Tools::getValue('STRIPE_MODE'));
@@ -293,12 +297,16 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue('STRIPE_PUBLISHABLE'));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if ($this->retrieveAccount($secret_key, $publishable_key)) {
-                        Configuration::updateValue('STRIPE_KEY', $secret_key);
-                        Configuration::updateValue('STRIPE_PUBLISHABLE', $publishable_key);
+                    if (strpos($secret_key, 'live') !== false && strpos($publishable_key, 'live') !== false) {
+                        if ($this->retrieveAccount($secret_key, $publishable_key)) {
+                            Configuration::updateValue('STRIPE_KEY', $secret_key);
+                            Configuration::updateValue('STRIPE_PUBLISHABLE', $publishable_key);
+                        }
+                    } else {
+                        $this->errors['keys'] = $this->l('mode live with API key test');
                     }
                 } else {
-                    $this->errors[] = 'Client ID and Secret Key fields are mandatory';
+                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
                 }
 
                 Configuration::updateValue('STRIPE_MODE', Tools::getValue('STRIPE_MODE'));
@@ -317,6 +325,8 @@ class Stripe_official extends PaymentModule
             if (Tools::getValue('applepay') !== false || Tools::getValue('googlepay') !== false) {
                 Configuration::updateValue('STRIPE_PRODUCT_PAYMENT', Tools::getValue('product_payment'));
             }
+
+            $this->registerDomain($secret_key);
         }
 
         if (!Configuration::get('STRIPE_KEY') && !Configuration::get('STRIPE_PUBLISHABLE')
@@ -422,6 +432,27 @@ class Stripe_official extends PaymentModule
         }
 
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
+    }
+
+    private function registerDomain($secret_key) {
+        $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
+        curl_setopt($curl, CURLOPT_FAILONERROR, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $result = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpcode != 200) {
+            $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To dd your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
+        } else {
+            \Stripe\Stripe::setApiKey($secret_key);
+            \Stripe\ApplePayDomain::create(array(
+              'domain_name' => $this->context->shop->domain
+            ));
+        }
     }
 
     /*

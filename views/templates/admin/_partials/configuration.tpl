@@ -47,13 +47,13 @@
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
