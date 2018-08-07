@@ -99,10 +99,8 @@
 							<label>{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
 							<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="applepay" name="applepay" {if $applepay}checked="checked"{/if}/>
-							<label>{l s='Activate Apple Pay' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="googlepay" name="googlepay" {if $googlepay}checked="checked"{/if}/>
-							<label>{l s='Activate Google Pay' mod='stripe_official'}</label><br>
+							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
+							<label>{l s='Activate Apple Pay and GooglePay' mod='stripe_official'}</label><br>
 
 							<span id="display_product_payment">
 								<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
