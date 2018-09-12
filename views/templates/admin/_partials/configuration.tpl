@@ -100,7 +100,11 @@
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
 							<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
+<<<<<<< HEAD
 							<label>{l s='Enable Payment Request Buttons. (Apple Pay/Chrome Payment Request API)' mod='stripe_official'}<br>{l s='By using Apple Pay, you agree to'  mod='stripe_official'} <a href="https://stripe.com/us/legal" target="blank">Stripe</a> {l s='and'  mod='stripe_official'} <a href="https://www.apple.com/legal/internet-services/terms/site.html" target="blank">Apple</a> {l s='\'s terms of service.'  mod='stripe_official'}</label><br>
+=======
+							<label>{l s='Activate Apple Pay and GooglePay' mod='stripe_official'}</label><br>
+>>>>>>> 487620ca50b1749bb69f774dfe17b64648a6b1ce
 
 							<span id="display_product_payment">
 								<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
