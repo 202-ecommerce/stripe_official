@@ -220,3 +220,9 @@ div.payment_module {
 #stripe-ajax-loader-europe {
 	text-align: center;
 }
+
+.stripe_or {
+    display: block;
+    text-align: center;
+    margin: 10px;
+}

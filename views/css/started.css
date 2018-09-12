@@ -165,6 +165,15 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
 .table .uppercase {
     text-transform: uppercase;
 }
+
+.add_domain {
+    width: 100%;
+}
+
+.bootstrap input[type="checkbox"] {
+    vertical-align: top;
+}
+
 /* Retina support */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),

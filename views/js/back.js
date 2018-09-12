@@ -101,13 +101,13 @@ $(document).ready(function() {
 
     displayPayment();
 
-    $('#googlepay, #applepay').change(function(event) {
+    $('#applepay_googlepay').change(function(event) {
         displayPayment();
     });
 });
 
 function displayPayment(){
-    if($('#googlepay').is(':checked') === true || $('#applepay').is(':checked') === true) {
+    if($('#applepay_googlepay').is(':checked') === true) {
         $('#display_product_payment').show();
     } else {
         $('#display_product_payment').hide();

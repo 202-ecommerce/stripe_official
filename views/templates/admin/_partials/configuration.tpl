@@ -47,13 +47,13 @@
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Publishable Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
 				<label class="control-label col-lg-3 required">{l s='Stripe Secrey Key' mod='stripe_official'}</label>
 				<div class="col-lg-9">
-					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
+					<input type="text" name="STRIPE_KEY" id="secret_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
@@ -99,10 +99,8 @@
 							<label>{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
 							<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="applepay" name="applepay" {if $applepay}checked="checked"{/if}/>
-							<label>{l s='Activate Apple Pay' mod='stripe_official'}</label><br>
-							<input type="checkbox" id="googlepay" name="googlepay" {if $googlepay}checked="checked"{/if}/>
-							<label>{l s='Activate Google Pay' mod='stripe_official'}</label><br>
+							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
+							<label>{l s='Enable Payment Request Buttons. (Apple Pay/Chrome Payment Request API)' mod='stripe_official'}<br>{l s='By using Apple Pay, you agree to'  mod='stripe_official'} <a href="https://stripe.com/us/legal" target="blank">Stripe</a> {l s='and'  mod='stripe_official'} <a href="https://www.apple.com/legal/internet-services/terms/site.html" target="blank">Apple</a> {l s='\'s terms of service.'  mod='stripe_official'}</label><br>
 
 							<span id="display_product_payment">
 								<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>

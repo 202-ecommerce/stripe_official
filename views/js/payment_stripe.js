@@ -244,17 +244,20 @@ function initStripeOfficial() {
                 type: 'POST',
                 dataType: 'json',
                 url: ajaxUrlStripe,
+                async: false,
                 data: {
                     stripeToken: result.id,
                     cardType: cardType,
                     cardHolderName: $('.stripe-name').val(),
                 },
                 success: function(data) {
+                    $('#payment-confirmation button[type="submit"]').attr('disabled', 'disabled');
                     if (data.code == '1') {
                         // Charge ok : redirect the customer to order confirmation page
                         location.replace(data.url);
                     } else {
                         //  Charge ko
+                        $('#payment-confirmation button[type="submit"]').removeAttr('disabled');
                         $('#stripe-ajax-loader').hide();
                         $('#stripe-payment-form').show();
                         $('#card-errors').show();

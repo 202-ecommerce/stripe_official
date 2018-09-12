@@ -123,8 +123,7 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue('STRIPE_ENABLE_SOFORT', 0)
             || !Configuration::updateValue('STRIPE_ENABLE_GIROPAY', 0)
             || !Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', 0)
-            || !Configuration::updateValue('STRIPE_ENABLE_APPLEPAY', 0)
-            || !Configuration::updateValue('STRIPE_ENABLE_GOOGLEPAY', 0)
+            || !Configuration::updateValue('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY', 0)
             || !Configuration::updateValue('STRIPE_PRODUCT_PAYMENT', 0)) {
                  return false;
         }
@@ -146,6 +145,10 @@ class Stripe_official extends PaymentModule
             return false;
         }
 
+        if (Validate::isLoadedObject($this)) {
+            $id_hook = Hook::getIdByName('displayProductAdditionalInfo');
+            $this->updatePosition($id_hook, 0);
+        }
 
         return true;
     }
@@ -166,8 +169,7 @@ class Stripe_official extends PaymentModule
             && Configuration::deleteByName('STRIPE_ENABLE_SOFORT')
             && Configuration::deleteByName('STRIPE_ENABLE_GIROPAY')
             && Configuration::deleteByName('STRIPE_ENABLE_BANCONTACT')
-            && Configuration::deleteByName('STRIPE_ENABLE_APPLEPAY')
-            && Configuration::deleteByName('STRIPE_ENABLE_GOOGLEPAY')
+            && Configuration::deleteByName('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY')
             && Configuration::deleteByName('STRIPE_PRODUCT_PAYMENT')
             && Configuration::deleteByName('STRIPE_MINIMUM_AMOUNT_3DS');
     }
@@ -320,11 +322,12 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue('STRIPE_ENABLE_SOFORT', Tools::getValue('sofort'));
             Configuration::updateValue('STRIPE_ENABLE_GIROPAY', Tools::getValue('giropay'));
             Configuration::updateValue('STRIPE_ENABLE_BANCONTACT', Tools::getValue('bancontact'));
-            Configuration::updateValue('STRIPE_ENABLE_APPLEPAY', Tools::getValue('applepay'));
-            Configuration::updateValue('STRIPE_ENABLE_GOOGLEPAY', Tools::getValue('googlepay'));
-            if (Tools::getValue('applepay') !== false || Tools::getValue('googlepay') !== false) {
+            Configuration::updateValue('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY', Tools::getValue('applepay_googlepay'));
+            if (Tools::getValue('applepay_googlepay') !== false) {
                 Configuration::updateValue('STRIPE_PRODUCT_PAYMENT', Tools::getValue('product_payment'));
             }
+
+            $this->registerDomain($secret_key);
         }
 
         if (!Configuration::get('STRIPE_KEY') && !Configuration::get('STRIPE_PUBLISHABLE')
@@ -432,6 +435,27 @@ class Stripe_official extends PaymentModule
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
     }
 
+    private function registerDomain($secret_key) {
+        $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
+        curl_setopt($curl, CURLOPT_FAILONERROR, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $result = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpcode != 200) {
+            $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
+        } else {
+            \Stripe\Stripe::setApiKey($secret_key);
+            \Stripe\ApplePayDomain::create(array(
+              'domain_name' => $this->context->shop->domain
+            ));
+        }
+    }
+
     /*
      ** @Method: displaySecure
      ** @description: just display 3d secure configuration
@@ -504,7 +528,7 @@ class Stripe_official extends PaymentModule
             'sofort' => Configuration::get('STRIPE_ENABLE_SOFORT'),
             'giropay' => Configuration::get('STRIPE_ENABLE_GIROPAY'),
             'bancontact' => Configuration::get('STRIPE_ENABLE_BANCONTACT'),
-            'applepay' => Configuration::get('STRIPE_ENABLE_APPLEPAY'),
+            'applepay_googlepay' => Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY'),
             'googlepay' => Configuration::get('STRIPE_ENABLE_GOOGLEPAY'),
             'product_payment' => Configuration::get('STRIPE_PRODUCT_PAYMENT'),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
@@ -1185,7 +1209,7 @@ class Stripe_official extends PaymentModule
                 $this->context->controller->registerJavascript($this->name.'-stripemethods', 'modules/'.$this->name.'/views/js/stripe-push-methods.js');
             }
 
-            if (Configuration::get('STRIPE_ENABLE_APPLEPAY') || Configuration::get('STRIPE_ENABLE_GOOGLEPAY')) {
+            if (Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY')) {
                 $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
             }
 
@@ -1245,7 +1269,7 @@ class Stripe_official extends PaymentModule
            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
 
-        if (Configuration::get('STRIPE_ENABLE_APPLEPAY') || Configuration::get('STRIPE_ENABLE_GOOGLEPAY')) {
+        if (Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY')) {
             $embeddedOption = new PaymentOption();
             $embeddedOption->setCallToActionText($this->l('Pay with Goole Pay or Apple Pay'))
                ->setAdditionalInformation($this->context->smarty->fetch('module:'.$this->name.'/views/templates/hook/payment_request_api.tpl'));
@@ -1272,7 +1296,7 @@ class Stripe_official extends PaymentModule
 
     public function hookDisplayProductAdditionalInfo($params)
     {
-        if ((Configuration::get('STRIPE_ENABLE_APPLEPAY') == 'on' || Configuration::get('STRIPE_ENABLE_GOOGLEPAY') == 'on') && Configuration::get('STRIPE_PRODUCT_PAYMENT') == 'on') {
+        if (Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY') == 'on' && Configuration::get('STRIPE_PRODUCT_PAYMENT') == 'on') {
             return $this->display(__FILE__, 'views/templates/hook/product_payment.tpl');
         }
     }

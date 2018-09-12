@@ -24,6 +24,7 @@
 *}
 
 {if $product.quantity > 0}
+    <span class="stripe_or"> - {l s='OR' mod='stripe_official'} - </span>
     <div class="row">
       <div class="col-xs-12">
         <div class="request-payment">

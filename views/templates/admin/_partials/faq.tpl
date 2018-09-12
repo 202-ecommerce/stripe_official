@@ -166,5 +166,22 @@
                 </p>
             </div>
         </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Add manually my domain from my Dashboard in order to use ApplePay' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='You can manually add your domain(s) throught your Dashboard. You can easily do this by following those five steps once you are logged into your Dashboard : ' mod='stripe_official'}<br/>
+                    A : {l s='Go to the "Payments" menu.' mod='stripe_official'}<br/>
+                    B : {l s='Click on Apple Pay.' mod='stripe_official'}<br/>
+                    C : {l s='Click on the button "Add new domain".' mod='stripe_official'}<br/>
+                    D : {l s='Provide the domain by filling the input.' mod='stripe_official'}<br/>
+                    ({l s='Additional step : make sure you have the file "apple-developer-merchantid-domain-association" on the root of your website in the folder ".well-known/". If no, please follow the steps 2 and 3 in the popup "Add new domain."' mod='stripe_official'})<br/>
+                    E : {l s='Add your domain by clicking thebutton "Add".' mod='stripe_official'}<br/><br/>
+                    <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_add_domain.png" />
+                </p>
+            </div>
+        </li>
     </ul>
 </div>
