@@ -226,3 +226,7 @@ div.payment_module {
     text-align: center;
     margin: 10px;
 }
+
+#payment-request-button.StripeElement {
+	margin-bottom: 20px;
+}
