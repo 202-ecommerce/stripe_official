@@ -92,23 +92,19 @@
 						<br><br>
 						<div class="form-group">
 							<input type="checkbox" id="ideal" name="ideal" {if $ideal}checked="checked"{/if}/>
-							<label>{l s='Activate iDEAL (if you have Dutch customers)' mod='stripe_official'}</label><br>
+							<label for="ideal">{l s='Activate iDEAL (if you have Dutch customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="bancontact" name="bancontact" {if $bancontact}checked="checked"{/if}/>
-							<label>{l s='Activate Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
+							<label for="bancontact">{l s='Activate Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
-							<label>{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
+							<label for="sofort">{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-							<label>{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
+							<label for="giropay">{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
-<<<<<<< HEAD
-							<label>{l s='Enable Payment Request Buttons. (Apple Pay/Chrome Payment Request API)' mod='stripe_official'}<br>{l s='By using Apple Pay, you agree to'  mod='stripe_official'} <a href="https://stripe.com/us/legal" target="blank">Stripe</a> {l s='and'  mod='stripe_official'} <a href="https://www.apple.com/legal/internet-services/terms/site.html" target="blank">Apple</a> {l s='\'s terms of service.'  mod='stripe_official'}</label><br>
-=======
-							<label>{l s='Activate Apple Pay and GooglePay' mod='stripe_official'}</label><br>
->>>>>>> 487620ca50b1749bb69f774dfe17b64648a6b1ce
+							<label for="applepay_googlepay">{l s='Enable Payment Request Buttons. (Apple Pay/Chrome Payment Request API)' mod='stripe_official'}<br>{l s='By using Apple Pay, you agree to'  mod='stripe_official'} <a href="https://stripe.com/us/legal" target="blank">Stripe</a> {l s='and'  mod='stripe_official'} <a href="https://www.apple.com/legal/internet-services/terms/site.html" target="blank">Apple</a> {l s='\'s terms of service.'  mod='stripe_official'}</label><br>
 
 							<span id="display_product_payment">
 								<input type="checkbox" id="product_payment" name="product_payment" {if $product_payment}checked="checked"{/if}/>
-								<label>{l s='Activate payment in product page (Only for ApplePay and GooglePay)' mod='stripe_official'}</label>
+								<label for="product_payment">{l s='Activate payment in product page (Only for ApplePay and GooglePay)' mod='stripe_official'}</label>
 							</span>
 						</div>
 
@@ -138,6 +134,29 @@
 					<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
 						{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 10 minutes.' mod='stripe_official'}</p>
 				</ol>
+
+				<div id="modal_applepay_googlepay" class="modal" tabindex="-1" role="dialog">
+				 	<div class="modal-dialog" role="document">
+				    	<div class="modal-content">
+				      		<div class="modal-header">
+				        		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				        		<h4 class="modal-title">{l s='Informations' mod='stripe_official'}</h4>
+				      		</div>
+				      		<div class="modal-body">
+				        		<p>{l s='You chose to enable ApplePay and GooglePay on product page.' mod='stripe_official'}</p>
+				        		<p>{l s='Please be sure to have : ' mod='stripe_official'}</p>
+				        		<ul>
+				        			<li>{l s='Google account associated with a card' mod='stripe_official'}</li>
+				        			<li>{l s='ApplePay account associated with a card : To add a card to Apple Pay, you need a MacBook Pro with Touch ID. On Mac models without built-in Touch ID, you can complete your purchase using Apple Pay on your eligible iPhone or Apple Watch' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204506#macbookpro" target="blank">https://support.apple.com/en-us/HT204506#macbookpro</a></li>
+				        			<li>{l s='Also, be sure to enable guest checkout in your Back Office "Enable guest checkout" (go to Preferences / Orders).' mod='stripe_official'}</li>
+				        		</ul>
+				      		</div>
+				      		<div class="modal-footer">
+				        		<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close' mod='stripe_official'}</button>
+				      		</div>
+				    	</div>
+				  	</div>
+				</div>
 			</div>
 		</div>
 		<div class="panel-footer">

@@ -183,5 +183,26 @@
                 </p>
             </div>
         </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='How to use ApplePay and GooglePay on product page' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='In order to use ApplePay or GooglePay on product page, you have to enable the guest checkout from your order configuration in the backoffice of your Prestashop. If not, ApplePay and GooglePay won\'t show up.' mod='stripe_official'}<br/><br/>
+                    <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_guest_checkout.png" />
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='How to be able to use ApplePay' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='ApplePay account associated with a card : To add a card to Apple Pay, you need a MacBook Pro with Touch ID. On Mac models without built-in Touch ID, you can complete your purchase using Apple Pay on your eligible iPhone or Apple Watch : ' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204506#macbookpro">https://support.apple.com/en-us/HT204506#macbookpro</a>
+                </p>
+            </div>
+        </li>
     </ul>
 </div>

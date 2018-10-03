@@ -104,6 +104,17 @@ $(document).ready(function() {
     $('#applepay_googlepay').change(function(event) {
         displayPayment();
     });
+
+    $('#product_payment').change(function(event) {
+        if ($(this).is(':checked') === true) {
+            console.log('coché');
+            $('#modal_applepay_googlepay').show();
+        }
+    });
+
+    $('#modal_applepay_googlepay button[data-dismiss="modal"]').click(function(event) {
+        $('#modal_applepay_googlepay').hide();
+    });
 });
 
 function displayPayment(){

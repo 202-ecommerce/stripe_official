@@ -1245,6 +1245,8 @@ class Stripe_official extends PaymentModule
 
             $this->context->smarty->assign(array_merge($js_def, $smatry_vars));
         }
+
+        $this->context->controller->registerStylesheet($this->name.'-frontmodalcss', 'modules/'.$this->name.'/views/css/frontmodal.css');
     }
 
     public function hookPaymentOptions($params)

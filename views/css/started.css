@@ -170,13 +170,10 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
     width: 100%;
 }
 
-<<<<<<< HEAD
 .bootstrap input[type="checkbox"] {
     vertical-align: top;
 }
 
-=======
->>>>>>> 487620ca50b1749bb69f774dfe17b64648a6b1ce
 /* Retina support */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),
