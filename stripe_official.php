@@ -1254,7 +1254,7 @@ class Stripe_official extends PaymentModule
         $payment_options = array();
         $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        if (!Configuration::get('PS_SSL_ENABLED')) {
+        if (!Configuration::get('PS_SSL_ENABLED') || ($this->getSecretKey() == '' || $this->getPublishableKey() == '')) {
             return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
         }
 
@@ -1298,7 +1298,7 @@ class Stripe_official extends PaymentModule
 
     public function hookDisplayProductAdditionalInfo($params)
     {
-        if (Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY') == 'on' && Configuration::get('STRIPE_PRODUCT_PAYMENT') == 'on') {
+        if (Configuration::get('STRIPE_ENABLE_APPLEPAY_GOOGLEPAY') == 'on' && Configuration::get('STRIPE_PRODUCT_PAYMENT') == 'on' && Configuration::get('PS_GUEST_CHECKOUT_ENABLED') == 1 && ($this->getSecretKey() != '' || $this->getPublishableKey() != '')) {
             return $this->display(__FILE__, 'views/templates/hook/product_payment.tpl');
         }
     }
