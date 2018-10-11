@@ -826,12 +826,13 @@ class Stripe_official extends PaymentModule
         return in_array($currency, $zeroDecimalCurrencies);
     }
 
-    public function createOrder($charge, $params)
+    public function createOrder($charge, $params, $product_page = false)
     {
         if (($charge->status == 'succeeded' && $charge->object == 'charge' && $charge->id)
             || ($charge->status == 'pending' && $charge->object == 'charge' && $charge->id && $params['type'] == 'sofort')) {
             /* The payment was approved */
             $message = 'Stripe Transaction ID: '.$charge->id;
+
             $secure_key = isset($params['secureKey']) ? $params['secureKey'] : false;
             try {
                 $paid = $this->isZeroDecimalCurrency($params['currency']) ? $params['amount'] : $params['amount'] / 100;
@@ -875,14 +876,21 @@ class Stripe_official extends PaymentModule
             $id_order = Order::getOrderByCartId($params['cart_id']);
 
             $ch = \Stripe\Charge::retrieve($charge->id);
-            $ch->description = "Order id: ".$id_order." - ".$params['carHolderEmail'];
+            $ch->description = "Order id: ".$id_order." - ".$params['cardHolderEmail'];
             $ch->save();
+
+            if ($product_page === true) {
+                $order = new Order($id_order);
+                $url = Context::getContext()->link->getPageLink('guest-tracking', true).'?order_reference='.$order->reference.'&email='.$params['cardHolderEmail'];
+            } else {
+                $url = Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$charge->metadata->cart_id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$secure_key;
+            }
 
             /* Ajax redirection Order Confirmation */
             return die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
                 'code' => '1',
-                'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$charge->metadata->cart_id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$secure_key,
+                'url' => $url,
             )));
         } else {
             $this->addTentative(
@@ -989,10 +997,47 @@ class Stripe_official extends PaymentModule
                 'msg' => $e->getMessage(),
             )));
         }
+
+        $product_page = false;
+        if ($this->context->customer->secure_key == NULL) {
+            $this->createGuestForPaymentRequest($params['cardHolderEmail'], $params['cardHolderName']);
+            $product_page = true;
+        }
+
         $params['cart_id'] = $this->context->cart->id;
-        $params['carHolderEmail'] = $this->context->customer->email;
+        $params['cardHolderEmail'] = $this->context->customer->email;
         $params['secureKey'] =  $this->context->customer->secure_key;
-        $this->createOrder($charge, $params);
+        $this->createOrder($charge, $params, $product_page);
+    }
+
+    private function createGuestForPaymentRequest($email, $name) {
+        $fullname = explode(' ', $name);
+        $firstname = $fullname[0];
+        $lastname = $fullname[1];
+
+        $customer = new Customer();
+        $customer->id_shop_group = (int)$this->context->shop->id_shop_group;
+        $customer->id_shop = $this->context->shop->id;
+        $customer->id_gender = 0;
+        $customer->id_default_group = 2;
+        $customer->id_lang = (int)$this->context->cookie->id_lang;
+        $customer->id_risk = 0;
+        $customer->firstname = $firstname;
+        $customer->lastname = $lastname;
+        $customer->email = $email;
+        $customer->passwd = md5(Tools::passwdGen(8, 'RANDOM'));
+        $customer->newsletter = 0;
+        $customer->optin = 0;
+        $customer->active = 1;
+        $customer->is_guest = 1;
+        $customer->save();
+
+        // $this->context->customer->email = $customer->email;
+        // $this->context->customer->secure_key = $customer->secure_key;
+        $this->context->customer = $customer;
+        $this->context->cart->id_customer = $customer->id;
+        $this->context->cart->secure_key = $customer->secure_key;
+        $this->context->cart->save();
     }
 
     /*

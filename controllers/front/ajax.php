@@ -93,6 +93,7 @@ class Stripe_officialAjaxModuleFrontController extends ModuleFrontController
                 'amount' => $amount,
                 'currency' => $this->context->currency->iso_code,
                 'cardHolderName' => Tools::getValue('cardHolderName'),
+                'cardHolderEmail' => Tools::getValue('cardHolderEmail'),
                 'type' => Tools::getValue('cardType'),
             );
 

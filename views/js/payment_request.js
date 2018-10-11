@@ -342,6 +342,7 @@ function createCharge(result, threeds=false) {
             "stripeToken": result.source.id,
             "cardType": result.source.card.brand,
             "cardHolderName": result.source.owner.name,
+            "cardHolderEmail": result.source.owner.email,
             "singleProductPrice": singleProductPrice,
             "city": result.shippingAddress.city,
             "country": result.shippingAddress.country,
@@ -360,6 +361,7 @@ function createCharge(result, threeds=false) {
             "stripeToken": result.source.id,
             "cardType": result.source.card.brand,
             "cardHolderName": result.source.owner.name,
+            "cardHolderEmail": result.source.owner.email,
             "singleProductPrice": singleProductPrice,
             "paymentRequest": productPage,
         };
