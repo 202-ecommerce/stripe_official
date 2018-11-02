@@ -412,6 +412,7 @@ class Stripe_official extends PaymentModule
             'logo' => $domain.__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png',
             'new_base_dir', $this->_path,
             'keys_configured' => $keys_configured,
+            'link' => new Link(),
         ));
 
         $this->displaySomething();

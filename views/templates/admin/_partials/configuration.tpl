@@ -146,9 +146,9 @@
 				        		<p>{l s='You chose to enable ApplePay and GooglePay on product page.' mod='stripe_official'}</p>
 				        		<p>{l s='Please be sure to have : ' mod='stripe_official'}</p>
 				        		<ul>
+				        			<li>{l s='Enabled guest checkout in your Back Office "Enable guest checkout"' mod='stripe_official'} <a href="{$link->getAdminLink('AdminOrderPreferences')|escape:'html':'UTF-8'}" target="blanc">{l s='(go to Preferences / Orders).' mod='stripe_official'}</a></li>
 				        			<li>{l s='Google account associated with a card' mod='stripe_official'}</li>
 				        			<li>{l s='ApplePay account associated with a card : To add a card to Apple Pay, you need a MacBook Pro with Touch ID. On Mac models without built-in Touch ID, you can complete your purchase using Apple Pay on your eligible iPhone or Apple Watch' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204506#macbookpro" target="blank">https://support.apple.com/en-us/HT204506#macbookpro</a></li>
-				        			<li>{l s='Also, be sure to enable guest checkout in your Back Office "Enable guest checkout" (go to Preferences / Orders).' mod='stripe_official'}</li>
 				        		</ul>
 				      		</div>
 				      		<div class="modal-footer">
