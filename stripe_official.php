@@ -919,7 +919,12 @@ class Stripe_official extends PaymentModule
         try {
             // Create the charge on Stripe's servers - this will charge the user's card
             \Stripe\Stripe::setApiKey($this->getSecretKey());
-            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+
+            if (getenv('PLATEFORM') != 'PSREADY') {
+                \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            } else {
+                \Stripe\Stripe::setAppInfo("Prestashop Ready", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            }
 
             $cart = new Cart($params['cart_id']);
             $address_delivery = new Address($cart->id_address_delivery);
@@ -963,7 +968,12 @@ class Stripe_official extends PaymentModule
         try {
             // Create the charge on Stripe's servers - this will charge the user's card
             \Stripe\Stripe::setApiKey($this->getSecretKey());
-            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+
+            if (getenv('PLATEFORM') != 'PSREADY') {
+                \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            } else {
+                \Stripe\Stripe::setAppInfo("Prestashop Ready", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            }
 
             $address_delivery = new Address($this->context->cart->id_address_delivery);
             $state_delivery = State::getNameById($address_delivery->id_state);
