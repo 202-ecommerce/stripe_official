@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ShoppingFeed addons" default="build" basedir="../">
+    <property environment="env" />
+    <property name="build-dir" value="${basedir}/202/build" />
+    <property name="src-dir" value="${basedir}" />
+    <property name="TARGETNAME" value="stripe_official" />
+    <property name="TARGETBRANCH" value="release/1.6" />
+    <property name="TARGETVERSION" value="1.6.0" />
+
+    <target name="build" depends="build-common,package-zip" />
+
+    <target name="build-common" depends="lint,prepare,npm,doc" />
+
+    <target name="package-zip" depends="build-common" description="Create ZIP package">
+        <echo>Create ZIP package</echo>
+        <exec executable="${PACKAGE_ZIP_PATH}" failonerror="true">
+            <arg value="prod" />
+            <arg value="${TARGETNAME}" />
+            <arg value="${TARGETBRANCH}" />
+            <arg value="${TARGETVERSION}" />
+            <arg value="${BUILD_TAG}" />
+            <arg value="${env.BUILD_TAG}" />
+        </exec>
+    </target>
+
+    <target name="lint" description="Perform syntax check of sourcecode files">
+        <apply executable="php" failonerror="false">
+            <arg value="-l" />
+            <fileset dir="${src-dir}">
+                <include name="**/*.php" />
+                <modified />
+            </fileset>
+        </apply>
+    </target>
+
+    <target name="clean" depends="clean-build,clean-composer" description="Cleanup build and composer artifacts" />
+
+    <target name="clean-build" description="Cleanup build artifacts">
+        <echo>Cleaning out the build artifacts</echo>
+        <delete dir="${build-dir}/packages" />
+        <delete dir="${build-dir}/logs" />
+    </target>
+    <target name="prepare" depends="clean-build" description="Prepare for build">
+        <echo>Making the build artifact folders</echo>
+        <mkdir dir="${build-dir}/packages" />
+        <mkdir dir="${build-dir}/logs" />
+    </target>
+
+    <!-- start composer -->
+    <target name="composer" depends="clean-composer,composer-install,composer-update" description="Install or update dependencies" />
+    <target name="clean-composer" depends="composer.check" if="composer.lock.exist.in.gitignore" description="Cleanup composer artifacts">
+        <delete file="${basedir}/composer.lock" />
+    </target>
+    <target name="composer.check">
+        <condition property="composer.lock.exist.in.gitignore">
+            <resourcecontains resource="${basedir}/.gitignore" substring="composer.lock" />
+        </condition>
+    </target>
+    <target name="composer-install" depends="composer.check" unless="composer.lock.exist.in.gitignore" description="Installing dependencies">
+        <echo>Installing dependencies</echo>
+        <exec executable="composer" failonerror="true">
+            <arg value="install" />
+        </exec>
+    </target>
+    <target name="composer-update" depends="composer.check" if="composer.lock.exist.in.gitignore" description="Updating dependencies">
+        <echo>Updating dependencies</echo>
+        <exec executable="composer" failonerror="true">
+            <arg value="update" />
+        </exec>
+    </target>
+    <!-- end composer -->
+
+    <!-- start documentation -->
+    <target name="doc.check">
+        <condition property="doc.directory.exist">
+            <available file="${basedir}/202/doc" type="dir"/>
+        </condition>
+    </target>
+    <target name="doc" if="doc.directory.exist" depends="doc.check,npm" description="Build documentation mini site.">
+        <exec executable="npm">
+            <arg value="run" />
+            <arg value="doc-build" />
+        </exec>
+    </target>
+    <target name="npm" depends="clean-npm,npm-install" description="Install or update node dependencies" />
+    <target name="clean-npm" description="Empty node_modules folder">
+        <delete dir="${basedir}/202/node_modules" />
+    </target>
+    <target name="npm-install" description="Installing node deps">
+        <exec executable="npm">
+            <arg value="install" />
+        </exec>
+    </target>
+    <!-- end documentation -->
+
+</project>
