@@ -7,7 +7,7 @@
     <property name="TARGETBRANCH" value="release/1.6" />
     <property name="TARGETVERSION" value="1.6.0" />
 
-    <target name="build" depends="build-common,package-zip" />
+    <target name="build" depends="build-common,package-zip,psvalidator" />
 
     <target name="build-common" depends="lint,prepare,npm,doc" />
 
@@ -20,6 +20,15 @@
             <arg value="${TARGETVERSION}" />
             <arg value="${BUILD_TAG}" />
             <arg value="${env.BUILD_TAG}" />
+        </exec>
+    </target>
+
+    <target name="psvalidator" description="Send Prestashop Validator">
+        <echo>Create ZIP package</echo>
+        <exec executable="php" failonerror="true">
+            <arg value="/var/www/totbuilder/bin/console" />
+            <arg value="psvalidator:validate" />
+            <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip" />
         </exec>
     </target>
 
