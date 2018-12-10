@@ -143,7 +143,7 @@ class Stripe_official extends PaymentModule
         if (!$this->createStripePayment()) {
             return false;
         }
-        
+
         if (!$this->installOrderState()) {
             return false;
         }
@@ -766,7 +766,7 @@ class Stripe_official extends PaymentModule
             $ch = \Stripe\Charge::retrieve($charge->id);
             $ch->description = "Order id: ".$id_order." - ".$params['carHolderEmail'];
             $ch->save();
-            
+
             /* Ajax redirection Order Confirmation */
             return die(Tools::jsonEncode(array(
                 'chargeObject' => $charge,
@@ -802,7 +802,12 @@ class Stripe_official extends PaymentModule
         try {
             // Create the charge on Stripe's servers - this will charge the user's card
             \Stripe\Stripe::setApiKey($this->getSecretKey());
-            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+
+            if (getenv('PLATEFORM') != 'PSREADY') {
+                \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html');
+            } else {
+                \Stripe\Stripe::setAppInfo("Prestashop Ready", $this->version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html');
+            }
 
             $cart = new Cart($params['cart_id']);
             $address_delivery = new Address($cart->id_address_delivery);
@@ -846,7 +851,12 @@ class Stripe_official extends PaymentModule
         try {
             // Create the charge on Stripe's servers - this will charge the user's card
             \Stripe\Stripe::setApiKey($this->getSecretKey());
-            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+
+            if (getenv('PLATEFORM') != 'PSREADY') {
+                \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html');
+            } else {
+                \Stripe\Stripe::setAppInfo("Prestashop Ready", $this->version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html');
+            }
 
             $address_delivery = new Address($this->context->cart->id_address_delivery);
             $state_delivery = State::getNameById($address_delivery->id_state);
@@ -856,7 +866,7 @@ class Stripe_official extends PaymentModule
             } else {
                 $cardHolderName = $params['cardHolderName'];
             }
-            
+
             $charge = \Stripe\Charge::create(
                 array(
                     "amount" => $params['amount'], // amount in cents, again
@@ -1451,7 +1461,7 @@ class Stripe_official extends PaymentModule
     public function hookPaymentOptions($params)
     {
         $this->context->smarty->assign('SSL', Configuration::get('PS_SSL_ENABLED'));
-        
+
         if (!Configuration::get('PS_SSL_ENABLED')) {
             return $this->context->smarty->fetch('module:stripe_official/views/templates/hook/payment.tpl');
         }
@@ -1459,19 +1469,19 @@ class Stripe_official extends PaymentModule
         $payment_options = array();
         $embeddedOption = new PaymentOption();
         $default_country = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
-        
+
         if (Tools::strtolower($default_country->iso_code) == 'us') {
             $cc_img = 'cc_merged.png';
         } else {
             $cc_img = 'logo-payment.png';
         }
-        
+
         $embeddedOption->setCallToActionText($this->l('Pay by card'))
                        ->setForm($this->generateFormStripe())
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
-        
-        if ($this->context->currency->iso_code == "EUR") 
+
+        if ($this->context->currency->iso_code == "EUR")
         {
             $address_invoice = new Address($this->context->cart->id_address_invoice);
             $amount = $this->context->cart->getOrderTotal();
@@ -1483,15 +1493,15 @@ class Stripe_official extends PaymentModule
             $iso_country = Country::getIsoById($address_invoice->id_country);
             $iso_countries = array('AT', 'BE', 'DE', 'NL', 'ES', 'IT');
             $available_countries = array();
-            
+
             foreach ($iso_countries as $iso) {
                 $id_country = Country::getByIso($iso);
                 $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
             }
 
-            foreach ($methods as $method) 
+            foreach ($methods as $method)
             {
-                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) 
+                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method)))
                 {
                     $this->context->smarty->assign(
                         array(
@@ -1578,8 +1588,8 @@ class Stripe_official extends PaymentModule
                 $currencyAvailable = true;
             }
         }
-        
-        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true) 
+
+        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true)
         {
             $this->context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
             $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
