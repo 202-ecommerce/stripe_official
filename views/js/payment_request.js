@@ -107,7 +107,6 @@ function initPaymentRequestButtons()
                 type: 'POST',
                 dataType: 'json',
                 url: paymentRequestUrlStripe,
-                async: false,
                 data: {
                     addressInfos: ev.shippingAddress,
                     carrierInfos: ev.shippingOption.id,
@@ -116,8 +115,6 @@ function initPaymentRequestButtons()
                     onToken: true,
                 },
                 success: function(data) {
-                    console.log('success');
-
                     var owner_info = {
                         address: {
                             line1: ev.shippingAddress.addressLine[0],
@@ -196,7 +193,6 @@ function initPaymentRequestButtons()
                 type: 'POST',
                 dataType: 'json',
                 url: paymentRequestUrlStripe,
-                async: false,
                 data: {
                     product: idProduct,
                     productCombination: id_combination,
@@ -204,7 +200,6 @@ function initPaymentRequestButtons()
                     idCustomer: id_customer,
                 },
                 success: function(data) {
-                    console.log('success');
                     paymentRequest.update({
                         total: {
                             label: 'Amount',
@@ -371,10 +366,8 @@ function createCharge(result, threeds=false) {
         type: 'POST',
         dataType: 'json',
         url: ajaxUrlStripe,
-        async: false,
         data: datas,
         success: function(data) {
-            console.log('success');
             if (data.code == '1') {
                 // Charge ok : redirect the customer to order confirmation page
                 result.complete('success');
