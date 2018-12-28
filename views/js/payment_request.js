@@ -29,10 +29,16 @@ $(document).ready(function() {
 
         prestashop.on('updateProduct', (data) => {
             prButton.unmount();
-            setTimeout(function(){
-                // $('#payment-request-button').addClass('StripeElement');
-                prButton.mount('#payment-request-button');
-            }, 500);
+
+            // Check the availability of the Payment Request API first.
+            paymentRequest.canMakePayment().then(function(result) {
+                if (result) {
+                    prButton.mount('#payment-request-button');
+                } else {
+                    document.getElementById('payment-request-button').style.display = 'none';
+                    $('.stripe_or').css('display', 'none');
+                }
+            });
         });
     }
 });
