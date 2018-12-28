@@ -119,22 +119,29 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
                 die;
             }
         } else {
-            echo $this->l('you must fill the address name');
-            die;
+            $firstname = "";
+            $lastname = "";
         }
 
         $city = $address['city'];
         $country = $address['country'];
-        $line1 = $address['addressLine'][0];
-        if (isset($address['addressLine'][1]) && $address['addressLine'][1] != '') {
-            $line2 = $address['addressLine'][1];
+
+        if (isset($address['addressLine'][0]) && $address['addressLine'][0] != '') {
+            $line1 = $address['addressLine'][0];
+            if (isset($address['addressLine'][1]) && $address['addressLine'][1] != '') {
+                $line2 = $address['addressLine'][1];
+            } else {
+                $line2 = '';
+            }
         } else {
-            $line2 = '';
+            $line1 = "";
+            $line2 = "";
         }
+
         $postal_code = $address['postalCode'];
         $phone = $address['phone'];
 
-        $id_address = $this->addressExists($line1, $line2, $postal_code, $city, $phone, $firstname, $lastname);
+        $id_address = $this->addressExists($postal_code, $city, $phone);
 
         if (!$id_address) {
             $newAddress = new Address();
@@ -177,16 +184,13 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
         return DB::getInstance()->getValue($sql);
     }
 
-    private function addressExists($address1, $address2, $postcode, $city, $phone, $firstname, $lastname)
+    private function addressExists($postcode, $city, $phone)
     {
         $sql = "SELECT id_address FROM "._DB_PREFIX_."address
-                WHERE address1='".pSQL($address1)."'
-                AND address2='".pSQL($address2)."'
-                AND postcode='".pSQL($postcode)."'
+                WHERE postcode='".pSQL($postcode)."'
                 AND city='".pSQL($city)."'
                 AND phone='".pSQL($phone)."'
-                AND firstname='".pSQL($firstname)."'
-                AND lastname='".pSQL($lastname)."'";
+                AND id_customer='".(int)$this->context->customer->id."'";
 
         $result = DB::getInstance()->getValue($sql);
 

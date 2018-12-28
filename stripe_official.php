@@ -1202,24 +1202,38 @@ class Stripe_official extends PaymentModule
 
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
+            $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
+
             if ($this->context->controller->php_self == 'product') {
                 $productPayment = true;
                 $productPrice = Product::getPriceStatic(Tools::getValue('id_product'), true, null, 2);
                 $amount = $this->isZeroDecimalCurrency($currency) ? $productPrice : $productPrice * 100;
+                $c = new Carrier($carriers[0]['id_carrier']);
+                if ($carriers[0]['shipping_method'] == 1) {
+                    $carrierPrice = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
+                } else {
+                    $carrierPrice = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
+                }
+                $amount += $carrierPrice;
+                if ($carrierPrice != 0) {
+                    $amount += round(($carrierPrice * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
+                }
             } else {
                 $productPayment = false;
                 $productPrice = 0;
             }
 
-            $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
-
             foreach ($carriers as &$carrier) {
                 $c = new Carrier($carrier['id_carrier']);
 
                 if ($carrier['shipping_method'] == 1) {
-                    $carrier['price'] = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone)*100);
+                    $carrier['price'] = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
                 } else {
-                    $carrier['price'] = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone)*100);
+                    $carrier['price'] = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
+                }
+
+                if ($carrier['price'] != 0) {
+                    $carrier['price'] = round($carrier['price'] + ($carrier['price'] * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
                 }
             }
 
