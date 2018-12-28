@@ -1202,7 +1202,12 @@ class Stripe_official extends PaymentModule
 
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
-            $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
+            if ($this->context->controller->php_self == 'product') {
+                $currentProduct = new Product(Tools::getValue('id_product'));
+                $carriers = $currentProduct->getCarriers();
+            } else {
+                $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
+            }
 
             if ($this->context->controller->php_self == 'product') {
                 $productPayment = true;
