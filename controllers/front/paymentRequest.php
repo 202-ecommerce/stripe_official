@@ -119,8 +119,8 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
                 die;
             }
         } else {
-            $firstname = "";
-            $lastname = "";
+            $firstname = "tmpname";
+            $lastname = "tmpname";
         }
 
         $city = $address['city'];
@@ -156,9 +156,10 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
             $newAddress->city = $city;
             $newAddress->phone = $phone;
 
-            if (!$newAddress->save()) {
-                //firstname or lastname are not mandatory in chrome popin form
-                echo $this->l('invalide address name');
+            try {
+                $newAddress->save();
+            } catch (Exception $e) {
+                echo $this->l('Error: Imcomplete address');
                 die;
             }
 
@@ -169,10 +170,11 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
         $this->context->cart->id_address_delivery = $idAddress;
         $this->context->cart->id_address_invoice = $idAddress;
 
-        if (!$this->context->cart->save()) {
-            //firstname or lastname are not mandatory in chrome popin form
-            echo $this->l('invalide address name');
-            die();
+        try {
+            $this->context->cart->save();
+        } catch (Exception $e) {
+            echo $this->l('Error: Incomplete address');
+            die;
         }
     }
 
