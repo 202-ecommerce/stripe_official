@@ -17,8 +17,6 @@ var stripe_isPaymentRequestInit = false;
 var cardType;
 var stripe_request_api;
 var paymentRequest;
-var elements_pr;
-var prButton;
 
 $(document).ready(function() {
     if (!stripe_isPaymentRequestInit) {
@@ -73,20 +71,6 @@ function initPaymentRequestButtons()
             },
         });
     }
-
-    elements_pr = stripe_request_api.elements({locale:stripeLanguageIso});
-    prButton = elements_pr.create('paymentRequestButton', {
-        paymentRequest: paymentRequest,
-    });
-
-    // Check the availability of the Payment Request API first.
-    paymentRequest.canMakePayment().then(function(result) {
-        if (result) {
-            prButton.mount('#payment-request-button');
-        } else {
-            document.getElementById('payment-request-button').style.display = 'none';
-        }
-    });
 
  	paymentRequest.on('source', function(ev) {
         if(typeof productPayment != 'undefined' && productPayment === true) {
