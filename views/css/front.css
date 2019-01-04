@@ -193,6 +193,27 @@ div.payment_module {
 	background: #fbfbfb;
 }
 
+#payment-request-button {
+	width: 100%;
+	border: none;
+	padding: 0px;
+}
+
+.product-additional-info #relative {
+	position: relative;
+}
+
+.product-additional-info #resetPriceButton {
+	border: none;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 0;
+	cursor: pointer;
+}
+
 #cardNumber-element, #cardCvc-element, #cardExpiry-element {
 	border: #CCCCCC solid 1px;
 	margin-bottom: 15px;
@@ -225,8 +246,4 @@ div.payment_module {
     display: block;
     text-align: center;
     margin: 10px;
-}
-
-#payment-request-button.StripeElement {
-	margin-bottom: 20px;
 }

@@ -26,20 +26,6 @@ $(document).ready(function() {
             stripe_request_api = Stripe(StripePubKey);
         }
         initPaymentRequestButtons();
-
-        prestashop.on('updateProduct', (data) => {
-            prButton.unmount();
-
-            // Check the availability of the Payment Request API first.
-            paymentRequest.canMakePayment().then(function(result) {
-                if (result) {
-                    prButton.mount('#payment-request-button');
-                } else {
-                    document.getElementById('payment-request-button').style.display = 'none';
-                    $('.stripe_or').css('display', 'none');
-                }
-            });
-        });
     }
 });
 
@@ -186,7 +172,7 @@ function initPaymentRequestButtons()
     });
 
     if(typeof productPayment != 'undefined' && productPayment === true) {
-        prButton.on('click', function(ev) {
+        $('#resetPriceButton').on('click', function(ev) {
             id_combination = $('#product-details').data('product').id_product_attribute;
             if (!$('#product-details').data('product').quantity_wanted) {
                 quantity = 1;
@@ -211,13 +197,26 @@ function initPaymentRequestButtons()
                             amount: data,
                         },
                     });
+                    //trigger click pour open la popin
+                    $('#payment-request-button').trigger('click');
                 },
                 error: function(err) {
                     console.log(err.statusText);
                 }
             });
         });
+    } else {
+        $('#resetPriceButton').on('click', function(ev) {
+            $('#payment-request-button').trigger('click');
+        });
     }
+
+    $('#payment-request-button').on('click', function(ev) {
+        // Check the availability of the Payment Request API first.
+        paymentRequest.canMakePayment().then(function(result) {
+            paymentRequest.show()
+        });
+    });
 
     paymentRequest.on('shippingaddresschange', function(ev) {
         $.ajax({

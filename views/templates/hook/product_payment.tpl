@@ -27,9 +27,12 @@
     <span class="stripe_or"> - {l s='OR' mod='stripe_official'} - </span>
     <div class="row">
       <div class="col-xs-12">
-        <div class="request-payment">
-          <div id="payment-request-button"></div>
-        </div>
+          <div id="relative">
+              <div class="request-payment">
+                  <button id="payment-request-button" type="button">{l s='Pay now' mod='stripe_official'}</button>
+              </div>
+              <div id="resetPriceButton"></div>
+          </div>
       </div>
     </div>
 
