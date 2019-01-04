@@ -49,12 +49,7 @@ function initPaymentRequestButtons()
         amountTtl = amount;
     }
 
-    if(typeof productPrice !== 'undefined') {
-        amountTtl = Math.round(productPrice*100);
-    }
-
     var id_customer;
-
     var obj = jQuery.parseJSON(carriersRequest);
     var shipping_options = new Array();
     var cmpt = 0;
@@ -153,7 +148,7 @@ function initPaymentRequestButtons()
                     }
                 },
                 error: function(err) {
-                    console.log('error');
+                    console.log(err.statusText);
                 }
             });
         } else {
@@ -193,7 +188,11 @@ function initPaymentRequestButtons()
     if(typeof productPayment != 'undefined' && productPayment === true) {
         prButton.on('click', function(ev) {
             id_combination = $('#product-details').data('product').id_product_attribute;
-            quantity = $('#product-details').data('product').quantity_wanted;
+            if (!$('#product-details').data('product').quantity_wanted) {
+                quantity = 1;
+            } else {
+                quantity = $('#product-details').data('product').quantity_wanted;
+            }
             idProduct = $('#product-details').data('product').id_product;
             $.ajax({
                 type: 'POST',
@@ -214,7 +213,7 @@ function initPaymentRequestButtons()
                     });
                 },
                 error: function(err) {
-                    console.log('error');
+                    console.log(err.statusText);
                 }
             });
         });
@@ -233,7 +232,6 @@ function initPaymentRequestButtons()
                 if(Number.isInteger(parseInt(data)) == true) {
                     ev.updateWith({
                         status: 'success',
-                        currency: currencyStripe.toLowerCase(),
                         total: {
                             label: 'Amount',
                             amount: parseInt(data),
@@ -247,7 +245,7 @@ function initPaymentRequestButtons()
                 }
             },
             error: function(err) {
-                console.log('error');
+                console.log(err.statusText);
             }
         });
     });
@@ -264,7 +262,6 @@ function initPaymentRequestButtons()
             success: function(data) {
                 ev.updateWith({
                     status: 'success',
-                    currency: currencyStripe.toLowerCase(),
                     total: {
                         label: 'Amount',
                         amount: parseInt(data),
@@ -272,7 +269,7 @@ function initPaymentRequestButtons()
                 });
             },
             error: function(err) {
-                console.log('error');
+                console.log(err.statusText);
             }
         });
     });
@@ -388,7 +385,7 @@ function createCharge(result, threeds=false) {
             }
         },
         error: function(err) {
-            console.log('error');
+            console.log(err.statusText);
             console.log(datas);
             // AJAX ko
             $('#stripe-ajax-loader').hide();

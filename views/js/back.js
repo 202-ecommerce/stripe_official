@@ -107,7 +107,6 @@ $(document).ready(function() {
 
     $('#product_payment').change(function(event) {
         if ($(this).is(':checked') === true) {
-            console.log('coché');
             $('#modal_applepay_googlepay').show();
         }
     });

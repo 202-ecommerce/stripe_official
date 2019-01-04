@@ -155,7 +155,12 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
             $newAddress->postcode = $postal_code;
             $newAddress->city = $city;
             $newAddress->phone = $phone;
-            $newAddress->save();
+
+            if (!$newAddress->save()) {
+                //firstname or lastname are not mandatory in chrome popin form
+                echo $this->l('invalide address name');
+                die;
+            }
 
             $idAddress = $newAddress->id;
         } else {
@@ -164,7 +169,11 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
         $this->context->cart->id_address_delivery = $idAddress;
         $this->context->cart->id_address_invoice = $idAddress;
 
-        $this->context->cart->save();
+        if (!$this->context->cart->save()) {
+            //firstname or lastname are not mandatory in chrome popin form
+            echo $this->l('invalide address name');
+            die();
+        }
     }
 
     private function changeCartCarrier($carrier)

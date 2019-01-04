@@ -1205,6 +1205,9 @@ class Stripe_official extends PaymentModule
             if ($this->context->controller->php_self == 'product') {
                 $currentProduct = new Product(Tools::getValue('id_product'));
                 $carriers = $currentProduct->getCarriers();
+                if (empty($carriers)) {
+                    $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
+                }
             } else {
                 $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
             }
