@@ -26,7 +26,12 @@
 <div class="payment_module">
 	<div class="row">
 		<div class="col-xs-12">
-			<div id="payment-request-button"></div>
+			<div id="relative">
+				<div class="request-payment">
+					<button id="payment-request-button" type="button">{l s='Pay now' mod='stripe_official'}</button>
+				</div>
+				<div id="resetPriceButton"></div>
+			</div>
 			<aside id="payment-request-unavailable" class="important alternate amber" style="display:none;">
 		      <p>
 		        <strong>Either your browser does not support the Payment Request API, or
