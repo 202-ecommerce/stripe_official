@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
  *
  * DISCLAIMER
  ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
+ * @copyright 2007-2019 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -773,8 +773,6 @@ class Stripe_official extends PaymentModule
                 'code' => '1',
                 'url' => Context::getContext()->link->getPageLink('order-confirmation', true).'?id_cart='.(int)$charge->metadata->cart_id.'&id_module='.(int)$this->id.'&id_order='.(int)$id_order.'&key='.$secure_key,
             )));
-
-
         } else {
             $this->addTentative(
                 $charge->id,
@@ -1481,8 +1479,7 @@ class Stripe_official extends PaymentModule
                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img));
         $payment_options[] = $embeddedOption;
 
-        if ($this->context->currency->iso_code == "EUR")
-        {
+        if ($this->context->currency->iso_code == "EUR") {
             $address_invoice = new Address($this->context->cart->id_address_invoice);
             $amount = $this->context->cart->getOrderTotal();
             $currency = $this->context->currency->iso_code;
@@ -1499,10 +1496,8 @@ class Stripe_official extends PaymentModule
                 $available_countries[$iso] = Country::getNameById($this->context->language->id, $id_country);
             }
 
-            foreach ($methods as $method)
-            {
-                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method)))
-                {
+            foreach ($methods as $method) {
+                if (Configuration::get('STRIPE_ENABLE_'.Tools::strtoupper($method))) {
                     $this->context->smarty->assign(
                         array(
                             'publishableKey' => $this->getPublishableKey(),
@@ -1524,7 +1519,7 @@ class Stripe_official extends PaymentModule
                     );
 
                     if ($method == 'sofort') {
-                            $this->context->smarty->assign(
+                        $this->context->smarty->assign(
                             array(
                                 'stripe_country_iso_code' => $iso_country,
                                 'sofort_available_countries' => $available_countries,
@@ -1545,7 +1540,7 @@ class Stripe_official extends PaymentModule
         return $payment_options;
     }
 
-    protected  function generateHiddenForm($method)
+    protected function generateHiddenForm($method)
     {
         $amount = $this->context->cart->getOrderTotal();
         $currency = $this->context->currency->iso_code;
@@ -1583,14 +1578,13 @@ class Stripe_official extends PaymentModule
         $moduleId = Module::getModuleIdByName($this->name);
         $currencyAvailable = false;
 
-        foreach(Currency::checkPaymentCurrencies($moduleId) as $currency) {
-            if($currency['id_currency'] == $this->context->currency->id) {
+        foreach (Currency::checkPaymentCurrencies($moduleId) as $currency) {
+            if ($currency['id_currency'] == $this->context->currency->id) {
                 $currencyAvailable = true;
             }
         }
 
-        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true)
-        {
+        if ($this->context->controller->php_self == 'order' && $currencyAvailable === true) {
             $this->context->controller->registerStylesheet($this->name.'-frontcss', 'modules/'.$this->name.'/views/css/front.css');
             $this->context->controller->registerJavascript($this->name.'-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
             $this->context->controller->registerJavascript($this->name.'-stipeV3', 'https://js.stripe.com/v3/', array('server'=>'remote'));

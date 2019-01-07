@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
  *
  * DISCLAIMER
  *
@@ -9,7 +9,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
+ * @copyright 2007-2019 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -36,9 +36,9 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         } else {
             $pubKey = Configuration::get('_PS_STRIPE_publishable');
         }
-        
+
         $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) : $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
-        
+
         $this->context->smarty->assign(array(
             'stripe_source' => $stripe_source,
             'stripe_client_secret' => $stripe_client_secret,
@@ -47,7 +47,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'module_dir' => _PS_MODULE_DIR_,
             'return_order_page' => $order_page,
         ));
-        
+
         $this->context->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
         $this->context->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
         $this->context->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));

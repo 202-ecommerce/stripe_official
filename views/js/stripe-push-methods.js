@@ -1,5 +1,5 @@
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
+ * @copyright 2007-2019 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -25,16 +25,16 @@ function initStripeOfficialGiropay() {
 
     var stripe_submit_button = document.getElementById('payment-confirmation');
     stripe_submit_button.addEventListener('click', function (e) {
-        
+
         var method_stripe = $('input[name=payment-option]:checked').data('module-name');
         var methods_stripe = ["ideal", "giropay", "bancontact", "sofort"];
         if (methods_stripe.indexOf($('input[name=payment-option]:checked').data('module-name')) == -1) {
             return true;
         }
-        
+
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (StripePubKey && typeof stripe_v3 !== 'object') {
             var stripe_v3 = Stripe(StripePubKey);
         }
