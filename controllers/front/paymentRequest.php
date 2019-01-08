@@ -115,7 +115,7 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
                     $lastname = $name[0];
                 }
             } else {
-                echo $this->l('invalide address name');
+                echo $this->l('Invalide address name');
                 die;
             }
         } else {
@@ -134,8 +134,8 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
                 $line2 = '';
             }
         } else {
-            $line1 = "";
-            $line2 = "";
+            echo $this->l('Missing address location');
+            die;
         }
 
         $postal_code = $address['postalCode'];
@@ -159,7 +159,7 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
             try {
                 $newAddress->save();
             } catch (Exception $e) {
-                echo $this->l('Error: Imcomplete address');
+                echo $this->l('Imcomplete address');
                 die;
             }
 
@@ -167,13 +167,21 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
         } else {
             $idAddress = $id_address;
         }
+
+        $id_zone = Address::getZoneById($idAddress);
+        if (!Address::isCountryActiveById($idAddress) ||
+            !Carrier::getCarriers($this->context->language->id, true, false, $id_zone)) {
+            echo $this->l('Invalide address location');
+            die;
+        }
+
         $this->context->cart->id_address_delivery = $idAddress;
         $this->context->cart->id_address_invoice = $idAddress;
 
         try {
             $this->context->cart->save();
         } catch (Exception $e) {
-            echo $this->l('Error: Incomplete address');
+            echo $this->l('Imcomplete address');
             die;
         }
     }
