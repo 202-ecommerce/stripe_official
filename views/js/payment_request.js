@@ -25,6 +25,11 @@ $(document).ready(function() {
         }
         initPaymentRequestButtons();
     }
+
+    //reinitialise le bouton si le block product-information est re-généré
+    prestashop.on('updatedProduct', function() {
+        initPaymentRequestButtons();
+    });
 });
 
 function initPaymentRequestButtons()

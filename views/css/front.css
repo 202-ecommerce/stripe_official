@@ -198,7 +198,9 @@ div.payment_module {
 	border: none;
 	padding: 0px;
 	height: 40px;
-	background: beige;
+	background: #39004f;
+	color: white;
+	font-size: 18px;
 }
 
 .product-additional-info #relative {
