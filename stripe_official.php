@@ -1216,15 +1216,17 @@ class Stripe_official extends PaymentModule
                 $productPayment = true;
                 $productPrice = Product::getPriceStatic(Tools::getValue('id_product'), true, null, 2);
                 $amount = $this->isZeroDecimalCurrency($currency) ? $productPrice : $productPrice * 100;
-                $c = new Carrier($carriers[0]['id_carrier']);
-                if ($carriers[0]['shipping_method'] == 1) {
-                    $carrierPrice = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
-                } else {
-                    $carrierPrice = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
-                }
-                $amount += $carrierPrice;
-                if ($carrierPrice != 0) {
-                    $amount += round(($carrierPrice * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
+                if (isset($carriers[0])) {
+                    $c = new Carrier($carriers[0]['id_carrier']);
+                    if ($carriers[0]['shipping_method'] == 1) {
+                        $carrierPrice = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
+                    } else {
+                        $carrierPrice = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
+                    }
+                    $amount += $carrierPrice;
+                    if ($carrierPrice != 0) {
+                        $amount += round(($carrierPrice * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
+                    }
                 }
             } else {
                 $productPayment = false;

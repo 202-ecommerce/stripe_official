@@ -170,7 +170,7 @@ class Stripe_officialPaymentRequestModuleFrontController extends ModuleFrontCont
 
         $id_zone = Address::getZoneById($idAddress);
         if (!Address::isCountryActiveById($idAddress) ||
-            !Carrier::getCarriers($this->context->language->id, true, false, $id_zone)) {
+            empty(Carrier::getCarriers($this->context->language->id, true, false, $id_zone))) {
             echo $this->l('Invalide address location');
             die;
         }
