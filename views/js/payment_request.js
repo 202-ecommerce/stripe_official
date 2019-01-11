@@ -18,7 +18,25 @@ var cardType;
 var stripe_request_api;
 var paymentRequest;
 
+var elements_pr;
+var prButton;
+
+
 $(document).ready(function() {
+
+    if ($('#payment-request-button').length === 0) {
+        return;
+    }
+    if ($('#product-details').length > 0) {
+        id_product_attribute = $('#product-details').data('product').id_product_attribute;
+        quantity = $('#product-details').data('product').quantity_wanted;
+        id_product = $('#product-details').data('product').id_product;
+    } else {
+        id_product_attribute = null;
+        quantity = null;
+        id_product= null;
+    }
+
     if (!stripe_isPaymentRequestInit) {
         if (StripePubKey && typeof stripe_request_api !== 'object') {
             stripe_request_api = Stripe(StripePubKey);
@@ -26,31 +44,22 @@ $(document).ready(function() {
         initPaymentRequestButtons();
     }
 
-    //reinitialise le bouton si le block product-information est re-généré
-    prestashop.on('updatedProduct', function() {
-        initPaymentRequestButtons();
+    prestashop.on('updatedProduct', (data) => {
+        id_product = $('#product-details').data('product').id_product;
+        id_product_attribute = $('#product-details').data('product').id_product_attribute;
+        quantity = $('#product-details').data('product').quantity_wanted;
+        initPaymentRequestButtons(amountTtl * quantity);
     });
 });
 
-function initPaymentRequestButtons()
+function initPaymentRequestButtons(amount = null)
 {
-    if(typeof amount !== 'undefined' && amount != null) {
-        amountTtl = amount;
+    if(typeof amount == 'undefined' || amount == null) {
+         amount = amountTtl;
     }
 
-    var id_customer;
     var obj = jQuery.parseJSON(carriersRequest);
     var shipping_options = new Array();
-    var cmpt = 0;
-    for (var prop in obj) {
-        shipping_options[cmpt] = {
-            id: obj[prop]['id_carrier'],
-            label: obj[prop]['name'],
-            detail: obj[prop]['delay'],
-            amount: obj[prop]['price'],
-        }
-        cmpt++;
-    }
 
     if(typeof productPayment != 'undefined' && productPayment === true) {
         paymentRequest = stripe_request_api.paymentRequest({
@@ -58,7 +67,7 @@ function initPaymentRequestButtons()
             currency: currencyStripe.toLowerCase(),
             total: {
                 label: 'Amount',
-                amount: amount_ttl,
+                amount: amount,
             },
             requestPayerEmail: true,
             requestPayerName: true,
@@ -72,23 +81,41 @@ function initPaymentRequestButtons()
             currency: currencyStripe.toLowerCase(),
             total: {
                 label: 'Amount',
-                amount: amount_ttl,
+                amount: amount,
             },
         });
     }
 
- 	paymentRequest.on('source', function(ev) {
+    elements_pr = stripe_request_api.elements({locale:stripeLanguageIso});
+    prButton = elements_pr.create('paymentRequestButton', {
+        paymentRequest: paymentRequest,
+    });
+
+    // Check the availability of the Payment Request API first.
+    paymentRequest.canMakePayment().then(function(result) {
+        if (result) {
+            $('.stripe_or').show();
+            prButton.mount('#payment-request-button');
+        } else {
+            $('#payment-request-button').hide();
+        }
+    });
+
+    paymentRequest.on('source', function(ev) {
         if(typeof productPayment != 'undefined' && productPayment === true) {
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
                 url: paymentRequestUrlStripe,
                 data: {
-                    addressInfos: ev.shippingAddress,
-                    carrierInfos: ev.shippingOption.id,
+                    address: ev.shippingAddress,
+                    carrier: ev.shippingOption.id,
                     payerEmail: ev.payerEmail,
                     payerName: ev.payerName,
                     onToken: true,
+                    id_product: id_product,
+                    id_product_attribute: id_product_attribute,
+                    quantity: quantity,
                 },
                 success: function(data) {
                     var owner_info = {
@@ -104,11 +131,11 @@ function initPaymentRequestButtons()
                         email: ev.payerEmail,
                     };
 
-                    if (secure_mode == 1 && typeof ev.source.card.three_d_secure != 'undefined' && ev.source.card.three_d_secure != "not_supported") {
+                    if (secureMode == 1 && typeof ev.source.card.three_d_secure != 'undefined' && ev.source.card.three_d_secure != "not_supported") {
                         threeds_datas = ev;
                         stripe_request_api.createSource({
                             type: 'three_d_secure',
-                            amount: data,
+                            amount: data.total.amount,
                             currency: currency_stripe,
                             three_d_secure: {
                                 card: ev.source.id
@@ -140,11 +167,11 @@ function initPaymentRequestButtons()
                 email: ev.source.owner.email,
             };
 
-            if (secure_mode == 1 && typeof ev.source.card.three_d_secure != 'undefined' && ev.source.card.three_d_secure != "not_supported") {
+            if (secureMode == 1 && typeof ev.source.card.three_d_secure != 'undefined' && ev.source.card.three_d_secure != "not_supported") {
                 threeds_datas = ev;
                 stripe_request_api.createSource({
                     type: 'three_d_secure',
-                    amount: amount_ttl,
+                    amount: amountTtl,
                     currency: currency_stripe,
                     three_d_secure: {
                         card: ev.source.id
@@ -160,53 +187,6 @@ function initPaymentRequestButtons()
         }
     });
 
-    if(typeof productPayment != 'undefined' && productPayment === true) {
-        $('#resetPriceButton').on('click', function(ev) {
-            id_combination = $('#product-details').data('product').id_product_attribute;
-            if (!$('#product-details').data('product').quantity_wanted) {
-                quantity = 1;
-            } else {
-                quantity = $('#product-details').data('product').quantity_wanted;
-            }
-            idProduct = $('#product-details').data('product').id_product;
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: paymentRequestUrlStripe,
-                data: {
-                    product: idProduct,
-                    productCombination: id_combination,
-                    quantity: quantity,
-                    idCustomer: id_customer,
-                },
-                success: function(data) {
-                    paymentRequest.update({
-                        total: {
-                            label: 'Amount',
-                            amount: data,
-                        },
-                    });
-                    //trigger click pour open la popin
-                    $('#payment-request-button').trigger('click');
-                },
-                error: function(err) {
-                    console.log(err.statusText);
-                }
-            });
-        });
-    } else {
-        $('#resetPriceButton').on('click', function(ev) {
-            $('#payment-request-button').trigger('click');
-        });
-    }
-
-    $('#payment-request-button').on('click', function(ev) {
-        // Check the availability of the Payment Request API first.
-        paymentRequest.canMakePayment().then(function(result) {
-            paymentRequest.show()
-        });
-    });
-
     paymentRequest.on('shippingaddresschange', function(ev) {
         $.ajax({
             type: 'POST',
@@ -214,23 +194,14 @@ function initPaymentRequestButtons()
             url: paymentRequestUrlStripe,
             data: {
                 address: ev.shippingAddress,
+                id_product: id_product,
+                id_product_attribute: id_product_attribute,
+                quantity: quantity,
                 shippingaddresschange: true,
             },
-            success: function(data) {
-                if(Number.isInteger(parseInt(data)) == true) {
-                    ev.updateWith({
-                        status: 'success',
-                        total: {
-                            label: 'Amount',
-                            amount: parseInt(data),
-                        },
-                    });
-                } else {
-                    console.log(data);
-                    ev.updateWith({
-                        status: 'fail',
-                    });
-                }
+            success: function(response) {
+                var responseJson = jQuery.parseJSON(response);
+                ev.updateWith(responseJson);
             },
             error: function(err) {
                 console.log(err.statusText);
@@ -245,16 +216,14 @@ function initPaymentRequestButtons()
             url: paymentRequestUrlStripe,
             data: {
                 carrier: ev.shippingOption.id,
+                id_product: id_product,
+                id_product_attribute: id_product_attribute,
+                quantity: quantity,
                 shippingoptionchange: true,
             },
-            success: function(data) {
-                ev.updateWith({
-                    status: 'success',
-                    total: {
-                        label: 'Amount',
-                        amount: parseInt(data),
-                    },
-                });
+            success: function(response) {
+                var responseJson = jQuery.parseJSON(response);
+                ev.updateWith(responseJson);
             },
             error: function(err) {
                 console.log(err.statusText);
@@ -279,21 +248,21 @@ function on3DSSource(result) {
             width: '100%'
         });
         Stripe.source.poll(
-                response.id,
-                response.client_secret,
-                function(status, source) {
-                    if (source.status == "chargeable") {
-                        $('#modal_stripe').modalStripe().close();
-                        createCharge(source, true);
-                    } else if (source.status == "failed") {
-                        $('#result_3d iframe').remove();
-                        $('#modal_stripe').modalStripe().close();
-                        $('#stripe-ajax-loader').hide();
-                        $('#stripe-payment-form').show();
-                        $('#card-errors').show();
-                        $form.find('#card-errors').text($('#stripe-card_declined').val()).fadeIn(1000);
-                    }
+            response.id,
+            response.client_secret,
+            function(status, source) {
+                if (source.status == "chargeable") {
+                    $('#modal_stripe').modalStripe().close();
+                    createCharge(source, true);
+                } else if (source.status == "failed") {
+                    $('#result_3d iframe').remove();
+                    $('#modal_stripe').modalStripe().close();
+                    $('#stripe-ajax-loader').hide();
+                    $('#stripe-payment-form').show();
+                    $('#card-errors').show();
+                    $form.find('#card-errors').text($('#stripe-card_declined').val()).fadeIn(1000);
                 }
+            }
         );
     } else if (response.status == "chargeable") {
         createCharge(response, true);

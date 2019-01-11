@@ -24,14 +24,13 @@
 *}
 
 {if $product.quantity > 0}
-    <span class="stripe_or"> - {l s='OR' mod='stripe_official'} - </span>
+    <div class="stripe_or"> - {l s='OR' mod='stripe_official'} - </div>
     <div class="row">
       <div class="col-xs-12">
           <div id="relative">
               <div class="request-payment">
-                  <button id="payment-request-button" type="button">{l s='Pay now' mod='stripe_official'}</button>
+                  <button id="payment-request-button" type="button"></button>
               </div>
-              <div id="resetPriceButton"></div>
           </div>
       </div>
     </div>

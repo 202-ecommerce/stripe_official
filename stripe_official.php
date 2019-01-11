@@ -17,7 +17,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__).'/libraries/sdk/stripe/init.php';
+require_once dirname(__FILE__) . '/libraries/sdk/stripe/init.php';
+require_once dirname(__FILE__) . '/classes/StripeLogger.php';
+require_once dirname(__FILE__) . '/classes/StripePaymentRequestHandler.php';
+require_once dirname(__FILE__) . '/classes/exceptions/StripePaymentRequestException.php';
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -436,7 +439,7 @@ class Stripe_official extends PaymentModule
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
     }
 
-    private function registerDomain($secret_key) {
+    protected function registerDomain($secret_key) {
         $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
         curl_setopt($curl, CURLOPT_FAILONERROR, true);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
@@ -1021,7 +1024,7 @@ class Stripe_official extends PaymentModule
         $this->createOrder($charge, $params, $product_page);
     }
 
-    private function createGuestForPaymentRequest($email, $name) {
+    protected function createGuestForPaymentRequest($email, $name) {
         $fullname = explode(' ', $name);
         $firstname = $fullname[0];
         $lastname = $fullname[1];
@@ -1057,7 +1060,7 @@ class Stripe_official extends PaymentModule
      **
      ** @return: (none)
      */
-    private function addTentative($id_stripe, $name, $type, $amount, $refund, $currency, $result, $id_cart = 0, $mode = null)
+    protected function addTentative($id_stripe, $name, $type, $amount, $refund, $currency, $result, $id_cart = 0, $mode = null)
     {
         if ($id_cart == 0) {
             $id_cart = (int)$this->context->cart->id;
@@ -1113,7 +1116,7 @@ class Stripe_official extends PaymentModule
      ** @arg:
      ** @return: (none)
      */
-    private function getSectionShape()
+    protected function getSectionShape()
     {
         return 'stripe_step_'.(int)$this->section_shape++;
     }
@@ -1165,10 +1168,12 @@ class Stripe_official extends PaymentModule
         }
     }
 
+    /**
+     * Load JS var when APPLEPAY and GOOGLEPAY active on product page
+     */
     public function hookHeader()
     {
         $moduleId = Module::getModuleIdByName($this->name);
-
         $currencyAvailable = false;
         foreach (Currency::checkPaymentCurrencies($moduleId) as $currency) {
             if ($currency['id_currency'] == $this->context->currency->id) {
@@ -1176,9 +1181,11 @@ class Stripe_official extends PaymentModule
             }
         }
 
-        if (($this->context->controller->php_self == 'order' && $currencyAvailable === true) || ($this->context->controller->php_self == 'product' && $currencyAvailable === true)) {
+        if (($this->context->controller->php_self == 'order' && $currencyAvailable === true)
+            || ($this->context->controller->php_self == 'product' && $currencyAvailable === true)
+            ) {
             $amount = $this->context->cart->getOrderTotal();
-            $secure_mode = Configuration::get('STRIPE_SECURE');
+            $secureMode = Configuration::get('STRIPE_SECURE');
             $currency = $this->context->currency->iso_code;
             $publishable_key = $this->getPublishableKey();
             $language_iso = $this->context->language->iso_code;
@@ -1203,48 +1210,12 @@ class Stripe_official extends PaymentModule
             $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
             if ($this->context->controller->php_self == 'product') {
-                $currentProduct = new Product(Tools::getValue('id_product'));
-                $carriers = $currentProduct->getCarriers();
-                if (empty($carriers)) {
-                    $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
-                }
-            } else {
-                $carriers = Carrier::getCarriers($this->context->language->id, true, false, $this->context->country->id_zone);
-            }
-
-            if ($this->context->controller->php_self == 'product') {
                 $productPayment = true;
                 $productPrice = Product::getPriceStatic(Tools::getValue('id_product'), true, null, 2);
                 $amount = $this->isZeroDecimalCurrency($currency) ? $productPrice : $productPrice * 100;
-                if (isset($carriers[0])) {
-                    $c = new Carrier($carriers[0]['id_carrier']);
-                    if ($carriers[0]['shipping_method'] == 1) {
-                        $carrierPrice = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
-                    } else {
-                        $carrierPrice = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
-                    }
-                    $amount += $carrierPrice;
-                    if ($carrierPrice != 0) {
-                        $amount += round(($carrierPrice * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
-                    }
-                }
             } else {
                 $productPayment = false;
                 $productPrice = 0;
-            }
-
-            foreach ($carriers as &$carrier) {
-                $c = new Carrier($carrier['id_carrier']);
-
-                if ($carrier['shipping_method'] == 1) {
-                    $carrier['price'] = round($c->getMaxDeliveryPriceByWeight($this->context->country->id_zone) * 100);
-                } else {
-                    $carrier['price'] = round($c->getDeliveryPriceByPrice($amount, $this->context->country->id_zone) * 100);
-                }
-
-                if ($carrier['price'] != 0) {
-                    $carrier['price'] = round($carrier['price'] + ($carrier['price'] * $c->getTaxesRate($address_invoice) / 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 100) + (Configuration::get('PS_SHIPPING_HANDLING') * 20));
-                }
             }
 
             $currency = $this->context->currency->iso_code;
@@ -1253,8 +1224,8 @@ class Stripe_official extends PaymentModule
                 'must_enable_3ds' => $must_enable_3ds,
                 'mode' => Configuration::get('STRIPE_MODE'),
                 'currency_stripe' => $currency,
-                'amount_ttl' => $amount,
-                'secure_mode' => $secure_mode,
+                'amountTtl' => $amount,
+                'secureMode' => $secureMode,
                 'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
                 'billing_address' => Tools::jsonEncode($billing_address),
                 'module_dir' => $this->_path,
@@ -1262,7 +1233,7 @@ class Stripe_official extends PaymentModule
                 'StripePubKey' => $publishable_key,
                 'stripeLanguageIso' => $language_iso,
                 'productPayment' => $productPayment,
-                'carriersRequest' => Tools::jsonEncode($carriers),
+                'carriersRequest' => Tools::jsonEncode(array()),
                 'currencyStripe' => $currency,
                 'paymentRequestUrlStripe'=> $this->context->link->getModuleLink('stripe_official', 'paymentRequest', array(), true),
                 'productPrice'=> $productPrice,
@@ -1280,7 +1251,7 @@ class Stripe_official extends PaymentModule
                 $push_methods = true;
             }
 
-            if (($secure_mode && $must_enable_3ds) || $push_methods) {
+            if (($secureMode && $must_enable_3ds) || $push_methods) {
                 $this->context->controller->registerJavascript($this->name.'-modaljs', 'modules/'.$this->name.'/views/js/jquery.the-modal.js');
                 $this->context->controller->registerStylesheet($this->name.'-modalcss', 'modules/'.$this->name.'/views/css/the-modal.css');
             }
