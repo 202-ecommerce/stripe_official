@@ -1,5 +1,5 @@
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
+ * @copyright 2007-2019 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -173,7 +173,7 @@ function initStripeOfficial() {
             if (must_enable_3ds && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
                 stripe_v3.createSource({
                     type: 'three_d_secure',
-                    amount: amount_ttl,
+                    amount: amountTtl,
                     currency: currency_stripe,
                     three_d_secure: {
                         card: response.id

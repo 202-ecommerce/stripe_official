@@ -1,5 +1,5 @@
 {*
-* 2007-2018 PrestaShop
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2018 PrestaShop SA
+*	@copyright	2007-2019 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
@@ -30,10 +30,8 @@
     var stripe_error_msg = "{l s='An error occured during the request. Please contact us' mod='stripe_official'}";
     var stripe_customer_name = "{$customer_name}";
     var stripe_cart_id = {$stripe_cart_id};
-    var stripe_order_url = "{$stripe_order_url nofilter}";
     var stripe_customer_email = "{$stripe_customer_email}";
     var bank_payment_declined = "{l s='Payment failed.' mod='stripe_official'}";
-    var verification_url = "{$verification_url nofilter}";
 </script>
 
 {if $payment_method == 'sofort'}

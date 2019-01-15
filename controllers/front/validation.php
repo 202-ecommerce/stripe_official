@@ -37,7 +37,9 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             $pubKey = Configuration::get('STRIPE_PUBLISHABLE');
         }
 
-        $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) : $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
+        $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ?
+            $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) :
+            $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
 
         $this->context->smarty->assign(array(
             'stripe_source' => $stripe_source,
@@ -48,11 +50,34 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'return_order_page' => $order_page,
         ));
 
-        $this->context->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
-        $this->context->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
-        $this->context->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
-        $this->context->controller->registerStylesheet('stripe_official-frontcss', 'modules/stripe_official/views/css/front.css');
-        $this->context->controller->registerStylesheet('stripe_official-modal', 'modules/stripe_official/views/css/the-modal.css');
+        $this->context->controller->registerJavascript(
+            'stripe_official-paymentjs',
+            'modules/stripe_official/views/js/jquery.the-modal.js'
+        );
+        $this->context->controller->registerJavascript(
+            'stripe_official-payment_validation',
+            'modules/stripe_official/views/js//payment_validation.js'
+        );
+        $this->context->controller->registerJavascript(
+            'stripe_official-stipeV2',
+            'https://js.stripe.com/v2/',
+            array('server'=>'remote')
+        );
+        $this->context->controller->registerStylesheet(
+            'stripe_official-frontcss',
+            'modules/stripe_official/views/css/front.css'
+        );
+        $this->context->controller->registerStylesheet(
+            'stripe_official-modal',
+            'modules/stripe_official/views/css/the-modal.css'
+        );
+
+        $js_def = array(
+            'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
+            'return_order_page' => $order_page
+        );
+
+        Media::addJsDef($js_def);
 
         $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
     }

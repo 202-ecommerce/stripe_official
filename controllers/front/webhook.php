@@ -52,14 +52,18 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $payment_type = $event_json->data->object->source->type;
                 $id_payment = $event_json->data->object->id;
                 if ($payment_type == 'sofort') {
-                    $stripe_payment = Db::getInstance()->getRow('SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment WHERE `id_stripe` = "' . pSQL($id_payment) . '"');
+                    $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'stripe_payment
+                            WHERE `id_stripe` = "' . pSQL($id_payment) . '"';
+                    $stripe_payment = Db::getInstance()->getRow($sql);
                     if ($stripe_payment) {
                         $id_order = Order::getOrderByCartId($stripe_payment['id_cart']);
                         $order = new Order($id_order);
                         if (Validate::isLoadedObject($order)) {
                             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
                         }
-                        Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 0 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
+                        $sql = 'UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 0
+                                WHERE `id_stripe` = "'.pSQL($id_payment).'"';
+                        Db::getInstance()->Execute($sql);
                     }
                 }
             }
@@ -67,14 +71,18 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $payment_type = $event_json->data->object->source->type;
                 $id_payment = $event_json->data->object->id;
                 if ($payment_type == 'sofort') {
-                    $stripe_payment = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($id_payment).'"');
+                    $sql = 'SELECT * FROM '._DB_PREFIX_.'stripe_payment
+                            WHERE `id_stripe` = "'.pSQL($id_payment).'"';
+                    $stripe_payment = Db::getInstance()->getRow($sql);
                     if ($stripe_payment['result'] == Stripe_official::_PENDING_SOFORT_) {
                         $id_order = Order::getOrderByCartId($stripe_payment['id_cart']);
                         $order = new Order($id_order);
                         if (Validate::isLoadedObject($order)) {
                             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
                         }
-                        Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 1 WHERE `id_stripe` = "'.pSQL($id_payment).'"');
+                        $sql = 'UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = 1
+                                WHERE `id_stripe` = "'.pSQL($id_payment).'"';
+                        Db::getInstance()->Execute($sql);
                     } else {
                         die('Payment is not in state pending');
                     }

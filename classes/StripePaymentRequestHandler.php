@@ -14,7 +14,6 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -69,7 +68,7 @@ class StripePaymentRequestHandler
     /**
      * changeCartProducts
      */
-    public function changeCartProducts($cleanOther = true)
+    public function changeCartProducts()
     {
         $products = $this->cart->getProducts();
 

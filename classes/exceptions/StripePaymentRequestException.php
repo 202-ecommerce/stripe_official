@@ -21,4 +21,3 @@ if (!defined('_PS_VERSION_')) {
 class StripePaymentRequestException extends \Exception
 {
 }
-
