@@ -13,22 +13,23 @@
 
     <target name="package-zip" depends="build-common" description="Create ZIP package">
         <echo>Create ZIP package</echo>
-        <exec executable="${PACKAGE_ZIP_PATH}" failonerror="true">
+        <exec executable="${env.TOTBUILDER_PATH}tot-package.sh" failonerror="true">
             <arg value="prod" />
             <arg value="${TARGETNAME}" />
             <arg value="${TARGETBRANCH}" />
             <arg value="${TARGETVERSION}" />
-            <arg value="${BUILD_TAG}" />
             <arg value="${env.BUILD_TAG}" />
+            <arg value="${env.GIT_URL}" />
         </exec>
     </target>
 
     <target name="psvalidator" description="Send Prestashop Validator">
-        <echo>Create ZIP package</echo>
+        <echo>Send Prestashop Validator</echo>
         <exec executable="php" failonerror="true">
-            <arg value="/var/www/totbuilder/bin/console" />
-            <arg value="psvalidator:validate" />
-            <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip" />
+            <arg value="${env.TOTBUILDER_PATH}console"/>
+            <arg value="psvalidator:validate"/>
+            <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip"/>
+            <arg value="${env.BUILD_NUMBER}"/>
         </exec>
     </target>
 
