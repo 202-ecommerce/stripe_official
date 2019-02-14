@@ -23,6 +23,20 @@ $(document).ready(function() {
         }
         initStripeOfficial();
     }
+
+    prestashop.on('updateCart', function() {
+        $.ajax({
+            url: ajaxStripePrice,
+            type: 'POST',
+            dataType: 'html'
+        })
+        .done(function(datas) {
+            amount_ttl = datas;
+        })
+        .fail(function() {
+            console.log("error");
+        })
+    });
 });
 
 

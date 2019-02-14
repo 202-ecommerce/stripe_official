@@ -1624,6 +1624,7 @@ class Stripe_official extends PaymentModule
 
         $domain = $context->link->getBaseLink($context->shop->id, true);
         $ajax_link = $context->link->getModuleLink('stripe_official', 'ajax', array(), true);
+        $ajaxStripePrice = $context->link->getModuleLink('stripe_official', 'ajaxprice', array(), true);
         $this->context->smarty->assign(
             array(
                 'publishableKey' => $this->getPublishableKey(),
@@ -1636,6 +1637,7 @@ class Stripe_official extends PaymentModule
                 'module_dir' => $this->_path,
                 'billing_address' => Tools::jsonEncode($billing_address),
                 'ajaxUrlStripe' => $ajax_link,
+                'ajaxStripePrice' => $ajaxStripePrice,
                 'amount_ttl' => $amount,
                 'stripeLanguageIso' => $this->context->language->iso_code,
             )

@@ -105,6 +105,7 @@
   var billing_address = {$billing_address nofilter};
   var module_dir = "{$module_dir}";
   var ajaxUrlStripe = "{$ajaxUrlStripe nofilter}";
+  var ajaxStripePrice = "{$ajaxStripePrice nofilter}";
   var StripePubKey = "{$publishableKey}";
   var stripeLanguageIso = "{$stripeLanguageIso}";
 </script>
