@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ShoppingFeed addons" default="build" basedir="../">
+<project name="Stripe addons" default="build" basedir="../">
     <property environment="env" />
     <property name="build-dir" value="${basedir}/202/build" />
     <property name="src-dir" value="${basedir}" />
     <property name="TARGETNAME" value="stripe_official" />
-    <property name="TARGETBRANCH" value="release/1.6" />
+    <property name="TARGETBRANCH" value="${env.GIT_BRANCH}" />
     <property name="TARGETVERSION" value="1.6.0" />
+    <property name="PHPVERSION" value="5.6" />
+    <property name="PSVERSION" value="1.7.5.x" />
 
-    <target name="build" depends="build-common,package-zip,psvalidator" />
+    <target name="build" depends="build-common,package-zip,psvalidator,tot-testing" />
 
     <target name="build-common" depends="lint,prepare,npm,doc" />
 
@@ -33,6 +35,17 @@
         </exec>
     </target>
 
+    <target name="tot-testing" description="Create prestashop environment and execute unit tests">
+        <exec executable="${env.TOTBUILDER_PATH}tot-testing.sh" failonerror="true">
+            <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip" />
+            <arg value="${TARGETNAME}" />
+            <arg value="${env.WORKSPACE}/" />
+            <arg value="${PHPVERSION}" />
+            <arg value="${PSVERSION}" />
+            <arg value="${env.TOTBUILDER_PATH}" />
+        </exec>
+    </target>
+
     <target name="lint" description="Perform syntax check of sourcecode files">
         <apply executable="php" failonerror="false">
             <arg value="-l" />
@@ -49,11 +62,13 @@
         <echo>Cleaning out the build artifacts</echo>
         <delete dir="${build-dir}/packages" />
         <delete dir="${build-dir}/logs" />
+        <delete dir="${build-dir}/coverage" />
     </target>
     <target name="prepare" depends="clean-build" description="Prepare for build">
         <echo>Making the build artifact folders</echo>
         <mkdir dir="${build-dir}/packages" />
         <mkdir dir="${build-dir}/logs" />
+        <mkdir dir="${build-dir}/coverage" />
     </target>
 
     <!-- start composer -->
