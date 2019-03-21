@@ -17,7 +17,8 @@
   'use strict';
 
   // Create references to the submit button.
-  const submitButton = document.getElementById('payment-confirmation').querySelector('button[type=submit]');
+  const $submit = $('#payment-confirmation > .ps-shown-by-js > button');
+  const submitInitialText = $submit.text();
 
   // Global variable to store the PaymentIntent object.
   let paymentIntent;
@@ -27,14 +28,10 @@
   */
 
   // Create a Stripe client.
-  const stripe = Stripe(stripe_pk, {
-    betas: ['payment_intent_beta_3'],
-  });
+  const stripe = Stripe(stripe_pk, { betas: ['payment_intent_beta_3'] });
 
-  // Create an instance of Elements.
+  // Create an instance of Elements and prepare the CSS
   const elements = stripe.elements();
-
-  // Prepare the styles for Elements.
   const style = JSON.parse(stripe_css);
 
   // Create a Card Element and pass some custom styles to it.
@@ -46,10 +43,43 @@
     // Monitor change events on the Card Element to display any errors.
     card.on('change', ({error}) => {
       updateError(error);
-
-      // Re-enable the Pay button.
-      submitButton.disabled = false;
     });
+
+    // Create the payment request (browser based payment button).
+    const paymentRequest = stripe.paymentRequest({
+      country: stripe_merchant_country_code, currency: stripe_currency,
+      total: { label: 'Total', amount: stripe_amount }, requestPayerEmail: true
+    });
+
+    // Callback when a source is created.
+    paymentRequest.on('source', async event => {
+      // Confirm the PaymentIntent with the source returned from the payment request.
+      const { error } = await stripe.confirmPaymentIntent(
+        stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
+      );
+
+      if (error) {
+        // Report to the browser that the payment failed.
+        event.complete('fail');
+        updateError({error});
+      } else {
+        // Report to the browser that the confirmation was successful, prompting
+        // it to close the browser payment method collection interface.
+        event.complete('success');
+        // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
+        const response = await stripe.handleCardPayment(stripe_client_secret);
+        handlePayment(response);
+      }
+    });
+
+    // Create the Payment Request Button.
+    const prButton = elements.create('paymentRequestButton', { paymentRequest });
+
+    // Check if the Payment Request is available.
+    if (await paymentRequest.canMakePayment()) {
+      prButton.mount('#stripe-payment-request-button');
+      // TODO: show additional instructions
+    }
   }
 
   // Create a IBAN Element and pass the right options for styles and supported countries.
@@ -61,9 +91,6 @@
     // Monitor change events on the IBAN Element to display any errors.
     iban.on('change', ({error, bankName}) => {
       updateError(error);
-
-      // Re-enable the Pay button.
-      submitButton.disabled = false;
     });
   }
 
@@ -78,50 +105,6 @@
     idealBank.mount('#stripe-ideal-bank-element');
   }
 
-  // Create the payment request (browser based payment button).
-  const paymentRequest = stripe.paymentRequest({
-    country: stripe_merchant_country_code,
-    currency: stripe_currency,
-    total: { label: 'Total', amount: stripe_amount },
-    requestPayerEmail: true
-  });
-
-  // Callback when a source is created.
-  paymentRequest.on('source', async event => {
-    // Confirm the PaymentIntent with the source returned from the payment request.
-    const {error} = await stripe.confirmPaymentIntent(
-      stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
-    );
-
-    if (error) {
-      // Report to the browser that the payment failed.
-      event.complete('fail');
-      handlePayment({error});
-    } else {
-      // Report to the browser that the confirmation was successful, prompting
-      // it to close the browser payment method collection interface.
-      event.complete('success');
-      // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
-      const response = await stripe.handleCardPayment(stripe_client_secret);
-      handlePayment(response);
-    }
-  });
-
-  // Create the Payment Request Button.
-  const paymentRequestButton = elements.create('paymentRequestButton', {
-    paymentRequest
-  });
-
-  // Check if the Payment Request is available (or Apple Pay on the Web).
-  const paymentRequestSupport = await paymentRequest.canMakePayment();
-
-  if (paymentRequestSupport) {
-    // Display the Pay button by mounting the Element in the DOM.
-    paymentRequestButton.mount('#stripe-payment-request-button');
-    // Show the payment request section.
-    document.getElementById('payment-request').classList.add('visible');
-  }
-
   /**
   * Handle the form submission.
   *
@@ -132,30 +115,28 @@
   * or Apple Pay, Google Pay, and Microsoft Pay since they provide name and
   * shipping information directly.
   */
-  $('#payment-confirmation > .ps-shown-by-js > button').click(async event => {
+  $submit.click(async event => {
     if (!$('.stripe-payment-form:visible').length) {
-      return;
+      return true;
     }
 
     // Retrieve the payment method.
-    const form = $('.stripe-payment-form:visible');
-    const payment = $('input[name="stripe-payment-method"]', form).val();
+    const $form = $('.stripe-payment-form:visible');
+    const payment = $('input[name="stripe-payment-method"]', $form).val();
 
     // Disable the Pay button to prevent multiple click events.
-    submitButton.disabled = true;
-    submitButton.textContent = 'Processing…';
+    disableSubmit('Processing…');
 
     if (payment === 'card') {
       // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
       const response = await stripe.handleCardPayment(
-        stripe_client_secret, card, { source_data: { owner: { name } } }
+        stripe_client_secret, card, { source_data: { owner: { name: stripe_fullname } } }
       );
       handlePayment(response);
     } else if (payment === 'sepa_debit') {
       // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
       const response = await stripe.confirmPaymentIntent(
-        stripe_client_secret, iban,
-        {
+        stripe_client_secret, iban, {
           source_data: {
             type: 'sepa_debit', owner: { name: stripe_fullname, email: stripe_email },
             mandate: { notification_method: 'email' }
@@ -166,31 +147,28 @@
     } else {
       // Prepare all the Stripe source common data.
       const sourceData = {
-        type: payment,
-        amount: stripe_amount,
-        currency: stripe_currency,
+        type: payment, amount: stripe_amount, currency: stripe_currency,
         owner: { name: stripe_fullname, email: stripe_email },
-        redirect: { return_url: window.location.href },
-        statement_descriptor: 'Stripe Payments Demo',
+        redirect: { return_url: stripe_return_url },
         metadata: { paymentIntent: stripe_payment_id }
       };
 
       // Add extra source information which are specific to a payment method.
       switch (payment) {
         case 'ideal':
-        // iDEAL: Add the selected Bank from the iDEAL Bank Element.
-        const {source} = await stripe.createSource(idealBank, sourceData);
-        handleSourceActivation(source);
-        return;
-        break;
+          // iDEAL: Add the selected Bank from the iDEAL Bank Element.
+          const {source} = await stripe.createSource(idealBank, sourceData);
+          handleSourceActivation(source);
+          return;
+          break;
         case 'sofort':
-        // SOFORT: The country is required before redirecting to the bank.
-        sourceData.sofort = { stripe_address_country_code };
-        break;
+          // SOFORT: The country is required before redirecting to the bank.
+          sourceData.sofort = { stripe_address_country_code };
+          break;
       }
 
       // Create a Stripe source with the common data and extra information.
-      console.log(sourceData);
+      // console.log(sourceData);
       const {source} = await stripe.createSource(sourceData);
       handleSourceActivation(source);
     }
@@ -202,159 +180,100 @@
   });
 
   // Handle new PaymentIntent result
-  const handlePayment = paymentResponse => {
-    const {paymentIntent, error} = paymentResponse;
-
-    const checkoutElement = document.getElementById('checkout');
-    const confirmationElement = document.getElementById('confirmation');
-
-    if (error) {
-      updateError(error);
-    } else if (paymentIntent.status === 'succeeded') {
-      // Success! Payment is confirmed. Update the interface to display the confirmation screen.
-      checkoutElement.classList.remove('processing');
-      checkoutElement.classList.remove('receiver');
-      // Update the note about receipt and shipping (the payment has been fully confirmed by the bank).
-      confirmationElement.querySelector('.note').innerText =
-      'We just sent your receipt to your email address, and your items will be on their way shortly.';
-      checkoutElement.classList.add('success');
-    } else if (paymentIntent.status === 'processing') {
-      // Success! Now waiting for payment confirmation. Update the interface to display the confirmation screen.
-      checkoutElement.classList.remove('processing');
-      // Update the note about receipt and shipping (the payment is not yet confirmed by the bank).
-      confirmationElement.querySelector('.note').innerText =
-      'We’ll send your receipt and ship your items as soon as your payment is confirmed.';
-      checkoutElement.classList.add('success');
+  function handlePayment(response) {
+    if (response.error) {
+      updateError(response.error);
     } else {
-      // Payment has failed.
-      checkoutElement.classList.remove('success');
-      checkoutElement.classList.remove('processing');
-      checkoutElement.classList.remove('receiver');
-      checkoutElement.classList.add('error');
+      window.location.replace(stripe_return_url);
     }
-  };
+  }
 
   // Handle activation of payment sources not yet supported by PaymentIntents
-  const handleSourceActivation = source => {
-    const checkoutElement = document.getElementById('checkout');
-    const confirmationElement = document.getElementById('confirmation');
+  function handleSourceActivation(source) {
     switch (source.flow) {
       case 'none':
-      // Normally, sources with a `flow` value of `none` are chargeable right away,
-      // but there are exceptions, for instance for WeChat QR codes just below.
-      if (source.type === 'wechat') {
-        // Display the QR code.
-        const qrCode = new QRCode('wechat-qrcode', {
-          text: source.wechat.qr_code_url,
-          width: 128,
-          height: 128,
-          colorDark: '#424770',
-          colorLight: '#f8fbfd',
-          correctLevel: QRCode.CorrectLevel.H,
-        });
-        // Hide the previous text and update the call to action.
-        form.querySelector('.payment-info.wechat p').style.display = 'none';
-        let amount = store.formatPrice(
-          stripe_amount,
-          stripe_currency
-        );
-        submitButton.textContent = `Scan this QR code on WeChat to pay ${amount}`;
-        // Start polling the PaymentIntent status.
-        pollPaymentIntentStatus(stripe_payment_id, 300000);
-      } else {
-        console.log('Unhandled none flow.', source);
-      }
-      break;
-      case 'redirect':
-      // Immediately redirect the customer.
-      submitButton.textContent = 'Redirecting…';
-      window.location.replace(source.redirect.url);
-      break;
-      case 'code_verification':
-      // Display a code verification input to verify the source.
-      break;
-      case 'receiver':
-      // Display the receiver address to send the funds to.
-      checkoutElement.classList.add('success', 'receiver');
-      const receiverInfo = confirmationElement.querySelector(
-        '.receiver .info'
-      );
-      let amount = store.formatPrice(source.amount, stripe_currency);
-      switch (source.type) {
-        case 'multibanco':
-        // Display the Multibanco payment information to the user.
-        const multibanco = source.multibanco;
-        receiverInfo.innerHTML = `
-        <ul>
-        <li>Amount (Montante): <strong>${amount}</strong></li>
-        <li>Entity (Entidade): <strong>${multibanco.entity}</strong></li>
-        <li>Reference (Referencia): <strong>${multibanco.reference}</strong></li>
-        </ul>`;
+        // Sources with flow as none don't require any additional action
+        if (source.type === 'wechat') {
+          // Display the QR code.
+          const qrCode = new QRCode('stripe-wechat-qrcode', {
+            text: source.wechat.qr_code_url, width: 128, height: 128,
+            colorDark: '#424770', colorLight: '#f8fbfd', correctLevel: QRCode.CorrectLevel.H,
+          });
+
+          // Hide the previous text and update the call to action.
+          $(".stripe-wechat-before").hide();
+          $(".stripe-wechat-after").show();
+
+          // Start polling the PaymentIntent status.
+          pollPaymentIntentStatus();
+        }
         break;
-        default:
-        console.log('Unhandled receiver flow.', source);
-      }
-      // Poll the PaymentIntent status.
-      pollPaymentIntentStatus(stripe_payment_id);
-      break;
+      case 'redirect':
+        disableSubmit('Redirecting…');
+        window.location.replace(source.redirect.url);
+        break;
+      case 'receiver':
+        // Display the receiver address to send the funds to.
+        // TODO: move this to order confirmation
+        checkoutElement.classList.add('success', 'receiver');
+        const receiverInfo = confirmationElement.querySelector(
+          '.receiver .info'
+        );
+        let amount = store.formatPrice(source.amount, stripe_currency);
+        switch (source.type) {
+          case 'multibanco':
+          // Display the Multibanco payment information to the user.
+          const multibanco = source.multibanco;
+          receiverInfo.innerHTML = `
+          <ul>
+          <li>Amount (Montante): <strong>${amount}</strong></li>
+          <li>Entity (Entidade): <strong>${multibanco.entity}</strong></li>
+          <li>Reference (Referencia): <strong>${multibanco.reference}</strong></li>
+          </ul>`;
+          break;
+          default:
+          console.log('Unhandled receiver flow.', source);
+        }
+        // Poll the PaymentIntent status.
+        pollPaymentIntentStatus();
+        break;
       default:
       // Customer's PaymentIntent is received, pending payment confirmation.
       break;
     }
-  };
+  }
 
-  /**
-  * Monitor the status of a source after a redirect flow.
-  *
-  * This means there is a `source` parameter in the URL, and an active PaymentIntent.
-  * When this happens, we'll monitor the status of the PaymentIntent and present real-time
-  * information to the user.
-  */
-
-  const pollPaymentIntentStatus = async (
-    paymentIntent,
-    timeout = 30000,
-    interval = 500,
-    start = null
-  ) => {
-    start = start ? start : Date.now();
+  async function pollPaymentIntentStatus() {
     const endStates = ['succeeded', 'processing', 'canceled'];
     // Retrieve the PaymentIntent status from our server.
-    const rawResponse = await fetch(`payment_intents/${paymentIntent}/status`);
-    const response = await rawResponse.json();
-    if (
-      !endStates.includes(response.paymentIntent.status) &&
-      Date.now() < start + timeout
-    ) {
-      // Not done yet. Let's wait and check again.
-      setTimeout(
-        pollPaymentIntentStatus,
-        interval,
-        paymentIntent,
-        timeout,
-        interval,
-        start
-      );
+    const response = await stripe.retrievePaymentIntent(stripe_client_secret);
+    console.log(response.paymentIntent.status);
+    if (!endStates.includes(response.paymentIntent.status)) {
+      setTimeout(pollPaymentIntentStatus, 1000); // Every second
     } else {
       handlePayment(response);
-      if (!endStates.includes(response.paymentIntent.status)) {
-        // Status has not changed yet. Let's time out.
-        console.warn(new Error('Polling timed out.'));
-      }
     }
   };
-
-  const url = new URL(window.location.href);
-  const checkoutElement = document.getElementById('checkout');
-  // Update the interface to display the processing screen.
-  checkoutElement.classList.add('checkout', 'success', 'processing');
 
   // Update error message
-  const updateError = (error) => {
+  function updateError(error) {
+    const $error = $(".stripe-payment-form:visible .stripe-error-message");
     if (error) {
-      $(".stripe-payment-form:visible .stripe-error-message").text(error.message).show();
+      $error.text(error.message).show();
+      disableSubmit();
     } else {
-      $(".stripe-payment-form:visible .stripe-error-message").text("").hide();
+      $error.text("").hide();
+      enableSubmit();
     }
-  };
+  }
+
+  function disableSubmit(text) {
+    $submit.prop('disabled', true);
+    $submit.text(text ? text : submitInitialText);
+  }
+
+  function enableSubmit() {
+    $submit.prop('disabled', false);
+    $submit.text(submitInitialText);
+  }
 })();

@@ -33,12 +33,7 @@ function upgrade_module_1_6_0($module)
 
     if (!Configuration::updateValue('STRIPE_ENABLE_APPLEPAY', 0)
         || !Configuration::updateValue('STRIPE_ENABLE_GOOGLEPAY', 0)
-        || !Configuration::updateValue('STRIPE_PRODUCT_PAYMENT', 0)
         || !Configuration::updateValue('STRIPE_MINIMUM_AMOUNT_3DS', 50)) {
-        return false;
-    }
-
-    if (!$module->registerHook('displayProductAdditionalInfo')) {
         return false;
     }
 

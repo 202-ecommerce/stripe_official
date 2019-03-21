@@ -72,13 +72,15 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'modules/stripe_official/views/css/the-modal.css'
         );
 
-        $js_def = array(
+        Media::addJsDef(array(
             'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
             'return_order_page' => $order_page
-        );
-
-        Media::addJsDef($js_def);
+        ));
 
         $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
+    }
+
+    public function postProcess() {
+      var_dump($_POST);
     }
 }

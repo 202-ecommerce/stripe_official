@@ -23,7 +23,7 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form" action="#">
+<form class="stripe-payment-form" action="">
   <input type="hidden" name="stripe-payment-method" value="alipay">
   <div class="stripe-error-message"></div>
 </form>

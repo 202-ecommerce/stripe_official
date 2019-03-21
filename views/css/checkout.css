@@ -1,7 +1,9 @@
 /* styles */
-.stripe-payment-form { max-width: 600px; margin: auto; padding: 10px 15px; }
+.stripe-payment-form { max-width: 600px; margin: 0 auto; padding: 10px 15px; }
 #stripe-card-element,
-#stripe-iban-element,
-#stripe-ideal-bank-element { padding: 12px; border: 1px solid #31325f; border-radius: 5px; }
+#stripe-iban-element { padding: 12px; border: 1px solid #31325f; border-radius: 5px; }
+#stripe-ideal-bank-element { border: 1px solid #31325f; border-radius: 5px; }
+#stripe-wechat-qrcode { margin: 0 auto 10px; width: 128px; }
+.stripe-wechat-after { text-align: center; }
 
 .stripe-error-message { margin: 5px 0; padding: 5px 10px; font-size: 12px; color: #d8000c; }

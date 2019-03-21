@@ -883,30 +883,10 @@ class Stripe_official extends PaymentModule
     Db::getInstance()->Execute($sql);
   }
 
-  public function updateConfigurationKey($oldKey, $newKey, $defaultValue)
-  {
-    if (Configuration::hasKey($oldKey)) {
-      $set = '';
-
-      if ($oldKey == '_PS_STRIPE_secure' && Configuration::get($oldKey) == '0') {
-        $set = ',`value`=2';
-      }
-
-      $sql = "UPDATE `"._DB_PREFIX_."configuration`
-      SET `name`='".pSQL($newKey)."'".$set."
-      WHERE `name`='".pSQL($oldKey)."'";
-
-      return Db::getInstance()->execute($sql);
-    } else {
-      Configuration::updateValue($newKey, $defaultValue);
-      return true;
-    }
-  }
-
   public function hookDisplayBackOfficeHeader($params)
   {
     if (Tools::getIsset('controller') && Tools::getValue('controller') == 'AdminModules' &&
-    Tools::getIsset('configure') && Tools::getValue('configure') == $this->name) {
+        Tools::getIsset('configure') && Tools::getValue('configure') == $this->name) {
       Media::addJsDef(array(
         'transaction_refresh_url' => $this->context->link->getAdminLink(
           'adminAjaxTransaction', true, array(),
@@ -927,16 +907,21 @@ class Stripe_official extends PaymentModule
     }
 
     $currency = $this->context->currency->iso_code;
-    $amount = $this->context->cart->getOrderTotal();
-    $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
     $address = new Address($this->context->cart->id_address_invoice);
+    $country = Country::getIsoById($address->id_country);
 
-    // The payment intent for this order
+    // Check that there is at least one Stripe Payment option
+    if (count($this->getPaymentMethods($country, $currency)) == 0) {
+      return;
+    }
+
+    // The total amount and payment intent for this order
+    $amount = $this->context->cart->getOrderTotal();
+    $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
     $intent = $this->retrievePaymentIntent($amount, $currency);
 
     if (!$intent) {
-      // Problem with the payment intent creation... TODO: log/alert
       return;
     }
 
@@ -949,10 +934,7 @@ class Stripe_official extends PaymentModule
       'stripe_merchant_country_code' => $merchantCountry->iso_code,
       'stripe_payment_id' => $intent->id,
       'stripe_client_secret' => $intent->client_secret,
-
-      'stripe_baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
-      'stripe_module_dir' => $this->_path,
-      'stripe_verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
+      'stripe_return_url' => $this->context->link->getModuleLink('stripe_official', 'validation'),
 
       'stripe_currency' => strtolower($currency),
       'stripe_amount' => $amount,
@@ -967,7 +949,7 @@ class Stripe_official extends PaymentModule
       'stripe_address_city' => $address->city,
       'stripe_address_zip_code' => $address->postcode,
       'stripe_address_country' => $address->country,
-      'stripe_address_country_code' => Country::getIsoById($address->id_country),
+      'stripe_address_country_code' => $country,
 
       'stripe_phone' => $address->phone_mobile ?: $address->phone,
       'stripe_email' => $this->context->customer->email,
@@ -1012,27 +994,46 @@ class Stripe_official extends PaymentModule
   */
   private function retrievePaymentIntent($amount, $currency)
   {
+    // Check for existing intent for that session
     if (isset($this->context->cookie->stripe_payment_intent)) {
       try {
         $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
-        // Check that the amount is still correct
-        if ($intent->amount != $amount) {
-          $intent->update(["amount" => $amount]);
-        }
+        // Check status
+        if ($this->isPaymentIntentClosed($intent)) {
+          // This probably means the user didn't return to the shop and we couldn't clean his session
+          unset($this->context->cookie->stripe_payment_intent);
+        } else {
+          // Check that the cart/amount is still correct
+          // Note: we could create a new intent for a new cart but since he
+          // probably just forgot a product, there is no need to track this
+          if ($intent->metadata['ps_cart_id'] != $this->context->cart->id) {
+            $intent->update([
+              "amount" => $amount,
+              "metadata" => ["ps_cart_id" => $this->context->cart->id]
+            ]);
+          } elseif ($intent->amount != $amount) {
+            $intent->update(["amount" => $amount]);
+          }
 
-        return $intent;
+          return $intent;
+        }
       } catch (Exception $e) {
         unset($this->context->cookie->stripe_payment_intent);
         error_log($e->getMessage());
       }
     }
 
+    // No existing intent, let's create a new one
     try {
       $intent = \Stripe\PaymentIntent::create([
         "amount" => $amount,
         "currency" => $currency,
-        "payment_method_types" => [array_keys(self::$paymentMethods)],
+        "payment_method_types" => [ array_keys(self::$paymentMethods) ],
+        "metadata" => [
+          "ps_cart_id" => $this->context->cart->id,
+          "ps_verification_url" => Configuration::get('PS_SHOP_DOMAIN')
+        ]
       ]);
 
       // Keep the payment intent ID in session
@@ -1045,12 +1046,43 @@ class Stripe_official extends PaymentModule
   }
 
   /*
+  ** Retrieve the current payment intent or create a new one
+  */
+  public function isPaymentIntentOpen($intent)
+  {
+    return in_array($intent->status, ['succeeded', 'processing', 'canceled']);
+  }
+
+  /*
+  ** Hook payment options
+  */
+  public function getPaymentMethods($country, $currency)
+  {
+    $paymentMethods = array();
+    foreach (self::$paymentMethods as $name => $paymentMethod) {
+      // Check for country support
+      if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
+        //continue; // TODO: uncomment after development
+      }
+
+      // Check for currency support
+      if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+        //continue; // TODO: uncomment after development
+      }
+
+      $paymentMethods[$name] = $paymentMethod;
+    }
+
+    return $paymentMethods;
+  }
+
+  /*
   ** Hook payment options
   */
   public function hookPaymentOptions($params)
   {
     if (!$this->active) {
-      return;
+      return array();
     }
 
     // Fetch country based on invoice address and currency
@@ -1060,21 +1092,12 @@ class Stripe_official extends PaymentModule
 
     // Show only the payment methods that are relevant to the selected country and currency
     $options = array();
-    foreach (self::$paymentMethods as $name => $paymentMethod) {
-      // Check for country support
-      if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
-        //continue;
-      }
-
-      // Check for currency support
-      if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
-        //continue;
-      }
-
+    foreach ($this->getPaymentMethods($country, $currency) as $name => $paymentMethod) {
       // The customer can potientially use this payment method
       $option = new PaymentOption();
       $option
       ->setModuleName($this->name)
+      ->setAction($this->context->link->getModuleLink('stripe_official', 'validation', array('payment_method' => $name)))
       //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
       ->setCallToActionText($this->l('Pay by ' . $paymentMethod['name']));
 
@@ -1111,10 +1134,8 @@ class Stripe_official extends PaymentModule
   {
     // @see: https://support.stripe.com/questions/which-zero-decimal-currencies-does-stripe-support
     $zeroDecimalCurrencies = array(
-      'BIF', 'CLP', 'DJF', 'GNF',
-      'JPY', 'KMF', 'KRW', 'MGA',
-      'PYG', 'RWF', 'UGX', 'VND',
-      'VUV', 'XAF', 'XOF', 'XPF'
+      'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA',
+      'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF'
     );
     return in_array($currency, $zeroDecimalCurrencies);
   }

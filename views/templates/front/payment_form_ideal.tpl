@@ -23,7 +23,7 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form" action="#">
+<form class="stripe-payment-form" action="">
   <input type="hidden" name="stripe-payment-method" value="ideal">
   <div id="stripe-ideal-bank-element" class="field"></div>
   <div class="stripe-error-message"></div>

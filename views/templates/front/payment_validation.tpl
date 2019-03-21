@@ -23,7 +23,34 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form" action="">
-  <input type="hidden" name="stripe-payment-method" value="giropay">
-  <div class="stripe-error-message"></div>
-</form>
+<head>
+    {block name='head'}
+        {include file='_partials/head.tpl'}
+    {/block}
+</head>
+
+<body>
+{hook h='displayAfterBodyOpeningTag'}
+<main>
+
+<p><h2>{l s='Transaction in progress, please wait.' mod='stripe_official'}</h2></p>
+
+<div id="modal_stripe_waiting"  class="modal" style="display: none">
+    <div id="stripe-ajax-loader-europe"><img src="/modules/stripe_official/views/img/ajax-loader.gif" alt="" />&nbsp;<br> <br>{l s='Transaction in progress, please wait.' mod='stripe_official'}</div>
+</div>
+
+<script>
+    var stripe_client_secret = "{$stripe_client_secret}";
+    var stripe_source = "{$stripe_source}";
+    var StripePubKey = "{$publishableKey}";
+</script>
+
+
+    <!-- Footer Ends -->
+    {block name='javascript_bottom'}
+        {include file="_partials/javascript.tpl" javascript=$javascript.bottom}
+    {/block}
+    {hook h='displayBeforeBodyClosingTag'}
+</main>
+
+</body>

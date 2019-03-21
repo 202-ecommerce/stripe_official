@@ -23,11 +23,10 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form" action="#">
+<form class="stripe-payment-form" action="">
   <input type="hidden" name="stripe-payment-method" value="wechat">
-  <div class="payment-info wechat">
-    <div id="wechat-qrcode"></div>
-    <p class="notice">Click the button below to generate a QR code for WeChat.</p>
-  </div>
+  <div id="stripe-wechat-qrcode"></div>
+  <p class="notice stripe-wechat-before">Click the button below to generate a QR code for WeChat.</p>
+  <p class="notice stripe-wechat-after" style="display: none;">Scan this QR code on WeChat to pay.</p>
   <div class="stripe-error-message"></div>
 </form>
