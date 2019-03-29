@@ -20,6 +20,8 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     {
         parent::__construct();
         $this->ssl = true;
+        $this->ajax = true;
+        $this->json = true;
     }
 
     /**
@@ -28,57 +30,33 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     public function initContent()
     {
         parent::initContent();
-        $stripe_client_secret = Tools::getValue('client_secret');
-        $stripe_source = Tools::getValue('source');
 
-        if (Configuration::get('STRIPE_MODE') == 1) {
-            $pubKey = Configuration::get('STRIPE_TEST_PUBLISHABLE');
-        } else {
-            $pubKey = Configuration::get('STRIPE_PUBLISHABLE');
+        $response = Tools::getValue('response');
+
+        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($response['paymentIntent']['id']);
+        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent'],
+                                                 $paymentIntentDatas['id_payment_intent'],
+                                                 null,
+                                                 $paymentIntentDatas['amount'],
+                                                 $paymentIntentDatas['currency'],
+                                                 $paymentIntentDatas['date_add'],
+                                                 null);
+
+        $paymentIntent->setStatus($response['paymentIntent']['status']);
+        $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
+        $paymentIntent->update();
+
+        if($response['paymentIntent']['status'] == 'succeeded') {
+            $params = array(
+                'token' => $response['paymentIntent']['source'],
+                'amount' => $paymentIntent->getAmount()*100,
+                'currency' => $paymentIntent->getCurrency(),
+                'cart_id' => $this->context->cart->id,
+            );
+
+            $chargeResult = $this->module->createOrder($response['paymentIntent'], $params);
         }
 
-        $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ?
-            $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) :
-            $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
-
-        $this->context->smarty->assign(array(
-            'stripe_source' => $stripe_source,
-            'stripe_client_secret' => $stripe_client_secret,
-            'publishableKey' => $pubKey,
-            'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
-            'module_dir' => _PS_MODULE_DIR_,
-            'return_order_page' => $order_page,
-        ));
-
-        $this->context->controller->registerJavascript(
-            'stripe_official-paymentjs',
-            'modules/stripe_official/views/js/jquery.the-modal.js'
-        );
-        $this->context->controller->registerJavascript(
-            'stripe_official-payment_validation',
-            'modules/stripe_official/views/js//payment_validation.js'
-        );
-        $this->context->controller->registerJavascript(
-            'stripe_official-stipeV2',
-            'https://js.stripe.com/v2/',
-            array('server'=>'remote')
-        );
-        $this->context->controller->registerStylesheet(
-            'stripe_official-frontcss',
-            'modules/stripe_official/views/css/front.css'
-        );
-        $this->context->controller->registerStylesheet(
-            'stripe_official-modal',
-            'modules/stripe_official/views/css/the-modal.css'
-        );
-
-        $js_def = array(
-            'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
-            'return_order_page' => $order_page
-        );
-
-        Media::addJsDef($js_def);
-
-        $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
+        $this->ajaxDie(Tools::jsonEncode($chargeResult));
     }
 }

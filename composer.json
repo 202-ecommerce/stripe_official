@@ -1,0 +1,13 @@
+{
+	"require": {
+		"stripe/stripe-php": "^6.30"
+	},
+    "autoload": {
+        "psr-4": {
+          "Stripe_officialClasslib\\": "vendor/totpsclasslib/src/"
+        }
+    },
+    "scripts": {
+        "pre-autoload-dump": "php ${TOTPSCLASSLIB_DEV_PATH}/classlib/refresh.php ."
+    }
+}

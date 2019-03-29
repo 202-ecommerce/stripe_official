@@ -1,5 +1,5 @@
 /**
- * 2007-2019 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * DISCLAIMER
  *
@@ -8,7 +8,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2019 PrestaShop SA
+ * @copyright 2007-2018 PrestaShop SA
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
@@ -170,10 +170,10 @@ function initStripeOfficial() {
         });
 
         function stripeSourceHandler(response) {
-            if (must_enable_3ds && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
+            if (secure_mode && typeof response.card.three_d_secure != 'undefined' && response.card.three_d_secure != "not_supported") {
                 stripe_v3.createSource({
                     type: 'three_d_secure',
-                    amount: amountTtl,
+                    amount: amount_ttl,
                     currency: currency_stripe,
                     three_d_secure: {
                         card: response.id
@@ -244,20 +244,17 @@ function initStripeOfficial() {
                 type: 'POST',
                 dataType: 'json',
                 url: ajaxUrlStripe,
-                async: false,
                 data: {
                     stripeToken: result.id,
                     cardType: cardType,
                     cardHolderName: $('.stripe-name').val(),
                 },
                 success: function(data) {
-                    $('#payment-confirmation button[type="submit"]').attr('disabled', 'disabled');
                     if (data.code == '1') {
                         // Charge ok : redirect the customer to order confirmation page
                         location.replace(data.url);
                     } else {
                         //  Charge ko
-                        $('#payment-confirmation button[type="submit"]').removeAttr('disabled');
                         $('#stripe-ajax-loader').hide();
                         $('#stripe-payment-form').show();
                         $('#card-errors').show();

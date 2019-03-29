@@ -51,7 +51,6 @@ class stripe_officialpaymentRequestModuleFrontController extends ModuleFrontCont
             $this->renderAjax(array('status' => 'fail', 'error' => $e->getMessage()));
         }
 
-        $response = array();
         if (Tools::getValue('shippingoptionchange') == true || Tools::getValue('shippingaddresschange') == true) {
             StripeLogger::logInfo('PaymentRequest: shippingoptionchange shippingaddresschange');
             $response['status'] = 'success';

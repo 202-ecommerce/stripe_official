@@ -1,5 +1,5 @@
 {*
-* 2007-2019 PrestaShop
+* 2007-2018 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2019 PrestaShop SA
+*	@copyright	2007-2018 PrestaShop SA
 *	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
 *	International Registered Trademark & Property of PrestaShop SA
 *}
@@ -85,6 +85,7 @@
 
         </div>
 
+
         <div class="clear"></div>
         <img class="powered_stripe" alt="" src="{$module_dir}views/img/verified_by_visa.png"/>
         <img class="powered_stripe" alt="" src="{$module_dir}views/img/mastercard_securecode.png"/>
@@ -95,6 +96,18 @@
 </div>
 <div id="modal_stripe"  class="modal" style="display: none">
   <div id="result_3d"> </div></div>
+<script type="text/javascript">
+  var mode = {$stripe_mode};
+  var currency_stripe = "{$currency_stripe}";
+  var amount_ttl = {$amount_ttl};
+  var secure_mode = {$secure_mode};
+  var baseDir = "{$baseDir}";
+  var billing_address = {$billing_address nofilter};
+  var module_dir = "{$module_dir}";
+  var ajaxUrlStripe = "{$ajaxUrlStripe}";
+  var StripePubKey = "{$publishableKey}";
+  var stripeLanguageIso = "{$stripeLanguageIso}";
+</script>
 {else}
 <div class="row stripe-payment">
   <div class="col-xs-12">

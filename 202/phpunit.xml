@@ -1,38 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- https://phpunit.de/manual/current/en/appendixes.configuration.html
--->
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="true" stopOnFailure="false" syntaxCheck="true" bootstrap="./build/prestashop/admin-dev/bootstrap.php">
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="bootstrap.php"
+>
     <php>
-        <ini name="error_reporting" value="-1"/>
-        <env name="addon_name" value="stripe_official"/>
+        <ini name="error_reporting" value="-1" />
+        <server name="KERNEL_DIR" value="/202/vendor/" />
+        <const name="_PS_ADMIN_DIR_" value="./bb" />
+        <const name="TOT_ENVIRONMENT" value="testing" />
     </php>
+
     <testsuites>
-        <testsuite name="Stripe Module Test Suite">
-            <directory suffix=".php">tests</directory>
+        <testsuite name="Trusted Shops Module Test Suite">
+            <directory prefix="testBack" suffix=".php">tests</directory>
         </testsuite>
     </testsuites>
+
     <filter>
         <whitelist>
-            <directory>./build/prestashop/modules/stripe_official</directory>
+            <directory>../</directory>
             <exclude>
-                <directory>./build/prestashop/modules/*/translations</directory>
-                <directory>./build/prestashop/modules/*/views</directory>
-                <directory>./build/prestashop/modules/*/upgrade</directory>
-                <directory>./build/prestashop/modules/*/changelog</directory>
-                <directory>./build/prestashop/modules/*/libraries</directory>
-                <directory>./build/prestashop/modules/*/upgrade</directory>
-                <directory>./build/prestashop/modules/*/202</directory>
-                <directory suffix="index.php">./build/prestashop/modules/*/</directory>
-                <directory suffix="index.php">./build/prestashop/modules/*/*/</directory>
-                <directory suffix="index.php">./build/prestashop/modules/*/*/*/</directory>
+                <directory>../202</directory>
+                <directory>../translations</directory>
+                <directory>../views</directory>
+                <directory>../css</directory>
+                <directory>../js</directory>
+                <directory>../img</directory>
+                <directory>../override</directory>
+                <directory>../upgrade</directory>
+                <directory suffix="index.php">../</directory>
+                <directory suffix="index.php">../*/</directory>
+                <directory suffix="index.php">../*/*/</directory>
             </exclude>
         </whitelist>
     </filter>
+
     <logging>
-        <log type="coverage-php" target="./build/backend.php" title="Stripe" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
-        <log type="coverage-html" target="./build/coverage" title="Stripe" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-        <log type="junit" target="./build/logs/junit.xml" logIncompleteSkipped="false"/>
+        <log type="coverage-html" target="build/coverage" title="Trusted Shops Integration" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-php" target="build/backend.php" title="Trusted Shops Integration" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
     </logging>
 </phpunit>
