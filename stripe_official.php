@@ -20,6 +20,7 @@ if (!defined('_PS_VERSION_')) {
 require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/classes/StripeLogger.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentRequestHandler.php';
+require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 require_once dirname(__FILE__) . '/classes/exceptions/StripePaymentRequestException.php';
 
@@ -38,6 +39,7 @@ class Stripe_official extends PaymentModule
      * @var array
      */
     public $objectModels = array(
+        'StripePayment',
         'StripePaymentIntent',
     );
 
@@ -179,12 +181,11 @@ class Stripe_official extends PaymentModule
         if (!$this->registerHook('header')
             || !$this->registerHook('orderConfirmation')
             || !$this->registerHook('displayBackOfficeHeader')
+            || !$this->registerHook('displayAdminOrderTabOrder')
+            || !$this->registerHook('displayAdminOrderContentOrder')
+            || !$this->registerHook('displayAdminCartsView')
             || !$this->registerHook('paymentOptions')
             || !$this->registerHook('adminOrder')) {
-            return false;
-        }
-
-        if (!$this->createStripePayment()) {
             return false;
         }
 
@@ -249,31 +250,6 @@ class Stripe_official extends PaymentModule
             }
             Configuration::updateValue('STRIPE_OS_SOFORT_WAITING', (int) $order_state->id);
         }
-        return true;
-    }
-
-    /* Create Database Stripe Payment */
-    protected function createStripePayment()
-    {
-        $db = Db::getInstance();
-        $query = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'stripe_payment` (
-            `id_payment` int(11) NOT NULL AUTO_INCREMENT,
-            `id_stripe` varchar(255) NOT NULL,
-            `name` varchar(255) NOT NULL,
-            `id_cart` int(11) NOT NULL,
-            `last4` varchar(4) NOT NULL,
-            `type` varchar(255) NOT NULL,
-            `amount` varchar(255) NOT NULL,
-            `refund` varchar(255) NOT NULL,
-            `currency` varchar(255) NOT NULL,
-            `result` tinyint(4) NOT NULL,
-            `state` tinyint(4) NOT NULL,
-            `date_add` datetime NOT NULL,
-            PRIMARY KEY (`id_payment`),
-           KEY `id_cart` (`id_cart`)
-       ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1';
-        $db->Execute($query);
-
         return true;
     }
 
@@ -407,7 +383,6 @@ class Stripe_official extends PaymentModule
 
         $this->displaySomething();
         $this->assignSmartyVars();
-        $this->displayTransaction();
         $this->displayRefundForm();
 
         if (count($this->warning)) {
@@ -445,67 +420,6 @@ class Stripe_official extends PaymentModule
             'product_payment' => Configuration::get('STRIPE_PRODUCT_PAYMENT'),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
-    }
-
-    /*
-     ** Display All Stripe transactions
-     */
-    public function displayTransaction($refresh = 0, $token_ajax = null, $id_employee = null)
-    {
-        $token_module = '';
-        if ($token_ajax && $id_employee) {
-            $employee = new Employee($id_employee);
-            $this->context->employee = $employee;
-            $token_module = Tools::getAdminTokenLite('AdminModules', $this->context);
-        }
-
-        $tenta = array();
-        if ($token_module == $token_ajax || $refresh == 0) {
-            $this->getSectionShape();
-            $orders = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment ORDER BY date_add DESC');
-
-            foreach ($orders as $order) {
-                if ($order['result'] == 0) {
-                    $result = 'n';
-                } elseif ($order['result'] == 1) {
-                    $result = '';
-                } elseif ($order['result'] == 2) {
-                    $result = 2;
-                } elseif ($order['result'] == 4) {
-                    $result = 4;
-                } else {
-                    $result = 3;
-                }
-
-                $refund = Tools::safeOutput($order['amount']) - Tools::safeOutput($order['refund']);
-                array_push($tenta, array(
-                    'date' => Tools::safeOutput($order['date_add']),
-                    'last_digits' => Tools::safeOutput($order['last4']),
-                    'type' => Tools::strtolower($order['type']),
-                    'amount' => Tools::safeOutput($order['amount']),
-                    'currency' => Tools::safeOutput(Tools::strtoupper($order['currency'])),
-                    'refund' => $refund,
-                    'id_stripe' => Tools::safeOutput($order['id_stripe']),
-                    'name' => Tools::safeOutput($order['name']),
-                    'result' => $result,
-                    'state' => Tools::safeOutput($order['state']) ? $this->l('Test') : $this->l('Live'),
-                ));
-            }
-
-            $this->context->smarty->assign(array(
-                'refresh' => $refresh,
-                'token_stripe' => Tools::getAdminTokenLite('AdminModules'),
-                'id_employee' => $this->context->employee->id,
-                'path' => Tools::getShopDomainSsl(true, true).$this->_path,
-            ));
-        }
-
-        $this->context->smarty->assign('tenta', $tenta);
-
-        if ($refresh) {
-            $this->context->smarty->assign('module_dir', $this->_path);
-            return $this->fetch(_PS_MODULE_DIR_ . $this->name . '/views/templates/admin/_partials/transaction.tpl');
-        }
     }
 
     /*
@@ -740,7 +654,7 @@ class Stripe_official extends PaymentModule
 
     public function createOrder($paymentIntent, $params)
     {
-        $message = 'Stripe Transaction ID: '.$paymentIntent['id'];
+        $message = 'Stripe Transaction ID: '.$paymentIntent->id;
 
         $source = \Stripe\Source::retrieve($params['token']);
 
@@ -748,10 +662,12 @@ class Stripe_official extends PaymentModule
         try {
             $paid = $this->isZeroDecimalCurrency($params['currency']) ? $params['amount'] : $params['amount'] / 100;
             /* Add transaction on Prestashop back Office (Order) */
-            if ($source->card->brand == 'sofort' && $charge->status == 'pending') {
+            if (!empty($source->type) && $source->type == 'sofort' && $paymentIntent->status == 'pending') {
                 $status = Configuration::get('STRIPE_OS_SOFORT_WAITING');
+                $result = 4;
             } else {
                 $status = Configuration::get('PS_OS_PAYMENT');
+                $result = 1;
             }
             $this->validateOrder(
                 (int)$params['cart_id'],
@@ -769,19 +685,13 @@ class Stripe_official extends PaymentModule
         }
 
         /* Add transaction on database */
-        if ($source->card->brand == 'sofort' && $charge->status == 'pending') {
-            $result = 4;
-        } else {
-            $result = 1;
-        }
-
         $this->addTentative(
-            $paymentIntent['id'],
+            $params['id_payment_intent'],
             $source->owner->name,
-            $source->card->brand,
-            $paymentIntent['amount'],
+            $source->type,
+            $source->amount,
             0,
-            $paymentIntent['currency'],
+            $source->currency,
             $result,
             (int)$params['cart_id']
         );
@@ -815,7 +725,7 @@ class Stripe_official extends PaymentModule
      **
      ** @return: (none)
      */
-    protected function addTentative($id_stripe, $name, $type, $amount, $refund, $currency, $result, $id_cart = 0)
+    protected function addTentative($id_payment_intent, $name, $type, $amount, $refund, $currency, $result, $id_cart = 0)
     {
         if ($id_cart == 0) {
             $id_cart = (int)$this->context->cart->id;
@@ -832,13 +742,30 @@ class Stripe_official extends PaymentModule
             $refund /= 100;
         }
 
-        /* Add request on Database */
-        Db::getInstance()->Execute(
-            'INSERT INTO '._DB_PREFIX_
-            .'stripe_payment (id_stripe, name, id_cart, type, amount, refund, currency, result, state, date_add)
-            VALUES ("'.pSQL($id_stripe).'", "'.pSQL($name).'", \''.(int)$id_cart.'\', "'.pSQL(Tools::strtolower($type)).'", "'
-            .pSQL($amount).'", "'.pSQL($refund).'", "'.pSQL(Tools::strtolower($currency)).'", '.(int)$result.', '.(int)Configuration::get('STRIPE_MODE').', NOW())'
-        );
+        $intent = \Stripe\PaymentIntent::retrieve($id_payment_intent);
+        $charges = $intent->charges->data;
+
+        $stripePayment = new StripePayment();
+        // $stripePayment->setIdStripe($charges[0]->id);
+        $stripePayment->setIdPaymentIntent($id_payment_intent);
+        $stripePayment->setName($name);
+        $stripePayment->setIdCart((int)$id_cart);
+        // $stripePayment->setLast4((int)$charges[0]->payment_method_details->card->last4);
+        $stripePayment->setType(Tools::strtolower($type));
+        $stripePayment->setAmount($amount);
+        $stripePayment->setRefund($refund);
+        $stripePayment->setCurrency(Tools::strtolower($currency));
+        $stripePayment->setResult((int)$result);
+        $stripePayment->setState((int)Configuration::get('STRIPE_MODE'));
+        $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
+        $stripePayment->save();
+
+        $orderId = Order::getOrderByCartId($id_cart);
+        $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
+
+        $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
+        // $orderPayment->transaction_id = $charges[0]->id;
+        $orderPayment->save();
     }
 
     /*
@@ -964,6 +891,43 @@ class Stripe_official extends PaymentModule
         }
     }
 
+    public function hookDisplayAdminCartsView($params)
+    {
+        $stripePayment = new StripePayment();
+        $paymentInformations = $stripePayment->getStripePaymentByCart($params['cart']->id);
+
+        if (empty($paymentInformations->getIdStripe())) {
+            return;
+        }
+
+        $paymentInformations->url_dashboard = $stripePayment->getDashboardUrl();
+
+        $this->context->smarty->assign(array(
+            'paymentInformations' => $paymentInformations
+        ));
+
+        return $this->display(__FILE__, 'views/templates/hook/admin_cart.tpl');
+    }
+
+    public function hookDisplayAdminOrderTabOrder()
+    {
+        return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
+    }
+
+    public function hookDisplayAdminOrderContentOrder($params)
+    {
+        $stripePayment = new StripePayment();
+        $stripePayment->getStripePaymentByCart($params['order']->id_cart);
+        $this->context->smarty->assign(array(
+            'stripe_charge' => $stripePayment->getIdStripe(),
+            'stripe_paymentIntent' => $stripePayment->getIdPaymentIntent(),
+            'stripe_date' => $stripePayment->getDateAdd(),
+            'stripe_dashboardUrl' => $stripePayment->getDashboardUrl()
+        ));
+
+        return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
     /**
      * Load JS
      */
@@ -1020,7 +984,7 @@ class Stripe_official extends PaymentModule
 
           'stripe_locale' => $this->context->language->iso_code,
 
-          'stripe_return_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
+          'stripe_validation_return_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
 
           'stripe_css' => '{
             "base": {

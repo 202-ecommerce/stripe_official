@@ -13,7 +13,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-require_once dirname(__FILE__).'/../../libraries/sdk/stripe/init.php';
+// require_once dirname(__FILE__).'/../../libraries/sdk/stripe/init.php';
 
 class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 {

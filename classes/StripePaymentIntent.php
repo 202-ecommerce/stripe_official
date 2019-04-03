@@ -3,17 +3,17 @@
 class StripePaymentIntent extends ObjectModel
 {
     /** @var string */
-    protected $id_payment_intent;
+    public $id_payment_intent;
     /** @var string */
-    protected $status;
+    public $status;
     /** @var float */
-    protected $amount;
+    public $amount;
     /** @var string */
-    protected $currency;
+    public $currency;
     /** @var date */
-    protected $date_add;
+    public $date_add;
     /** @var date */
-    protected $date_upd;
+    public $date_upd;
 
     /**
      * @see ObjectModel::$definition
@@ -25,7 +25,6 @@ class StripePaymentIntent extends ObjectModel
             'id_payment_intent'  => array(
                 'type'     => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'required' => true,
                 'size'     => 40,
             ),
             'status'  => array(
@@ -54,21 +53,6 @@ class StripePaymentIntent extends ObjectModel
             ),
         ),
     );
-
-    public function __construct($id_stripe_payment_intent = null, $id_payment_intent = null, $status = null, $amount = null, $currency = null, $date_add = null, $date_upd = null)
-    {
-        parent::__construct();
-
-        if ($id_stripe_payment_intent != null) {
-            $this->id = $id_stripe_payment_intent;
-            $this->id_payment_intent = $id_payment_intent;
-            $this->status = $status;
-            $this->amount = $amount;
-            $this->currency = $currency;
-            $this->date_add = $date_add;
-            $this->date_upd = $date_upd;
-        }
-    }
 
     public function setIdPaymentIntent($id_payment_intent)
     {

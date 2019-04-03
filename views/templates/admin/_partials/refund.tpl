@@ -23,4 +23,3 @@
 *	International Registered Trademark & Property of PrestaShop SA
 *}
 {$refund_form}
-{include file="./transaction.tpl"}

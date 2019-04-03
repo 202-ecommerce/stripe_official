@@ -31,32 +31,57 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     {
         parent::initContent();
 
-        $response = Tools::getValue('response');
 
-        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($response['paymentIntent']['id']);
-        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent'],
-                                                 $paymentIntentDatas['id_payment_intent'],
-                                                 null,
-                                                 $paymentIntentDatas['amount'],
-                                                 $paymentIntentDatas['currency'],
-                                                 $paymentIntentDatas['date_add'],
-                                                 null);
+        $source = Tools::getValue('source');
 
-        $paymentIntent->setStatus($response['paymentIntent']['status']);
+        if (!empty($source)) {
+            $secret_key = $this->module->getSecretKey();
+
+            \Stripe\Stripe::setApiKey($secret_key);
+
+            $currency = $this->context->currency->iso_code;
+            $amount = $this->context->cart->getOrderTotal();
+            $amount = $this->module->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+
+            $response = \Stripe\Charge::create([
+              'amount' => $amount,
+              'currency' => $currency,
+              'source' => $source,
+            ]);
+
+            $intent = \Stripe\PaymentIntent::retrieve($response->source->metadata->paymentIntent);
+
+            $response->payment_intent = $intent;
+            $token = $source;
+            $id_payment_intent = $response->payment_intent->id;
+        } else {
+            $response = (object)Tools::getValue('response')['paymentIntent'];
+            $token = $response->source;
+            $id_payment_intent = $response->id;
+        }
+
+        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($id_payment_intent);
+        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent']);
+        $paymentIntent->setStatus($response->status);
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
         $paymentIntent->update();
 
-        if($response['paymentIntent']['status'] == 'succeeded') {
+        if($response->status == 'succeeded') {
             $params = array(
-                'token' => $response['paymentIntent']['source'],
+                'token' => $token,
                 'amount' => $paymentIntent->getAmount()*100,
                 'currency' => $paymentIntent->getCurrency(),
                 'cart_id' => $this->context->cart->id,
+                'id_payment_intent' => $id_payment_intent,
             );
 
-            $chargeResult = $this->module->createOrder($response['paymentIntent'], $params);
+            $chargeResult = $this->module->createOrder($response, $params);
         }
 
+        if (!empty($response->source->flow) && $response->source->flow == 'redirect') {
+            Tools::redirect($chargeResult['url']);
+            exit;
+        }
         $this->ajaxDie(Tools::jsonEncode($chargeResult));
     }
 }

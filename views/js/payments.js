@@ -151,7 +151,7 @@
       const sourceData = {
         type: payment, amount: stripe_amount, currency: stripe_currency,
         owner: { name: stripe_fullname, email: stripe_email },
-        redirect: { return_url: stripe_return_url },
+        redirect: { return_url: stripe_validation_return_url },
         metadata: { paymentIntent: stripe_payment_id }
       };
 
@@ -189,7 +189,7 @@
       $.ajax({
           type: 'POST',
           dataType: 'json',
-          url: stripe_return_url,
+          url: stripe_validation_return_url,
           data: {
               response: response,
           },
@@ -265,6 +265,7 @@
     // Retrieve the PaymentIntent status from our server.
     const response = await stripe.retrievePaymentIntent(stripe_client_secret);
     console.log(response.paymentIntent.status);
+    console.log('testtest');
     if (!endStates.includes(response.paymentIntent.status)) {
       setTimeout(pollPaymentIntentStatus, 1000); // Every second
     } else {
