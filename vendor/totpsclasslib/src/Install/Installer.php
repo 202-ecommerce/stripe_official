@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.0.0
+ * @version   release/2.1.0
  */
 
 namespace Stripe_officialClasslib\Install;
@@ -34,6 +34,10 @@ use \Tab;
 use \Language;
 use \Configuration;
 
+/**
+ * @deprecated Since v2.1
+ * Class Installer
+ */
 class Installer
 {
     /**

@@ -44,9 +44,44 @@
 </div>
 
 <div class="clearfix"></div>
+<h3><i class="icon-info-sign"></i> {l s='Improve your conversion rate and securely charge your customers with Stripe, the easiest payment platform' mod='stripe_official'}</h3>
+<div class="form-group stripe-module-col1inner">
+    - <span>{l s='Improve your conversion rate' mod='stripe_official'} </span>
+    {l s='by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
+    - <span>{l s='Keep your fraud under control' mod='stripe_official'}</span> {l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
+    <a target="_blank" href="https://stripe.com/radar">{l s='Stripe Radar' mod='stripe_official'}</a>{l s=', our suite of anti-fraud tools.' mod='stripe_official'}<br>
+    - <span>{l s='Easily refund ' mod='stripe_official'}</span>
+    {l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
+    - {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
+    <span>{l s='135+ currencies' mod='stripe_official'}</span> {l s='and 4 local payment methods (iDEAL, Bancontact, SOFORT, Giropay).' mod='stripe_official'}<br><br>
+    <img src="{$module_dir}/views/img/started.png" style="width:100%;">
+    <br><br>
+    <p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
+    <a target="_blank" href="https://stripe.com/fr">www.stripe.com</a></p>
+</div>
+
+<div class="clearfix"></div>
 <h3><i class="icon-info-sign"></i> {l s='Frequently Asked Questions' mod='stripe_official'}</h3>
  <div class="faq items">
     <ul id="basics" class="faq-items">
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='How much does Stripe cost?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Stripe has not setup fees, no monthly fees and no storage fees.' mod='stripe_official'}<br>
+                    {l s='There’s no additional fee for failed charges.' mod='stripe_official'}<br><br>
+                    {l s='For European companies, Stripe charges (per successful transaction) :' mod='stripe_official'}<br>
+                    - {l s='1.4% + €0.25/£0.20 with a European card' mod='stripe_official'}<br>
+                    - {l s='2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
+                    {l s='For other payment methods, non-European merchants pricing and additional information, please check our website:' mod='stripe_official'} <a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a>.
+                </p><br>
+                <p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
+                    <a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.
+                </p>
+            </div>
+        </li>
+
         <li class="faq-item">
             <span class="faq-trigger">{l s='What are the required elements to use the module?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>

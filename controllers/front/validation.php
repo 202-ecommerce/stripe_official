@@ -14,6 +14,8 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
+use Stripe_officialClasslib\Actions\ActionsHandler;
+
 class stripe_officialValidationModuleFrontController extends ModuleFrontController
 {
     public function __construct()
@@ -31,57 +33,58 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     {
         parent::initContent();
 
+        // Create the handler
+        $handler = new ActionsHandler();
 
-        $source = Tools::getValue('source');
+         // Set input data
+        $handler->setConveyor(array(
+                    'source' => Tools::getValue('source'),
+                    'response' => Tools::getValue('response'),
+                    'module' => $this->module,
+                    'context' => $this->context,
+                ));
 
-        if (!empty($source)) {
-            $secret_key = $this->module->getSecretKey();
-
-            \Stripe\Stripe::setApiKey($secret_key);
-
-            $currency = $this->context->currency->iso_code;
-            $amount = $this->context->cart->getOrderTotal();
-            $amount = $this->module->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
-
-            $response = \Stripe\Charge::create([
-              'amount' => $amount,
-              'currency' => $currency,
-              'source' => $source,
-            ]);
-
-            $intent = \Stripe\PaymentIntent::retrieve($response->source->metadata->paymentIntent);
-
-            $response->payment_intent = $intent;
-            $token = $source;
-            $id_payment_intent = $response->payment_intent->id;
+        // Set list of actions to execute
+        if (empty(Tools::getValue('source'))) {
+            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'addTentative');
         } else {
-            $response = (object)Tools::getValue('response')['paymentIntent'];
-            $token = $response->source;
-            $id_payment_intent = $response->id;
+            $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'addTentative');
         }
 
-        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($id_payment_intent);
-        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent']);
-        $paymentIntent->setStatus($response->status);
-        $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
-        $paymentIntent->update();
-
-        if($response->status == 'succeeded') {
-            $params = array(
-                'token' => $token,
-                'amount' => $paymentIntent->getAmount()*100,
-                'currency' => $paymentIntent->getCurrency(),
-                'cart_id' => $this->context->cart->id,
-                'id_payment_intent' => $id_payment_intent,
-            );
-
-            $chargeResult = $this->module->createOrder($response, $params);
+        // Process actions chain
+        if ($handler->process('ValidationOrder')) {
+            // Retrieve and use resulting data
+            $returnValues = $handler->getConveyor();
+        } else {
+            // Handle error
+            ProcessLoggerHandler::logError('Order validation process failed.');
         }
 
-        if (!empty($response->source->flow) && $response->source->flow == 'redirect') {
-            Tools::redirect($chargeResult['url']);
+
+        $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+        $url = Context::getContext()->link->getPageLink(
+            'order-confirmation',
+            true,
+            null,
+            array(
+                'id_cart' => (int)$this->context->cart->id,
+                'id_module' => (int)$this->module->id,
+                'id_order' => (int)$id_order,
+                'key' => $returnValues['secure_key']
+            )
+        );
+
+        if (!empty(Tools::getValue('source'))) {
+            Tools::redirect($url);
             exit;
         }
+
+         /* Ajax redirection Order Confirmation */
+        $chargeResult = array(
+            'code' => '1',
+            'url' => $url
+        );
         $this->ajaxDie(Tools::jsonEncode($chargeResult));
     }
 }

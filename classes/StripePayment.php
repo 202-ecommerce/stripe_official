@@ -263,7 +263,10 @@ class StripePayment extends ObjectModel
                 break;
         }
 
-        $url_dashboard = 'https://dashboard.stripe.com/'.$url_type.'/payments/'.$this->id_stripe;
+        $url_dashboard = array(
+            'charge' => 'https://dashboard.stripe.com/'.$url_type.'/payments/'.$this->id_stripe,
+            'paymentIntent' => 'https://dashboard.stripe.com/'.$url_type.'/payments/'.$this->id_payment_intent
+        );
 
         return $url_dashboard;
     }

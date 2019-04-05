@@ -20,23 +20,18 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_0_0($module)
 {
-    if (!$module->updateConfigurationKey('_PS_STRIPE_mode', 'STRIPE_MODE', 0)
-        || !$module->updateConfigurationKey('_PS_STRIPE_partial_refund_state', 'STRIPE_PARTIAL_REFUND_STATE', 18)
-        || !$module->updateConfigurationKey('_PS_STRIPE_refund_mode', 'STRIPE_REFUND_MODE', 1)
-        || !$module->updateConfigurationKey('_PS_STRIPE_test_key', 'STRIPE_TEST_KEY', null)
-        || !$module->updateConfigurationKey('_PS_STRIPE_test_publishable', 'STRIPE_TEST_PUBLISHABLE', null)
-        || !$module->updateConfigurationKey('_PS_STRIPE_key', 'STRIPE_KEY', null)
-        || !$module->updateConfigurationKey('_PS_STRIPE_publishable', 'STRIPE_PUBLISHABLE', null)) {
-        return false;
-    }
+    $module->updateConfigurationKey('_PS_STRIPE_mode', 'STRIPE_MODE');
+    $module->updateConfigurationKey('_PS_STRIPE_partial_refund_state', 'STRIPE_PARTIAL_REFUND_STATE');
+    $module->updateConfigurationKey('_PS_STRIPE_refund_mode', 'STRIPE_REFUND_MODE');
+    $module->updateConfigurationKey('_PS_STRIPE_test_key', 'STRIPE_TEST_KEY');
+    $module->updateConfigurationKey('_PS_STRIPE_test_publishable', 'STRIPE_TEST_PUBLISHABLE');
+    $module->updateConfigurationKey('_PS_STRIPE_key', 'STRIPE_KEY');
+    $module->updateConfigurationKey('_PS_STRIPE_publishable', 'STRIPE_PUBLISHABLE');
 
-    if (!Configuration::deleteByName('_PS_STRIPE_secure')) {
-        return false;
-    }
+    Configuration::deleteByName('_PS_STRIPE_secure');
 
-    if (!$module->unregisterHook('displayProductAdditionalInfo')) {
-        return false;
-    }
+    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+    $installer->installObjectModel('StripePaymentIntent');
 
     return true;
 }

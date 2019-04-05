@@ -18,7 +18,7 @@
         <tbody>
             <tr>
                 <td>{$paymentInformations->date_add}</td>
-                <td><a href="{$paymentInformations->url_dashboard}" target="blank">{$paymentInformations->id_payment_intent}</a></td>
+                <td><a href="{$paymentInformations->url_dashboard.paymentIntent|escape:'htmlall'}" target="blank">{$paymentInformations->id_payment_intent}</a></td>
                 <td>{$paymentInformations->name}</td>
                 <td><img src="{$module_dir}/views/img/cc-{$paymentInformations->type}.png" alt="payment method" style="width:43px;"/></td>
                 <td>{$paymentInformations->amount} {$paymentInformations->currency}</td>

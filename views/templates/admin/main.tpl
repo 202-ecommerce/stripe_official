@@ -31,19 +31,15 @@
 		{/if}
 		<nav class="list-group categorieList">
 			<a class="list-group-item migration-tab" href="#stripe_step_1">
-			  	<i class="icon-book pstab-icon"></i>
-			  	{l s='Get Started' mod='stripe_official'}
-			</a>
-			<a class="list-group-item migration-tab" href="#stripe_step_2">
 			  	<i class="icon-power-off pstab-icon"></i>
 			  	{l s='Connection' mod='stripe_official'}
 			  	<span class="badge-module-tabs pull-right {if $keys_configured === true}tab-success{else}tab-warning{/if}"></span>
 			</a>
-			<a class="list-group-item migration-tab" href="#stripe_step_5">
+			<a class="list-group-item migration-tab" href="#stripe_step_2">
 			  	<i class="icon-ticket pstab-icon"></i>
 			  	{l s='Refund' mod='stripe_official'}
 			</a>
-			<a class="list-group-item migration-tab" href="#stripe_step_6">
+			<a class="list-group-item migration-tab" href="#stripe_step_3">
 			  	<i class="icon-question pstab-icon"></i>
 			  	{l s='Contact and FAQ' mod='stripe_official'}
 			</a>
@@ -53,15 +49,12 @@
 	<div class="col-md-10">
 		<div class="content-wrap panel">
 			<section id="section-shape-1">
-				{include file="./_partials/started.tpl"}
-			</section>
-			<section id="section-shape-2">
 				{include file="./_partials/configuration.tpl"}
 			</section>
-			<section id="section-shape-5">
+			<section id="section-shape-2">
 				{include file="./_partials/refund.tpl"}
 			</section>
-			<section id="section-shape-6">
+			<section id="section-shape-3">
 				{include file="./_partials/faq.tpl"}
 			</section>
 		</div>

@@ -27,6 +27,16 @@
 	<input type="hidden" name="submit_login" value="1">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
+			<div class="form-group stripe-connection">
+				<span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a> </span>
+				{l s='and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
+				<div class="connect_btn">
+					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url}" class="stripe-connect">
+						<span>{l s='Connect with Stripe' mod='stripe_official'}</span>
+					</a>
+				</div>
+			</div>
+			<hr/>
 			<div class="form-group">
 				<label class="control-label col-lg-3">{l s='Mode' mod='stripe_official'}</label>
 				<div class="col-lg-9">
