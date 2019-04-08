@@ -166,6 +166,12 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
 .table .uppercase {
     text-transform: uppercase;
 }
+
+.stripe-connection .connect_btn {
+    text-align: center;
+    margin-top: 10px;
+}
+
 /* Retina support */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),

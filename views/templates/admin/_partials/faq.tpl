@@ -83,6 +83,16 @@
         </li>
 
         <li class="faq-item">
+            <span class="faq-trigger">{l s='How to upgrade my TLS version to 1.2 ?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='You can follow our' mod='stripe_official'} <a href="https://support.stripe.com/questions/how-do-i-upgrade-my-stripe-integration-from-tls-1-0-to-tls-1-2" target="blank">{l s='detailed upgrade instructions' mod='stripe_official'}</a> {l s='to check your version and learn how to secure your servers. While there are usually no changes required to your Stripe code, you might need to upgrade the operating system or packages on your servers.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
             <span class="faq-trigger">{l s='What are the required elements to use the module?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">

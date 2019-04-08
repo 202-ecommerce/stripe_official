@@ -34,7 +34,7 @@ class ValidationOrderActions extends DefaultActions
 
     /*
         Input : 'source', 'response', 'context', 'module'
-        Output : 'token', 'id_payment_intent', 'status'
+        Output : 'token', 'id_payment_intent', 'status', 'chargeId', 'amount'
      */
     public function prepareFlowNone()
     {
@@ -56,7 +56,7 @@ class ValidationOrderActions extends DefaultActions
 
     /*
         Input : 'source', 'response', 'context', 'module'
-        Output : 'token', 'id_payment_intent', 'status'
+        Output : 'token', 'id_payment_intent', 'status', 'chargeId', 'amount'
      */
     public function prepareFlowRedirect()
     {

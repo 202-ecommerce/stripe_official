@@ -25,7 +25,9 @@
 
 <form class="stripe-payment-form">
     <input type="hidden" name="stripe-payment-method" value="card">
-    <!-- <div id="stripe-payment-request-button"></div> -->
     <div id="stripe-card-element" class="field"></div>
-    <div class="stripe-error-message"></div>
+    {if $applepay_googlepay == 'on'}
+        <div id="stripe-payment-request-button"></div>
+    {/if}
+    <div class="stripe-error-message"><p>{if isset($stripeError)}{$stripeError}{/if}</p></div>
 </form>

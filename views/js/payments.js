@@ -45,43 +45,45 @@
       updateError(error);
     });
 
-    // // Create the payment request (browser based payment button).
-    // const paymentRequest = stripe.paymentRequest({
-    //   country: stripe_merchant_country_code,
-    //   currency: stripe_currency,
-    //   total: { label: 'Total', amount: stripe_amount },
-    //   requestPayerEmail: true
-    // });
+    // Create the payment request (browser based payment button).
+    const paymentRequest = stripe.paymentRequest({
+      country: stripe_merchant_country_code,
+      currency: stripe_currency,
+      total: { label: 'Total', amount: stripe_amount },
+      requestPayerEmail: true
+    });
 
-    // // Callback when a source is created.
-    // paymentRequest.on('source', async event => {
-    //   // Confirm the PaymentIntent with the source returned from the payment request.
-    //   const { error } = await stripe.confirmPaymentIntent(
-    //     stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
-    //   );
+    if ($('#stripe-payment-request-button').length > 0) {
+      // Callback when a source is created.
+      paymentRequest.on('source', async event => {
+        // Confirm the PaymentIntent with the source returned from the payment request.
+        const { error } = await stripe.confirmPaymentIntent(
+          stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
+        );
 
-    //   if (error) {
-    //     // Report to the browser that the payment failed.
-    //     event.complete('fail');
-    //     updateError({error});
-    //   } else {
-    //     // Report to the browser that the confirmation was successful, prompting
-    //     // it to close the browser payment method collection interface.
-    //     event.complete('success');
-    //     // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
-    //     const response = await stripe.handleCardPayment(stripe_client_secret);
-    //     handlePayment(response);
-    //   }
-    // });
+        if (error) {
+          // Report to the browser that the payment failed.
+          event.complete('fail');
+          updateError({error});
+        } else {
+          // Report to the browser that the confirmation was successful, prompting
+          // it to close the browser payment method collection interface.
+          event.complete('success');
+          // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
+          const response = await stripe.handleCardPayment(stripe_client_secret);
+          handlePayment(response);
+        }
+      });
 
-    // // Create the Payment Request Button.
-    // const prButton = elements.create('paymentRequestButton', { paymentRequest });
+      // Create the Payment Request Button.
+      const prButton = elements.create('paymentRequestButton', { paymentRequest });
 
-    // // Check if the Payment Request is available.
-    // if (await paymentRequest.canMakePayment()) {
-    //   prButton.mount('#stripe-payment-request-button');
-    //   // TODO: show additional instructions
-    // }
+      // Check if the Payment Request is available.
+      if (await paymentRequest.canMakePayment()) {
+        prButton.mount('#stripe-payment-request-button');
+        // TODO: show additional instructions
+      }
+    }
   }
 
   // Create a IBAN Element and pass the right options for styles and supported countries.
