@@ -231,8 +231,23 @@ class Stripe_official extends PaymentModule
             $this->displayName = $this->l('Payment by Stripe');
         }
 
-        \Stripe\Stripe::setApiKey($this->getSecretKey());
-        \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version.'_'._PS_VERSION_.'_'.phpversion(), Configuration::get('PS_SHOP_DOMAIN_SSL'));
+        if (self::isWellConfigured()) {
+            \Stripe\Stripe::setApiKey($this->getSecretKey());
+            \Stripe\Stripe::setAppInfo("StripePrestashop", $this->version.'_'._PS_VERSION_.'_'.phpversion(), Configuration::get('PS_SHOP_DOMAIN_SSL'));
+        }
+    }
+
+    /**
+     * Check if configuration is completed. If not, disabled frontend features.
+     */
+    public static function isWellConfigured()
+    {
+        if (Configuration::get(self::MODE) && !empty(Configuration::get(self::TEST_PUBLISHABLEPUBLISHABLE))) {
+            return true;
+        } elseif (!empty(Configuration::get(self::PUBLISHABLE))) {
+            return true;
+        }
+        return false
     }
 
     public function install()
@@ -488,6 +503,9 @@ class Stripe_official extends PaymentModule
      */
     protected function assignSmartyVars()
     {
+        if (!self::isWellConfigured()) {
+            return;
+        }
         $this->context->smarty->assign(array(
             'stripe_mode' => Configuration::get(self::MODE),
             'stripe_key' => Configuration::get(self::KEY),
@@ -765,6 +783,9 @@ class Stripe_official extends PaymentModule
 
     protected function checkApiConnection($secretKey = null)
     {
+        if (!self::isWellConfigured()) {
+            return false;
+        }
         if (!$secretKey) {
             $secretKey = $this->getSecretKey();
         }
@@ -895,6 +916,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
+        if (!$this->active || !self::isWellConfigured()) {
+            return;
+        }
         if ($this->context->controller->php_self != 'order') {
             return;
         }
@@ -974,10 +998,9 @@ class Stripe_official extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
-        if (!$this->active) {
+        if (!$this->active || !self::isWellConfigured()) {
             return;
         }
-
         if (!$this->checkApiConnection()) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l('No API keys have been provided. Please contact the owner of the website.')
@@ -1040,6 +1063,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookOrderConfirmation($params)
     {
+        if (!self::isWellConfigured()) {
+            return;
+        }
         $this->context->smarty->assign('stripe_order_reference', pSQL($params['order']->reference));
         if ($params['order']->module == $this->name) {
             return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
