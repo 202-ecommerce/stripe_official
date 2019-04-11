@@ -11,7 +11,7 @@
 
     <target name="build" depends="build-common,package-zip,psvalidator,tot-testing" />
 
-    <target name="build-common" depends="lint,prepare,npm,doc" />
+    <target name="build-common" depends="lint,prepare,composer,npm,doc" />
 
     <target name="package-zip" depends="build-common" description="Create ZIP package">
         <echo>Create ZIP package</echo>
