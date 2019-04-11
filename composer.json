@@ -8,6 +8,6 @@
         }
     },
     "scripts": {
-        "pre-autoload-dump": "php ${TOTPSCLASSLIB_DEV_PATH}/classlib/refresh.php ."
+        "pre-autoload-dump": "if [ ${TOTPSCLASSLIB_DEV_PATH} ]; then php ${TOTPSCLASSLIB_DEV_PATH}/classlib/refresh.php .; fi"
     }
 }
