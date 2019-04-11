@@ -19,8 +19,12 @@ $(function(){
 
     // Create references to the submit button.
     // const $submit = $('.stripe-submit-button');
-    const $submit = $('.stripe-europe-payments[data-method="bancontact"], .stripe-europe-payments[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
+    const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .stripe-europe-payments[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
     const submitInitialText = $submit.text();
+
+    let $form = '';
+    let payment = '';
+    let disableText = '';
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
@@ -127,11 +131,20 @@ $(function(){
       }
 
       // Retrieve the payment method.
-      const $form = event.currentTarget;
-      const payment = event.currentTarget.dataset.method;
+      if ($('#payment-confirmation button[type="submit"]').length > 0) {
+        /* Prestashop 1.7 */
+        $form = $('.stripe-payment-form:visible');
+        payment = $('input[name="stripe-payment-method"]', $form).val();
+        disableText = event.currentTarget;
+      } else {
+        /* Prestashop 1.6 */
+        $form = event.currentTarget;
+        payment = event.currentTarget.dataset.method;
+        disableText = event.currentTarget;
+      }
 
       // Disable the Pay button to prevent multiple click events.
-      disableSubmit($form, 'Processing…');
+      disableSubmit(disableText, 'Processing…');
 
       if (payment === 'card') {
         // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
@@ -173,9 +186,6 @@ $(function(){
             break;
         }
 
-        console.log(sourceData);
-        console.log(sourceData.sofort);
-
         // Create a Stripe source with the common data and extra information.
         // console.log(sourceData);
         const {source} = await stripe.createSource(sourceData);
@@ -214,7 +224,6 @@ $(function(){
 
     // Handle activation of payment sources not yet supported by PaymentIntents
     function handleSourceActivation(source, element) {
-      console.log(source);
       switch (source.flow) {
         case 'none':
           // Sources with flow as none don't require any additional action
@@ -234,7 +243,7 @@ $(function(){
           }
           break;
         case 'redirect':
-          disableSubmit($(element), 'Redirecting…');
+          disableSubmit(disableText, 'Redirecting…');
           window.location.replace(source.redirect.url);
           break;
         case 'receiver':
@@ -285,10 +294,10 @@ $(function(){
       const $error = $(".stripe-payment-form:visible .stripe-error-message");
       if (error) {
         $error.text(error.message).show();
-        disableSubmit($form);
+        disableSubmit(disableText);
       } else {
         $error.text("").hide();
-        enableSubmit($form);
+        enableSubmit(disableText);
       }
     }
 

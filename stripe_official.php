@@ -195,10 +195,6 @@ class Stripe_official extends PaymentModule
         */
     );
 
-    /* tab section shape */
-    // @todo verify if already in use
-    protected $section_shape = 1;
-
     /* refund */
     // @todo verify if already in use
     protected $refund = 0;
@@ -383,13 +379,15 @@ class Stripe_official extends PaymentModule
         }
 
         /* Check if TLS is enabled and the TLS version used is 1.2 */
-        try {
-            \Stripe\Charge::all();
-        } catch (\Stripe\Error\ApiConnection $e) {
-            $this->warning[] = $this->l(
-                'TLS 1.2 is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
-                $this->name
-            );
+        if (self::isWellConfigured()) {
+            try {
+                \Stripe\Charge::all();
+            } catch (\Stripe\Error\ApiConnection $e) {
+                $this->warning[] = $this->l(
+                    'TLS 1.2 is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
+                    $this->name
+                );
+            }
         }
 
         /* Do Log In  */
@@ -614,7 +612,7 @@ class Stripe_official extends PaymentModule
 
         $this->context->smarty->assign(
             'refund_form',
-            $this->renderGenericForm($fields_form, $fields_value, $this->getSectionShape(),$submit_action)
+            $this->renderGenericForm($fields_form, $fields_value, $submit_action)
         );
     }
 
@@ -636,7 +634,7 @@ class Stripe_official extends PaymentModule
         }
 
         if (isset($_SERVER['REQUEST_URI'])) {
-            $return_url = urlencode($domain.$_SERVER['REQUEST_URI'].$this->getSectionShape());
+            $return_url = urlencode($domain.$_SERVER['REQUEST_URI']);
         }
 
         $this->context->smarty->assign('return_url', $return_url);
@@ -649,7 +647,7 @@ class Stripe_official extends PaymentModule
      ** @arg: $fields_form, $fields_value, $submit = false, array $tpls_vars = array()
      ** @return: (none)
      */
-    public function renderGenericForm($fields_form, $fields_value = array(), $fragment = false, $submit = false, array $tpl_vars = array())
+    public function renderGenericForm($fields_form, $fields_value = array(), $submit = false, array $tpl_vars = array())
     {
         $helper = new HelperForm();
         $helper->module = $this;
@@ -662,10 +660,6 @@ class Stripe_official extends PaymentModule
         $helper->default_form_language = $default_lang;
         $helper->allow_employee_form_lang = $default_lang;
 
-        if ($fragment !== false) {
-            $helper->token .= '#'.$fragment;
-        }
-
         if ($submit) {
             $helper->submit_action = $submit;
         }
@@ -676,7 +670,7 @@ class Stripe_official extends PaymentModule
             'back_url' => $this->context->link->getAdminLink('AdminModules')
             .'&configure='.$this->name
             .'&tab_module='.$this->tab
-            .'&module_name='.$this->name.($fragment !== false ? '#'.$fragment : '')
+            .'&module_name='.$this->name
         ), $tpl_vars);
 
         return $helper->generateForm($fields_form);
@@ -777,16 +771,6 @@ class Stripe_official extends PaymentModule
             'XPF'
         );
         return in_array($currency, $zeroDecimalCurrencies);
-    }
-
-    /**
-     * get section shape fragment
-     *
-     * @return string
-     */
-    protected function getSectionShape()
-    {
-        return 'stripe_step_'.(int)$this->section_shape++;
     }
 
     /**
@@ -939,6 +923,7 @@ class Stripe_official extends PaymentModule
             return;
         }
 
+        $paymentInformations->state = $paymentInformations->state ? 'TEST' : 'LIVE';
         $paymentInformations->url_dashboard = $stripePayment->getDashboardUrl();
 
         $this->context->smarty->assign(array(
@@ -1097,12 +1082,12 @@ class Stripe_official extends PaymentModule
 
             // Check for country support
             if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
-                //continue;
+                continue;
             }
 
             // Check for currency support
             if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
-                //continue;
+                continue;
             }
 
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_' . basename($name) . '.tpl');
@@ -1147,12 +1132,12 @@ class Stripe_official extends PaymentModule
 
             // Check for country support
             if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
-                //continue;
+                continue;
             }
 
             // Check for currency support
             if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
-                //continue;
+                continue;
             }
 
             // The customer can potientially use this payment method
