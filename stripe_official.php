@@ -25,12 +25,6 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 
-/**
-* Stripe object for ApplePay and GooglePay
-*/
-require_once dirname(__FILE__) . '/classes/StripePaymentRequestHandler.php';
-require_once dirname(__FILE__) . '/classes/exceptions/StripePaymentRequestException.php';
-
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 /**
