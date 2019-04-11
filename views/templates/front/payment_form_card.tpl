@@ -23,9 +23,23 @@
 *   International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form">
+<form class="stripe-payment-form" id="stripe-card-payment">
+
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+        <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
+
+        <img class="cc-icon disable"  id="visa"       rel="visa"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-visa.png" />
+        <img class="cc-icon disable"  id="mastercard" rel="masterCard" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-mastercard.png" />
+        <img class="cc-icon disable"  id="amex"       rel="amex"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-amex.png" />
+    {/if}
+
     <input type="hidden" name="stripe-payment-method" value="card">
     <div id="stripe-card-element" class="field"></div>
+
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+        <button class="stripe-submit-button" data-method="card">{l s='Buy now' mod='stripe_official'}</button>
+    {/if}
+
     {if $applepay_googlepay == 'on'}
         <div id="stripe-payment-request-button"></div>
     {/if}

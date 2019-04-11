@@ -24,7 +24,21 @@
 *}
 
 <form class="stripe-payment-form" action="">
-  <input type="hidden" name="stripe-payment-method" value="ideal">
-  <div id="stripe-ideal-bank-element" class="field"></div>
-  <div class="stripe-error-message"></div>
+    <input type="hidden" name="stripe-payment-method" value="ideal">
+    {if isset($prestashop_version) && $prestashop_version == '1.7'}
+        <div id="stripe-ideal-bank-element" class="field"></div>
+    {/if}
+
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+        <div class="payment_module stripe-europe-payments" data-method="ideal">
+            <p title="{l s='Pay by iDeal' mod='stripe_official'}">
+                <img id="ideal" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ideal.png" alt="{l s='Pay by iDeal' mod='stripe_official'}" />
+                {l s='Pay by iDeal' mod='stripe_official'}
+                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+            </p>
+        </div>
+                <span id="stripe-ideal-bank-element" class="field"></span>
+    {/if}
+
+    <div class="stripe-error-message"></div>
 </form>

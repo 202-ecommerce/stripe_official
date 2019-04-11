@@ -24,6 +24,17 @@
 *}
 
 <form class="stripe-payment-form" action="">
-  <input type="hidden" name="stripe-payment-method" value="sofort">
-  <div class="stripe-error-message"></div>
+    <input type="hidden" name="stripe-payment-method" value="sofort">
+
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+        <div class="payment_module stripe-europe-payments" data-method="sofort">
+            <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
+                <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
+                {l s='Pay by SOFORT' mod='stripe_official'}
+                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
+            </p>
+        </div>
+    {/if}
+
+    <div class="stripe-error-message"></div>
 </form>
