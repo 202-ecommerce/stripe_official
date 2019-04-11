@@ -215,8 +215,8 @@ class Stripe_official extends PaymentModule
         $this->display = 'view';
         $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.9.99');
-        // @todo verify if already in use
         $this->currencies = true;
+
         /* curl check */
         if (is_callable('curl_init') === false) {
             $this->errors[] = $this->l('To be able to use this module, please activate cURL (PHP extension).');
@@ -321,6 +321,15 @@ class Stripe_official extends PaymentModule
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 // @todo find translations for all languages
+                // switch (Tools::strtolower($language['iso_code'])) {
+                //     case 'value':
+                //         # code...
+                //         break;
+
+                //     default:
+                //         # code...
+                //         break;
+                // }
                 if (Tools::strtolower($language['iso_code']) == 'fr') {
                     $order_state->name[$language['id_lang']] = 'En attente de paiement Sofort';
                 } else {
@@ -803,15 +812,12 @@ class Stripe_official extends PaymentModule
 
     protected function checkApiConnection($secretKey = null)
     {
-        if (!self::isWellConfigured()) {
-            return false;
-        }
-
         if (!$secretKey) {
             $secretKey = $this->getSecretKey();
         }
 
         try {
+            \Stripe\Stripe::setApiKey($secretKey);
             \Stripe\Account::retrieve();
         } catch (Exception $e) {
             error_log($e->getMessage());
