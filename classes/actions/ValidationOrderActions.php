@@ -94,8 +94,11 @@ class ValidationOrderActions extends DefaultActions
      */
     public function updatePaymentIntent()
     {
-        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent']);
+        $paymentIntent = new StripePaymentIntent();
+        if ($paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']) == false) {
+            // @todo log this case
+            return true;
+        }
         $paymentIntent->setStatus($this->conveyor['status']);
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
         $paymentIntent->update();

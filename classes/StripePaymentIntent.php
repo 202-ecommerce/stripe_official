@@ -117,13 +117,19 @@ class StripePaymentIntent extends ObjectModel
         return $this->date_upd;
     }
 
-    public static function getDatasByIdPaymentIntent($idPaymentIntent)
+    public function findByIdPaymentIntent($idPaymentIntent)
     {
         $query = new DbQuery();
         $query->select('*');
         $query->from(self::$definition['table']);
         $query->where('id_payment_intent = "'. pSQL($idPaymentIntent) .'"');
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+        $data = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+        if ($data) {
+            return false;
+        }
+        $this->hydrate($data);
+
+        return $this;
     }
 }
