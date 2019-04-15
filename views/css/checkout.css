@@ -80,3 +80,8 @@
     cursor: pointer;
     margin-bottom: 9px;
 }
+
+.stripe-error-message {
+    display: none;
+    margin-bottom: 8px;
+}

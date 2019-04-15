@@ -26,6 +26,7 @@
 <form class="stripe-payment-form" action="">
     <input type="hidden" name="stripe-payment-method" value="sofort">
 
+    <div class="stripe-error-message alert alert-danger"></div>
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <div class="payment_module stripe-europe-payments" data-method="sofort">
             <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
@@ -36,5 +37,4 @@
         </div>
     {/if}
 
-    <div class="stripe-error-message"></div>
 </form>

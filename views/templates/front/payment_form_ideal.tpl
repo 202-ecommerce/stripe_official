@@ -25,6 +25,7 @@
 
 <form class="stripe-payment-form" action="">
     <input type="hidden" name="stripe-payment-method" value="ideal">
+    <div class="stripe-error-message alert alert-danger"></div>
     {if isset($prestashop_version) && $prestashop_version == '1.7'}
         <div id="stripe-ideal-bank-element" class="field"></div>
     {/if}
@@ -40,5 +41,4 @@
                 <span id="stripe-ideal-bank-element" class="field"></span>
     {/if}
 
-    <div class="stripe-error-message"></div>
 </form>
