@@ -170,13 +170,18 @@ class ValidationOrderActions extends DefaultActions
         $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
         $charges = $intent->charges->data;
 
+        $cardType = $this->conveyor['source']->type;
+        if (isset($this->conveyor['source']->card)) {
+            $cardType = $this->conveyor['source']->card->brand;
+        }
+
         $stripePayment = new StripePayment();
         $stripePayment->setIdStripe($this->conveyor['chargeId']);
         $stripePayment->setIdPaymentIntent($this->conveyor['id_payment_intent']);
         $stripePayment->setName($this->conveyor['source']->owner->name);
         $stripePayment->setIdCart((int)$this->context->cart->id);
         // $stripePayment->setLast4((int)$charges[0]->payment_method_details->card->last4);
-        $stripePayment->setType(Tools::strtolower($this->conveyor['source']->type));
+        $stripePayment->setType(Tools::strtolower($cardType));
         $stripePayment->setAmount($this->conveyor['amount']);
         $stripePayment->setRefund((int)0);
         $stripePayment->setCurrency(Tools::strtolower($this->context->currency->iso_code));
