@@ -714,7 +714,7 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        if ($this->checkApiConnection($secret_key) && !empty($refund_id)) {
+        if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
             $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
             if ($mode == 1) { /* Total refund */
                 try {
