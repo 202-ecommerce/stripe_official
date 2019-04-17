@@ -25,6 +25,12 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 
+/**
+* Stripe object for ApplePay and GooglePay
+*/
+require_once dirname(__FILE__) . '/classes/StripePaymentRequestHandler.php';
+require_once dirname(__FILE__) . '/classes/exceptions/StripePaymentRequestException.php';
+
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 /**
@@ -93,6 +99,16 @@ class Stripe_official extends PaymentModule
             'visible' => false,
         ),
     );
+
+    /**
+     * List of ModuleFrontController used in this Module
+     * Module::install() register it, after that you can edit it in BO (for rewrite if needed)
+     * @var array
+      */
+    public $controllers = array(
+        'orderFailure',
+    );
+
 
     // public $orderStates = array(
     //     self::OS_SOFORT_WAITING => array(
@@ -315,19 +331,26 @@ class Stripe_official extends PaymentModule
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 // @todo find translations for all languages
-                // switch (Tools::strtolower($language['iso_code'])) {
-                //     case 'value':
-                //         # code...
-                //         break;
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = 'En attente de paiement Sofort';
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = 'Esperando pago Sofort';
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = 'Warten auf Zahlung Sofort';
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = 'Wachten op betaling Sofort';
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = 'In attesa di pagamento Sofort';
+                        break;
 
-                //     default:
-                //         # code...
-                //         break;
-                // }
-                if (Tools::strtolower($language['iso_code']) == 'fr') {
-                    $order_state->name[$language['id_lang']] = 'En attente de paiement Sofort';
-                } else {
-                    $order_state->name[$language['id_lang']] = 'Awaiting for Sofort payment';
+                    default:
+                        $order_state->name[$language['id_lang']] = 'Awaiting for Sofort payment';
+                        break;
                 }
             }
             $order_state->send_email = false;
@@ -990,6 +1013,28 @@ class Stripe_official extends PaymentModule
         // Merchant country (for payment request API)
         $merchantCountry = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $this->context->controller->registerJavascript($this->name.'-stripe-v3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
+            $this->context->controller->registerJavascript($this->name.'-payments', 'modules/'.$this->name.'/views/js/payments.js');
+
+            if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY)) {
+                $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
+            }
+
+            $this->context->controller->registerStylesheet($this->name.'-checkoutcss', 'modules/'.$this->name.'/views/css/checkout.css');
+            $prestashop_version = '1.7';
+        } else {
+            $this->context->controller->addJS('https://js.stripe.com/v3/');
+            $this->context->controller->addJS($this->_path . '/views/js/payments.js');
+
+            if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY)) {
+                $this->context->controller->addJS($this->_path . '/views/js/payment_request.js');
+            }
+
+            $this->context->controller->addCSS($this->_path . '/views/css/checkout.css', 'all');
+            $prestashop_version = '1.6';
+        }
+
         // Javacript variables needed by Elements
         Media::addJsDef(array(
           'stripe_pk' => $this->getPublishableKey(),
@@ -1023,28 +1068,11 @@ class Stripe_official extends PaymentModule
 
           'stripe_validation_return_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
 
-          'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}'
+          'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
+
+          'prestashop_version' => $prestashop_version
         ));
 
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $this->context->controller->registerJavascript($this->name.'-stripe-v3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
-            $this->context->controller->registerJavascript($this->name.'-payments', 'modules/'.$this->name.'/views/js/payments.js');
-
-            if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY)) {
-                $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
-            }
-
-            $this->context->controller->registerStylesheet($this->name.'-checkoutcss', 'modules/'.$this->name.'/views/css/checkout.css');
-        } else {
-            $this->context->controller->addJS('https://js.stripe.com/v3/');
-            $this->context->controller->addJS($this->_path . '/views/js/payments.js');
-
-            if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY)) {
-                $this->context->controller->addJS($this->_path . '/views/js/payment_request.js');
-            }
-
-            $this->context->controller->addCSS($this->_path . '/views/css/checkout.css', 'all');
-        }
     }
 
     /**

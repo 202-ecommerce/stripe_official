@@ -20,7 +20,8 @@ $(function(){
     // Create references to the submit button.
     // const $submit = $('.stripe-submit-button');
     const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .stripe-europe-payments[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
-    const submitInitialText = $submit.text();
+    const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
+    const submitInitialText = $submitButtons.text();
 
     let $form = '';
     let payment = '';
@@ -48,7 +49,7 @@ $(function(){
 
       // Monitor change events on the Card Element to display any errors.
       card.on('change', ({error}) => {
-        updateError(error);
+        updateError($submitButtons, error);
       });
 
       // Create the payment request (browser based payment button).
@@ -70,7 +71,7 @@ $(function(){
           if (error) {
             // Report to the browser that the payment failed.
             event.complete('fail');
-            updateError({error});
+            updateError($submitButtons, {error});
           } else {
             // Report to the browser that the confirmation was successful, prompting
             // it to close the browser payment method collection interface.
@@ -100,7 +101,7 @@ $(function(){
 
       // Monitor change events on the IBAN Element to display any errors.
       iban.on('change', ({error, bankName}) => {
-        updateError(error);
+        updateError($submitButtons, error);
       });
     }
 
@@ -129,6 +130,7 @@ $(function(){
       if (!$('.stripe-payment-form:visible').length) {
         return true;
       }
+      event.preventDefault();
 
       // Retrieve the payment method.
       if ($('#payment-confirmation button[type="submit"]').length > 0) {
@@ -192,7 +194,6 @@ $(function(){
         handleSourceActivation(source, $form);
       }
 
-      event.preventDefault();
       event.stopPropagation();
 
       return false;
@@ -201,7 +202,7 @@ $(function(){
     // Handle new PaymentIntent result
     function handlePayment(response) {
       if (response.error) {
-        updateError(response.error);
+        updateError($submitButtons, response.error);
       } else {
         $.ajax({
             type: 'POST',
@@ -290,14 +291,24 @@ $(function(){
     };
 
     // Update error message
-    function updateError(error) {
+    function updateError(element, error) {
       const $error = $(".stripe-payment-form:visible .stripe-error-message");
+      var elementError = $(element).siblings('.stripe-error-message');
+      var disableElement = $(element).siblings('.stripe-submit-button');
       if (error) {
-        $error.text(error.message).show();
-        disableSubmit(disableText);
+        if (prestashop_version == '1.6') {
+          $(elementError).text(error.message).show();
+        } else {
+          $error.text(error.message).show();
+        }
+        enableSubmit($submitButtons);
       } else {
-        $error.text("").hide();
-        enableSubmit(disableText);
+        if (prestashop_version == '1.6') {
+          $(elementError).text("").hide();
+        } else {
+          $error.text("").hide();
+        }
+        enableSubmit($submitButtons);
       }
     }
 

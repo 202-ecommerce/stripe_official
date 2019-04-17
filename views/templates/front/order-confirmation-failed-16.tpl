@@ -1,5 +1,5 @@
 {*
-* 2007-2019 PrestaShop
+* 2007-2018 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,22 +18,12 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *   @author PrestaShop SA <contact@prestashop.com>
-*   @copyright  2007-2019 PrestaShop SA
+*   @copyright  2007-2018 PrestaShop SA
 *   @license        http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *   International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form class="stripe-payment-form" action="">
-    <input type="hidden" name="stripe-payment-method" value="giropay">
-
-    {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="giropay">
-            <p title="{l s='Pay by Giropay' mod='stripe_official'}">
-                <img id="giropay" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/giropay.png" alt="{l s='Pay by Giropay' mod='stripe_official'}" />
-                {l s='Pay by Giropay' mod='stripe_official'}
-                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
-            </p>
-        </div>
-    {/if}
-
-</form>
+<p>
+    {l s='An error occured during your payment.' mod='stripe_official'}<br />
+    {l s='Please retry later or contact the website owner.' mod='stripe_official'}
+</p>

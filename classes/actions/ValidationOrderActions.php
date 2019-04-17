@@ -64,6 +64,16 @@ class ValidationOrderActions extends DefaultActions
         $this->module = $this->conveyor['module'];
         $source = $this->conveyor['source'];
 
+        $sourceRetrieve = \Stripe\Source::retrieve($source);
+        ProcessLoggerHandler::logInfo($sourceRetrieve);
+        ProcessLoggerHandler::closeLogger();
+
+        if ($sourceRetrieve->status == 'failed') {
+            ProcessLoggerHandler::logInfo($source . " => status failed", 'Cart', $this->context->cart->id);
+            ProcessLoggerHandler::closeLogger();
+            return false;
+        }
+
         $secret_key = $this->module->getSecretKey();
 
         \Stripe\Stripe::setApiKey($secret_key);
@@ -76,9 +86,6 @@ class ValidationOrderActions extends DefaultActions
           'source' => $source,
         ]);
 
-        // $intent = \Stripe\PaymentIntent::retrieve($response->source->metadata->paymentIntent);
-
-        // $response->payment_intent = $intent; //
         $this->conveyor['token'] = $source;
         $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
         $this->conveyor['status'] = $response->status;
@@ -94,11 +101,8 @@ class ValidationOrderActions extends DefaultActions
      */
     public function updatePaymentIntent()
     {
-        $paymentIntent = new StripePaymentIntent();
-        if ($paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']) == false) {
-            // @todo log this case
-            return true;
-        }
+        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($this->conveyor['id_payment_intent']);
+        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent']);
         $paymentIntent->setStatus($this->conveyor['status']);
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
         $paymentIntent->update();

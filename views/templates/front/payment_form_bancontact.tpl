@@ -26,7 +26,6 @@
 <form class="stripe-payment-form" action="">
     <input type="hidden" name="stripe-payment-method" value="bancontact">
 
-    <div class="stripe-error-message alert alert-danger"></div>
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <div class="payment_module stripe-europe-payments" data-method="bancontact">
             <p title="{l s='Pay by Bancontact' mod='stripe_official'}">
