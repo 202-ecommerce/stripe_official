@@ -44,7 +44,8 @@
     margin-bottom: 10px;
 }
 
-#HOOK_PAYMENT #stripe-card-payment .stripe-submit-button {
+#HOOK_PAYMENT #stripe-card-payment .stripe-submit-button,
+#HOOK_PAYMENT .ideal-submit-button {
     background-image: url(../img/lock-locked.png);
     background-size: 12px 17px;
     background-repeat: no-repeat;

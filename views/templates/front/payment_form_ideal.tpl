@@ -39,6 +39,7 @@
             </p>
         </div>
         <span id="stripe-ideal-bank-element" class="field"></span>
+        <button class="ideal-submit-button" data-method="ideal">{l s='Buy now' mod='stripe_official'}</button>
     {/if}
 
 </form>

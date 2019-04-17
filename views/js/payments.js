@@ -19,7 +19,7 @@ $(function(){
 
     // Create references to the submit button.
     // const $submit = $('.stripe-submit-button');
-    const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .stripe-europe-payments[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
+    const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .ideal-submit-button[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
     const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
     const submitInitialText = $submitButtons.text();
 
