@@ -129,19 +129,20 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['secure_key'] = isset($this->context->customer->secure_key) ? $this->context->customer->secure_key : false;
         $paid = $this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency()) ? $this->conveyor['paymentIntent']->getAmount()*100 : $this->conveyor['paymentIntent']->getAmount();
         /* Add transaction on Prestashop back Office (Order) */
-        if (!empty($source->type) && $source->type == 'sofort' && $this->conveyor['status'] == 'pending') {
+        if (!empty($this->conveyor['source']->type) && $this->conveyor['source']->type == 'sofort' && $this->conveyor['status'] == 'pending') {
             $orderStatus = Configuration::get('STRIPE_OS_SOFORT_WAITING');
             $this->conveyor['result'] = 4;
         } else {
             $orderStatus = Configuration::get('PS_OS_PAYMENT');
             $this->conveyor['result'] = 1;
         }
+        $this->conveyor['cart'] = $this->context->cart;
         try {
             $this->module->validateOrder(
-                (int)$this->context->cart->id,
+                (int)$this->conveyor['cart']->id,
                 (int)$orderStatus,
                 $paid,
-                $this->module->l('Payment by Stripe'),
+                $this->module->l('Payment by Stripe', 'ValidationOrderActions'),
                 $message,
                 array(),
                 null,
@@ -157,7 +158,6 @@ class ValidationOrderActions extends DefaultActions
 
         return true;
     }
-
     /*
         Input : 'id_payment_intent', 'source', 'result'
         Output :
@@ -197,12 +197,66 @@ class ValidationOrderActions extends DefaultActions
         $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
         $stripePayment->save();
 
-        $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
-        $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
+        // Payent with Sofort is not accepted yet so we can't get his orderPayment
+        if (Tools::strtolower($cardType) != 'sofort') {
+            $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
+            $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
-        $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
-        $orderPayment->transaction_id = $this->conveyor['chargeId'];
-        $orderPayment->save();
+            $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
+            $orderPayment->transaction_id = $this->conveyor['chargeId'];
+            $orderPayment->save();
+        }
+
+        return true;
+    }
+
+
+    public function chargeWebhook()
+    {
+        ProcessLoggerHandler::logInfo('chargeWebhook', null, null, 'webhook');
+        ProcessLoggerHandler::closeLogger();
+        $this->conveyor['chargeId'] = $this->conveyor['event_json']->data->object->id;
+        ProcessLoggerHandler::logInfo('chargeId => ' . $this->conveyor['chargeId'], null, null, 'webhook');
+        ProcessLoggerHandler::closeLogger();
+        $stripe_payment = new StripePayment();
+        $stripe_payment->getStripePaymentByCharge($this->conveyor['chargeId']);
+        if ($stripe_payment->id == false) {
+            ProcessLoggerHandler::logError('$stripe_payment->id = false', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            return false;
+        }
+
+        ProcessLoggerHandler::logInfo('$stripe_payment->id = OK', null, null, 'webhook');
+        ProcessLoggerHandler::closeLogger();
+
+        $id_order = Order::getOrderByCartId($stripe_payment->id_cart);
+        if ($id_order == false) {
+            ProcessLoggerHandler::logError('$id_order = false', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            return false;
+        }
+
+        ProcessLoggerHandler::logInfo('$id_order = OK', null, null, 'webhook');
+        ProcessLoggerHandler::closeLogger();
+
+        $order = new Order($id_order);
+
+        ProcessLoggerHandler::logInfo('current charge => ' . $this->conveyor['event_json']->type, null, null, 'webhook');
+        ProcessLoggerHandler::closeLogger();
+
+        if ($this->conveyor['event_json']->type == 'charge.succeeded') {
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.succeeded', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+        } elseif ($this->conveyor['event_json']->type == 'charge.canceled') {
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.canceled', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
+        } elseif ($this->conveyor['event_json']->type == 'charge.failed') {
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.failed', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+        }
 
         return true;
     }

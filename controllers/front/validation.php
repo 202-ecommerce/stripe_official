@@ -15,6 +15,7 @@
  */
 
 use Stripe_officialClasslib\Actions\ActionsHandler;
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialValidationModuleFrontController extends ModuleFrontController
 {
@@ -58,6 +59,13 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         } else {
             // Handle error
             ProcessLoggerHandler::logError('Order validation process failed.');
+            ProcessLoggerHandler::closeLogger();
+
+            $url_failed = Context::getContext()->link->getModuleLink(
+                $this->module->name,
+                'orderFailure'
+            );
+            Tools::redirect($url_failed);
         }
 
 
