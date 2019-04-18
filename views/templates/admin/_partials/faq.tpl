@@ -106,7 +106,7 @@
                     </li>
 
                     <li>
-                        {l s='A PHP version >= 5.3.3 environment (Stripe prerequisite). If you have an older PHP version, please ask your hosting provider to' mod='stripe_official'}
+                        {l s='A PHP version >= 5.6 environment (Stripe prerequisite). If you have an older PHP version, please ask your hosting provider to' mod='stripe_official'}
                         {l s='upgrade it to match the requirement.' mod='stripe_official'}
                     </li>
                 </ul>
@@ -225,17 +225,6 @@
                     ({l s='Additional step : make sure you have the file "apple-developer-merchantid-domain-association" on the root of your website in the folder ".well-known/". If no, please follow the steps 2 and 3 in the popup "Add new domain."' mod='stripe_official'})<br/>
                     E : {l s='Add your domain by clicking thebutton "Add".' mod='stripe_official'}<br/><br/>
                     <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_add_domain.png" />
-                </p>
-            </div>
-        </li>
-
-        <li class="faq-item">
-            <span class="faq-trigger">{l s='How to use ApplePay and GooglePay on product page' mod='stripe_official'}</span>
-            <span class="expand pull-right">+</span>
-            <div class="faq-content">
-                <p>
-                    {l s='In order to use ApplePay or GooglePay on product page, you have to enable the guest checkout from your order configuration in the backoffice of your Prestashop. If not, ApplePay and GooglePay won\'t show up.' mod='stripe_official'}<br/><br/>
-                    <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_guest_checkout.png" />
                 </p>
             </div>
         </li>
