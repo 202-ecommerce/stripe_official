@@ -148,7 +148,7 @@ class StripePaymentIntent extends ObjectModel
         $query->where('id_payment_intent = "'. pSQL($idPaymentIntent) .'"');
 
         $data = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
-        if ($data) {
+        if (!$data) {
             return false;
         }
         $this->hydrate($data);

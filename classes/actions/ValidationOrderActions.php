@@ -157,6 +157,7 @@ class ValidationOrderActions extends DefaultActions
             $this->conveyor['result'] = 1;
         }
         $this->conveyor['cart'] = $this->context->cart;
+
         try {
             $this->module->validateOrder(
                 (int)$this->conveyor['cart']->id,
