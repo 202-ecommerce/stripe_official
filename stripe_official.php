@@ -1,16 +1,26 @@
 <?php
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
  *
  * DISCLAIMER
- ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
- * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
- * International Registered Trademark & Property of PrestaShop SA
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
+ * @license   Commercial license
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -24,12 +34,6 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 */
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
-
-/**
-* Stripe object for ApplePay and GooglePay
-*/
-require_once dirname(__FILE__) . '/classes/StripePaymentRequestHandler.php';
-require_once dirname(__FILE__) . '/classes/exceptions/StripePaymentRequestException.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -410,7 +414,7 @@ class Stripe_official extends PaymentModule
                 \Stripe\Charge::all();
             } catch (\Stripe\Error\ApiConnection $e) {
                 $this->warning[] = $this->l(
-                    'TLS 1.2 is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
+                    'Your TLS version is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
                     $this->name
                 );
             }
@@ -872,27 +876,31 @@ class Stripe_official extends PaymentModule
     protected function retrievePaymentIntent($amount, $currency)
     {
         if (isset($this->context->cookie->stripe_payment_intent)) {
-          try {
-            $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
+            try {
+                $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
-            // Check that the amount is still correct
-            if ($intent->amount != $amount) {
-              $intent->update(["amount" => $amount]);
+                // Check that the amount is still correct
+                if ($intent->amount != $amount) {
+                    $intent->update(array(
+                        "amount" => $amount
+                    ));
+                }
+
+                return $intent;
+            } catch (Exception $e) {
+                unset($this->context->cookie->stripe_payment_intent);
+                error_log($e->getMessage());
             }
-
-            return $intent;
-          } catch (Exception $e) {
-            unset($this->context->cookie->stripe_payment_intent);
-            error_log($e->getMessage());
-          }
         }
 
         try {
-            $intent = \Stripe\PaymentIntent::create([
+            $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
-                "payment_method_types" => [array_keys(self::$paymentMethods)],
-            ]);
+                "payment_method_types" => array(
+                    array_keys(self::$paymentMethods)
+                ),
+            ));
 
             // Keep the payment intent ID in session
             $this->context->cookie->stripe_payment_intent = $intent->id;
@@ -1042,26 +1050,14 @@ class Stripe_official extends PaymentModule
           'stripe_payment_id' => $intent->id,
           'stripe_client_secret' => $intent->client_secret,
 
-          'stripe_baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
-          'stripe_module_dir' => $this->_path,
-          'stripe_verification_url' => Configuration::get('PS_SHOP_DOMAIN'),
-
-          'stripe_currency' => strtolower($currency),
+          'stripe_currency' => Tools::strtolower($currency),
           'stripe_amount' => $amount,
 
-          'stripe_firstname' => $this->context->customer->firstname,
-          'stripe_lastname' => $this->context->customer->lastname,
           'stripe_fullname' => $this->context->customer->firstname . ' ' .
                                $this->context->customer->lastname,
 
-          'stripe_address_line1' => $address->address1,
-          'stripe_address_line2' => $address->address2,
-          'stripe_address_city' => $address->city,
-          'stripe_address_zip_code' => $address->postcode,
-          'stripe_address_country' => $address->country,
           'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
-          'stripe_phone' => $address->phone_mobile ?: $address->phone,
           'stripe_email' => $this->context->customer->email,
 
           'stripe_locale' => $this->context->language->iso_code,
@@ -1098,7 +1094,7 @@ class Stripe_official extends PaymentModule
         // Fetch country based on invoice address and currency
         $address = new Address($params['cart']->id_address_invoice);
         $country = Country::getIsoById($address->id_country);
-        $currency = strtolower($this->context->currency->iso_code);
+        $currency = Tools::strtolower($this->context->currency->iso_code);
 
         // Show only the payment methods that are relevant to the selected country and currency
         $display = '';
@@ -1148,7 +1144,7 @@ class Stripe_official extends PaymentModule
         // Fetch country based on invoice address and currency
         $address = new Address($params['cart']->id_address_invoice);
         $country = Country::getIsoById($address->id_country);
-        $currency = strtolower($this->context->currency->iso_code);
+        $currency = Tools::strtolower($this->context->currency->iso_code);
 
         // Show only the payment methods that are relevant to the selected country and currency
         $options = array();
