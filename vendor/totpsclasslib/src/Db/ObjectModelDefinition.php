@@ -367,7 +367,8 @@ class ObjectModelDefinition
                     );
                     break;
                 case ObjectModel::TYPE_HTML:
-                case ObjectModel::TYPE_SQL:
+                // TYPE_SQL not supported in PS 1.6.0
+                //case ObjectModel::TYPE_SQL:
                     $length = isset($constraints['size']) ? $constraints['size'] : null;
                     $length = isset($length['max']) ? $length['max'] : $length;
                     $description .= $length ? "TEXT($length)" : 'TEXT';
