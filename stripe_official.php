@@ -514,7 +514,7 @@ class Stripe_official extends PaymentModule
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
 
             if (!count($this->errors)) {
-                $this->success = $this->l('Data succesfuly saved.');
+                $this->success = $this->l('Refunds processed successfully.');
             }
         }
 
@@ -546,18 +546,17 @@ class Stripe_official extends PaymentModule
 
         $this->displaySomething();
         $this->assignSmartyVars();
-        $this->displayRefundForm();
 
         if (count($this->warning)) {
-            $this->context->smarty->assign('warnings', $this->displayWarning($this->warning));
+            $this->context->smarty->assign('warnings', $this->warning);
         }
 
         if (!empty($this->success) && !count($this->errors)) {
-            $this->context->smarty->assign('success', $this->displayConfirmation($this->success));
+            $this->context->smarty->assign('success', $this->success);
         }
 
         if (count($this->errors)) {
-            $this->context->smarty->assign('errors', $this->displayError($this->errors));
+            $this->context->smarty->assign('errors', $this->errors);
         }
 
         return $this->display($this->_path, 'views/templates/admin/main.tpl');
@@ -585,78 +584,6 @@ class Stripe_official extends PaymentModule
     }
 
     /*
-     ** Display Submit form for Refund
-     */
-    public function displayRefundForm()
-    {
-        $fields_form = array();
-        $fields_value = array();
-
-        $fields_form[1]['form'] = array(
-            'legend' => array(
-                'title' => $this->l('Choose an Order you want to Refund'),
-            ),
-            'input' => array(
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Stripe Payment ID'),
-                    'desc' => '<i>'.$this->l('To process a refund, please input Stripe’s payment ID below, which can be found in the « Payments » tab of this plugin').'</i>',
-                    'name' => self::REFUND_ID,
-                    'class' => 'fixed-width-xxl',
-                    'required' => true
-                ),
-                array(
-                    'type' => 'radio',
-                    'desc' => '<i>'.$this->l('We’ll submit any refund you make to your customer’s bank immediately.').'<br>'.
-                        $this->l('Your customer will then receive the funds from a refund approximately 2-3 business days after the date on which the refund was initiated.').'<br>'.
-                        $this->l('Refunds take 5 to 10 days to appear on your cutomer’s statement.').'</i>',
-                    'name' => self::REFUND_MODE,
-                    'size' => 50,
-                    'values' => array(
-                        array(
-                            'id' => 'active_on_refund',
-                            'value' => 1,
-                            'label' => $this->l('Full refund')
-                        ),
-                        array(
-                            'id' => 'active_off_refund',
-                            'value' => 0,
-                            'label' => $this->l('Partial Refund')
-                        )
-                    ),
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Amount'),
-                    'desc' => $this->l('Please, enter an amount your want to refund'),
-                    'name' => self::REFUND_AMOUNT,
-                    'size' => 20,
-                    'id' => 'refund_amount',
-                    'class' => 'fixed-width-sm',
-                    'required' => true
-                ),
-            ),
-            'submit' => array(
-                'title' => $this->l('Request Refund'),
-                'class' => 'btn btn-default pull-right button',
-            ),
-        );
-        $this->refund = 1;
-
-        $submit_action = 'submit_refund_id';
-        $fields_value = array(
-            self::REFUND_ID => Configuration::get(self::REFUND_ID),
-            self::REFUND_MODE => Configuration::get(self::REFUND_MODE),
-            self::REFUND_AMOUNT => Configuration::get(self::REFUND_AMOUNT),
-        );
-
-        $this->context->smarty->assign(
-            'refund_form',
-            $this->renderGenericForm($fields_form, $fields_value, $submit_action)
-        );
-    }
-
-    /*
      ** @Method: displaySomething
      ** @description: just display something (it's something)
      **
@@ -678,42 +605,6 @@ class Stripe_official extends PaymentModule
         }
 
         $this->context->smarty->assign('return_url', $return_url);
-    }
-
-    /*
-     ** @Method: renderGenericForm
-     ** @description: render generic form for prestashop
-     **
-     ** @arg: $fields_form, $fields_value, $submit = false, array $tpls_vars = array()
-     ** @return: (none)
-     */
-    public function renderGenericForm($fields_form, $fields_value = array(), $submit = false, array $tpl_vars = array())
-    {
-        $helper = new HelperForm();
-        $helper->module = $this;
-        $helper->name_controller = $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-        $helper->title = $this->displayName;
-        $helper->show_toolbar = false;
-        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-        $helper->default_form_language = $default_lang;
-        $helper->allow_employee_form_lang = $default_lang;
-
-        if ($submit) {
-            $helper->submit_action = $submit;
-        }
-
-        $helper->tpl_vars = array_merge(array(
-            'fields_value' => $fields_value,
-            'id_language' => $this->context->language->id,
-            'back_url' => $this->context->link->getAdminLink('AdminModules')
-            .'&configure='.$this->name
-            .'&tab_module='.$this->tab
-            .'&module_name='.$this->name
-        ), $tpl_vars);
-
-        return $helper->generateForm($fields_form);
     }
 
     /*

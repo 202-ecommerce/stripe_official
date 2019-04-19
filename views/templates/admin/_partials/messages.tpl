@@ -23,11 +23,23 @@
 *}
 
 {if isset($success)}
-	{$success|escape:'htmlall':'UTF-8'}
+    {foreach from=$success item=success_message}
+    	<div class="alert alert-success clearfix">
+            {$success_message|escape:'htmlall':'UTF-8'}
+        </div>
+    {/foreach}
 {/if}
 {if isset($warnings)}
-	{$warnings|escape:'htmlall':'UTF-8'}
+    {foreach from=$warnings item=warnings_message}
+        <div class="alert alert-warning clearfix">
+            {$warnings_message|escape:'htmlall':'UTF-8'}
+        </div>
+    {/foreach}
 {/if}
 {if isset($errors)}
-	{$errors|escape:'htmlall':'UTF-8'}
+    {foreach from=$errors item=errors_message}
+        <div class="alert alert-danger clearfix">
+            {$errors_message|escape:'htmlall':'UTF-8'}
+        </div>
+    {/foreach}
 {/if}

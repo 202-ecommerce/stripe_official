@@ -22,7 +22,7 @@
  * @license   Commercial license
 *}
 
-<form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_2" method="post" enctype="multipart/form-data" novalidate="">
+<form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">

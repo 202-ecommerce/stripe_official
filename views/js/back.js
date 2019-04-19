@@ -79,17 +79,17 @@ $(document).ready(function() {
 	value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 	if (value == 1)
-		$("#refund_amount").parent().parent().hide();
+		$(".partial-amount").hide();
 	else
-		$("#refund_amount").parent().parent().show();
+		$(".partial-amount").show();
 
 	$('input[name=STRIPE_REFUND_MODE]').on('change', function() {
 		value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 		if (value == 1)
-			$("#refund_amount").parent().parent().hide();
+			$(".partial-amount").hide();
 		else
-			$("#refund_amount").parent().parent().show();
+			$(".partial-amount").show();
 	});
 
 	$('.process-icon-refresh').click(function(){
