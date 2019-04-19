@@ -85,7 +85,7 @@ class ValidationOrderActions extends DefaultActions
 
         $amount = $this->context->cart->getOrderTotal();
         if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
-            $amount * 100;
+            $amount = $amount * 100;
         }
 
         $response = \Stripe\Charge::create(array(
@@ -141,7 +141,7 @@ class ValidationOrderActions extends DefaultActions
         }
 
         if ($this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency())) {
-            $paid = $this->conveyor['paymentIntent']->getAmount()*100
+            $paid = $this->conveyor['paymentIntent']->getAmount()*100;
         } else {
             $paid = $this->conveyor['paymentIntent']->getAmount();
         }
