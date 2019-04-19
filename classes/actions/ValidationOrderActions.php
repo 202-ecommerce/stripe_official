@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2007-2019 PrestaShop
  *
@@ -23,6 +22,7 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
+
 use Stripe_officialClasslib\Actions\DefaultActions;
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 use Stripe_officialClasslib\Registry;
@@ -50,7 +50,12 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['id_payment_intent'] = $response->id;
         $this->conveyor['status'] = $response->status;
         $this->conveyor['chargeId'] = $charges[0]->id;
-        $this->conveyor['amount'] = $this->module->isZeroDecimalCurrency($this->context->currency->iso_code) ? $charges[0]->amount : $charges[0]->amount / 100;
+
+        if ($this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
+            $this->conveyor['amount'] = $charges[0]->amount;
+        } else {
+            $this->conveyor['amount'] = $charges[0]->amount / 100;
+        }
 
         return true;
     }
@@ -80,12 +85,15 @@ class ValidationOrderActions extends DefaultActions
         \Stripe\Stripe::setApiKey($secret_key);
 
         $amount = $this->context->cart->getOrderTotal();
+        if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
+            $amount * 100
+        }
 
-        $response = \Stripe\Charge::create([
-          'amount' => $this->module->isZeroDecimalCurrency($this->context->currency->iso_code) ? $amount : $amount * 100,
+        $response = \Stripe\Charge::create(array(
+          'amount' => $amount,
           'currency' => $this->context->currency->iso_code,
           'source' => $source,
-        ]);
+        ));
 
         $this->conveyor['token'] = $source;
         $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
@@ -102,8 +110,8 @@ class ValidationOrderActions extends DefaultActions
      */
     public function updatePaymentIntent()
     {
-        $paymentIntentDatas = StripePaymentIntent::getDatasByIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $paymentIntent = new StripePaymentIntent($paymentIntentDatas['id_stripe_payment_intent']);
+        $paymentIntent = new StripePaymentIntent();
+        $paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']);
         $paymentIntent->setStatus($this->conveyor['status']);
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
         $paymentIntent->update();
@@ -119,7 +127,7 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
-        if($this->conveyor['status'] != 'succeeded' && $this->conveyor['status'] != 'pending') {
+        if ($this->conveyor['status'] != 'succeeded' && $this->conveyor['status'] != 'pending') {
             return false;
         }
 
@@ -127,10 +135,22 @@ class ValidationOrderActions extends DefaultActions
 
         $this->conveyor['source'] = \Stripe\Source::retrieve($this->conveyor['token']);
 
-        $this->conveyor['secure_key'] = isset($this->context->customer->secure_key) ? $this->context->customer->secure_key : false;
-        $paid = $this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency()) ? $this->conveyor['paymentIntent']->getAmount()*100 : $this->conveyor['paymentIntent']->getAmount();
+        if (isset($this->context->customer->secure_key)) {
+            $this->conveyor['secure_key'] = $this->context->customer->secure_key;
+        } else {
+            $this->conveyor['secure_key'] = false;
+        }
+
+        if ($this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency())) {
+            $paid = $this->conveyor['paymentIntent']->getAmount()*100
+        } else {
+            $paid = $this->conveyor['paymentIntent']->getAmount();
+        }
+
         /* Add transaction on Prestashop back Office (Order) */
-        if (!empty($this->conveyor['source']->type) && $this->conveyor['source']->type == 'sofort' && $this->conveyor['status'] == 'pending') {
+        if (!empty($this->conveyor['source']->type)
+            && $this->conveyor['source']->type == 'sofort'
+            && $this->conveyor['status'] == 'pending') {
             $orderStatus = Configuration::get('STRIPE_OS_SOFORT_WAITING');
             $this->conveyor['result'] = 4;
         } else {
@@ -176,7 +196,6 @@ class ValidationOrderActions extends DefaultActions
         }
 
         $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
-        $charges = $intent->charges->data;
 
         $cardType = $this->conveyor['source']->type;
         if (isset($this->conveyor['source']->card)) {
@@ -188,7 +207,6 @@ class ValidationOrderActions extends DefaultActions
         $stripePayment->setIdPaymentIntent($this->conveyor['id_payment_intent']);
         $stripePayment->setName($this->conveyor['source']->owner->name);
         $stripePayment->setIdCart((int)$this->context->cart->id);
-        // $stripePayment->setLast4((int)$charges[0]->payment_method_details->card->last4);
         $stripePayment->setType(Tools::strtolower($cardType));
         $stripePayment->setAmount($this->conveyor['amount']);
         $stripePayment->setRefund((int)0);
@@ -242,7 +260,7 @@ class ValidationOrderActions extends DefaultActions
 
         $order = new Order($id_order);
 
-        ProcessLoggerHandler::logInfo('current charge => ' . $this->conveyor['event_json']->type, null, null, 'webhook');
+        ProcessLoggerHandler::logInfo('current charge => '.$this->conveyor['event_json']->type, null, null, 'webhook');
         ProcessLoggerHandler::closeLogger();
 
         if ($this->conveyor['event_json']->type == 'charge.succeeded') {
@@ -261,5 +279,4 @@ class ValidationOrderActions extends DefaultActions
 
         return true;
     }
-
 }

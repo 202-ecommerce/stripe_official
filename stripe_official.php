@@ -405,7 +405,10 @@ class Stripe_official extends PaymentModule
     {
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
-            $this->warning[] = $this->l('You must enable SSL on the store if you want to use this module in production.', $this->name);
+            $this->warning[] = $this->l(
+                'You must enable SSL on the store if you want to use this module in production.',
+                $this->name
+            );
         }
 
         /* Check if TLS is enabled and the TLS version used is 1.2 */
@@ -413,6 +416,9 @@ class Stripe_official extends PaymentModule
             try {
                 \Stripe\Charge::all();
             } catch (\Stripe\Error\ApiConnection $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo($e);
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+
                 $this->warning[] = $this->l(
                     'Your TLS version is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
                     $this->name
@@ -480,7 +486,11 @@ class Stripe_official extends PaymentModule
         if (Tools::isSubmit('submit_refund_id')) {
             $refund_id = Tools::getValue(self::REFUND_ID);
             if (!empty($refund_id)) {
-                $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+                $query = new DbQuery();
+                $query->select('*');
+                $query->from('stripe_payment');
+                $query->where('id_stripe = "'.pSQL($refund_id).'"');
+                $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
             } else {
                 $this->errors[] = $this->l('Please make sure to put a Stripe Id');
                 return false;
@@ -719,7 +729,11 @@ class Stripe_official extends PaymentModule
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
         if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
-            $refund = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+            $query = new DbQuery();
+            $query->select('*');
+            $query->from('stripe_payment');
+            $query->where('id_stripe = "'.pSQL($refund_id).'"');
+            $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
             if ($mode == 1) { /* Total refund */
                 try {
                     $ch = \Stripe\Charge::retrieve($refund_id);
@@ -756,15 +770,23 @@ class Stripe_official extends PaymentModule
 
                 if ($amount <= $refund[0]['amount']) {
                     Db::getInstance()->Execute(
-                        'UPDATE `'._DB_PREFIX_.'stripe_payment` SET `result` = '.(int)$result.', `date_add` = NOW(), `refund` = "'
-                        .pSQL($amount).'" WHERE `id_stripe` = "'.pSQL($refund_id).'"'
+                        'UPDATE `'._DB_PREFIX_.'stripe_payment`
+                        SET `result` = '.(int)$result.',
+                            `date_add` = NOW(),
+                            `refund` = "'.pSQL($amount).'"
+                        WHERE `id_stripe` = "'.pSQL($refund_id).'"'
                     );
                 }
             }
 
             $id_order = Order::getOrderByCartId($id_card);
             $order = new Order($id_order);
-            $state = Db::getInstance()->getValue('SELECT `result` FROM '._DB_PREFIX_.'stripe_payment WHERE `id_stripe` = "'.pSQL($refund_id).'"');
+
+            $query = new DbQuery();
+            $query->select('result');
+            $query->from('stripe_payment');
+            $query->where('id_stripe = "'.pSQL($refund_id).'"');
+            $state = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
 
             if ($state == 2) {
                 /* Refund State */
@@ -930,14 +952,13 @@ class Stripe_official extends PaymentModule
             Tools::getValue('controller') == 'AdminModules' &&
             Tools::getIsset('configure') &&
             Tools::getValue('configure') == $this->name) {
-
             Media::addJsDef(array(
                 'transaction_refresh_url' => $this->context->link->getAdminLink(
-                            'AdminAjaxTransaction',
-                            true,
-                            array(),
-                            array('ajax' => 1, 'action' => 'refresh')
-                  ),
+                    'AdminAjaxTransaction',
+                    true,
+                    array(),
+                    array('ajax' => 1, 'action' => 'refresh')
+                ),
             ));
         }
     }
@@ -1022,14 +1043,29 @@ class Stripe_official extends PaymentModule
         $merchantCountry = new Country(Configuration::get('PS_COUNTRY_DEFAULT'));
 
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $this->context->controller->registerJavascript($this->name.'-stripe-v3', 'https://js.stripe.com/v3/', array('server'=>'remote'));
-            $this->context->controller->registerJavascript($this->name.'-payments', 'modules/'.$this->name.'/views/js/payments.js');
+            $this->context->controller->registerJavascript(
+                $this->name.'-stripe-v3',
+                'https://js.stripe.com/v3/',
+                array(
+                    'server'=>'remote'
+                )
+            );
+            $this->context->controller->registerJavascript(
+                $this->name.'-payments',
+                'modules/'.$this->name.'/views/js/payments.js'
+            );
 
             if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY)) {
-                $this->context->controller->registerJavascript($this->name.'-stripepaymentrequest', 'modules/'.$this->name.'/views/js/payment_request.js');
+                $this->context->controller->registerJavascript(
+                    $this->name.'-stripepaymentrequest',
+                    'modules/'.$this->name.'/views/js/payment_request.js'
+                );
             }
 
-            $this->context->controller->registerStylesheet($this->name.'-checkoutcss', 'modules/'.$this->name.'/views/css/checkout.css');
+            $this->context->controller->registerStylesheet(
+                $this->name.'-checkoutcss',
+                'modules/'.$this->name.'/views/css/checkout.css'
+            );
             $prestashop_version = '1.7';
         } else {
             $this->context->controller->addJS('https://js.stripe.com/v3/');
@@ -1045,30 +1081,34 @@ class Stripe_official extends PaymentModule
 
         // Javacript variables needed by Elements
         Media::addJsDef(array(
-          'stripe_pk' => $this->getPublishableKey(),
-          'stripe_merchant_country_code' => $merchantCountry->iso_code,
-          'stripe_payment_id' => $intent->id,
-          'stripe_client_secret' => $intent->client_secret,
+            'stripe_pk' => $this->getPublishableKey(),
+            'stripe_merchant_country_code' => $merchantCountry->iso_code,
+            'stripe_payment_id' => $intent->id,
+            'stripe_client_secret' => $intent->client_secret,
 
-          'stripe_currency' => Tools::strtolower($currency),
-          'stripe_amount' => $amount,
+            'stripe_currency' => Tools::strtolower($currency),
+            'stripe_amount' => $amount,
 
-          'stripe_fullname' => $this->context->customer->firstname . ' ' .
+            'stripe_fullname' => $this->context->customer->firstname . ' ' .
                                $this->context->customer->lastname,
 
-          'stripe_address_country_code' => Country::getIsoById($address->id_country),
+            'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
-          'stripe_email' => $this->context->customer->email,
+            'stripe_email' => $this->context->customer->email,
 
-          'stripe_locale' => $this->context->language->iso_code,
+            'stripe_locale' => $this->context->language->iso_code,
 
-          'stripe_validation_return_url' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
+            'stripe_validation_return_url' => $this->context->link->getModuleLink(
+                $this->name,
+                'validation',
+                array(),
+                true
+            ),
 
-          'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
+            'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
 
-          'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version
         ));
-
     }
 
     /**
@@ -1082,7 +1122,10 @@ class Stripe_official extends PaymentModule
 
         if (!$this->checkApiConnection()) {
             $this->context->smarty->assign(array(
-                'stripeError' => $this->l('No API keys have been provided. Please contact the owner of the website.', $this->name)
+                'stripeError' => $this->l(
+                    'No API keys have been provided. Please contact the owner of the website.',
+                    $this->name
+                )
             ));
         }
 
@@ -1131,7 +1174,10 @@ class Stripe_official extends PaymentModule
 
         if (!$this->checkApiConnection()) {
             $this->context->smarty->assign(array(
-                'stripeError' => $this->l('No API keys have been provided. Please contact the owner of the website.', $this->name)
+                'stripeError' => $this->l(
+                    'No API keys have been provided. Please contact the owner of the website.',
+                    $this->name
+                )
             ));
         }
 
@@ -1175,14 +1221,16 @@ class Stripe_official extends PaymentModule
             if (in_array($paymentMethod['flow'], array('redirect', 'receiver'))) {
                 $option->setAdditionalInformation(
                     $this->context->smarty->fetch(
-                        'module:' . $this->name . '/views/templates/front/payment_info_' . basename($paymentMethod['flow']) . '.tpl'
+                        'module:'.$this->name.'/views/templates/front/payment_info_'.basename($paymentMethod['flow']).'.tpl'
                     )
                 );
             }
 
             // Payment methods with embedded form fields
-            $option->setForm($this->context->smarty->fetch(
-                'module:' . $this->name . '/views/templates/front/payment_form_' .  basename($name) . '.tpl')
+            $option->setForm(
+                $this->context->smarty->fetch(
+                    'module:' . $this->name . '/views/templates/front/payment_form_' .  basename($name) . '.tpl'
+                )
             );
 
             $options[] = $option;

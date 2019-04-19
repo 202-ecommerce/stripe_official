@@ -23,11 +23,11 @@
 *}
 
 {if isset($success)}
-	{$success}
+	{$success|escape:'htmlall':'UTF-8'}
 {/if}
 {if isset($warnings)}
-	{$warnings}
+	{$warnings|escape:'htmlall':'UTF-8'}
 {/if}
 {if isset($errors)}
-	{$errors}
+	{$errors|escape:'htmlall':'UTF-8'}
 {/if}

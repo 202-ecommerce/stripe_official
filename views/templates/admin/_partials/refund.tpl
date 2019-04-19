@@ -21,4 +21,4 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
 *}
-{$refund_form}
+{$refund_form|escape:'htmlall':'UTF-8'}

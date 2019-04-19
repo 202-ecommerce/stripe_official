@@ -25,7 +25,6 @@
 
 class stripe_officialOrderFailureModuleFrontController extends ModuleFrontController
 {
-
     /**
      * @see FrontController::initContent()
      */

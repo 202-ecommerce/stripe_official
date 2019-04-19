@@ -26,7 +26,7 @@
 <div class="tabs">
 	<div class="sidebar navigation col-md-2">
 		{if isset($logo)}
-		  <img class="tabs-logo" src="{$logo}"/>
+		  <img class="tabs-logo" src="{$logo|escape:'htmlall':'UTF-8'}"/>
 		{/if}
 		<nav class="list-group categorieList">
 			<a class="list-group-item migration-tab" href="#stripe_step_1">

@@ -102,6 +102,8 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'code' => '1',
             'url' => $url
         );
-        $this->ajaxDie(Tools::jsonEncode($chargeResult));
+
+        echo Tools::jsonEncode($chargeResult);
+        exit;
     }
 }

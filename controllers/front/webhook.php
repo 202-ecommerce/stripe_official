@@ -79,14 +79,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             echo $msg;
             exit;
         }
-        // if ($event_json->data->object->metadata->verification_url != Configuration::get('PS_SHOP_DOMAIN')) {
-        //     $msg = 'This order have been done on other site';
-        //     ProcessLoggerHandler::logError($msg, null, null, 'webhook');
-        //     ProcessLoggerHandler::closeLogger();
-        //     http_response_code(500);
-        //     echo $msg;
-        //     exit;
-        // }
 
         http_response_code(200);
         $availlableType = array('charge.canceled', 'charge.failed', 'charge.succeeded', 'charge.pending');
@@ -96,7 +88,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             ProcessLoggerHandler::closeLogger();
             echo $msg;
             exit;
-
         }
 
         ProcessLoggerHandler::logInfo('starting webhook actions', null, null, 'webhook');

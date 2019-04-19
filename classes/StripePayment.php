@@ -228,8 +228,6 @@ class StripePayment extends ObjectModel
 
     public function getState()
     {
-        //$paymentInformations['state'] = Tools::safeOutput($paymentInformations['state']) ? $this->l('Test') : $this->l('Live');
-
         return $this->state;
     }
 

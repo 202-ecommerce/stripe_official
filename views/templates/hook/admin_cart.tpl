@@ -41,12 +41,12 @@
 
         <tbody>
             <tr>
-                <td>{$paymentInformations->date_add}</td>
-                <td><a href="{$paymentInformations->url_dashboard.paymentIntent|escape:'htmlall'}" target="blank">{$paymentInformations->id_payment_intent}</a></td>
-                <td>{$paymentInformations->name}</td>
-                <td><img src="{$module_dir}/views/img/cc-{$paymentInformations->type}.png" alt="payment method" style="width:43px;"/></td>
-                <td>{$paymentInformations->amount} {$paymentInformations->currency}</td>
-                <td>{$paymentInformations->refund} {$paymentInformations->currency}</td>
+                <td>{$paymentInformations->date_add|escape:'htmlall':'UTF-8'}</td>
+                <td><a href="{$paymentInformations->url_dashboard.paymentIntent|escape:'htmlall':'UTF-8'}" target="blank">{$paymentInformations->id_payment_intent|escape:'htmlall':'UTF-8'}</a></td>
+                <td>{$paymentInformations->name|escape:'htmlall':'UTF-8'}</td>
+                <td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$paymentInformations->type|escape:'htmlall':'UTF-8'}.png" alt="payment method" style="width:43px;"/></td>
+                <td>{$paymentInformations->amount|escape:'htmlall':'UTF-8'} {$paymentInformations->currency|escape:'htmlall':'UTF-8'}</td>
+                <td>{$paymentInformations->refund|escape:'htmlall':'UTF-8'} {$paymentInformations->currency|escape:'htmlall':'UTF-8'}</td>
                 {if $paymentInformations->result == 2}
                     <td>{l s='Refund' mod='stripe_official'}</td>
                 {elseif $paymentInformations->result == 3}
@@ -54,9 +54,9 @@
                 {elseif $paymentInformations->result == 4}
                     <td>{l s='Waiting' mod='stripe_official'}</td>
                 {else}
-                    <td><img src="{$module_dir}/views/img/{$paymentInformations->result}ok.gif" alt="result" /></td>
+                    <td><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/{$paymentInformations->result|escape:'htmlall':'UTF-8'}ok.gif" alt="result" /></td>
                 {/if}
-                <td class="uppercase">{$paymentInformations->state}</td>
+                <td class="uppercase">{$paymentInformations->state|escape:'htmlall':'UTF-8'}</td>
             </tr>
         </tbody>
     </table>

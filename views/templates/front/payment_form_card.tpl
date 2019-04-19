@@ -33,7 +33,7 @@
     {/if}
 
     <input type="hidden" name="stripe-payment-method" value="card">
-    <div class="stripe-error-message alert alert-danger"><p>{if isset($stripeError)}{$stripeError}{/if}</p></div>
+    <div class="stripe-error-message alert alert-danger"><p>{if isset($stripeError)}{$stripeError|escape:'htmlall':'UTF-8'}{/if}</p></div>
     <div id="stripe-card-element" class="field"></div>
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}

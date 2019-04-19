@@ -33,10 +33,10 @@
     </p>
     <p>
         <span><strong>{l s='Payment date' mod='stripe_official'}</strong></span><br/>
-        <span>{$stripe_date}</span>
+        <span>{$stripe_date|escape:'htmlall':'UTF-8'}</span>
     </p>
     <p>
         <span><strong>{l s='Payment Type' mod='stripe_official'}</strong></span><br/>
-        <span><img src="{$module_dir}/views/img/cc-{$stripe_paymentType}.png" alt="payment method" style="width:43px;"/></span>
+        <span><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$stripe_paymentType|escape:'htmlall':'UTF-8'}.png" alt="payment method" style="width:43px;"/></span>
     </p>
 </div>
