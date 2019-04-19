@@ -172,6 +172,12 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
     margin-top: 10px;
 }
 
+#applepay_googlepay,
+label[for="applepay_googlepay"] {
+    display: inline-block;
+    vertical-align: top;
+}
+
 /* Retina support */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),
