@@ -29,7 +29,6 @@ use Stripe_officialClasslib\Registry;
 
 class ValidationOrderActions extends DefaultActions
 {
-
     protected $context;
     protected $module;
 
@@ -86,7 +85,7 @@ class ValidationOrderActions extends DefaultActions
 
         $amount = $this->context->cart->getOrderTotal();
         if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
-            $amount * 100
+            $amount * 100;
         }
 
         $response = \Stripe\Charge::create(array(
@@ -194,8 +193,6 @@ class ValidationOrderActions extends DefaultActions
         if (!$this->module->isZeroDecimalCurrency($this->conveyor['source']->currency)) {
             $this->conveyor['source']->amount /= 100;
         }
-
-        $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
 
         $cardType = $this->conveyor['source']->type;
         if (isset($this->conveyor['source']->card)) {
