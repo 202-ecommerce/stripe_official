@@ -34,42 +34,33 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $secret_key = $this->module->getSecretKey();
 
         ProcessLoggerHandler::logInfo($secret_key, null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
 
         try {
             \Stripe\Stripe::setApiKey($secret_key);
-            ProcessLoggerHandler::logInfo('setApiKey ok', null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             print_r($e->getMessage());
-            ProcessLoggerHandler::logInfo('setApiKey not ok', null, null, 'webhook');
-            ProcessLoggerHandler::logError($e->getMessage(), null, null, 'webhook');
+            ProcessLoggerHandler::logError('setApiKey not ok: ' . $e->getMessage(), null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             http_response_code(500);
             exit;
         }
         // Retrieve the request's body and parse it as JSON
-        ProcessLoggerHandler::logInfo('Retrieve the request\'s body and parse it as JSON', null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
+        ProcessLoggerHandler::logInfo('setApiKey ok. Retrieve the request\'s body and parse it as JSON', null, null, 'webhook');
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
         $event_json = json_decode($input);
         ProcessLoggerHandler::logInfo('$event_json->type => ' . $event_json->type, null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
 
         try {
             \Stripe\Event::retrieve($event_json->id);
-            ProcessLoggerHandler::logInfo('event ' . $event_json->id . ' retrieved', null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
-            print_r($e->getMessage());
             ProcessLoggerHandler::logError($e->getMessage(), null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             http_response_code(500);
+            echo $e->getMessage();
             exit;
         }
-
+        ProcessLoggerHandler::logInfo('event ' . $event_json->id . ' retrieved', null, null, 'webhook');
 
         if (!$event_json) {
             $msg = 'JSON not valid';
@@ -91,12 +82,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         ProcessLoggerHandler::logInfo('starting webhook actions', null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
 
         // Create the handler
         $handler = new ActionsHandler();
-
-         // Set input data
         $handler->setConveyor(array(
                     'event_json' => $event_json,
                     'module' => $this->module,
@@ -111,6 +99,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             ProcessLoggerHandler::closeLogger();
             exit;
         }
+        ProcessLoggerHandler::closeLogger();
         echo 'OK';
         exit;
     }
