@@ -40,7 +40,11 @@ function upgrade_module_2_0_0($module)
     Configuration::deleteByName('_PS_STRIPE_secure');
 
     $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+    $installer->installObjectModel('StripePayment');
     $installer->installObjectModel('StripePaymentIntent');
+    $installer->installExtension(Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension::class);
+    $installer->installAdminControllers();
+    $installer->registerHooks();
 
     return true;
 }
