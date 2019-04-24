@@ -99,6 +99,15 @@ $(function(){
           prButton.mount('#stripe-payment-request-button');
           // TODO: show additional instructions
         }
+
+        prButton.on('click', function(event) {
+          if (prestashop_version == '1.7') {
+            if ($('#payment-confirmation button[type="submit"]').attr('disabled') == "disabled") {
+              $('.stripe-payment-request-button-warning').modal('show');
+              event.preventDefault();
+            }
+          }
+        });
       }
     }
 

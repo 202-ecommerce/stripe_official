@@ -23,13 +23,23 @@
 *}
 
 <form class="stripe-payment-form" id="stripe-card-payment">
+    {if $applepay_googlepay == 'on'}
+        <div id="stripe-payment-request-button"></div>
 
-    {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <h3 class="stripe_title">{l s='Pay by card' mod='stripe_official'}</h3>
+        {if isset($prestashop_version) && $prestashop_version == '1.7'}
+            <div class="stripe-payment-request-button-warning modal fade">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <button type="button" class="closer" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div class="modal-body">{l s='Please make sure you agreed to our Terms of Service before going any further' mod='stripe_official'}</div>
+                    </div>
+                </div>
+            </div>
+        {/if}
 
-        <img class="cc-icon disable"  id="visa"       rel="visa"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-visa.png" />
-        <img class="cc-icon disable"  id="mastercard" rel="masterCard" alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-mastercard.png" />
-        <img class="cc-icon disable"  id="amex"       rel="amex"       alt="" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/cc-amex.png" />
+        <p class="card-payment-informations">{l s='Pay now with the card saved in your device by clicking on the button above or fill in your card details below and submit at the end of the page' mod='stripe_official'}</p>
     {/if}
 
     <input type="hidden" name="stripe-payment-method" value="card">
@@ -38,9 +48,5 @@
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <button class="stripe-submit-button" data-method="card">{l s='Buy now' mod='stripe_official'}</button>
-    {/if}
-
-    {if $applepay_googlepay == 'on'}
-        <div id="stripe-payment-request-button"></div>
     {/if}
 </form>
