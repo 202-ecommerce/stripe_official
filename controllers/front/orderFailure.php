@@ -32,6 +32,10 @@ class stripe_officialOrderFailureModuleFrontController extends ModuleFrontContro
     {
         parent::initContent();
 
+        $this->context->smarty->assign(array(
+            'stripe_order_url' => $this->context->link->getPageLink('order')
+        ));
+
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $this->setTemplate('module:stripe_official/views/templates/front/order-confirmation-failed-17.tpl');
         } else {

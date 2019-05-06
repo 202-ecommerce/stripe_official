@@ -24,5 +24,5 @@
 
 <p>
     {l s='An error occured during your payment.' mod='stripe_official'}<br />
-    {l s='Please retry later or contact the website owner.' mod='stripe_official'}
+    {l s='Please' mod='stripe_official'} <a href="{$stripe_order_url}">{l s='try again' mod='stripe_official'}</a> {l s='or contact the website owner.' mod='stripe_official'}
 </p>
