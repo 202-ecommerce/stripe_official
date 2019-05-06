@@ -105,9 +105,9 @@
 							<input type="checkbox" id="bancontact" name="bancontact" {if $bancontact}checked="checked"{/if}/>
 							<label for="bancontact">{l s='Activate Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
-							<label for="sofort">{l s='Activate SOFORT (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
+							<label for="sofort">{l s='Activate SOFORT (if you have German, Austrian customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-							<label for="giropay">{l s='Activate Giropay (if you have German, Austrian or Swiss customers)' mod='stripe_official'}</label><br>
+							<label for="giropay">{l s='Activate Giropay (if you have German customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
 							<label for="applepay_googlepay">{l s='Enable Payment Request Buttons. (Apple Pay/Google Pay)' mod='stripe_official'}<br>{l s='By using Apple Pay, you agree to'  mod='stripe_official'} <a href="https://stripe.com/us/legal" target="blank">Stripe</a> {l s='and'  mod='stripe_official'} <a href="https://www.apple.com/legal/internet-services/terms/site.html" target="blank">Apple</a> {l s='\'s terms of service.'  mod='stripe_official'}</label>
 						</div>

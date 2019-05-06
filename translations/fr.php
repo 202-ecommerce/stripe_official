@@ -37,8 +37,8 @@ $_MODULE['<{stripe_official}prestashop>configuration_c5a13d3307dcb32aa18305c13e9
 $_MODULE['<{stripe_official}prestashop>configuration_ab13c23b9e0b23a84d9639f61d3cc895'] = 'Sélectionnez ci-dessous chaque moyen de paiement que vous souhaitez proposer sur votre site Web :';
 $_MODULE['<{stripe_official}prestashop>configuration_77f102c7f89c43904527db3fe946fb27'] = 'Activer iDEAL (si vous avez des clients néerlandais)';
 $_MODULE['<{stripe_official}prestashop>configuration_10b796a790281eac8b4ad65c0d2abc1f'] = 'Activer Bancontact (si vous avez des clients belges)';
-$_MODULE['<{stripe_official}prestashop>configuration_5148a94327ef83766d070b7af9e781ef'] = 'Activer SOFORT (si vous avez des clients allemands, autrichiens ou suisses)';
-$_MODULE['<{stripe_official}prestashop>configuration_4fe629b3d3e807c8c204539e00385a66'] = 'Activer Giropay (si vous avez des clients allemands, autrichiens ou suisses)';
+$_MODULE['<{stripe_official}prestashop>configuration_a9ecff279618334cae1a99378be0f22c'] = 'Activer SOFORT (si vous avez des clients allemands ou australiens)';
+$_MODULE['<{stripe_official}prestashop>configuration_8a2d8b97c8711d8db7d6b2bf22930f93'] = 'Activer Giropay (si vous avez des clients allemands)';
 $_MODULE['<{stripe_official}prestashop>configuration_a2d4c952c20daaa54c9be8d3191af08b'] = 'Pour suivre le bon déroulement des paiements effectués avec ces moyens de paiement, vous devrez ajouter un « webhook ». Un webhook vous permet d’être informé lorsqu’un événement (paiement réussi par exemple) se produit sur votre site Web.';
 $_MODULE['<{stripe_official}prestashop>configuration_03482676272af7083c8578b65b57d433'] = 'Allez sur la page webhook de votre tableau de bord Stripe :';
 $_MODULE['<{stripe_official}prestashop>configuration_132a923c9b43d622f9b7ff66194b000a'] = 'Mettez le bouton « Filter event » sur « Send all event types ».';
