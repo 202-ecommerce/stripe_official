@@ -59,6 +59,7 @@ $(function(){
       // Monitor change events on the Card Element to display any errors.
       card.on('change', ({error}) => {
         updateError($submitButtons, error);
+        $submit.attr('disabled', 'disabled');
       });
 
       // Create the payment request (browser based payment button).
@@ -102,7 +103,7 @@ $(function(){
 
         prButton.on('click', function(event) {
           if (prestashop_version == '1.7') {
-            if ($('#payment-confirmation button[type="submit"]').attr('disabled') == "disabled") {
+            if ($submit.attr('disabled') == "disabled") {
               $('.stripe-payment-request-button-warning').modal('show');
               event.preventDefault();
             }
