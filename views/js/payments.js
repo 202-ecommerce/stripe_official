@@ -101,6 +101,8 @@ $(function(){
         if (await paymentRequest.canMakePayment()) {
           prButton.mount('#stripe-payment-request-button');
           // TODO: show additional instructions
+        } else {
+          $('.card-payment-informations').hide();
         }
 
         prButton.on('click', function(event) {
