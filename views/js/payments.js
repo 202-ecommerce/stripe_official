@@ -47,7 +47,9 @@ $(function(){
     const stripe = Stripe(stripe_pk, { betas: ['payment_intent_beta_3'] });
 
     // Create an instance of Elements and prepare the CSS
-    const elements = stripe.elements();
+    const elements = stripe.elements({
+      locale: stripe_locale
+    });
     const style = JSON.parse(stripe_css);
 
     // Create a Card Element and pass some custom styles to it.
