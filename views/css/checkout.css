@@ -86,3 +86,12 @@
     display: none;
     margin-bottom: 8px;
 }
+
+.card-payment-informations {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.payment-options #stripe-card-payment {
+    margin: 20px 0px;
+}
