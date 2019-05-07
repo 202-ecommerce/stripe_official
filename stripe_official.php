@@ -405,7 +405,13 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#FFDD99';
-            $order_state->save();
+            try {
+                $order_state->save();
+            } catch (\PrestaShopException $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo('Install error: ' . $e);
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+                return false;
+            }
 
             Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
         }
