@@ -377,6 +377,7 @@ class Stripe_official extends PaymentModule
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE)))) {
             $order_state = new OrderState();
             $langs = Language::getLanguages();
+            $order_state->name = array();
             foreach ($langs as $lang) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'fr':
