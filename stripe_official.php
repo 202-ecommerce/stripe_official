@@ -410,7 +410,7 @@ class Stripe_official extends PaymentModule
             } catch (\PrestaShopException $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo('Install error: ' . $e);
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
-                return false;
+                return true;
             }
 
             Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
