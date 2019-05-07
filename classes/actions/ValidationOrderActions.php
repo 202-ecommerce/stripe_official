@@ -238,8 +238,7 @@ class ValidationOrderActions extends DefaultActions
         ProcessLoggerHandler::logInfo('chargeId => ' . $this->conveyor['chargeId'], null, null, 'webhook');
         ProcessLoggerHandler::closeLogger();
         $stripe_payment = new StripePayment();
-
-        $stripe_payment->getStripePaymentByCart((int)$this->context->cart->id);
+        $stripe_payment->getStripePaymentByCharge($this->conveyor['chargeId']);
 
         if ($stripe_payment->id == false) {
             ProcessLoggerHandler::logError('$stripe_payment->id = false', null, null, 'webhook');

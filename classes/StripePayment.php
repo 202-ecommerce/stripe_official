@@ -258,6 +258,23 @@ class StripePayment extends ObjectModel
         return $this;
     }
 
+    public function getStripePaymentByCharge($id_charge)
+    {
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from(static::$definition['table']);
+        $query->where('id_stripe = ' . (int)$id_charge);
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+        if ($result == false) {
+            return $this;
+        }
+
+        $this->hydrate($result);
+
+        return $this;
+    }
+
     public function getDashboardUrl()
     {
         $url_type = '';
