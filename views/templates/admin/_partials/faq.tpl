@@ -61,179 +61,231 @@
 
 <div class="clearfix"></div>
 <h3><i class="icon-info-sign"></i> {l s='Frequently Asked Questions' mod='stripe_official'}</h3>
- <div class="faq items">
+<div class="faq items">
+    <span class="faq-title">{l s='General' mod='stripe_official'}</span>
     <ul id="basics" class="faq-items">
         <li class="faq-item">
-            <span class="faq-trigger">{l s='How much does Stripe cost?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Do I need a Stripe account to use this module?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Stripe has not setup fees, no monthly fees and no storage fees.' mod='stripe_official'}<br>
-                    {l s='There’s no additional fee for failed charges.' mod='stripe_official'}<br><br>
-                    {l s='For European companies, Stripe charges (per successful transaction) :' mod='stripe_official'}<br>
-                    - {l s='1.4% + €0.25/£0.20 with a European card' mod='stripe_official'}<br>
-                    - {l s='2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
-                    {l s='For other payment methods, non-European merchants pricing and additional information, please check our website:' mod='stripe_official'} <a target="_blank" href="https://www.stripe.com/pricing">www.stripe.com/pricing</a>.
-                </p><br>
-                <p>{l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
-                    <a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>.
+                    {l s='Yes. It takes only a few minutes to sign up and it\'s free:' mod='stripe_official'} <a target="_blank" href="https://dashboard.stripe.com/register ">https://dashboard.stripe.com/register </a>.
+                </p><
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Can I test before creating an account?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Unfortunately, you have to use your own account. Again, this is quick & free and doesn\'t engage you to anything. You can use the test mode and never go live if you are not satisfied with our solutions!' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='How to upgrade my TLS version to 1.2 ?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='How much will it cost me?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='You can follow our' mod='stripe_official'} <a href="https://support.stripe.com/questions/how-do-i-upgrade-my-stripe-integration-from-tls-1-0-to-tls-1-2" target="blank">{l s='detailed upgrade instructions' mod='stripe_official'}</a> {l s='to check your version and learn how to secure your servers. While there are usually no changes required to your Stripe code, you might need to upgrade the operating system or packages on your servers.' mod='stripe_official'}
+                    {l s='Downloading, installing and testing this module is entirely free. You will only get charged once you start processing live payments. You can learn more about our pricing model online:' mod='stripe_official'} <a target="_blank" href="https://stripe.com/pricing">https://stripe.com/pricing</a>.
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <span class="faq-title">{l s='Features' mod='stripe_official'}</span>
+    <ul id="basics" class="faq-items">
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='What payment methods are supported?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='This module supports card payments, Apple Pay, Google Pay, Microsoft Pay, Bancontact, iDeal, Giropay and Sofort.' mod='stripe_official'}<br>
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='What are the required elements to use the module?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Why are some Stripe features not supported by this module?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
-                <p>
-                    {l s='To use this module and process credit card payments, you will need to have the following before going any further:' mod='stripe_official'}
-                </p>
-
-                <ul>
-                    <li>
-                        {l s='An installed SSL certificate. In order to get it, please contact your web hosting service or a SSL certificate provider.' mod='stripe_official'}
-                    </li>
-
-                    <li>
-                        {l s='A PHP version >= 5.6 environment (Stripe prerequisite). If you have an older PHP version, please ask your hosting provider to' mod='stripe_official'}
-                        {l s='upgrade it to match the requirement.' mod='stripe_official'}
-                    </li>
-                </ul>
+                {l s='Implementing features in this module requires time for development, testing and releasing. We started with what we felt was more likely to cover most of the merchants and customers needs. We will be adding the missing features one by one in the future.' mod='stripe_official'}
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='How can I get Stripe test secret and publishable keys for the connection tab?' mod='stripe_official'}</span>
-            <span class="expand pull-right">+</span>
-            <div class="faq-content">
-                {l s='First, you need to create and administrate a Stripe account. Then, you’ll find your API keys located in your account settings.' mod='stripe_official'}
-            </div>
-        </li>
-
-        <li class="faq-item">
-            <span class="faq-trigger">{l s='What is Stripe pricing?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Can I ask you to add a new feature?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='For European companies, Stripe charges (per successful transaction): ' mod='stripe_official'}<br>
-                    - {l s='1.4% + €0.25/£0.20 with a European card ' mod='stripe_official'}<br>
-                    - {l s='2.9% + €0.25/£0.20 with a non-European card' mod='stripe_official'}<br>
-                    {l s='Stripe has no setup fees, no monthly fees, no validation fees, no refund fees, and no card storage fees. There’s no additional fee for failed charges or refunds.' mod='stripe_official'}<br>
-                </p>
-
-                <p>
-                    {l s='If you’d like to learn more about our simple pricing, please check our website: ' mod='stripe_official'}
-                    <a href="http://stripe.com/pricing" target="_blank">http://stripe.com/pricing</a><br>
-                    {l s='We offer customized pricing for larger businesses. If you accept more than €30,000 per month,' mod='stripe_official'}
-                    <a target="_blank" href="https://stripe.com/contact/sales"> {l s='get in touch' mod='stripe_official'}</a>
+                    {l s='We don\'t take feature requests at the moment. If you still feel like your suggestion could benefit all our PrestaShop users, feel free to reach out to us:' mod='stripe_official'} <a target="_blank" href="https://support.stripe.com/contact">https://support.stripe.com/contact</a>.
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='What is the difference between Test and Live Mode?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Is Stripe Radar supported?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Every account is divided into two universes: one for testing, and one for running on your live website.' mod='stripe_official'}
-                </p>
-
-                <p>
-                    {l s='In test mode, credit card transactions don\'t go through the actual credit card network — instead, they go through simple checks in' mod='stripe_official'}
-                    {l s='Stripe to validate that they look like they might be credit cards.' mod='stripe_official'}
-                </p>
-
-                <p>
-                    {l s='In order to activate Live mode, you only need to click No in “Test mode” configuration.' mod='stripe_official'}
+                    {l s='Yes, if available for your Stripe account, you can use Stripe Radar with this module.' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='How can I make test payments using Stripe payment gateway on my store?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Are card payments compatible with the new Strong Customer Authentication requirement and 3DS v2?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='When the module is in test mode, you are able to click any of the credit card buttons (VISA, MasterCard, etc. logos) on the' mod='stripe_official'}
-                    {l s='payment page to generate a sample credit card number for testing purposes.' mod='stripe_official'}
+                    {l s='Yes, starting from the version 2.0 of this module, all card payments are compatible with 3DS v2 and SCA ready.' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='What are the required elements to use ApplePay and GooglePay?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Is Stripe Billing supported?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    <h3>{l s='To use ApplePay : ' mod='stripe_official'}</h3>
-                </p>
-                <p>
-                    <h4>{l s='On IOS device' mod='stripe_official'}</h4>
-                    - {l s='Open in Safari on your device running iOS 10 or later.' mod='stripe_official'}<br/>
-                    - {l s='Make sure you have a card in your Wallet, by going to Settings -> Wallet & Apple Pay.' mod='stripe_official'}
-                    <h4>{l s='On Mac' mod='stripe_official'}</h4>
-                    - {l s='Open in Safari on your Mac running macOS Sierra or later.' mod='stripe_official'}<br/>
-                    - {l s='Make sure you have an iPhone (not an iPad; Safari doesn\'t support them yet) with a card in its Wallet paired to your Mac with Handoff. Instructions can be found on' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204681" target="blank">{l s='Apple\'s Support website.' mod='stripe_official'}</a>
-                </p>
-                <hr/>
-                <p>
-                    <h3>{l s='To use GooglePay : ' mod='stripe_official'}</h3>
-                </p>
-                <p>
-                    <h4>{l s='On Chrome' mod='stripe_official'}</h4>
-                    - {l s='Chrome 61 or newer.' mod='stripe_official'}<br/>
-                    - <a href="https://support.google.com/chrome/answer/142893?co=GENIE.Platform%3DDesktop&hl=en" target="blank">{l s='A saved payment card.' mod='stripe_official'}</a>
-                    <h4>{l s='On Chrome Mobile for Android' mod='stripe_official'}</h4>
-                    - {l s='Chrome 61 or newer.' mod='stripe_official'}<br/>
-                    - <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel" target="blank">{l s='An activated Android Pay card' mod='stripe_official'}</a> {l s='or' mod='stripe_official'} <a href="https://support.google.com/chrome/answer/142893?co=GENIE.Platform%3DAndroid&hl=en" target="blank"> {l s='a saved card.' mod='stripe_official'}</a>
+                    {l s='No, Stripe Billing is not currently supported.' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='Why are ApplePay and GooglePay not displayed on my website ?' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Is Stripe Connect supported?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Both ApplePay and GooglePay needs a secure https to be displayed and to be used.' mod='stripe_official'}<br/>
-                    <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ssl_secure.png" />
+                    {l s='No, Stripe Connect is not currently supported.' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='Add manually my domain from my Dashboard in order to use ApplePay' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='How can I implement a new feature myself?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='You can manually add your domain(s) throught your Dashboard. You can easily do this by following those five steps once you are logged into your Dashboard : ' mod='stripe_official'}<br/>
-                    A : {l s='Go to the "Payments" menu.' mod='stripe_official'}<br/>
-                    B : {l s='Click on Apple Pay.' mod='stripe_official'}<br/>
-                    C : {l s='Click on the button "Add new domain".' mod='stripe_official'}<br/>
-                    D : {l s='Provide the domain by filling the input.' mod='stripe_official'}<br/>
-                    ({l s='Additional step : make sure you have the file "apple-developer-merchantid-domain-association" on the root of your website in the folder ".well-known/". If no, please follow the steps 2 and 3 in the popup "Add new domain."' mod='stripe_official'})<br/>
-                    E : {l s='Add your domain by clicking thebutton "Add".' mod='stripe_official'}<br/><br/>
-                    <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_add_domain.png" />
+                    {l s='If you\'re a developer, you can follow our online guides and documentation:' mod='stripe_official'} <a target="_blank" href="https://stripe.com/docs">https://stripe.com/docs</a><br/>
+                    {l s='Otherwise, you can look for a developer or an agency specialised in PrestaShop:' mod='stripe_official'} <a target="_blank" href="https://www.prestashop.com/experts">https://www.prestashop.com/experts</a>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <span class="faq-title">{l s='Installation' mod='stripe_official'}</span>
+    <ul id="basics" class="faq-items">
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='What are the requirements?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    - {l s='PrestaShop 1.6 or higher' mod='stripe_official'}<br/>
+                    - {l s='PHP 5.6 or higher' mod='stripe_official'}<br/>
+                    - {l s='TLS 1.2 (live mode)' mod='stripe_official'}<br/>
+                    - {l s='A Stripe account' mod='stripe_official'}
                 </p>
             </div>
         </li>
 
         <li class="faq-item">
-            <span class="faq-trigger">{l s='How to be able to use ApplePay' mod='stripe_official'}</span>
+            <span class="faq-trigger">{l s='Are there any known incompatibilities with other modules?' mod='stripe_official'}</span>
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='ApplePay account associated with a card : To add a card to Apple Pay, you need a MacBook Pro with Touch ID. On Mac models without built-in Touch ID, you can complete your purchase using Apple Pay on your eligible iPhone or Apple Watch : ' mod='stripe_official'} <a href="https://support.apple.com/en-us/HT204506#macbookpro">https://support.apple.com/en-us/HT204506#macbookpro</a>
+                    - {l s='PrestaShop is a highly customisable online shop solution with many ready to use extensions in order to fit your specific needs.' mod='stripe_official'}<br>
+                    - {l s='Knowing this, it is impossible to guarantee that our module will work with all customised shops.' mod='stripe_official'}<br>
+                    - {l s='This module is compatible with most of the existing modules. The only exception concerns modules altering the standard behavior of the checkout flow. If you have such modules installed in your shop, we recommend you try our module in your test environment first.' mod='stripe_official'}<br>
+                    - {l s='In case there is an incompatibility, you should reach out to your developer to make our module compatible with your shop.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='What are test and live modes?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    - {l s='Test mode allows you to validate that the module works well in your shop and to see what the user experience feels like without actually debiting any money nor triggering any cost to you.' mod='stripe_official'}
+                    - {l s='Once ready to charge your customers with our module, you can switch to live mode.' mod='stripe_official'}
+                    - {l s='Test and live modes are distinguished by different sets of API keys.' mod='stripe_official'}
+                    - {l s='For more information:' mod='stripe_official'} <a href="https://stripe.com/docs/keys">https://stripe.com/docs/keys</a> {l s='and' mod='stripe_official'} <a href="https://stripe.com/docs/testing">https://stripe.com/docs/testing</a>
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='How can I check if my installation is successful?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Configure your test mode API keys (see https://stripe.com/docs/keys), activate your preferred payment methods and go through the consumer checkout flow.' mod='stripe_official'}
+                    {l s='You can use our testing card numbers:' mod='stripe_official'} <a href="https://stripe.com/docs/testing">https://stripe.com/docs/testing</a> {l s='You can use our testing card numbers:' mod='stripe_official'}<br/>
+                    {l s='If the module works well in test mode, it should work just as well in live mode.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='How can I configure my 3DS preferences?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='You can use Stripe Radar, our anti-fraud module to fine-tune your protection needs directly from your Stripe Dashboard:' mod='stripe_official'} <a href="https://stripe.com/radar">https://stripe.com/radar</a>
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <span class="faq-title">{l s='Troubleshooting problems' mod='stripe_official'}</span>
+    <ul id="basics" class="faq-items">
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='I activated Apple Pay / Google Pay, why can\'t I see the Pay button?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    - {l s='Make sure that your host supports TLS 1.2.' mod='stripe_official'}<br/>
+                    - {l s='For Apple Pay, you also need to get your domain verified by Apple (see https://stripe.com/docs/apple-pay/web/v2#going-live).' mod='stripe_official'}<br/>
+                    - {l s='Check that you have a payment card saved in your device/browser.' mod='stripe_official'}<br/>
+                    {l s='If the button still doesn\'t show, please contact our developers: https://addons.prestashop.com/en/contact-us?id_product=24922' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='My customer can\'t/couldn\'t pay, how can I help him?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='You can check your Stripe Dashboard to see if his payment has been declined:' mod='stripe_official'} <a href="https://dashboard.stripe.com/payments">https://dashboard.stripe.com/payments</a><br>
+                    {l s='If you don\'t find a trace of any payment attempt for that customer, there might have been a technical issue. Please reach out to our developers:' mod='stripe_official'} <a href="https://addons.prestashop.com/en/contact-us?id_product=24922">https://addons.prestashop.com/en/contact-us?id_product=24922</a>
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='My customer already provided his payment details, can I debit him myself for future orders?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Stripe allows payment methods to be securely saved against your customers for future use:' mod='stripe_official'} <a href="https://stripe.com/docs/payments/payment-methods/saving">https://stripe.com/docs/payments/payment-methods/saving</a><br/>
+                    {l s='Unfortunately, this module doesn\'t support this feature yet. Thus, your customer has to enter his payment details for any new payment via the usual checkout flow.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='My customer paid but the order status has not been updated, what should I do?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='A technical issue might have occured between the payment and the order validation.' mod='stripe_official'}<br/>
+                    {l s='You can check your Stripe Dashboard to confirm that the customer has indeed been debited (https://dashboard.stripe.com/payments) and update the order manually in your shop\'s back office.' mod='stripe_official'}<br/>
+                    {l s='If this occurs more than once, you may want to ask your developer to investigate for any Javascript or PHP errors occuring during the checkout flow and eventually reach out to our developers for help:' mod='stripe_official'} <a href="https://addons.prestashop.com/en/contact-us?id_product=24922">https://addons.prestashop.com/en/contact-us?id_product=24922</a>
                 </p>
             </div>
         </li>

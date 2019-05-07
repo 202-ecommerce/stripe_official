@@ -532,7 +532,7 @@ class Stripe_official extends PaymentModule
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
 
             if (!count($this->errors)) {
-                $this->success = $this->l('Refunds processed successfully.');
+                $this->success = $this->l('Refunds processed successfully');
             }
         }
 

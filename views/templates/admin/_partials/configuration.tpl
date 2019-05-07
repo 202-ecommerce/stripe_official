@@ -166,7 +166,7 @@
 		<div class="panel-footer">
 			<button type="submit" value="1" id="configuration_form_submit_btn" name="submit_login" class="btn btn-default pull-right button">
 				<i class="process-icon-save"></i>
-				{l s='Enregistrer' mod='stripe_official'}
+				{l s='Save' mod='stripe_official'}
 			</button>
 		</div>
 	</div>
