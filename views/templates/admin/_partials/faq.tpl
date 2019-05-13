@@ -70,7 +70,7 @@
             <div class="faq-content">
                 <p>
                     {l s='Yes. It takes only a few minutes to sign up and it\'s free:' mod='stripe_official'} <a target="_blank" href="https://dashboard.stripe.com/register ">https://dashboard.stripe.com/register </a>.
-                </p><
+                </p>
             </div>
         </li>
 
