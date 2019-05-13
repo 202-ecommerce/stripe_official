@@ -83,7 +83,6 @@ $(function(){
           if (error) {
             // Report to the browser that the payment failed.
             event.complete('fail');
-            updateError($submitButtons, {error});
           } else {
             // Report to the browser that the confirmation was successful, prompting
             // it to close the browser payment method collection interface.
