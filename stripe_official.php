@@ -526,7 +526,7 @@ class Stripe_official extends PaymentModule
                 Configuration::updateValue(self::REFUND_ID, Tools::getValue(self::REFUND_ID));
             } else {
                 $this->refund = 0;
-                $this->errors[] = $this->l('This Stipe ID doesn\'t exist, please check it again');
+                $this->errors[] = $this->l('This Stripe ID doesn\'t exist, please check it again');
                 Configuration::updateValue(self::REFUND_ID, '');
             }
 
