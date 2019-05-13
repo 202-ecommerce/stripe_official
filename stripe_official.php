@@ -113,19 +113,6 @@ class Stripe_official extends PaymentModule
         'orderFailure',
     );
 
-
-    // public $orderStates = array(
-    //     self::OS_SOFORT_WAITING => array(
-    //         'name'        => array(
-    //             'en' => 'Payment end of month',
-    //             'fr' => 'Paiement à la fin du mois',
-    //         ),
-    //         'color'       => '#FFDD99',
-    //         'logable'     => true,
-    //         'unremovable' => true,
-    //     ),
-    // );
-
     /**
     * List of hooks needed in this module
     * _202 classlib_ extentions will plugged automatically hooks
@@ -200,7 +187,6 @@ class Stripe_official extends PaymentModule
             'countries' => array('CN', 'HK', 'SG', 'JP'),
             'currencies' => array('aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'nzd', 'sgd', 'usd'),
         ),
-        // In BETA on request only. TODO: check what to do about this one
         'sepa_debit' => array(
             'name' => 'SEPA Direct Debit', 'flow' => 'none',
             'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'FI'),
