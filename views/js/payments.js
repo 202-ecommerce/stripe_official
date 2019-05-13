@@ -88,6 +88,7 @@ $(function(){
             // Report to the browser that the confirmation was successful, prompting
             // it to close the browser payment method collection interface.
             event.complete('success');
+            $submit.attr('disabled', 'disabled');
             // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
             const response = await stripe.handleCardPayment(stripe_client_secret);
             handlePayment(response);
