@@ -362,9 +362,8 @@ class Stripe_official extends PaymentModule
         if (!Configuration::get(self::PARTIAL_REFUND_STATE)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE)))) {
             $order_state = new OrderState();
-            $langs = Language::getLanguages();
             $order_state->name = array();
-            foreach ($langs as $lang) {
+            foreach (Language::getLanguages() as $language) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'fr':
                         $order_state->name[$language['id_lang']] = pSQL('Remboursement partiel Stripe');
@@ -383,7 +382,7 @@ class Stripe_official extends PaymentModule
                         break;
 
                     default:
-                        $order_state->name[$lang['id_lang']] = pSQL('Stripe Partial Refund');
+                        $order_state->name[$language['id_lang']] = pSQL('Stripe Partial Refund');
                         break;
                 }
             }
@@ -391,13 +390,7 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#FFDD99';
-            try {
-                $order_state->save();
-            } catch (\PrestaShopException $e) {
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo('Install error: ' . $e);
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
-                return true;
-            }
+            $order_state->add();
 
             Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
         }
