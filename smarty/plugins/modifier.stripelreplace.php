@@ -30,8 +30,8 @@
  * @param.name string
  */
 
-if (!function_exists('smarty_modifier_totlreplace')) {
-    function smarty_modifier_totlreplace($string, $replaces = array())
+if (!function_exists('smarty_modifier_stripelreplace')) {
+    function smarty_modifier_stripelreplace($string, $replaces = array())
     {
         $search = array(
             '[b]',
