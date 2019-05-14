@@ -51,7 +51,7 @@
 				<span>{l s='Now that you have created your Stripe account, you have to enter below your API keys in both test and live mode.' mod='stripe_official'}</span>
 				<br/>
 				<span>
-					{{l s='These API keys can be found and managed from your Stripe [a @href1@]dashboard[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/account/apikeys'}, '@target@' => {'target="blank"'}]}
+					{{l s='These API keys can be found and managed from your Stripe [a @href1@]dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/apikeys'}, '@target@' => {'target="blank"'}]}
 				</span>
 			</div>
 
@@ -85,7 +85,7 @@
 				<ul>
 					<li>{l s='Toggle the button above to Test Mode.' mod='stripe_official'}</li>
 					<li>
-						{{l s='To perform test payments, you can use test card numbers available in our [a @href1@]documentation[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'http://www.stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}
+						{{l s='To perform test payments, you can use test card numbers available in our [a @href1@]documentation[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'http://www.stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}
 					</li>
 					<li>{l s='In Test Mode, you can not run live charges.' mod='stripe_official'}</li>
 				</ul>
@@ -113,7 +113,7 @@
 							<label for="giropay">{l s='Activate Giropay (if you have German customers)' mod='stripe_official'}</label><br>
 							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
 							<label for="applepay_googlepay">
-								{{l s='Enable Payment Request Buttons. (Apple Pay/Google Pay)[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
+								{{l s='Enable Payment Request Buttons. (Apple Pay/Google Pay)[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
 							</label>
 						</div>
 
@@ -123,7 +123,7 @@
 						<br><br>
 						<ul>
 							<li>
-								{{l s='Go on the webhook page of your Stripe dashboard: [a @href1@]https://dashboard.stripe.com/account/webhooks[/a]' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/account/webhooks'}, '@target@' => {'target="blank"'}]}
+								{{l s='Go on the webhook page of your Stripe dashboard: [a @href1@]https://dashboard.stripe.com/account/webhooks[/a]' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/webhooks'}, '@target@' => {'target="blank"'}]}
 							</li>
 							<li>{l s='Click on "Add Endpoint" and copy/paste this URL in the "URL to be called" field:' mod='stripe_official'} {$url_webhhoks|escape:'htmlall':'UTF-8'}</li>
 							<li>{l s='Set the "Events to send" radion button to "Live events"' mod='stripe_official'}</li>
@@ -138,7 +138,7 @@
 					</li>
 					<br>
 					<li>
-						{{l s='Activate these payment methods on your [a @href1@]Stripe dashboard[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
+						{{l s='Activate these payment methods on your [a @href1@]Stripe dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
 					</li>
 					<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
 						{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 10 minutes.' mod='stripe_official'}</p>

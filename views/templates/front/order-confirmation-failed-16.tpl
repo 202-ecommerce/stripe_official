@@ -24,5 +24,5 @@
 
 <p>
     {l s='An error occured during your payment.' mod='stripe_official'}<br />
-    {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|totlreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}]}
+    {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}]}
 </p>
