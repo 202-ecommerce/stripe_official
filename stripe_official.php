@@ -1143,15 +1143,20 @@ class Stripe_official extends PaymentModule
     {
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $order = $params['order'];
+            $prestashop_version = '1.7';
         } else {
             $order = $params['objOrder'];
+            $prestashop_version = '1.6';
         }
 
         if (!self::isWellConfigured() || !$this->active || $order->module != $this->name) {
             return;
         }
 
-        $this->context->smarty->assign('stripe_order_reference', pSQL($order->reference));
+        $this->context->smarty->assign(array(
+            'stripe_order_reference' => pSQL($order->reference),
+            'prestashop_version' => $prestashop_version
+        ));
 
         return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
     }

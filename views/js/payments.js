@@ -64,6 +64,10 @@ $(function(){
         $submit.attr('disabled', 'disabled');
       });
 
+      card.on('change', ({complete}) => {
+        $submit.removeAttr('disabled');
+      });
+
       // Create the payment request (browser based payment button).
       const paymentRequest = stripe.paymentRequest({
         country: stripe_merchant_country_code,
