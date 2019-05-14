@@ -229,6 +229,8 @@ class Stripe_official extends PaymentModule
         $this->description = $this->l('Start accepting stripe payments today, directly from your shop!', $this->name);
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?', $this->name);
 
+        require_once realpath(dirname(__FILE__) .'/smarty/plugins') . '/modifier.Stripelreplace.php';
+
         /* Use a specific name to bypass an Order confirmation controller check */
         $bypassControllers = array('orderconfirmation', 'order-confirmation');
         if (in_array(Tools::getValue('controller'), $bypassControllers)) {

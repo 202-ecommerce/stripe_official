@@ -45,18 +45,15 @@
 <div class="clearfix"></div>
 <h3><i class="icon-info-sign"></i> {l s='Improve your conversion rate and securely charge your customers with Stripe, the easiest payment platform' mod='stripe_official'}</h3>
 <div class="form-group stripe-module-col1inner">
-    - <span>{l s='Improve your conversion rate' mod='stripe_official'} </span>
-    {l s='by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your own pages, without redirection to a bank third-part page.' mod='stripe_official'}<br>
-    - <span>{l s='Keep your fraud under control' mod='stripe_official'}</span> {l s='thanks to customizable 3D-Secure and' mod='stripe_official'}
-    <a target="_blank" href="https://stripe.com/radar">{l s='Stripe Radar' mod='stripe_official'}</a>{l s=', our suite of anti-fraud tools.' mod='stripe_official'}<br>
-    - <span>{l s='Easily refund ' mod='stripe_official'}</span>
-    {l s='your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}<br>
-    - {l s='Start selling abroad by offering payments in ' mod='stripe_official'}
-    <span>{l s='135+ currencies' mod='stripe_official'}</span> {l s='and 4 local payment methods (iDEAL, Bancontact, SOFORT, Giropay).' mod='stripe_official'}<br><br>
+    - {{l s='[b]Improve your conversion rate[/b] by offering a seamless payment experience to your customers: Stripe lets you host the payment form on your own pages, without redirection to a bank third-part page.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/radar'}, '@target@' => {'target="blank"'}]}<br>
+    - {{l s='[b]Keep your fraud under control[/b] thanks to customizable 3D-Secure and [a @href1@]Stripe Radar[/a], our suite of anti-fraud tools.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/radar'}, '@target@' => {'target="blank"'}]}<br>
+    - {{l s='[b]Easily refund[/b] your orders through your PrestaShop’s back-office (and automatically update your PrestaShop order status).' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/radar'}, '@target@' => {'target="blank"'}]}<br>
+    - {{l s='Start selling abroad by offering payments in [b]135+ currencies[/b] and 4 local payment methods (iDEAL, Bancontact, SOFORT, Giropay).' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/radar'}, '@target@' => {'target="blank"'}]}<br><br>
     <img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/started.png" style="width:100%;">
     <br><br>
-    <p>{l s='Find out more about Stripe on our website: ' mod='stripe_official'}
-    <a target="_blank" href="https://stripe.com/fr">www.stripe.com</a></p>
+    <p>
+        {{l s='Find out more about Stripe on our website: [a @href1@]www.stripe.com[/a]' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/fr'}, '@target@' => {'target="blank"'}]}
+    </p>
 </div>
 
 <div class="clearfix"></div>
@@ -69,7 +66,7 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Yes. It takes only a few minutes to sign up and it\'s free:' mod='stripe_official'} <a target="_blank" href="https://dashboard.stripe.com/register ">https://dashboard.stripe.com/register </a>.
+                    {{l s='Yes. It takes only a few minutes to sign up and it\'s free: [a @href1@]https://dashboard.stripe.com/register[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/register'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -89,7 +86,7 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Downloading, installing and testing this module is entirely free. You will only get charged once you start processing live payments. You can learn more about our pricing model online:' mod='stripe_official'} <a target="_blank" href="https://stripe.com/pricing">https://stripe.com/pricing</a>.
+                    {{l s='Downloading, installing and testing this module is entirely free. You will only get charged once you start processing live payments. You can learn more about our pricing model online: [a @href1@]https://stripe.com/pricing[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/pricing'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -120,7 +117,7 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='We don\'t take feature requests at the moment. If you still feel like your suggestion could benefit all our PrestaShop users, feel free to reach out to us:' mod='stripe_official'} <a target="_blank" href="https://support.stripe.com/contact">https://support.stripe.com/contact</a>.
+                    {{l s='We don\'t take feature requests at the moment. If you still feel like your suggestion could benefit all our PrestaShop users, feel free to reach out to us: [a @href1@]https://support.stripe.com/contact[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://support.stripe.com/contact'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -170,8 +167,8 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='If you\'re a developer, you can follow our online guides and documentation:' mod='stripe_official'} <a target="_blank" href="https://stripe.com/docs">https://stripe.com/docs</a><br/>
-                    {l s='Otherwise, you can look for a developer or an agency specialised in PrestaShop:' mod='stripe_official'} <a target="_blank" href="https://www.prestashop.com/experts">https://www.prestashop.com/experts</a>
+                    {{l s='If you\'re a developer, you can follow our online guides and documentation: [a @href1@]https://stripe.com/docs[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs'}, '@target@' => {'target="blank"'}]}<br/>
+                    {{l s='Otherwise, you can look for a developer or an agency specialised in PrestaShop: [a @href1@]https://www.prestashop.com/experts[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://www.prestashop.com/experts'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -210,10 +207,10 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    - {l s='Test mode allows you to validate that the module works well in your shop and to see what the user experience feels like without actually debiting any money nor triggering any cost to you.' mod='stripe_official'}
-                    - {l s='Once ready to charge your customers with our module, you can switch to live mode.' mod='stripe_official'}
-                    - {l s='Test and live modes are distinguished by different sets of API keys.' mod='stripe_official'}
-                    - {l s='For more information:' mod='stripe_official'} <a href="https://stripe.com/docs/keys">https://stripe.com/docs/keys</a> {l s='and' mod='stripe_official'} <a href="https://stripe.com/docs/testing">https://stripe.com/docs/testing</a>
+                    - {l s='Test mode allows you to validate that the module works well in your shop and to see what the user experience feels like without actually debiting any money nor triggering any cost to you.' mod='stripe_official'}<br>
+                    - {l s='Once ready to charge your customers with our module, you can switch to live mode.' mod='stripe_official'}<br>
+                    - {l s='Test and live modes are distinguished by different sets of API keys.' mod='stripe_official'}<br>
+                    - {{l s='For more information: [a @href1@]https://stripe.com/docs/keys[/a] and [a @href2@]https://stripe.com/docs/testing[/a]\'s terms of service.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs/keys'}, '@href2@' => {'https://stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -223,8 +220,8 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Configure your test mode API keys (see https://stripe.com/docs/keys), activate your preferred payment methods and go through the consumer checkout flow.' mod='stripe_official'}
-                    {l s='You can use our testing card numbers:' mod='stripe_official'} <a href="https://stripe.com/docs/testing">https://stripe.com/docs/testing</a> {l s='You can use our testing card numbers:' mod='stripe_official'}<br/>
+                    {{l s='Configure your test mode API keys (see [a @href1@]https://stripe.com/docs/keys[/a]), activate your preferred payment methods and go through the consumer checkout flow.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs/keys'}, '@target@' => {'target="blank"'}]}
+                    {{l s='You can use our testing card numbers: [a @href1@]https://stripe.com/docs/testing[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}<br/>
                     {l s='If the module works well in test mode, it should work just as well in live mode.' mod='stripe_official'}
                 </p>
             </div>
@@ -235,7 +232,7 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='You can use Stripe Radar, our anti-fraud module to fine-tune your protection needs directly from your Stripe Dashboard:' mod='stripe_official'} <a href="https://stripe.com/radar">https://stripe.com/radar</a>
+                    {{l s='You can use Stripe Radar, our anti-fraud module to fine-tune your protection needs directly from your Stripe Dashboard: [a @href1@]https://stripe.com/radar[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/radar'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -249,9 +246,9 @@
             <div class="faq-content">
                 <p>
                     - {l s='Make sure that your host supports TLS 1.2.' mod='stripe_official'}<br/>
-                    - {l s='For Apple Pay, you also need to get your domain verified by Apple (see https://stripe.com/docs/apple-pay/web/v2#going-live).' mod='stripe_official'}<br/>
+                    - {{l s='For Apple Pay, you also need to get your domain verified by Apple (see [a @href1@]https://stripe.com/docs/apple-pay/web/v2#going-live[/a]).' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs/apple-pay/web/v2#going-live'}, '@target@' => {'target="blank"'}]}<br/>
                     - {l s='Check that you have a payment card saved in your device/browser.' mod='stripe_official'}<br/>
-                    {l s='If the button still doesn\'t show, please contact our developers: https://addons.prestashop.com/en/contact-us?id_product=24922' mod='stripe_official'}
+                    {{l s='If the button still doesn\'t show, please contact our developers: [a @href1@]https://addons.prestashop.com/en/contact-us?id_product=24922[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://addons.prestashop.com/en/contact-us?id_product=24922'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -261,8 +258,8 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='You can check your Stripe Dashboard to see if his payment has been declined:' mod='stripe_official'} <a href="https://dashboard.stripe.com/payments">https://dashboard.stripe.com/payments</a><br>
-                    {l s='If you don\'t find a trace of any payment attempt for that customer, there might have been a technical issue. Please reach out to our developers:' mod='stripe_official'} <a href="https://addons.prestashop.com/en/contact-us?id_product=24922">https://addons.prestashop.com/en/contact-us?id_product=24922</a>
+                    {{l s='You can check your Stripe Dashboard to see if his payment has been declined: [a @href1@]https://dashboard.stripe.com/payments[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/payments'}, '@target@' => {'target="blank"'}]}<br>
+                    {{l s='If you don\'t find a trace of any payment attempt for that customer, there might have been a technical issue. Please reach out to our developers: [a @href1@]https://addons.prestashop.com/en/contact-us?id_product=24922[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://addons.prestashop.com/en/contact-us?id_product=24922'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
@@ -272,7 +269,7 @@
             <span class="expand pull-right">+</span>
             <div class="faq-content">
                 <p>
-                    {l s='Stripe allows payment methods to be securely saved against your customers for future use:' mod='stripe_official'} <a href="https://stripe.com/docs/payments/payment-methods/saving">https://stripe.com/docs/payments/payment-methods/saving</a><br/>
+                    {{l s='Stripe allows payment methods to be securely saved against your customers for future use: [a @href1@]https://stripe.com/docs/payments/payment-methods/saving[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://stripe.com/docs/payments/payment-methods/saving'}, '@target@' => {'target="blank"'}]}<br/>
                     {l s='Unfortunately, this module doesn\'t support this feature yet. Thus, your customer has to enter his payment details for any new payment via the usual checkout flow.' mod='stripe_official'}
                 </p>
             </div>
@@ -284,8 +281,8 @@
             <div class="faq-content">
                 <p>
                     {l s='A technical issue might have occured between the payment and the order validation.' mod='stripe_official'}<br/>
-                    {l s='You can check your Stripe Dashboard to confirm that the customer has indeed been debited (https://dashboard.stripe.com/payments) and update the order manually in your shop\'s back office.' mod='stripe_official'}<br/>
-                    {l s='If this occurs more than once, you may want to ask your developer to investigate for any Javascript or PHP errors occuring during the checkout flow and eventually reach out to our developers for help:' mod='stripe_official'} <a href="https://addons.prestashop.com/en/contact-us?id_product=24922">https://addons.prestashop.com/en/contact-us?id_product=24922</a>
+                    {{l s='You can check your Stripe Dashboard to confirm that the customer has indeed been debited ([a @href1@]https://dashboard.stripe.com/payments[/a]) and update the order manually in your shop\'s back office.' mod='stripe_official'}|totlreplace:['@href1@' => {'https://dashboard.stripe.com/payments'}, '@target@' => {'target="blank"'}]}<br/>
+                    {{l s='If this occurs more than once, you may want to ask your developer to investigate for any Javascript or PHP errors occuring during the checkout flow and eventually reach out to our developers for help: [a @href1@]https://addons.prestashop.com/en/contact-us?id_product=24922[/a].' mod='stripe_official'}|totlreplace:['@href1@' => {'https://addons.prestashop.com/en/contact-us?id_product=24922'}, '@target@' => {'target="blank"'}]}
                 </p>
             </div>
         </li>
