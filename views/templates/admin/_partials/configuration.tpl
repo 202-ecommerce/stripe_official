@@ -27,8 +27,9 @@
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
-				<span><a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" rel="external" target="_blank">{l s='Create your Stripe account in 10 minutes' mod='stripe_official'}</a> </span>
-				{l s='and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank)' mod='stripe_official'}.<br>
+				{assign var='stripe_url' value='https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]='}
+				{{l s='[a @href1@]Create your Stripe account in 10 minutes[/a] and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank).' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_url|cat:$return_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}<br>
+
 				<div class="connect_btn">
 					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect">
 						<span>{l s='Connect with Stripe' mod='stripe_official'}</span>
@@ -96,8 +97,9 @@
 				</ul>
 
 				<p><b>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</b></p>
-				<p>{l s='These payment methods are available within this plugin for our European users only. To activate them, follow these' mod='stripe_official'}
-				<b> {l s='three steps:' mod='stripe_official'}</b></p>
+				<p>
+					{{l s='These payment methods are available within this plugin for our European users only. To activate them, follow these [b]three steps:[/b]' mod='stripe_official'}|stripelreplace}
+				</p>
 				<ol item="1">
 					<li>
 						{l s='Select below each payment method you wish to offer on your website :' mod='stripe_official'}
