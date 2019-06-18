@@ -50,19 +50,19 @@ if (!function_exists('smarty_modifier_stripelreplace')) {
             '[/i]'
         );
         $replace = array(
-            '<b> @target@',
+            '<b>',
             '</b>',
             '<br>',
-            '<em> @target@',
+            '<em>',
             '</em>',
             '<a href="@href1@" @target@>',
             '<a href="@href2@" @target@>',
             '</a>',
-            '<small> @target@',
+            '<small>',
             '</small>',
-            '<strong> @target@',
+            '<strong>',
             '</strong>',
-            '<i> @target@',
+            '<i>',
             '</i>'
         );
         $string = str_replace($search, $replace, $string);
