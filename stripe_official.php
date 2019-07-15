@@ -816,9 +816,7 @@ class Stripe_official extends PaymentModule
             $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
-                "payment_method_types" => array(
-                    array_keys(self::$paymentMethods)
-                ),
+                "payment_method_types" => array("card"),
             ));
 
             // Keep the payment intent ID in session
