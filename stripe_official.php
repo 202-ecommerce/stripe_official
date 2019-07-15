@@ -812,11 +812,35 @@ class Stripe_official extends PaymentModule
             }
         }
 
+        $address = new Address($this->context->cart->id_address_invoice);
+        $country = Country::getIsoById($address->id_country);
+        $currency = Tools::strtolower($this->context->currency->iso_code);
+
+        $options = array();
+        foreach (self::$paymentMethods as $name => $paymentMethod) {
+            // Check if the payment method is enabled
+            if ($paymentMethod['enable'] !== true && Configuration::get($paymentMethod['enable']) != 'on') {
+                continue;
+            }
+
+            // Check for country support
+            if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
+                continue;
+            }
+
+            // Check for currency support
+            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+                continue;
+            }
+
+            $options[] = strtolower($paymentMethod['name']);
+        }
+
         try {
             $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
-                "payment_method_types" => array("card"),
+                "payment_method_types" => array($options),
             ));
 
             // Keep the payment intent ID in session
