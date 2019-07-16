@@ -833,7 +833,7 @@ class Stripe_official extends PaymentModule
                 continue;
             }
 
-            $options[] = strtolower($paymentMethod['name']);
+            $options[] = $name;
         }
 
         try {
