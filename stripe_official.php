@@ -249,9 +249,9 @@ class Stripe_official extends PaymentModule
      */
     public static function isWellConfigured()
     {
-        if (Configuration::get(self::MODE) && !empty(Configuration::get(self::TEST_PUBLISHABLE))) {
+        if (Configuration::get(self::MODE) == '1' && !empty(Configuration::get(self::TEST_PUBLISHABLE))) {
             return true;
-        } elseif (!empty(Configuration::get(self::PUBLISHABLE))) {
+        } elseif (Configuration::get(self::MODE) == '0' && !empty(Configuration::get(self::PUBLISHABLE))) {
             return true;
         }
 
