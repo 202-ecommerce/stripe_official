@@ -890,8 +890,12 @@ class Stripe_official extends PaymentModule
      * Add a tab to controle intents on an order details admin page (tab header)
      * @return html
      */
-    public function hookDisplayAdminOrderTabOrder()
+    public function hookDisplayAdminOrderTabOrder($params)
     {
+        if ($params['order']->module != 'stripe_official') {
+            return;
+        }
+
         return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
     }
 
