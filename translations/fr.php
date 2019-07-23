@@ -39,6 +39,10 @@ $_MODULE['<{stripe_official}prestashop>configuration_bbc16174a55b556c4e26da014f7
 $_MODULE['<{stripe_official}prestashop>configuration_cd635e5283e67ed1c054dfe4b72158b4'] = 'Utilisation de Stripe en mode production';
 $_MODULE['<{stripe_official}prestashop>configuration_5101c69a76d979b5f207f57051472ec7'] = 'Déplacez le bouton ci-dessus pour activer le mode Production.';
 $_MODULE['<{stripe_official}prestashop>configuration_0c1eff3d5e1aebea71560355c658ef62'] = 'En mode Production, vous ne pouvez pas exécuter de paiements de test.';
+$_MODULE['<{stripe_official}prestashop>configuration_4075672a26a5c86990cc4c4b9cc48047'] = 'Paramétrer le formulaire de paiement';
+$_MODULE['<{stripe_official}prestashop>configuration_3201f79f0cd6f882e85c01589effda79'] = 'Options pour le formulaire de paiement par carte';
+$_MODULE['<{stripe_official}prestashop>configuration_58dc44e65768134839c7064569e9acdf'] = 'Désactiver le champ Code Postal pour les cartes en provenance des Etats-Unis, du Royaume-Uni et du Canada (non-recommandé*).';
+$_MODULE['<{stripe_official}prestashop>configuration_b777d11c1699ade9c4dfc7acd4c14b59'] = 'Collecter le code postal optimise les chances de paiement avec succès pour ces pays.';
 $_MODULE['<{stripe_official}prestashop>configuration_77efb82ffbc0671e65f439985d603f7a'] = 'Autres moyens de paiement (pour les utilisateurs en Europe uniquement) : iDEAL, Bancontact, SOFORT et Giropay.';
 $_MODULE['<{stripe_official}prestashop>configuration_dfca57b13d6e6901548338c1a842d55b'] = 'Ce plugin prend en charge ces moyens de paiement pour les utilisateurs d\'Europe uniquement. Pour les activer, suivez ces [b]trois étapes :[/b]';
 $_MODULE['<{stripe_official}prestashop>configuration_ab13c23b9e0b23a84d9639f61d3cc895'] = 'Sélectionnez ci-dessous tous les moyens de paiement que vous souhaitez proposer sur votre site Web :';
