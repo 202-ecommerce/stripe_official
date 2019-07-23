@@ -165,38 +165,9 @@ class Stripe_official extends PaymentModule
           'currencies' => array('eur'),
           'enable' => self::ENABLE_SOFORT
         ),
-        /**
-        * not yet implemented
-        'alipay' => array(
-            'name' => 'Alipay', 'flow' => 'redirect',
-            'countries' => array('CN', 'HK', 'SG', 'JP'),
-            'currencies' => array('aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'nzd', 'sgd', 'usd')
-        ),
-        'eps' => array(
-            'name' => 'EPS', 'flow' => 'redirect',
-            'countries' => array('AT'),
-            'currencies' => array('eur')
-        ),
-        'multibanco' => array(
-            'name' => 'Multibanco', 'flow' => 'receiver',
-            'countries' => array('PT'),
-            'currencies' => array('eur'),
-        ),
-        'wechat' => array(
-            'name' => 'WeChat', 'flow' => 'none',
-            'countries' => array('CN', 'HK', 'SG', 'JP'),
-            'currencies' => array('aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'nzd', 'sgd', 'usd'),
-        ),
-        'sepa_debit' => array(
-            'name' => 'SEPA Direct Debit', 'flow' => 'none',
-            'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'FI'),
-            'currencies' => array('eur')
-        ),
-        */
     );
 
     /* refund */
-    // @todo verify if already in use
     protected $refund = 0;
 
     public $errors = array();
@@ -226,11 +197,11 @@ class Stripe_official extends PaymentModule
 
         parent::__construct();
 
-        $this->button_label['Card'] = $this->l('Pay by card');
-        $this->button_label['Bancontact'] = $this->l('Pay by Bancontact');
-        $this->button_label['Giropay'] = $this->l('Pay by Giropay');
-        $this->button_label['iDEAL'] = $this->l('Pay by iDEAL');
-        $this->button_label['SOFORT'] = $this->l('Pay by SOFORT');
+        $this->button_label['card'] = $this->l('Pay by card');
+        $this->button_label['bancontact'] = $this->l('Pay by Bancontact');
+        $this->button_label['giropay'] = $this->l('Pay by Giropay');
+        $this->button_label['ideal'] = $this->l('Pay by iDEAL');
+        $this->button_label['sofort'] = $this->l('Pay by SOFORT');
 
         $this->meta_title = $this->l('Stripe', $this->name);
         $this->displayName = $this->l('Stripe payment module', $this->name);
@@ -1142,7 +1113,7 @@ class Stripe_official extends PaymentModule
             $option
             ->setModuleName($this->name)
             //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
-            ->setCallToActionText($this->button_label[$paymentMethod['name']]);
+            ->setCallToActionText($this->button_label[$name]);
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], array('redirect', 'receiver'))) {
