@@ -419,7 +419,7 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue(self::TEST_PUBLISHABLE));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, 'test') !== false && strpos($publishable_key, 'test') !== false) {
+                    if (strpos($secret_key, '_test_') !== false && strpos($publishable_key, '_test_') !== false) {
                         if ($this->checkApiConnection($secret_key)) {
                             Configuration::updateValue(self::TEST_KEY, $secret_key);
                             Configuration::updateValue(self::TEST_PUBLISHABLE, $publishable_key);
@@ -437,7 +437,7 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue(self::PUBLISHABLE));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, 'live') !== false && strpos($publishable_key, 'live') !== false) {
+                    if (strpos($secret_key, '_live_') !== false && strpos($publishable_key, '_live_') !== false) {
                         if ($this->checkApiConnection($secret_key)) {
                             Configuration::updateValue(self::KEY, $secret_key);
                             Configuration::updateValue(self::PUBLISHABLE, $publishable_key);
