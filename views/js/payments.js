@@ -65,7 +65,15 @@ $(function(){
       });
 
       card.on('change', ({complete}) => {
-        $submit.removeAttr('disabled');
+        if ($('.custom-checkbox input') != 'undefined' && $('.custom-checkbox input').is(":checked")) {
+            enableSubmit($submitButtons);
+        }
+      });
+
+      $('.custom-checkbox input').click(function(event) {
+        if ($('input[data-module-name="stripe_official"]').is(":checked")) {
+          enableSubmit($submitButtons);
+        }
       });
 
       // Create the payment request (browser based payment button).
