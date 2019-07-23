@@ -63,6 +63,7 @@ class Stripe_official extends PaymentModule
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
+    const POSTCODE = 'STRIPE_POSTCODE';
     const ENABLE_IDEAL = 'STRIPE_ENABLE_IDEAL';
     const ENABLE_SOFORT = 'STRIPE_ENABLE_SOFORT';
     const ENABLE_GIROPAY = 'STRIPE_ENABLE_GIROPAY';
@@ -460,6 +461,7 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_GIROPAY, Tools::getValue('giropay'));
             Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
+            Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -559,6 +561,7 @@ class Stripe_official extends PaymentModule
             'stripe_publishable' => Configuration::get(self::PUBLISHABLE),
             'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE),
             'stripe_test_key' => Configuration::get(self::TEST_KEY),
+            'postcode' => Configuration::get(self::POSTCODE),
             'ideal' => Configuration::get(self::ENABLE_IDEAL),
             'sofort' => Configuration::get(self::ENABLE_SOFORT),
             'giropay' => Configuration::get(self::ENABLE_GIROPAY),
@@ -1005,7 +1008,9 @@ class Stripe_official extends PaymentModule
 
             'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
 
-            'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version,
+
+            'stripe_postcode_disabled' => Configuration::get(self::POSTCODE)
         ));
     }
 

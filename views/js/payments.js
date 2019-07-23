@@ -55,7 +55,11 @@ $(function(){
     // Create a Card Element and pass some custom styles to it.
     let card;
     if ($("#stripe-card-element").length) {
-      card = elements.create('card', { style });
+      if (stripe_postcode_disabled == 'on') {
+        card = elements.create('card', { style, hidePostalCode: true });
+      } else {
+        card = elements.create('card', { style });
+      }
       card.mount('#stripe-card-element');
 
       // Monitor change events on the Card Element to display any errors.
