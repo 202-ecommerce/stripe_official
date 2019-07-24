@@ -63,6 +63,7 @@ class Stripe_official extends PaymentModule
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
+    const POSTCODE = 'STRIPE_POSTCODE';
     const ENABLE_IDEAL = 'STRIPE_ENABLE_IDEAL';
     const ENABLE_SOFORT = 'STRIPE_ENABLE_SOFORT';
     const ENABLE_GIROPAY = 'STRIPE_ENABLE_GIROPAY';
@@ -165,38 +166,9 @@ class Stripe_official extends PaymentModule
           'currencies' => array('eur'),
           'enable' => self::ENABLE_SOFORT
         ),
-        /**
-        * not yet implemented
-        'alipay' => array(
-            'name' => 'Alipay', 'flow' => 'redirect',
-            'countries' => array('CN', 'HK', 'SG', 'JP'),
-            'currencies' => array('aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'nzd', 'sgd', 'usd')
-        ),
-        'eps' => array(
-            'name' => 'EPS', 'flow' => 'redirect',
-            'countries' => array('AT'),
-            'currencies' => array('eur')
-        ),
-        'multibanco' => array(
-            'name' => 'Multibanco', 'flow' => 'receiver',
-            'countries' => array('PT'),
-            'currencies' => array('eur'),
-        ),
-        'wechat' => array(
-            'name' => 'WeChat', 'flow' => 'none',
-            'countries' => array('CN', 'HK', 'SG', 'JP'),
-            'currencies' => array('aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'nzd', 'sgd', 'usd'),
-        ),
-        'sepa_debit' => array(
-            'name' => 'SEPA Direct Debit', 'flow' => 'none',
-            'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE', 'FI'),
-            'currencies' => array('eur')
-        ),
-        */
     );
 
     /* refund */
-    // @todo verify if already in use
     protected $refund = 0;
 
     public $errors = array();
@@ -204,6 +176,8 @@ class Stripe_official extends PaymentModule
     public $warning = array();
 
     public $success;
+
+    public $button_label = array();
 
     public function __construct()
     {
@@ -223,6 +197,12 @@ class Stripe_official extends PaymentModule
         }
 
         parent::__construct();
+
+        $this->button_label['card'] = $this->l('Pay by card');
+        $this->button_label['bancontact'] = $this->l('Pay by Bancontact');
+        $this->button_label['giropay'] = $this->l('Pay by Giropay');
+        $this->button_label['ideal'] = $this->l('Pay by iDEAL');
+        $this->button_label['sofort'] = $this->l('Pay by SOFORT');
 
         $this->meta_title = $this->l('Stripe', $this->name);
         $this->displayName = $this->l('Stripe payment module', $this->name);
@@ -249,9 +229,9 @@ class Stripe_official extends PaymentModule
      */
     public static function isWellConfigured()
     {
-        if (Configuration::get(self::MODE) && !empty(Configuration::get(self::TEST_PUBLISHABLE))) {
+        if (Configuration::get(self::MODE) == '1' && !empty(Configuration::get(self::TEST_PUBLISHABLE))) {
             return true;
-        } elseif (!empty(Configuration::get(self::PUBLISHABLE))) {
+        } elseif (Configuration::get(self::MODE) == '0' && !empty(Configuration::get(self::PUBLISHABLE))) {
             return true;
         }
 
@@ -439,7 +419,7 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue(self::TEST_PUBLISHABLE));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, 'test') !== false && strpos($publishable_key, 'test') !== false) {
+                    if (strpos($secret_key, '_test_') !== false && strpos($publishable_key, '_test_') !== false) {
                         if ($this->checkApiConnection($secret_key)) {
                             Configuration::updateValue(self::TEST_KEY, $secret_key);
                             Configuration::updateValue(self::TEST_PUBLISHABLE, $publishable_key);
@@ -457,7 +437,7 @@ class Stripe_official extends PaymentModule
                 $publishable_key = trim(Tools::getValue(self::PUBLISHABLE));
 
                 if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, 'live') !== false && strpos($publishable_key, 'live') !== false) {
+                    if (strpos($secret_key, '_live_') !== false && strpos($publishable_key, '_live_') !== false) {
                         if ($this->checkApiConnection($secret_key)) {
                             Configuration::updateValue(self::KEY, $secret_key);
                             Configuration::updateValue(self::PUBLISHABLE, $publishable_key);
@@ -481,6 +461,7 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_GIROPAY, Tools::getValue('giropay'));
             Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
+            Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -580,6 +561,7 @@ class Stripe_official extends PaymentModule
             'stripe_publishable' => Configuration::get(self::PUBLISHABLE),
             'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE),
             'stripe_test_key' => Configuration::get(self::TEST_KEY),
+            'postcode' => Configuration::get(self::POSTCODE),
             'ideal' => Configuration::get(self::ENABLE_IDEAL),
             'sofort' => Configuration::get(self::ENABLE_SOFORT),
             'giropay' => Configuration::get(self::ENABLE_GIROPAY),
@@ -812,13 +794,35 @@ class Stripe_official extends PaymentModule
             }
         }
 
+        $address = new Address($this->context->cart->id_address_invoice);
+        $country = Country::getIsoById($address->id_country);
+        $currency = Tools::strtolower($this->context->currency->iso_code);
+
+        $options = array();
+        foreach (self::$paymentMethods as $name => $paymentMethod) {
+            // Check if the payment method is enabled
+            if ($paymentMethod['enable'] !== true && Configuration::get($paymentMethod['enable']) != 'on') {
+                continue;
+            }
+
+            // Check for country support
+            if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
+                continue;
+            }
+
+            // Check for currency support
+            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+                continue;
+            }
+
+            $options[] = $name;
+        }
+
         try {
             $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
-                "payment_method_types" => array(
-                    array_keys(self::$paymentMethods)
-                ),
+                "payment_method_types" => array($options),
             ));
 
             // Keep the payment intent ID in session
@@ -886,8 +890,12 @@ class Stripe_official extends PaymentModule
      * Add a tab to controle intents on an order details admin page (tab header)
      * @return html
      */
-    public function hookDisplayAdminOrderTabOrder()
+    public function hookDisplayAdminOrderTabOrder($params)
     {
+        if ($params['order']->module != 'stripe_official') {
+            return;
+        }
+
         return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
     }
 
@@ -1004,7 +1012,9 @@ class Stripe_official extends PaymentModule
 
             'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
 
-            'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version,
+
+            'stripe_postcode_disabled' => Configuration::get(self::POSTCODE)
         ));
     }
 
@@ -1112,7 +1122,7 @@ class Stripe_official extends PaymentModule
             $option
             ->setModuleName($this->name)
             //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
-            ->setCallToActionText($this->l('Pay by ' . $paymentMethod['name']));
+            ->setCallToActionText($this->button_label[$name]);
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], array('redirect', 'receiver'))) {
