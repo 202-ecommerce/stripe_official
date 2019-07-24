@@ -152,7 +152,7 @@ $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-16_7dc9c0e2e38c
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_9d67bee92ea535ba9c7840797966edfa'] = 'Se ha producido un error durante el pago.';
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_d1fcab4fdfa9d55382cc997bcfdce7a2'] = 'Por favor[1][url][2]inténtelo de nuevo[/1] o póngase en contacto con el propietario del sitio web.';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_3380b659ba0a8b01af98dbe7494c0706'] = 'Enhorabuena, tu pedido se ha completado y será procesado en breve.';
-$_MODULE['<{stripe_official}prestashop>order-confirmation_173102ed0a5ae25fb534e47b87576c15'] = 'La referencia del pedido es [1][ref][/1]. Recibirás un correo electrónico de confirmación en breve.';
+$_MODULE['<{stripe_official}prestashop>order-confirmation_cbd3b0713e0b9d880914563820ed27e0'] = 'La referencia del pedido es [1]@ref@[/1]. Recibirás un correo electrónico de confirmación en breve.';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_77031dd06e26cfdab21b078a37741bb6'] = 'La referencia del pedido es [b]@target@[/b]. Recibirás un correo electrónico de confirmación en breve.';
 $_MODULE['<{stripe_official}prestashop>order-confirmation_978dec2eec7a6d7350ceefbbb6b1e1b1'] = 'Te agradecemos la confianza depositada.';
 $_MODULE['<{stripe_official}prestashop>payment_form_bancontact_d536f6cb1304cde5da44c530d3157886'] = 'Pagar por Bancontact';
