@@ -404,16 +404,19 @@ class Stripe_official extends PaymentModule
 
         /* Check if TLS is enabled and the TLS version used is 1.2 */
         if (self::isWellConfigured()) {
-            try {
-                \Stripe\Charge::all();
-            } catch (\Stripe\Error\ApiConnection $e) {
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo($e);
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            $secret_key = trim(Tools::getValue(self::TEST_KEY));
+            if ($this->checkApiConnection($secret_key)) {
+                try {
+                    \Stripe\Charge::all();
+                } catch (\Stripe\Error\ApiConnection $e) {
+                    Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo($e);
+                    Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 
-                $this->warning[] = $this->l(
-                    'Your TLS version is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
-                    $this->name
-                );
+                    $this->warning[] = $this->l(
+                        'Your TLS version is not supported. You will need to upgrade your integration. Please check the FAQ if you don\'t know how to do it.',
+                        $this->name
+                    );
+                }
             }
         }
 
