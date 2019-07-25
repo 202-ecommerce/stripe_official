@@ -934,13 +934,15 @@ class Stripe_official extends PaymentModule
         $currency = $this->context->currency->iso_code;
         $address = new Address($this->context->cart->id_address_invoice);
         $amount = $this->context->cart->getOrderTotal();
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : Tools::ps_round($amount * 100, 0);
 
         // The payment intent for this order
         $intent = $this->retrievePaymentIntent($amount, $currency);
 
         if (!$intent) {
-            // Problem with the payment intent creation... TODO: log/alert
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError('Payment Intent not retrieve. amount: '. $amount . ' currency: '.$currency . ' Round precision:' . _PS_PRICE_COMPUTE_PRECISION_, null, null, 'hookHeader');
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            // @todo set isWellConfigured to false to prevent display pay by stripe options on hookPaymentOptions
             return;
         }
 
