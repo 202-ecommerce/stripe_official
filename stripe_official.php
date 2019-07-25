@@ -928,7 +928,7 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
-        if ($this->context->controller->php_self != 'order') {
+        if (!in_array($this->context->controller->php_self, ['order', 'order-opc'])) {
             return;
         }
 
