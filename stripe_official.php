@@ -218,9 +218,14 @@ class Stripe_official extends PaymentModule
         }
         // Do not call Stripe Instance if API keys are not already configured
         if (self::isWellConfigured()) {
-            \Stripe\Stripe::setApiKey($this->getSecretKey());
-            $version = $this->version.'_'._PS_VERSION_.'_'.phpversion();
-            \Stripe\Stripe::setAppInfo('StripePrestashop', $version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            try {
+                \Stripe\Stripe::setApiKey($this->getSecretKey());
+                $version = $this->version.'_'._PS_VERSION_.'_'.phpversion();
+                \Stripe\Stripe::setAppInfo('StripePrestashop', $version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+            } catch (\Stripe\Error\ApiConnection $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError('Fail to set API Key. Stripe SDK return error: ' . $e);
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            }
         }
     }
 
