@@ -939,7 +939,8 @@ class Stripe_official extends PaymentModule
         $currency = $this->context->currency->iso_code;
         $address = new Address($this->context->cart->id_address_invoice);
         $amount = $this->context->cart->getOrderTotal();
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : Tools::ps_round($amount * 100, 0);
+        $amount = Tools::ps_round($amount, 2);
+        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
         // The payment intent for this order
         $intent = $this->retrievePaymentIntent($amount, $currency);
