@@ -232,6 +232,7 @@ $(function(){
     function handlePayment(response) {
       if (response.error) {
         updateError($submitButtons, response.error);
+        enableSubmit($submitButtons);
       } else {
         $.ajax({
             type: 'POST',
