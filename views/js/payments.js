@@ -327,17 +327,16 @@ $(function(){
       if (error) {
         if (prestashop_version == '1.6') {
           $(elementError).text(error.message).show();
+          enableSubmit($submitButtons);
         } else {
           $error.text(error.message).show();
         }
-        enableSubmit($submitButtons);
       } else {
         if (prestashop_version == '1.6') {
           $(elementError).text("").hide();
         } else {
           $error.text("").hide();
         }
-        enableSubmit($submitButtons);
       }
     }
 
