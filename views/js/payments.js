@@ -23,7 +23,8 @@
  */
 
 $(function(){
-  (async () => {
+  let $form = '';
+  const initStripe = async () => {
     'use strict';
 
     // Create references to the submit button.
@@ -31,23 +32,21 @@ $(function(){
     const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
     const submitInitialText = $submitButtons.text();
 
-    let $form = $('#stripe-card-payment');
+    $form = $('#stripe-card-payment');
     let payment = '';
     let disableText = '';
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
 
-    // Disabled card form
-    if (prestashop_version == '1.7') {
-      $form.on('submit', (event) => {
-        event.preventDefault();
-      });
-    }
+    // Disabled card form (enter button)
+    $form.on('submit', (event) => {
+      event.preventDefault();
+    });
+
     /**
     * Setup Stripe Elements.
     */
-
     // Create a Stripe client.
     const stripe = Stripe(stripe_pk, { betas: ['payment_intent_beta_3'] });
 
@@ -351,5 +350,20 @@ $(function(){
       $(element).prop('disabled', false);
       $(element).text(submitInitialText);
     }
-  })();
+  };
+
+  initStripe();
+
+  const observer = new MutationObserver((mutations) => {
+    $.each(mutations, function(i, mutation) {
+      const addedNodes = $(mutation.addedNodes);
+      const selector = '#stripe-card-payment';
+      const filteredEls = addedNodes.find(selector).addBack(selector);
+      if (filteredEls.length) {
+        initStripe();
+      }
+    })
+  });
+
+  observer.observe(document.body, {childList: true, subtree: true});
 })
