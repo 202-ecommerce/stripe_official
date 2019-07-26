@@ -27,18 +27,23 @@ $(function(){
     'use strict';
 
     // Create references to the submit button.
-    // const $submit = $('.stripe-submit-button');
     const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .ideal-submit-button[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-submit-button');
     const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
     const submitInitialText = $submitButtons.text();
 
-    let $form = '';
+    let $form = $('#stripe-card-payment');
     let payment = '';
     let disableText = '';
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
 
+    // Disabled card form
+    if (prestashop_version == '1.7') {
+      $form.on('submit', (event) => {
+        event.preventDefault();
+      });
+    }
     /**
     * Setup Stripe Elements.
     */
@@ -65,19 +70,6 @@ $(function(){
       // Monitor change events on the Card Element to display any errors.
       card.on('change', ({error}) => {
         updateError($submitButtons, error);
-        $submit.attr('disabled', 'disabled');
-      });
-
-      card.on('change', ({complete}) => {
-        if ($('.custom-checkbox input') != 'undefined' && $('.custom-checkbox input').is(":checked")) {
-            enableSubmit($submitButtons);
-        }
-      });
-
-      $('.custom-checkbox input').click(function(event) {
-        if ($('input[data-module-name="stripe_official"]').is(":checked")) {
-          enableSubmit($submitButtons);
-        }
       });
 
       // Create the payment request (browser based payment button).
@@ -172,9 +164,9 @@ $(function(){
       event.preventDefault();
 
       // Retrieve the payment method.
-      if ($('#payment-confirmation button[type="submit"]').length > 0) {
+      if (prestashop_version == '1.7') {
         /* Prestashop 1.7 */
-        $form = $('.stripe-payment-form:visible');
+        $form = $('.stripe-payment-form');
         payment = $('input[name="stripe-payment-method"]', $form).val();
         disableText = event.currentTarget;
       } else {
@@ -228,7 +220,6 @@ $(function(){
         }
 
         // Create a Stripe source with the common data and extra information.
-        // console.log(sourceData);
         const {source} = await stripe.createSource(sourceData);
         handleSourceActivation(source, $form);
       }
