@@ -165,7 +165,7 @@ $(function(){
       // Retrieve the payment method.
       if (prestashop_version == '1.7') {
         /* Prestashop 1.7 */
-        $form = $('.stripe-payment-form');
+        $form = $('.stripe-payment-form:visible');
         payment = $('input[name="stripe-payment-method"]', $form).val();
         disableText = event.currentTarget;
       } else {
