@@ -263,7 +263,7 @@ class StripePayment extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_stripe = ' . (int)$id_charge);
+        $query->where('id_stripe = "' . pSQL($id_charge) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
