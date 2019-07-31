@@ -1,6 +1,16 @@
 <?php
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
@@ -8,11 +18,13 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
- * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
- * International Registered Trademark & Property of PrestaShop SA
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
+ * @license   Commercial license
  */
+
+use Stripe_officialClasslib\Actions\ActionsHandler;
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialValidationModuleFrontController extends ModuleFrontController
 {
@@ -20,6 +32,8 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     {
         parent::__construct();
         $this->ssl = true;
+        $this->ajax = true;
+        $this->json = true;
     }
 
     /**
@@ -28,32 +42,68 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
     public function initContent()
     {
         parent::initContent();
-        $stripe_client_secret = Tools::getValue('client_secret');
-        $stripe_source = Tools::getValue('source');
 
-        if (Configuration::get('_PS_STRIPE_mode') == 1) {
-            $pubKey = Configuration::get('_PS_STRIPE_test_publishable');
+        // Create the handler
+        $handler = new ActionsHandler();
+
+         // Set input data
+        $handler->setConveyor(array(
+                    'source' => Tools::getValue('source'),
+                    'response' => Tools::getValue('response'),
+                    'module' => $this->module,
+                    'context' => $this->context,
+                ));
+
+        // Set list of actions to execute
+        if (empty(Tools::getValue('source'))) {
+            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'addTentative');
         } else {
-            $pubKey = Configuration::get('_PS_STRIPE_publishable');
+            $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'addTentative');
         }
-        
-        $order_page = Configuration::get('PS_ORDER_PROCESS_TYPE') ? $this->context->link->getPageLink('order-opc', true, null, array('stripe_failed' => true)) : $this->context->link->getPageLink('order', true, null, array('step' => 3, 'stripe_failed' => true));
-        
-        $this->context->smarty->assign(array(
-            'stripe_source' => $stripe_source,
-            'stripe_client_secret' => $stripe_client_secret,
-            'publishableKey' => $pubKey,
-            'ajaxUrlStripe' => $this->context->link->getModuleLink('stripe_official', 'ajax', array(), true),
-            'module_dir' => _PS_MODULE_DIR_,
-            'return_order_page' => $order_page,
-        ));
-        
-        $this->context->controller->registerJavascript('stripe_official-paymentjs', 'modules/stripe_official/views/js/jquery.the-modal.js');
-        $this->context->controller->registerJavascript('stripe_official-payment_validation', 'modules/stripe_official/views/js//payment_validation.js');
-        $this->context->controller->registerJavascript('stripe_official-stipeV2', 'https://js.stripe.com/v2/', array('server'=>'remote'));
-        $this->context->controller->registerStylesheet('stripe_official-frontcss', 'modules/stripe_official/views/css/front.css');
-        $this->context->controller->registerStylesheet('stripe_official-modal', 'modules/stripe_official/views/css/the-modal.css');
 
-        $this->setTemplate('module:stripe_official/views/templates/front/payment_validation.tpl');
+        // Process actions chain
+        if ($handler->process('ValidationOrder')) {
+            // Retrieve and use resulting data
+            $returnValues = $handler->getConveyor();
+        } else {
+            // Handle error
+            ProcessLoggerHandler::logError('Order validation process failed.');
+            ProcessLoggerHandler::closeLogger();
+
+            $url_failed = Context::getContext()->link->getModuleLink(
+                $this->module->name,
+                'orderFailure'
+            );
+            Tools::redirect($url_failed);
+        }
+
+
+        $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+        $url = Context::getContext()->link->getPageLink(
+            'order-confirmation',
+            true,
+            null,
+            array(
+                'id_cart' => (int)$this->context->cart->id,
+                'id_module' => (int)$this->module->id,
+                'id_order' => (int)$id_order,
+                'key' => $returnValues['secure_key']
+            )
+        );
+
+        if (!empty(Tools::getValue('source'))) {
+            Tools::redirect($url);
+            exit;
+        }
+
+         /* Ajax redirection Order Confirmation */
+        $chargeResult = array(
+            'code' => '1',
+            'url' => $url
+        );
+
+        echo Tools::jsonEncode($chargeResult);
+        exit;
     }
 }

@@ -1,26 +1,28 @@
 /**
-* 2007-2018 PrestaShop
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-* @author    PrestaShop SA <contact@prestashop.com>
-* @copyright 2007-2018 PrestaShop SA
-* @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
-* International Registered Trademark & Property of PrestaShop SA
-*/
+ * 2007-2019 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
+ * @license   Commercial license
+ */
 
 $(document).ready(function() {
-
-	//rename switch fiels value labels
-	$('label[for=_PS_STRIPE_mode_on]').html(stripe_test_mode);
-	$('label[for=_PS_STRIPE_mode_off]').html(live);
-	$('#section-shape-2 .form-group').first().append(conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.stripe.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.');
-
-	$('#section-shape-2 .panel .form-wrapper').append($('#conf-payment-methods'));
 
 	// multistore
 	var old = $('.bootstrap.panel');
@@ -29,7 +31,7 @@ $(document).ready(function() {
 
 
 	var value = 0;
-	value = $('input[name=_PS_STRIPE_mode]:checked', '#configuration_form').val();
+	value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
 
 	if (value == 1)
 	{
@@ -47,7 +49,7 @@ $(document).ready(function() {
 	}
 
 	$('#configuration_form input').on('change', function() {
-		value = $('input[name=_PS_STRIPE_mode]:checked', '#configuration_form').val();
+		value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
 
 		if (value == 1)
 		{
@@ -74,31 +76,59 @@ $(document).ready(function() {
 
 	/* Refund Option */
 	var value = 0;
-	value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
+	value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 	if (value == 1)
-		$("#refund_amount").parent().parent().hide();
+		$(".partial-amount").hide();
 	else
-		$("#refund_amount").parent().parent().show();
+		$(".partial-amount").show();
 
-	$('input[name=_PS_STRIPE_refund_mode]').on('change', function() {
-		value = $('input[name=_PS_STRIPE_refund_mode]:checked').val();
+	$('input[name=STRIPE_REFUND_MODE]').on('change', function() {
+		value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
 
 		if (value == 1)
-			$("#refund_amount").parent().parent().hide();
+			$(".partial-amount").hide();
 		else
-			$("#refund_amount").parent().parent().show();
+			$(".partial-amount").show();
 	});
 
 	$('.process-icon-refresh').click(function(){
         $.ajax({
-            url: validate + 'refresh.php',
+            url: transaction_refresh_url,
             data: {'token_stripe' : token_stripe,
             'id_employee' : id_employee}
         }).done(function(response) {
-            $('.table').html(response);
+            $('.table-transaction').html(response);
         });
     });
 
+	(function() {
+		[].slice.call(document.querySelectorAll('.tabs')).forEach(function(el) {
+			new PSTabs(el);
+		});
+	})();
 
+    displayPayment();
+
+    $('#applepay_googlepay').change(function(event) {
+        displayPayment();
+    });
+
+    $('#product_payment').change(function(event) {
+        if ($(this).is(':checked') === true) {
+            $('#modal_applepay_googlepay').show();
+        }
+    });
+
+    $('#modal_applepay_googlepay button[data-dismiss="modal"]').click(function(event) {
+        $('#modal_applepay_googlepay').hide();
+    });
 });
+
+function displayPayment(){
+    if($('#applepay_googlepay').is(':checked') === true) {
+        $('#display_product_payment').show();
+    } else {
+        $('#display_product_payment').hide();
+    }
+}

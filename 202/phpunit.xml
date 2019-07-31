@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ https://phpunit.de/manual/current/en/appendixes.configuration.html
+-->
+<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="true" stopOnFailure="false" syntaxCheck="true" bootstrap="./build/prestashop/admin-dev/bootstrap.php">
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <env name="addon_name" value="stripe_official"/>
+    </php>
+    <testsuites>
+        <testsuite name="Stripe Module Test Suite">
+            <directory suffix=".php">tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>./build/prestashop/modules/stripe_official</directory>
+            <exclude>
+                <directory>./build/prestashop/modules/*/translations</directory>
+                <directory>./build/prestashop/modules/*/views</directory>
+                <directory>./build/prestashop/modules/*/upgrade</directory>
+                <directory>./build/prestashop/modules/*/changelog</directory>
+                <directory>./build/prestashop/modules/*/libraries</directory>
+                <directory>./build/prestashop/modules/*/upgrade</directory>
+                <directory>./build/prestashop/modules/*/202</directory>
+                <directory suffix="index.php">./build/prestashop/modules/*/</directory>
+                <directory suffix="index.php">./build/prestashop/modules/*/*/</directory>
+                <directory suffix="index.php">./build/prestashop/modules/*/*/*/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-php" target="./build/backend.php" title="Stripe" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-html" target="./build/coverage" title="Stripe" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+        <log type="junit" target="./build/logs/junit.xml" logIncompleteSkipped="false"/>
+    </logging>
+</phpunit>

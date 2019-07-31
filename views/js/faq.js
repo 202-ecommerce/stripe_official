@@ -1,5 +1,15 @@
 /**
- * 2007-2018 PrestaShop
+ * 2007-2019 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
@@ -7,32 +17,32 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2018 PrestaShop SA
- * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
- * International Registered Trademark & Property of PrestaShop SA
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
+ * @license   Commercial license
  */
 
 $(function() {
-	  $('.faq-item').click(
-		    function(){
-			      if($(this).find('.faq-content').is(':visible'))
-			      {
-				        $(this).find('.faq-content').slideUp('fast');
-				        $(this).find('.expand').html('+');
-			      }
-			      else
-			      {
-				        $('.faq-content').hide('fast');
-				        $(this).find('.faq-content').slideDown('fast');
-				        $('.expand').html('+');
-				        $(this).find('.expand').html('-');
-			      }
-		    }
-	  );
-	  $('.faq-item a').click(
-		    function(e){
-			      e.stopPropagation();
-		    }
-	  );
+	$('.faq-item').click(
+	    function(){
+			if($(this).find('.faq-content').is(':visible'))
+			{
+			    $(this).find('.faq-content').slideUp('fast');
+			    $(this).find('.expand').html('+');
+			}
+			else
+			{
+			    $('.faq-content').hide('fast');
+			    $(this).find('.faq-content').slideDown('fast');
+			    $('.expand').html('+');
+			    $(this).find('.expand').html('-');
+			}
+	    }
+	);
+
+	$('.faq-item a').click(
+	    function(e){
+		    e.stopPropagation();
+	    }
+	);
 });

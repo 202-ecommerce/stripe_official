@@ -166,6 +166,25 @@ table.stripe-cc-numbers td.number code { font-family: Courier; }
 .table .uppercase {
     text-transform: uppercase;
 }
+
+.stripe-connection .connect_btn {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#applepay_googlepay,
+label[for="applepay_googlepay"] {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.faq-title {
+    display: block;
+    margin: 10px 0px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 /* Retina support */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
 only screen and (min--moz-device-pixel-ratio: 1.5),
