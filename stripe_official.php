@@ -784,21 +784,25 @@ class Stripe_official extends PaymentModule
     */
     protected function retrievePaymentIntent($amount, $currency)
     {
-        if (isset($this->context->cookie->stripe_payment_intent)) {
+        if (isset($this->context->cookie->stripe_payment_intent) && !empty($this->context->cookie->stripe_payment_intent)) {
             try {
                 $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
                 // Check that the amount is still correct
                 if ($intent->amount != $amount) {
-                    $intent->update(array(
-                        "amount" => $amount
-                    ));
+                    $intent->update(
+                        $this->context->cookie->stripe_payment_intent,
+                        array(
+                            "amount" => $amount
+                        )
+                    );
                 }
 
                 return $intent;
             } catch (Exception $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage(), null, null, 'retrievePaymentIntent');
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 unset($this->context->cookie->stripe_payment_intent);
-                error_log($e->getMessage());
             }
         }
 
