@@ -987,6 +987,7 @@ class Stripe_official extends PaymentModule
                 'modules/'.$this->name.'/views/css/checkout.css'
             );
             $prestashop_version = '1.7';
+            $stripe_fullname = str_replace('"', '\\"', $this->context->customer->firstname) . ' ' . str_replace('"', '\\"', $this->context->customer->lastname);
         } else {
             $this->context->controller->addJS('https://js.stripe.com/v3/');
             $this->context->controller->addJS($this->_path . '/views/js/payments.js');
@@ -997,6 +998,7 @@ class Stripe_official extends PaymentModule
 
             $this->context->controller->addCSS($this->_path . '/views/css/checkout.css', 'all');
             $prestashop_version = '1.6';
+            $stripe_fullname = str_replace('\'', '\\\'', $this->context->customer->firstname) . ' ' . str_replace('\'', '\\\'', $this->context->customer->lastname);
         }
 
         // Javacript variables needed by Elements
@@ -1009,8 +1011,7 @@ class Stripe_official extends PaymentModule
             'stripe_currency' => Tools::strtolower($currency),
             'stripe_amount' => $amount,
 
-            'stripe_fullname' => $this->context->customer->firstname . ' ' .
-                               $this->context->customer->lastname,
+            'stripe_fullname' => $stripe_fullname,
 
             'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
