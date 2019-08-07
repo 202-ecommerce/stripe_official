@@ -1,0 +1,11 @@
+# Ignore project dependencies
+node_modules/
+
+# Ignore compiled files
+/views/
+
+# Let eslint do his job for `.js` files
+*.js
+
+# Prevent linting in documentation
+*.md

@@ -5,7 +5,8 @@
   "main": "webpack.config.js",
   "scripts": {
     "watch": "webpack --mode development --colors --devtool source-map --hide-modules -w",
-    "build": "webpack --mode production --colors --devtool source-map --progress -p"
+    "build": "webpack --mode production --colors --devtool source-map --progress -p",
+    "lint-css": "stylelint \"_dev/scss/**/*.scss\" --cache --cache-location .cache/.stylelintcache"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^1.0.0",
+    "stylelint": "^10.1.0",
+    "stylelint-config-twbs-bootstrap": "^0.4.0",
     "terser-webpack-plugin": "^1.4.1",
     "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6",

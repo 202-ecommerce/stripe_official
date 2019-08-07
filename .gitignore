@@ -1,4 +1,9 @@
 /vendor
 !/vendor/totpsclasslib
 /node_modules
+
+# @TODO We should probably git composer.lock
 composer.lock
+
+# Ignore cache folder used by linters.
+/.cache
