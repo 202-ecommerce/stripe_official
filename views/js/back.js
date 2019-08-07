@@ -126,94 +126,64 @@ __webpack_require__.r(__webpack_exports__);
  * @license   Commercial license
  */
 $(document).ready(function () {
-  // multistore
+  // Multistore
   var old = $('.bootstrap.panel');
   $('#content').after(old);
-  old.css('margin-left', '12%');
-  var value = 0;
-  value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
+  old.css('margin-left', '12%'); // Test mode
 
-  if (value == 1) {
-    $("#secret_key").parent().parent().hide();
-    $("#public_key").parent().parent().hide();
-    $("#test_secret_key").parent().parent().show();
-    $("#test_public_key").parent().parent().show();
-  } else {
-    $("#secret_key").parent().parent().show();
-    $("#public_key").parent().parent().show();
-    $("#test_secret_key").parent().parent().hide();
-    $("#test_public_key").parent().parent().hide();
-  }
-
+  toggleTestMode();
   $('#configuration_form input').on('change', function () {
-    value = $('input[name=STRIPE_MODE]:checked', '#configuration_form').val();
+    toggleTestMode();
+  }); // Ask confirmation on refund
 
-    if (value == 1) {
-      $("#secret_key").parent().parent().hide();
-      $("#public_key").parent().parent().hide();
-      $("#test_secret_key").parent().parent().show();
-      $("#test_public_key").parent().parent().show();
-    } else {
-      $("#secret_key").parent().parent().show();
-      $("#public_key").parent().parent().show();
-      $("#test_secret_key").parent().parent().hide();
-      $("#test_public_key").parent().parent().hide();
+  $('#configuration_form_submit_btn_2').click(function () {
+    if (confirm('Are you sure that you want to refund this order?')) {
+      return true;
     }
-  });
-  /* Alert Confirmation Refund */
 
-  $("#configuration_form_submit_btn_2").click(function () {
-    if (confirm('Are you sure that you want to refund this order?')) return true;
     return false;
-  });
-  /* Refund Option */
+  }); // Refund mode
 
-  var value = 0;
-  value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
-  if (value == 1) $(".partial-amount").hide();else $(".partial-amount").show();
-  $('input[name=STRIPE_REFUND_MODE]').on('change', function () {
-    value = $('input[name=STRIPE_REFUND_MODE]:checked').val();
-    if (value == 1) $(".partial-amount").hide();else $(".partial-amount").show();
+  toggleRefundMode();
+  $('input[name="STRIPE_REFUND_MODE"]').on('change', function () {
+    toggleRefundMode();
   });
-  $('.process-icon-refresh').click(function () {
-    $.ajax({
-      url: transaction_refresh_url,
-      data: {
-        'token_stripe': token_stripe,
-        'id_employee': id_employee
-      }
-    }).done(function (response) {
-      $('.table-transaction').html(response);
-    });
-  });
+  initFaq();
+}); // Init faq tabs
+// Opens/closes answer on click.
 
-  (function () {
-    var _context;
+function initFaq() {
+  var _context;
 
-    _babel_runtime_corejs3_core_js_stable_instance_for_each__WEBPACK_IMPORTED_MODULE_1___default()(_context = _babel_runtime_corejs3_core_js_stable_instance_slice__WEBPACK_IMPORTED_MODULE_0___default()([]).call(document.querySelectorAll('.tabs'))).call(_context, function (el) {
-      new PSTabs(el);
-    });
-  })();
+  _babel_runtime_corejs3_core_js_stable_instance_for_each__WEBPACK_IMPORTED_MODULE_1___default()(_context = _babel_runtime_corejs3_core_js_stable_instance_slice__WEBPACK_IMPORTED_MODULE_0___default()([]).call(document.querySelectorAll('.tabs'))).call(_context, function (el) {
+    new PSTabs(el);
+  });
+}
 
-  displayPayment();
-  $('#applepay_googlepay').change(function (event) {
-    displayPayment();
-  });
-  $('#product_payment').change(function (event) {
-    if ($(this).is(':checked') === true) {
-      $('#modal_applepay_googlepay').show();
-    }
-  });
-  $('#modal_applepay_googlepay button[data-dismiss="modal"]').click(function (event) {
-    $('#modal_applepay_googlepay').hide();
-  });
-});
+function toggleTestMode() {
+  var isTestModeActive = $('input[name="STRIPE_MODE"]:checked', '#configuration_form').val();
 
-function displayPayment() {
-  if ($('#applepay_googlepay').is(':checked') === true) {
-    $('#display_product_payment').show();
+  if (isTestModeActive) {
+    $('#secret_key').parent().parent().hide();
+    $('#public_key').parent().parent().hide();
+    $('#test_secret_key').parent().parent().show();
+    $('#test_public_key').parent().parent().show();
   } else {
-    $('#display_product_payment').hide();
+    $('#secret_key').parent().parent().show();
+    $('#public_key').parent().parent().show();
+    $('#test_secret_key').parent().parent().hide();
+    $('#test_public_key').parent().parent().hide();
+  }
+}
+
+function toggleRefundMode() {
+  var isPartialRefund = $('input[name="STRIPE_REFUND_MODE"]:checked').val();
+  var $partialAmount = $('.partial-amount');
+
+  if (isPartialRefund) {
+    $partialAmount.show();
+  } else {
+    $partialAmount.hide();
   }
 }
 

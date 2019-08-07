@@ -22,27 +22,25 @@
  * @license   Commercial license
  */
 
-$(function() {
-	$('.faq-item').click(
-	    function(){
-			if($(this).find('.faq-content').is(':visible'))
-			{
-			    $(this).find('.faq-content').slideUp('fast');
-			    $(this).find('.expand').html('+');
-			}
-			else
-			{
-			    $('.faq-content').hide('fast');
-			    $(this).find('.faq-content').slideDown('fast');
-			    $('.expand').html('+');
-			    $(this).find('.expand').html('-');
-			}
-	    }
-	);
+$(function () {
+  // Open/close faq items on click.
+  $('.faq-item').click(function () {
+    const $content = $(this).find('.faq-content');
+    const $button = $(this).find('.expand');
 
-	$('.faq-item a').click(
-	    function(e){
-		    e.stopPropagation();
-	    }
-	);
+    if ($content.is(':visible')) {
+      $content.slideUp('fast');
+      $button.html('+');
+    } else {
+      $('.faq-content').hide('fast');
+      $('.expand').html('+');
+      $content.slideDown('fast');
+      $button.html('-');
+    }
+  });
+
+  // Prevent closing a faq item when clicking on a link inside a it.
+  $('.faq-item a').click(function (event) {
+    event.stopPropagation();
+  });
 });

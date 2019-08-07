@@ -123,29 +123,27 @@ __webpack_require__.r(__webpack_exports__);
  * @license   Commercial license
  */
 $(function () {
+  // Open/close faq items on click.
   $('.faq-item').click(function () {
-    var _context;
+    var _context, _context2;
 
-    if (_babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context = $(this)).call(_context, '.faq-content').is(':visible')) {
-      var _context2, _context3;
+    var $content = _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context = $(this)).call(_context, '.faq-content');
 
-      _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context2 = $(this)).call(_context2, '.faq-content').slideUp('fast');
+    var $button = _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context2 = $(this)).call(_context2, '.expand');
 
-      _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context3 = $(this)).call(_context3, '.expand').html('+');
+    if ($content.is(':visible')) {
+      $content.slideUp('fast');
+      $button.html('+');
     } else {
-      var _context4, _context5;
-
       $('.faq-content').hide('fast');
-
-      _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context4 = $(this)).call(_context4, '.faq-content').slideDown('fast');
-
       $('.expand').html('+');
-
-      _babel_runtime_corejs3_core_js_stable_instance_find__WEBPACK_IMPORTED_MODULE_0___default()(_context5 = $(this)).call(_context5, '.expand').html('-');
+      $content.slideDown('fast');
+      $button.html('-');
     }
-  });
-  $('.faq-item a').click(function (e) {
-    e.stopPropagation();
+  }); // Prevent closing a faq item when clicking on a link inside a it.
+
+  $('.faq-item a').click(function (event) {
+    event.stopPropagation();
   });
 });
 
