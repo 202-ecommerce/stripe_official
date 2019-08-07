@@ -19,8 +19,7 @@ const config = {
     'js/PSTabs': './_dev/js/PSTabs.js',
 
     'css/checkout': './_dev/scss/checkout.scss',
-    'css/started': './_dev/scss/started.scss',
-    'css/tabs': './_dev/scss/tabs.scss',
+    'css/admin': './_dev/scss/admin.scss',
   },
 
   output: {

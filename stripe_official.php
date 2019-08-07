@@ -519,11 +519,12 @@ class Stripe_official extends PaymentModule
             $domain = Tools::getShopDomain(true, true);
         }
 
+        // @TODO we can bundle the following js files into a single one as they are only used in this place.
         $this->context->controller->addJS($this->_path.'/views/js/faq.js');
         $this->context->controller->addJS($this->_path.'/views/js/back.js');
         $this->context->controller->addJS($this->_path.'/views/js/PSTabs.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/started.css');
-        $this->context->controller->addCSS($this->_path.'/views/css/tabs.css');
+
+        $this->context->controller->addCSS($this->_path.'/views/css/admin.css');
 
         if ((Configuration::get(self::TEST_KEY) != '' && Configuration::get(self::TEST_PUBLISHABLE) != '')
             || (Configuration::get(self::KEY) != '' && Configuration::get(self::PUBLISHABLE) != '')) {
