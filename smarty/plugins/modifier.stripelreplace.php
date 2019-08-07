@@ -74,4 +74,3 @@ if (!function_exists('smarty_modifier_stripelreplace')) {
         return $string;
     }
 }
-
