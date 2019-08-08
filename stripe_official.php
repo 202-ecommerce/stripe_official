@@ -504,6 +504,7 @@ class Stripe_official extends PaymentModule
             $mode = Tools::getValue(self::REFUND_MODE);
             if ($mode == 0) {
                 $amount = Tools::getValue(self::REFUND_AMOUNT);
+                $amount = str_replace(',', '.', $amount);
             }
 
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
