@@ -36,7 +36,7 @@
   line-height: 33px;
   color: #fff;
   text-shadow: 0 -1px 0 #03609e;
-  background: url("$img_dir/bg_btn-blue.png") left top no-repeat;
+  background: url("~img_dir/bg_btn-blue.png") left top no-repeat;
 }
 
 .stripe-module-header a.stripe-module-create-btn span {
@@ -44,7 +44,7 @@
   height: 35px;
   padding: 0 20px 0 0;
   margin: 0 -20px 0 0;
-  background: url("$img_dir/bg_btn-blue.png") right bottom no-repeat;
+  background: url("~img_dir/bg_btn-blue.png") right bottom no-repeat;
 }
 
 .stripe-module-wrap {
@@ -117,7 +117,7 @@
   color: #008cdd;
   text-decoration: none;
   text-shadow: 0 1px 0 #fff;
-  background: url("$img_dir/stripe-btn-arrow.png") left center no-repeat;
+  background: url("~img_dir/stripe-btn-arrow.png") left center no-repeat;
 }
 
 .stripe-module-wrap a.stripe-module-btn:hover {
@@ -133,7 +133,7 @@
 .stripe-module-wrap ul li {
   padding: 0 0 0 15px;
   margin: 0;
-  background: url('$img_dir/checkmark-blue.png') left 5px no-repeat;
+  background: url('~img_dir/checkmark-blue.png') left 5px no-repeat;
 }
 
 img.stripe-cc {

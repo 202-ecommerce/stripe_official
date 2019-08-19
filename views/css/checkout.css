@@ -47,7 +47,7 @@
   color: #fff;
   cursor: pointer;
   background-color: #5b9bd5;
-  background-image: url("$img_dir/lock-locked.png");
+  background-image: url(../../views/img/lock-locked.png);
   background-repeat: no-repeat;
   background-position: 7px;
   background-size: 12px 17px;
