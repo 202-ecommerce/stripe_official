@@ -59,6 +59,20 @@ const config = {
         ],
       },
 
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              emitFile: false,
+              name: '[path][name].[ext]',
+              publicPath: '../..'
+            },
+          },
+        ],
+      },
+
     ],
   },
 
@@ -77,7 +91,7 @@ const config = {
     extensions: ['.js', '.scss', '.css'],
     alias: {
       '~': path.resolve(__dirname, './node_modules'),
-      '$img_dir': path.resolve(__dirname, './views/img'),
+      'img_dir': path.resolve(__dirname, './views/img'),
     },
   },
 };
