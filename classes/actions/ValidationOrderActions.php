@@ -109,11 +109,17 @@ class ValidationOrderActions extends DefaultActions
      */
     public function updatePaymentIntent()
     {
+        $amount = $this->conveyor['amount'];
+        if (strstr($this->conveyor['chargeId'], 'ch_')) {
+            $amount = $amount*100;
+        }
+
         $paymentIntent = new StripePaymentIntent();
         $paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $paymentIntent->setAmount($this->conveyor['amount']*100);
+        $paymentIntent->setAmount($amount);
         $paymentIntent->setStatus($this->conveyor['status']);
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
+
         $paymentIntent->update();
 
         $this->conveyor['paymentIntent'] = $paymentIntent;
