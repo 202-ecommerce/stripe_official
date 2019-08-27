@@ -1,6 +1,8 @@
 /vendor
 !/vendor/totpsclasslib
 /node_modules
+/views/css
+/views/js
 
 # @TODO We should probably git composer.lock
 composer.lock

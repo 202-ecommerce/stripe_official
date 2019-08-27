@@ -65,7 +65,7 @@ function initFaq() {
 function toggleTestMode() {
   const isTestModeActive = $('input[name="STRIPE_MODE"]:checked', '#configuration_form').val();
 
-  if (isTestModeActive) {
+  if (isTestModeActive == '1') {
     $('#secret_key').parent().parent().hide();
     $('#public_key').parent().parent().hide();
     $('#test_secret_key').parent().parent().show();
