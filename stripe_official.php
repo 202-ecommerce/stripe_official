@@ -1011,7 +1011,7 @@ class Stripe_official extends PaymentModule
             'stripe_client_secret' => $intent->client_secret,
 
             'stripe_currency' => Tools::strtolower($currency),
-            'stripe_amount' => $amount,
+            'stripe_amount' => Tools::ps_round($amount, 2),
 
             'stripe_fullname' => $stripe_fullname,
 
