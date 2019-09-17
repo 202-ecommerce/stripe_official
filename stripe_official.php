@@ -1053,6 +1053,18 @@ class Stripe_official extends PaymentModule
                 )
             ));
         }
+        
+        // The hookHeader isn't triggered when updating the cart or the carrier
+        // on PS1.6 with OPC; so we need to update the PaymentIntent here
+        $currency = new Currency($params['cart']->id_currency);
+        $currency_iso_code = Tools::strtolower($currency->iso_code);
+        $address = new Address($params['cart']->id_address_invoice);
+        $amount = $this->context->cart->getOrderTotal();
+        $amount = Tools::ps_round($amount, 2);
+        $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
+
+        // Create or update the payment intent for this order
+        $this->retrievePaymentIntent($amount, $currency_iso_code);
 
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
@@ -1060,9 +1072,7 @@ class Stripe_official extends PaymentModule
         ));
 
         // Fetch country based on invoice address and currency
-        $address = new Address($params['cart']->id_address_invoice);
         $country = Country::getIsoById($address->id_country);
-        $currency = Tools::strtolower($this->context->currency->iso_code);
 
         // Show only the payment methods that are relevant to the selected country and currency
         $display = '';
@@ -1078,7 +1088,7 @@ class Stripe_official extends PaymentModule
             }
 
             // Check for currency support
-            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+            if (isset($paymentMethod['currencies']) && !in_array($currency_iso_code, $paymentMethod['currencies'])) {
                 continue;
             }
 
