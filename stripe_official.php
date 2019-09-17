@@ -1066,7 +1066,9 @@ class Stripe_official extends PaymentModule
         // Create or update the payment intent for this order
         $this->retrievePaymentIntent($amount, $currency_iso_code);
 
+        // Send the payment amount, it may have changed
         $this->context->smarty->assign(array(
+            'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
         ));
@@ -1093,6 +1095,9 @@ class Stripe_official extends PaymentModule
             }
 
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_' . basename($name) . '.tpl');
+        }
+        if ($display != '') {
+            $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
         }
 
         return $display;
