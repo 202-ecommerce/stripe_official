@@ -221,7 +221,7 @@ class Stripe_official extends PaymentModule
             try {
                 \Stripe\Stripe::setApiKey($this->getSecretKey());
                 $version = $this->version.'_'._PS_VERSION_.'_'.phpversion();
-                \Stripe\Stripe::setAppInfo('StripePrestashop', $version, Configuration::get('PS_SHOP_DOMAIN_SSL'));
+                \Stripe\Stripe::setAppInfo('StripePrestashop', $version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html', 'pp_partner_EX2Z2idAZw7OWr');
             } catch (\Stripe\Error\ApiConnection $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError('Fail to set API Key. Stripe SDK return error: ' . $e);
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
@@ -504,6 +504,7 @@ class Stripe_official extends PaymentModule
             $mode = Tools::getValue(self::REFUND_MODE);
             if ($mode == 0) {
                 $amount = Tools::getValue(self::REFUND_AMOUNT);
+                $amount = str_replace(',', '.', $amount);
             }
 
             $this->apiRefund($refund[0]['id_stripe'], $refund[0]['currency'], $mode, $refund[0]['id_cart'], $amount);
@@ -519,11 +520,12 @@ class Stripe_official extends PaymentModule
             $domain = Tools::getShopDomain(true, true);
         }
 
+        // @TODO we can bundle the following js files into a single one as they are only used in this place.
         $this->context->controller->addJS($this->_path.'/views/js/faq.js');
         $this->context->controller->addJS($this->_path.'/views/js/back.js');
         $this->context->controller->addJS($this->_path.'/views/js/PSTabs.js');
-        $this->context->controller->addCSS($this->_path.'/views/css/started.css');
-        $this->context->controller->addCSS($this->_path.'/views/css/tabs.css');
+
+        $this->context->controller->addCSS($this->_path.'/views/css/admin.css');
 
         if ((Configuration::get(self::TEST_KEY) != '' && Configuration::get(self::TEST_PUBLISHABLE) != '')
             || (Configuration::get(self::KEY) != '' && Configuration::get(self::PUBLISHABLE) != '')) {
@@ -784,21 +786,25 @@ class Stripe_official extends PaymentModule
     */
     protected function retrievePaymentIntent($amount, $currency)
     {
-        if (isset($this->context->cookie->stripe_payment_intent)) {
+        if (isset($this->context->cookie->stripe_payment_intent) && !empty($this->context->cookie->stripe_payment_intent)) {
             try {
                 $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
                 // Check that the amount is still correct
                 if ($intent->amount != $amount) {
-                    $intent->update(array(
-                        "amount" => $amount
-                    ));
+                    $intent->update(
+                        $this->context->cookie->stripe_payment_intent,
+                        array(
+                            "amount" => $amount
+                        )
+                    );
                 }
 
                 return $intent;
             } catch (Exception $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage(), null, null, 'retrievePaymentIntent');
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 unset($this->context->cookie->stripe_payment_intent);
-                error_log($e->getMessage());
             }
         }
 
@@ -983,6 +989,7 @@ class Stripe_official extends PaymentModule
                 'modules/'.$this->name.'/views/css/checkout.css'
             );
             $prestashop_version = '1.7';
+            $stripe_fullname = str_replace('"', '\\"', $this->context->customer->firstname) . ' ' . str_replace('"', '\\"', $this->context->customer->lastname);
         } else {
             $this->context->controller->addJS('https://js.stripe.com/v3/');
             $this->context->controller->addJS($this->_path . '/views/js/payments.js');
@@ -993,6 +1000,7 @@ class Stripe_official extends PaymentModule
 
             $this->context->controller->addCSS($this->_path . '/views/css/checkout.css', 'all');
             $prestashop_version = '1.6';
+            $stripe_fullname = str_replace('\'', '\\\'', $this->context->customer->firstname) . ' ' . str_replace('\'', '\\\'', $this->context->customer->lastname);
         }
 
         // Javacript variables needed by Elements
@@ -1003,10 +1011,9 @@ class Stripe_official extends PaymentModule
             'stripe_client_secret' => $intent->client_secret,
 
             'stripe_currency' => Tools::strtolower($currency),
-            'stripe_amount' => $amount,
+            'stripe_amount' => Tools::ps_round($amount, 2),
 
-            'stripe_fullname' => $this->context->customer->firstname . ' ' .
-                               $this->context->customer->lastname,
+            'stripe_fullname' => $stripe_fullname,
 
             'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
@@ -1046,16 +1053,28 @@ class Stripe_official extends PaymentModule
                 )
             ));
         }
+        
+        // The hookHeader isn't triggered when updating the cart or the carrier
+        // on PS1.6 with OPC; so we need to update the PaymentIntent here
+        $currency = new Currency($params['cart']->id_currency);
+        $currency_iso_code = Tools::strtolower($currency->iso_code);
+        $address = new Address($params['cart']->id_address_invoice);
+        $amount = $this->context->cart->getOrderTotal();
+        $amount = Tools::ps_round($amount, 2);
+        $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
 
+        // Create or update the payment intent for this order
+        $this->retrievePaymentIntent($amount, $currency_iso_code);
+
+        // Send the payment amount, it may have changed
         $this->context->smarty->assign(array(
+            'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
         ));
 
         // Fetch country based on invoice address and currency
-        $address = new Address($params['cart']->id_address_invoice);
         $country = Country::getIsoById($address->id_country);
-        $currency = Tools::strtolower($this->context->currency->iso_code);
 
         // Show only the payment methods that are relevant to the selected country and currency
         $display = '';
@@ -1071,11 +1090,14 @@ class Stripe_official extends PaymentModule
             }
 
             // Check for currency support
-            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+            if (isset($paymentMethod['currencies']) && !in_array($currency_iso_code, $paymentMethod['currencies'])) {
                 continue;
             }
 
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_' . basename($name) . '.tpl');
+        }
+        if ($display != '') {
+            $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
         }
 
         return $display;

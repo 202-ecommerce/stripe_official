@@ -1,0 +1,198 @@
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to a commercial license from SARL 202 ecommerce
+ * Use, copy, modification or distribution of this source file without written
+ * license agreement from the SARL 202 ecommerce is strictly forbidden.
+ * In order to obtain a license, please contact us: tech@202-ecommerce.com
+ * ...........................................................................
+ * INFORMATION SUR LA LICENCE D'UTILISATION
+ *
+ * L'utilisation de ce fichier source est soumise a une licence commerciale
+ * concedee par la societe 202 ecommerce
+ * Toute utilisation, reproduction, modification ou distribution du present
+ * fichier source sans contrat de licence ecrit de la part de la SARL 202 ecommerce est
+ * expressement interdite.
+ * Pour obtenir une licence, veuillez contacter 202-ecommerce <tech@202-ecommerce.com>
+ * ...........................................................................
+ *
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) 202-ecommerce
+ * @license   Commercial license
+ */
+
+.tabs nav a {
+  display: block;
+  text-decoration: none;
+}
+
+.tabs nav li.tab-current a {
+  color: #fff;
+}
+
+/* Content */
+.content-wrap {
+  position: relative;
+  min-height: 455px;
+}
+
+.content-wrap section {
+  display: none;
+  padding: 1em;
+  margin: 0 auto;
+}
+
+.tabs-logo {
+  display: block;
+  width: 100%;
+  max-width: 250px;
+  padding: 0;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.content-wrap section.content-current {
+  display: block;
+}
+
+.list-group-item {
+  padding: 10px 15px !important;
+}
+
+.pstab-icon {
+  width: 25px;
+  height: 25px;
+  padding: 5px;
+  margin-right: 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.badge-module-tabs {
+  width: 10px;
+  height: 10px;
+  padding: 3px;
+  margin-top: 10px;
+}
+
+.tab-info {
+  display: none;
+  padding-left: 5px;
+  color: #fff;
+  background-color: #00aff0;
+  border-radius: 50%;
+}
+
+.tab-warning {
+  padding-left: 5px;
+  color: #fff !important;
+  background-color: #f4c178;
+  border-radius: 50%;
+}
+
+.tab-success {
+  padding-left: 5px;
+  color: #fff !important;
+  background-color: #90cb5c;
+  border-radius: 50%;
+}
+
+.tab-error {
+  padding-left: 5px;
+  font-weight: bold;
+  color: #fff !important;
+  background-color: #a94442;
+  border-radius: 50%;
+}
+
+.tab-back {
+  width: 100%;
+  background-color: #ddd;
+}
+
+// @TODO this file should probably be about 'tabs' only, as its name suggests.
+// faq stuff could be moved in its own file.
+.faq ul.faq-items {
+  width: 100%;
+  padding: 0;
+  list-style-type: none;
+}
+
+.faq ul.faq-items > li {
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  border-radius: 2px;
+  box-shadow: 0 0 10px -4px #bbb;
+}
+
+.faq ul.faq-items > li:hover {
+  box-shadow: 0 0 10px -4px #555;
+}
+
+.faq ul.faq-items > li .faq-trigger {
+  font-size: 20px;
+  color: #00aff0;
+}
+
+.faq ul.faq-items > li .faq-trigger:hover {
+  color: #00aff0;
+  text-decoration: none;
+}
+
+.faq ul.faq-items > li .faq-trigger:active {
+  color: #00aff0;
+  text-decoration: none;
+}
+
+.faq .expand {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.faq-content {
+  display: none;
+  padding-top: 20px;
+  padding-left: 15px;
+  line-height: 200%;
+}
+
+.faq-content a {
+  padding-bottom: -2px;
+  color: #555;
+  border-bottom: 1px dotted #555;
+  size: 16px;
+}
+
+.faq-content a:hover {
+  text-decoration: none;
+  border-bottom: none;
+}
+
+label[for="secure_all"],
+label[for="secure_only"] {
+  float: none;
+  width: 345px;
+  text-align: left;
+}
+
+#section-shape-4 #secure_all,
+#section-shape-4 #secure_only {
+  display: inline-block;
+  margin: 0;
+  margin-top: 2px;
+  margin-right: 5px;
+  vertical-align: top;
+}
+
+#section-shape-4 .margin-form {
+  box-sizing: content-box;
+  width: 387px;
+}
+
+#section-shape-4 input[name="submit_secure"] {
+  position: absolute;
+  right: 26px;
+  margin-top: -30px;
+}

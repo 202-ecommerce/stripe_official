@@ -38,6 +38,12 @@ $(function(){
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
+    
+    // Get Stripe amount. On PS1.6 with OPC, the checkout page isn't refreshed
+    // when updating cart quantity / carrier, so we need to update our data.
+    if ($('#stripe-amount').length) {
+        stripe_amount = parseInt($('#stripe-amount').val());
+    }
 
     // Disabled card form (enter button)
     $form.on('submit', (event) => {

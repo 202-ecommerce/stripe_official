@@ -1,4 +1,4 @@
-/**
+{*
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,29 +20,6 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
- */
+*}
 
-$(function() {
-	$('.faq-item').click(
-	    function(){
-			if($(this).find('.faq-content').is(':visible'))
-			{
-			    $(this).find('.faq-content').slideUp('fast');
-			    $(this).find('.expand').html('+');
-			}
-			else
-			{
-			    $('.faq-content').hide('fast');
-			    $(this).find('.faq-content').slideDown('fast');
-			    $('.expand').html('+');
-			    $(this).find('.expand').html('-');
-			}
-	    }
-	);
-
-	$('.faq-item a').click(
-	    function(e){
-		    e.stopPropagation();
-	    }
-	);
-});
+<input type="hidden" id="stripe-amount" value="{{$stripe_amount|escape:'htmlall':'UTF-8'}}">
