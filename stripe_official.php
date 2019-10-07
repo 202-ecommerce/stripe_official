@@ -470,6 +470,8 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
             Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
+
+            $this->addAppleDomainAssociation($secret_key);
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -579,6 +581,58 @@ class Stripe_official extends PaymentModule
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
+    }
+
+    /*
+     ** @Method: copyAppleDomainFile
+     ** @description: Copy apple-developer-merchantid-domain-association file to .well-known/ folder
+     **
+     ** @arg: (none)
+     ** @return: bool
+     */
+    public function copyAppleDomainFile()
+    {
+        if (!Tools::copy(_PS_MODULE_DIR_.'stripe_official/apple-developer-merchantid-domain-association', _PS_ROOT_DIR_.'/.well-known/apple-developer-merchantid-domain-association'))
+        {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /*
+     ** @Method: displaySomething
+     ** @description: Register Apple Pay domain in Stripe dashboard
+     **
+     ** @arg: secret_key
+     ** @return: (none)
+     */
+    public function addAppleDomainAssociation($secret_key, $upgrade = false)
+    {
+        $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
+        curl_setopt($curl, CURLOPT_FAILONERROR, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $result = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($httpcode != 200 && $upgrade) {
+            if (!$this->copyAppleDomainFile()) {
+                $this->warning[] = $this->l('Your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
+            }
+        } else if ($httpcode != 200 || !$result) {
+            if (!$this->copyAppleDomainFile()) {
+                $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
+            } else {
+                \Stripe\Stripe::setApiKey($secret_key);
+                \Stripe\ApplePayDomain::create(array(
+                  'domain_name' => $this->context->shop->domain
+                ));
+            }
+        }
     }
 
     /*
@@ -1053,7 +1107,7 @@ class Stripe_official extends PaymentModule
                 )
             ));
         }
-        
+
         // The hookHeader isn't triggered when updating the cart or the carrier
         // on PS1.6 with OPC; so we need to update the PaymentIntent here
         $currency = new Currency($params['cart']->id_currency);
