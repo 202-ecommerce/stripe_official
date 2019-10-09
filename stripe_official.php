@@ -594,8 +594,7 @@ class Stripe_official extends PaymentModule
      */
     public function copyAppleDomainFile()
     {
-        if (!Tools::copy(_PS_MODULE_DIR_.'stripe_official/apple-developer-merchantid-domain-association', _PS_ROOT_DIR_.'/.well-known/apple-developer-merchantid-domain-association'))
-        {
+        if (!Tools::copy(_PS_MODULE_DIR_.'stripe_official/apple-developer-merchantid-domain-association', _PS_ROOT_DIR_.'/.well-known/apple-developer-merchantid-domain-association')) {
             return false;
         } else {
             return true;
