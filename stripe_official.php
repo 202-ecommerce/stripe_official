@@ -471,7 +471,9 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
             Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
 
-            $this->addAppleDomainAssociation($secret_key);
+            if (Configuration::get(self::KEY) && Configuration::get(self::KEY) != '') {
+                $this->addAppleDomainAssociation(Configuration::get(self::KEY));
+            }
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -609,28 +611,29 @@ class Stripe_official extends PaymentModule
      */
     public function addAppleDomainAssociation($secret_key, $upgrade = false)
     {
-        $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
-        curl_setopt($curl, CURLOPT_FAILONERROR, true);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        $result = curl_exec($curl);
-        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-
-        if ($httpcode != 200 && $upgrade) {
+        $domain_file = _PS_ROOT_DIR_.'/.well-known/apple-developer-merchantid-domain-association';
+        if (!file_exists($domain_file)) {
             if (!$this->copyAppleDomainFile()) {
                 $this->warning[] = $this->l('Your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
-            }
-        } else if ($httpcode != 200 || !$result) {
-            if (!$this->copyAppleDomainFile()) {
-                $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
             } else {
                 \Stripe\Stripe::setApiKey($secret_key);
                 \Stripe\ApplePayDomain::create(array(
                   'domain_name' => $this->context->shop->domain
                 ));
+
+                $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
+                curl_setopt($curl, CURLOPT_FAILONERROR, true);
+                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                $result = curl_exec($curl);
+                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+
+                if ($httpcode != 200 || !$result) {
+                    $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                }
             }
         }
     }

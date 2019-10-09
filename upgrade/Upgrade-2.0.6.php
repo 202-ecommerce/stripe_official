@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_0_6($module)
 {
     if (Configuration::get($module::KEY) && Configuration::get($module::KEY) != '') {
-        $module->addAppleDomainAssociation(Configuration::get($module::KEY), true);
+        $module->addAppleDomainAssociation(Configuration::get($module::KEY));
     }
 
     return true;
