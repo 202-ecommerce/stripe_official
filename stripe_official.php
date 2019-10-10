@@ -608,8 +608,15 @@ class Stripe_official extends PaymentModule
      ** @arg: secret_key
      ** @return: (none)
      */
-    public function addAppleDomainAssociation($secret_key, $upgrade = false)
+    public function addAppleDomainAssociation($secret_key)
     {
+        if (!is_dir(_PS_ROOT_DIR_.'/.well-known')) {
+            if (!mkdir(_PS_ROOT_DIR_.'/.well-known')) {
+                $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                return false;
+            }
+        }
+
         $domain_file = _PS_ROOT_DIR_.'/.well-known/apple-developer-merchantid-domain-association';
         if (!file_exists($domain_file)) {
             if (!$this->copyAppleDomainFile()) {
