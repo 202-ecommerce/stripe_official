@@ -38,7 +38,7 @@ $(function(){
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
-    
+
     // Get Stripe amount. On PS1.6 with OPC, the checkout page isn't refreshed
     // when updating cart quantity / carrier, so we need to update our data.
     if ($('#stripe-amount').length) {
@@ -179,6 +179,12 @@ $(function(){
         $form = event.currentTarget;
         payment = event.currentTarget.dataset.method;
         disableText = event.currentTarget;
+
+        if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
+          var error = { "message" : 'Please accept the CGV' };
+          updateError($submitButtons, error);
+          return false;
+        }
       }
 
       // Disable the Pay button to prevent multiple click events.
@@ -359,6 +365,16 @@ $(function(){
   };
 
   initStripe();
+
+  /* for Prestashop 1.6 if eu_compliance module is used */
+  $('.payment_module.pointer-box').click(function(event) {
+    if ($(this).parent().find('.stripe-payment-form').length > 0) {
+      $(this).parent().find('.payment_option_form').show();
+    } else {
+      $('.stripe-payment-form').parent().hide();
+    }
+  });
+  /* END for Prestashop 1.6 if eu_compliance module is used */
 
   const observer = new MutationObserver((mutations) => {
     $.each(mutations, function(i, mutation) {

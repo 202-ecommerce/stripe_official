@@ -128,6 +128,7 @@ class Stripe_official extends PaymentModule
         'displayAdminCartsView',
         'paymentOptions',
         'payment',
+        'displayPaymentEU',
         'adminOrder',
     );
 
@@ -1164,6 +1165,27 @@ class Stripe_official extends PaymentModule
         }
 
         return $display;
+    }
+
+    public function hookDisplayPaymentEU($params)
+    {
+        if (!self::isWellConfigured() || !$this->active) {
+            return;
+        }
+
+        $payment = $this->hookPayment($params);
+
+        Media::addJsDef(array(
+            'stripe_compliance' => true
+        ));
+
+        $payment_options = array(
+            'cta_text' => $this->l('Pay by card'),
+            'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'),
+            'form' => $payment
+        );
+
+        return $payment_options;
     }
 
     /**
