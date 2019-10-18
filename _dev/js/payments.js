@@ -39,6 +39,8 @@ $(function(){
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
 
+    let cardType;
+
     // Get Stripe amount. On PS1.6 with OPC, the checkout page isn't refreshed
     // when updating cart quantity / carrier, so we need to update our data.
     if ($('#stripe-amount').length) {
@@ -75,8 +77,10 @@ $(function(){
         cardExpiry.mount('#stripe-card-expiry');
         cardCvc = elements.create('cardCvc');
         cardCvc.mount('#stripe-card-cvc');
-        cardPostalCode = elements.create('postalCode');
-        cardPostalCode.mount('#stripe-card-postalcode');
+        if (stripe_postcode_disabled != 'on') {
+          cardPostalCode = elements.create('postalCode');
+          cardPostalCode.mount('#stripe-card-postalcode');
+        }
       } else {
         if (stripe_postcode_disabled == 'on') {
           card = elements.create('card', { style, hidePostalCode: true });
@@ -194,9 +198,11 @@ $(function(){
           setOutcome(event);
       });
 
-      cardPostalCode.addEventListener('change', function(event) {
-          setOutcome(event);
-      });
+      if (stripe_postcode_disabled != 'on') {
+        cardPostalCode.addEventListener('change', function(event) {
+            setOutcome(event);
+        });
+      }
     }
 
     function setOutcome(result) {

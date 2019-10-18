@@ -1139,7 +1139,8 @@ class Stripe_official extends PaymentModule
             'prestashop_version' => $prestashop_version,
 
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
-            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE)
+            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
+            'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
         ));
     }
 
@@ -1178,6 +1179,10 @@ class Stripe_official extends PaymentModule
             'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
+            'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
+            'stripe_payment_methods' => $this->getPaymentMethods(),
+            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
         ));
 
         // Fetch country based on invoice address and currency

@@ -164,3 +164,25 @@ form#stripe-card-payment #cards-logos {
     right: 0;
     width: 31px;
 }
+
+.stripe-submit-button {
+    position: relative;
+    display: inline-block;
+    width: 210px;
+    padding: 5px 7px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    background-color: #5b9bd5;
+    background-image: url(../../views/img/lock-locked.png);
+    background-repeat: no-repeat;
+    background-position: 7px;
+    background-size: 12px 17px;
+    border: 1px solid rgba(77,96,113,0.63);
+    border-radius: 3px;
+}
+
+#powered_by_stripe {
+    margin-bottom: 20px;
+}
