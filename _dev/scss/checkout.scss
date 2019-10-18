@@ -90,3 +90,77 @@
 .payment-options #stripe-card-payment {
   margin: 20px 0;
 }
+
+.stripe-payment-form .stripe-card-cvc, .stripe-payment-form .stripe-card-expiry {
+    width: 102px;
+    max-width: 102px;
+    display: inline-block;
+    padding: 3px 1px !important;
+}
+
+#stripe-card-number {
+    width: 210px;
+}
+
+#stripe-card-cvc,
+#stripe-card-expiry,
+#stripe-card-postalcode {
+    width: 102px;
+    max-width: 102px;
+}
+
+#stripe-card-number,
+#stripe-card-expiry,
+#stripe-card-cvc,
+#stripe-card-postalcode {
+    border: #CCCCCC solid 1px;
+    margin-bottom: 15px;
+    padding: 3px;
+    box-sizing: border-box;
+    font-size: 15px;
+    width: 210px;
+    background-color: #ffffff;
+    position: relative;
+}
+
+.stripe-payment-form label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+form#stripe-card-payment img.card_logo {
+    width: 50px;
+    height: auto;
+    display: inline-block;
+    margin: 0px 10px;
+}
+
+form#stripe-card-payment #cards-logos {
+    margin-bottom: 10px;
+}
+
+.stripe-payment-form label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.stripe-payment-form label.required:before {
+    content: "*";
+    color: red;
+    font-size: 14px;
+    position: relative;
+    line-height: 12px;
+}
+
+.stripe-payment-form .form-row {
+    margin: 0 auto;
+}
+
+#stripe-card-number img.img-card {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    width: 31px;
+}

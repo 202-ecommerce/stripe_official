@@ -64,6 +64,15 @@ class Stripe_official extends PaymentModule
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
+    const REINSURANCE = 'STRIPE_REINSURANCE';
+    const VISA = 'STRIPE_PAYMENT_VISA';
+    const MASTERCARD = 'STRIPE_PAYMENT_MASTERCARD';
+    const AMERICAN_EXPRESS = 'STRIPE_PAYMENT_AMERICAN_EXPRESS';
+    const CB = 'STRIPE_PAYMENT_CB';
+    const DINERS_CLUB = 'STRIPE_PAYMENT_DINERS_CLUB';
+    const UNION_PAY = 'STRIPE_PAYMENT_UNION_PAY';
+    const JCB = 'STRIPE_PAYMENT_JCB';
+    const DISCOVERS = 'STRIPE_PAYMENT_DISCOVERS';
     const ENABLE_IDEAL = 'STRIPE_ENABLE_IDEAL';
     const ENABLE_SOFORT = 'STRIPE_ENABLE_SOFORT';
     const ENABLE_GIROPAY = 'STRIPE_ENABLE_GIROPAY';
@@ -471,6 +480,15 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
             Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
+            Configuration::updateValue(self::REINSURANCE, Tools::getValue('reinsurance'));
+            Configuration::updateValue(self::VISA, Tools::getValue('visa'));
+            Configuration::updateValue(self::MASTERCARD, Tools::getValue('mastercard'));
+            Configuration::updateValue(self::AMERICAN_EXPRESS, Tools::getValue('american_express'));
+            Configuration::updateValue(self::CB, Tools::getValue('cb'));
+            Configuration::updateValue(self::DINERS_CLUB, Tools::getValue('diners_club'));
+            Configuration::updateValue(self::UNION_PAY, Tools::getValue('union_pay'));
+            Configuration::updateValue(self::JCB, Tools::getValue('jcb'));
+            Configuration::updateValue(self::DISCOVERS, Tools::getValue('discovers'));
 
             if (Configuration::get(self::KEY) && Configuration::get(self::KEY) != '') {
                 $this->addAppleDomainAssociation(Configuration::get(self::KEY));
@@ -569,7 +587,6 @@ class Stripe_official extends PaymentModule
      */
     protected function assignSmartyVars()
     {
-
         $this->context->smarty->assign(array(
             'stripe_mode' => Configuration::get(self::MODE),
             'stripe_key' => Configuration::get(self::KEY),
@@ -577,6 +594,15 @@ class Stripe_official extends PaymentModule
             'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE),
             'stripe_test_key' => Configuration::get(self::TEST_KEY),
             'postcode' => Configuration::get(self::POSTCODE),
+            'reinsurance' => Configuration::get(self::REINSURANCE),
+            'visa' => Configuration::get(self::VISA),
+            'mastercard' => Configuration::get(self::MASTERCARD),
+            'american_express' => Configuration::get(self::AMERICAN_EXPRESS),
+            'cb' => Configuration::get(self::CB),
+            'diners_club' => Configuration::get(self::DINERS_CLUB),
+            'union_pay' => Configuration::get(self::UNION_PAY),
+            'jcb' => Configuration::get(self::JCB),
+            'discovers' => Configuration::get(self::DISCOVERS),
             'ideal' => Configuration::get(self::ENABLE_IDEAL),
             'sofort' => Configuration::get(self::ENABLE_SOFORT),
             'giropay' => Configuration::get(self::ENABLE_GIROPAY),
@@ -922,6 +948,22 @@ class Stripe_official extends PaymentModule
         }
     }
 
+    public function getPaymentMethods()
+    {
+        $query = new DbQuery();
+        $query->select('name');
+        $query->from('configuration');
+        $query->where('name LIKE "STRIPE_PAYMENT%"');
+        $query->where('value = "on"');
+        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
+
+        foreach ($results as &$result) {
+            $result['name'] = strtolower(str_replace('STRIPE_PAYMENT_', '', $result['name']));
+        }
+
+        return $results;
+    }
+
     /**
      * Set JS var in backoffice
      */
@@ -1096,7 +1138,8 @@ class Stripe_official extends PaymentModule
 
             'prestashop_version' => $prestashop_version,
 
-            'stripe_postcode_disabled' => Configuration::get(self::POSTCODE)
+            'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
+            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE)
         ));
     }
 
@@ -1209,7 +1252,11 @@ class Stripe_official extends PaymentModule
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.7',
-            'publishableKey' => $this->getPublishableKey()
+            'publishableKey' => $this->getPublishableKey(),
+            'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
+            'stripe_payment_methods' => $this->getPaymentMethods(),
+            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
         ));
 
         // Fetch country based on invoice address and currency

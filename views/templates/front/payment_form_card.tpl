@@ -21,7 +21,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
 *}
-
 <form class="stripe-payment-form" id="stripe-card-payment">
     {if $applepay_googlepay == 'on'}
         <div id="stripe-payment-request-button"></div>
@@ -46,7 +45,47 @@
     <div class="stripe-error-message alert alert-danger">
       {if isset($stripeError)}<p>{$stripeError|escape:'htmlall':'UTF-8'}</p>{/if}
     </div>
-    <div id="stripe-card-element" class="field"></div>
+
+    {if $stripe_reinsurance_enabled == 'on'}
+        <div class="form-row">
+            <div id="cards-logos">
+                {if isset($stripe_payment_methods)}
+                    {foreach from=$stripe_payment_methods item=stripe_payment_method}
+                        <img class="card_logo" src="{$module_dir}/views/img/logo_{$stripe_payment_method.name}.png" />
+                    {/foreach}
+                {/if}
+            </div>
+            <label for="card-element">
+                {l s='Card Number' mod='stripe_official'}
+            </label><label class="required"> </label>
+            <div id="stripe-card-number" class="field"></div>
+            <div class="block-left stripe-card-expiry">
+                <label for="card-element">
+                    {l s='Expiry date' mod='stripe_official'}
+                </label><label class="required"> </label>
+                <div id="stripe-card-expiry" class="field"></div>
+            </div>
+            <div class="stripe-card-cvc">
+                <label for="card-element">
+                    {l s='CVC/CVV' mod='stripe_official'}
+                </label><label class="required"> </label>
+                <div id="stripe-card-cvc" class="field"></div>
+            </div>
+            {if isset($stripe_postcode_enabled) && $stripe_postcode_enabled == ''}
+                <div class="stripe-card-postalcode">
+                    <label for="card-element">
+                        {l s='Postal code' mod='stripe_official'}
+                    </label><label class="required"> </label>
+                    <div id="stripe-card-postalcode" class="field"></div>
+                </div>
+            {/if}
+            <div id="powered_by_stripe">
+                <img src="{$module_dir}/views/img/powered_by_stripe.png" />
+            </div>
+        </div>
+    {else}
+        <div id="stripe-card-element" class="field"></div>
+    {/if}
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <button class="stripe-submit-button" data-method="card">{l s='Buy now' mod='stripe_official'}</button>

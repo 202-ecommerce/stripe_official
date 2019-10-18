@@ -64,13 +64,28 @@ $(function(){
 
     // Create a Card Element and pass some custom styles to it.
     let card;
-    if ($("#stripe-card-element").length) {
-      if (stripe_postcode_disabled == 'on') {
-        card = elements.create('card', { style, hidePostalCode: true });
+    let cardExpiry;
+    let cardCvc;
+    let cardPostalCode;
+    if ($("#stripe-card-element").length || $("#stripe-card-number").length) {
+      if (stripe_reinsurance_enabled == 'on') {
+        card = elements.create('cardNumber');
+        card.mount('#stripe-card-number');
+        cardExpiry = elements.create('cardExpiry');
+        cardExpiry.mount('#stripe-card-expiry');
+        cardCvc = elements.create('cardCvc');
+        cardCvc.mount('#stripe-card-cvc');
+        cardPostalCode = elements.create('postalCode');
+        cardPostalCode.mount('#stripe-card-postalcode');
       } else {
-        card = elements.create('card', { style });
+        if (stripe_postcode_disabled == 'on') {
+          card = elements.create('card', { style, hidePostalCode: true });
+        } else {
+          card = elements.create('card', { style });
+        }
+        card.mount('#stripe-card-element');
       }
-      card.mount('#stripe-card-element');
+
 
       // Monitor change events on the Card Element to display any errors.
       card.on('change', ({error}) => {
@@ -127,6 +142,73 @@ $(function(){
           }
         });
       }
+    }
+
+    card.addEventListener('change', function(event) {
+        setOutcome(event);
+        cardType = event.brand;
+        if (typeof cardType != "undefined" && cardType != "unknown") {
+            if (cardType == "American Express")
+                cardType = "amex";
+            if (cardType == "Diners Club")
+                cardType = "diners";
+            if ($('.img-card').length > 0) {
+                if ($('#img-'+cardType).length > 0) {
+                    return false;
+                } else {
+                    $('.img-card').remove();
+                }
+            }
+
+            var card_logo = document.createElement('img');
+            card_logo.src = stripe_module_dir + '/views/img/cc-' + cardType.toLowerCase() +'.png';
+            card_logo.id = "img-"+cardType;
+            card_logo.className = "img-card";
+            $('#stripe-card-number').append($(card_logo));
+            $('#img-'+cardType).css({'margin-left': '-34px'});
+
+            $('.cc-icon').removeClass('enable');
+            $('.cc-icon').removeClass('disable');
+            $('.cc-icon').each(function() {
+                if ($(this).attr('rel') == cardType) {
+                    $(this).addClass('enable');
+                } else {
+                    $(this).addClass('disable');
+                }
+            });
+        } else {
+            if ($('.img-card').length > 0) {
+                $('.img-card').remove();
+            }
+            $('.cc-icon').removeClass('enable');
+            $('.cc-icon:not(.disable)').addClass('disable');
+        }
+    });
+
+    if (stripe_reinsurance_enabled == 'on') {
+      cardExpiry.addEventListener('change', function(event) {
+          setOutcome(event);
+      });
+
+      cardCvc.addEventListener('change', function(event) {
+          setOutcome(event);
+      });
+
+      cardPostalCode.addEventListener('change', function(event) {
+          setOutcome(event);
+      });
+    }
+
+    function setOutcome(result) {
+
+        $form = $('#stripe-payment-form');
+        if (result.error) {
+            $('#card-errors').show();
+            $form.find('#card-errors').text(result.error.message).fadeIn(1000);
+        } else {
+            $('#card-errors').hide();
+            $form.find('#card-errors').text()
+        }
     }
 
     // Create a IBAN Element and pass the right options for styles and supported countries.

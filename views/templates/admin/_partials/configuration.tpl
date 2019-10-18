@@ -102,6 +102,28 @@
 						<p>{l s='Options for the card payment form' mod='stripe_official'}</p>
 
 						<div class="form-group">
+							<input type="checkbox" id="reinsurance" name="reinsurance" {if $reinsurance}checked="checked"{/if}/>
+							<label for="reinsurance">{l s='Activate extended display containing reinsurance elements (logo of cards. You must choose to display the cards you configured on Stripe\'s dashboard)' mod='stripe_official'}</label><br/>
+
+							<input type="checkbox" id="visa" name="visa" {if $visa}checked="checked"{/if}/>
+							<label for="visa">{l s='Visa' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="mastercard" name="mastercard" {if $mastercard}checked="checked"{/if}/>
+							<label for="mastercard">{l s='Mastercard' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="american_express" name="american_express" {if $american_express}checked="checked"{/if}/>
+							<label for="american_express">{l s='American Express' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="cb" name="cb" {if $cb}checked="checked"{/if}/>
+							<label for="cb">{l s='CB (Cartes Bancaires)' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="diners_club" name="diners_club" {if $diners_club}checked="checked"{/if}/>
+							<label for="diners_club">{l s='Diners Club / Discover' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="union_pay" name="union_pay" {if $union_pay}checked="checked"{/if}/>
+							<label for="union_pay">{l s='China UnionPay' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="jcb" name="jcb" {if $jcb}checked="checked"{/if}/>
+							<label for="jcb">{l s='JCB' mod='stripe_official'}</label><br/>
+							<input type="checkbox" id="discovers" name="discovers" {if $discovers}checked="checked"{/if}/>
+							<label for="discovers">{l s='Discovers' mod='stripe_official'}</label><br/>
+						</div>
+
+						<div class="form-group">
 							<input type="checkbox" id="postcode" name="postcode" {if $postcode}checked="checked"{/if}/>
 							<label for="postcode">{l s='Disable the Postal Code field for cards from the United States, United Kingdom and Canada (not recommended *).' mod='stripe_official'}</label><br/>
 							<span>*{l s='Collecting postal code optimizes the chances of successful payment for these countries.' mod='stripe_official'}</span>
