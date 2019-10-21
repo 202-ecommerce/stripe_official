@@ -1260,6 +1260,8 @@ class Stripe_official extends PaymentModule
             ));
         }
 
+        $address = new Address($params['cart']->id_address_invoice);
+
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.7',
@@ -1268,7 +1270,8 @@ class Stripe_official extends PaymentModule
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
-            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
+            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
+            'customer_name' => $address->firstname . ' ' . $address->lastname
         ));
 
         // Fetch country based on invoice address and currency

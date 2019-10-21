@@ -60,7 +60,7 @@
                     <label for="card-element">
                         {l s='Cardholder\'s Name' mod='stripe_official'}
                     </label><label class="required"> </label>
-                    <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name}"/>
+                    <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name}{/if}" placeholder="{l s='Firstname Lastname' mod='stripe_official'}" />
                 </div>
             {/if}
             <label for="card-element">
@@ -91,7 +91,7 @@
     {else}
         <div id="stripe-card-element" class="field"></div>
         {if isset($stripe_cardholdername_enabled) && $stripe_cardholdername_enabled == 'on'}
-            <input name="cardholder-name" type="text"  autocomplete="off" id="stripe-card-cardholdername" class="stripe-name" data-stripe="name" value="{$customer_name}"/>
+            <input name="cardholder-name" type="text"  autocomplete="off" id="stripe-card-cardholdername" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name}{/if}" placeholder="{l s='Firstname Lastname' mod='stripe_official'}"/>
         {/if}
     {/if}
 
