@@ -961,7 +961,7 @@ class Stripe_official extends PaymentModule
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
         foreach ($results as &$result) {
-            $result['name'] = strtolower(str_replace('STRIPE_PAYMENT_', '', $result['name']));
+            $result['name'] = Tools::strtolower(str_replace('STRIPE_PAYMENT_', '', $result['name']));
         }
 
         return $results;
