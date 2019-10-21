@@ -392,6 +392,14 @@ label[for="applepay_googlepay"] {
   margin-top: 20px;
 }
 
+.bootstrap label {
+  display: inline-block;
+  max-width: 97%;
+  margin-bottom: 5px;
+  font-weight: bold;
+  vertical-align: top;
+}
+
 /* Retina support */
 @media only screen and (resolution: 150dpi) {
   .stripe-connect span::before,

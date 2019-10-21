@@ -55,6 +55,14 @@
                     {/foreach}
                 {/if}
             </div>
+            {if isset($stripe_cardholdername_enabled) && $stripe_cardholdername_enabled == 'on'}
+                <div class="stripe-card-cardholdername">
+                    <label for="card-element">
+                        {l s='Cardholder\'s Name' mod='stripe_official'}
+                    </label><label class="required"> </label>
+                    <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{$customer_name}"/>
+                </div>
+            {/if}
             <label for="card-element">
                 {l s='Card Number' mod='stripe_official'}
             </label><label class="required"> </label>
@@ -79,15 +87,21 @@
                     <div id="stripe-card-postalcode" class="field"></div>
                 </div>
             {/if}
-            <div id="powered_by_stripe">
-                <img src="{$module_dir}/views/img/powered_by_stripe.png" />
-            </div>
         </div>
     {else}
         <div id="stripe-card-element" class="field"></div>
+        {if isset($stripe_cardholdername_enabled) && $stripe_cardholdername_enabled == 'on'}
+            <input name="cardholder-name" type="text"  autocomplete="off" id="stripe-card-cardholdername" class="stripe-name" data-stripe="name" value="{$customer_name}"/>
+        {/if}
     {/if}
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <button class="stripe-submit-button" data-method="card">{l s='Buy now' mod='stripe_official'}</button>
+    {/if}
+
+    {if $stripe_reinsurance_enabled == 'on'}
+        <div id="powered_by_stripe">
+            <img src="{$module_dir}/views/img/powered_by_stripe.png" />
+        </div>
     {/if}
 </form>

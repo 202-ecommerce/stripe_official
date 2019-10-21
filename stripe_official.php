@@ -64,6 +64,7 @@ class Stripe_official extends PaymentModule
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
+    const CARDHOLDERNAME = 'STRIPE_CARDHOLDERNAME';
     const REINSURANCE = 'STRIPE_REINSURANCE';
     const VISA = 'STRIPE_PAYMENT_VISA';
     const MASTERCARD = 'STRIPE_PAYMENT_MASTERCARD';
@@ -480,6 +481,7 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
             Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
             Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
+            Configuration::updateValue(self::CARDHOLDERNAME, Tools::getValue('cardholdername'));
             Configuration::updateValue(self::REINSURANCE, Tools::getValue('reinsurance'));
             Configuration::updateValue(self::VISA, Tools::getValue('visa'));
             Configuration::updateValue(self::MASTERCARD, Tools::getValue('mastercard'));
@@ -594,6 +596,7 @@ class Stripe_official extends PaymentModule
             'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE),
             'stripe_test_key' => Configuration::get(self::TEST_KEY),
             'postcode' => Configuration::get(self::POSTCODE),
+            'cardholdername' => Configuration::get(self::CARDHOLDERNAME),
             'reinsurance' => Configuration::get(self::REINSURANCE),
             'visa' => Configuration::get(self::VISA),
             'mastercard' => Configuration::get(self::MASTERCARD),
@@ -1139,6 +1142,7 @@ class Stripe_official extends PaymentModule
             'prestashop_version' => $prestashop_version,
 
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
+            'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
         ));
@@ -1180,9 +1184,11 @@ class Stripe_official extends PaymentModule
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
             'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
-            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
+            'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
+            'customer_name' => $address->firstname . ' ' . $address->lastname
         ));
 
         // Fetch country based on invoice address and currency
@@ -1259,6 +1265,7 @@ class Stripe_official extends PaymentModule
             'prestashop_version' => '1.7',
             'publishableKey' => $this->getPublishableKey(),
             'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)

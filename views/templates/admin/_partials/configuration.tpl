@@ -128,6 +128,11 @@
 							<label for="postcode">{l s='Disable the Postal Code field for cards from the United States, United Kingdom and Canada (not recommended *).' mod='stripe_official'}</label><br/>
 							<span>*{l s='Collecting postal code optimizes the chances of successful payment for these countries.' mod='stripe_official'}</span>
 						</div>
+
+						<div class="form-group">
+							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
+							<label for="cardholdername">{l s='Activate display of card holder name' mod='stripe_official'}</label>
+						</div>
 					</li>
 					<li>
 						<p>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</p>
