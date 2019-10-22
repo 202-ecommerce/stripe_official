@@ -45,7 +45,12 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             exit;
         }
         // Retrieve the request's body and parse it as JSON
-        ProcessLoggerHandler::logInfo('setApiKey ok. Retrieve the request\'s body and parse it as JSON', null, null, 'webhook');
+        ProcessLoggerHandler::logInfo(
+            'setApiKey ok. Retrieve the request\'s body and parse it as JSON',
+            null,
+            null,
+            'webhook'
+        );
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
         $event_json = json_decode($input);

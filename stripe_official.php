@@ -235,7 +235,8 @@ class Stripe_official extends PaymentModule
                 \Stripe\Stripe::setAppInfo(
                     'StripePrestashop',
                     $version,
-                    'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html', 'pp_partner_EX2Z2idAZw7OWr'
+                    'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html',
+                    'pp_partner_EX2Z2idAZw7OWr'
                 );
             } catch (\Stripe\Error\ApiConnection $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
