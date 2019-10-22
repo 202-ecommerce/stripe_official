@@ -79,7 +79,7 @@
                 </label><label class="required"> </label>
                 <div id="stripe-card-cvc" class="field"></div>
             </div>
-            {if isset($stripe_postcode_enabled) && $stripe_postcode_enabled == ''}
+            {if isset($stripe_postcode_enabled) && $stripe_postcode_enabled != 'on'}
                 <div class="stripe-card-postalcode">
                     <label for="card-element">
                         {l s='Postal code' mod='stripe_official'}

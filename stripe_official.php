@@ -1200,12 +1200,18 @@ class Stripe_official extends PaymentModule
         // Create or update the payment intent for this order
         $this->retrievePaymentIntent($amount, $currency_iso_code);
 
+        if (Configuration::get(self::POSTCODE) == NULL) {
+            $stripe_reinsurance_enabled = 'off';
+        } else {
+            $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
+        }
+
         // Send the payment amount, it may have changed
         $this->context->smarty->assign(array(
             'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
-            'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_postcode_enabled' => $stripe_reinsurance_enabled,
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
@@ -1284,11 +1290,17 @@ class Stripe_official extends PaymentModule
 
         $address = new Address($params['cart']->id_address_invoice);
 
+        if (Configuration::get(self::POSTCODE) == NULL) {
+            $stripe_reinsurance_enabled = 'off';
+        } else {
+            $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
+        }
+
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.7',
             'publishableKey' => $this->getPublishableKey(),
-            'stripe_postcode_enabled' => Configuration::get(self::POSTCODE),
+            'stripe_postcode_enabled' => $stripe_reinsurance_enabled,
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
