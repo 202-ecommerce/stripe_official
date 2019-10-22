@@ -232,9 +232,15 @@ class Stripe_official extends PaymentModule
             try {
                 \Stripe\Stripe::setApiKey($this->getSecretKey());
                 $version = $this->version.'_'._PS_VERSION_.'_'.phpversion();
-                \Stripe\Stripe::setAppInfo('StripePrestashop', $version, 'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html', 'pp_partner_EX2Z2idAZw7OWr');
+                \Stripe\Stripe::setAppInfo(
+                    'StripePrestashop',
+                    $version,
+                    'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html', 'pp_partner_EX2Z2idAZw7OWr'
+                );
             } catch (\Stripe\Error\ApiConnection $e) {
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError('Fail to set API Key. Stripe SDK return error: ' . $e);
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                    'Fail to set API Key. Stripe SDK return error: ' . $e
+                );
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             }
         }
@@ -879,7 +885,8 @@ class Stripe_official extends PaymentModule
     */
     protected function retrievePaymentIntent($amount, $currency)
     {
-        if (isset($this->context->cookie->stripe_payment_intent) && !empty($this->context->cookie->stripe_payment_intent)) {
+        if (isset($this->context->cookie->stripe_payment_intent)
+            && !empty($this->context->cookie->stripe_payment_intent)) {
             try {
                 $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
@@ -895,7 +902,12 @@ class Stripe_official extends PaymentModule
 
                 return $intent;
             } catch (Exception $e) {
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage(), null, null, 'retrievePaymentIntent');
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'retrievePaymentIntent'
+                );
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 unset($this->context->cookie->stripe_payment_intent);
             }
@@ -1064,7 +1076,12 @@ class Stripe_official extends PaymentModule
         $intent = $this->retrievePaymentIntent($amount, $currency);
 
         if (!$intent) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError('Payment Intent not retrieve. amount: '. $amount . ' currency: '.$currency . ' Round precision:' . _PS_PRICE_COMPUTE_PRECISION_, null, null, 'hookHeader');
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                'Payment Intent not retrieve. amount: '. $amount . ' currency: '.$currency . ' Round precision:' . _PS_PRICE_COMPUTE_PRECISION_,
+                null,
+                null,
+                'hookHeader'
+            );
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             // @todo set isWellConfigured to false to prevent display pay by stripe options on hookPaymentOptions
             return;
@@ -1098,7 +1115,9 @@ class Stripe_official extends PaymentModule
                 'modules/'.$this->name.'/views/css/checkout.css'
             );
             $prestashop_version = '1.7';
-            $stripe_fullname = str_replace('"', '\\"', $this->context->customer->firstname) . ' ' . str_replace('"', '\\"', $this->context->customer->lastname);
+            $firstname = str_replace('"', '\\"', $this->context->customer->firstname);
+            $lastname = str_replace('"', '\\"', $this->context->customer->lastname);
+            $stripe_fullname = $firstname . ' ' . $lastname;
         } else {
             $this->context->controller->addJS('https://js.stripe.com/v3/');
             $this->context->controller->addJS($this->_path . '/views/js/payments.js');
@@ -1109,7 +1128,9 @@ class Stripe_official extends PaymentModule
 
             $this->context->controller->addCSS($this->_path . '/views/css/checkout.css', 'all');
             $prestashop_version = '1.6';
-            $stripe_fullname = str_replace('\'', '\\\'', $this->context->customer->firstname) . ' ' . str_replace('\'', '\\\'', $this->context->customer->lastname);
+            $firstname = str_replace('\'', '\\\'', $this->context->customer->firstname);
+            $lastname = str_replace('\'', '\\\'', $this->context->customer->lastname);
+            $stripe_fullname = $firstname . ' ' . $lastname;
         }
 
         // Javacript variables needed by Elements
@@ -1312,6 +1333,7 @@ class Stripe_official extends PaymentModule
                     )
                 );
             }
+
 
             // Payment methods with embedded form fields
             $option->setForm(

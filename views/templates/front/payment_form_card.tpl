@@ -51,7 +51,7 @@
             <div id="cards-logos">
                 {if isset($stripe_payment_methods)}
                     {foreach from=$stripe_payment_methods item=stripe_payment_method}
-                        <img class="card_logo" src="{$module_dir}/views/img/logo_{$stripe_payment_method.name}.png" />
+                        <img class="card_logo" src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/logo_{$stripe_payment_method.name|escape:'htmlall':'UTF-8'}.png" />
                     {/foreach}
                 {/if}
             </div>
@@ -60,7 +60,7 @@
                     <label for="card-element">
                         {l s='Cardholder\'s Name' mod='stripe_official'}
                     </label><label class="required"> </label>
-                    <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name}{/if}" placeholder="{l s='Firstname Lastname' mod='stripe_official'}" />
+                    <input name="cardholder-name" type="text"  autocomplete="off" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name|escape:'htmlall':'UTF-8'}{/if}"/>
                 </div>
             {/if}
             <label for="card-element">
@@ -91,7 +91,7 @@
     {else}
         <div id="stripe-card-element" class="field"></div>
         {if isset($stripe_cardholdername_enabled) && $stripe_cardholdername_enabled == 'on'}
-            <input name="cardholder-name" type="text"  autocomplete="off" id="stripe-card-cardholdername" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name}{/if}" placeholder="{l s='Firstname Lastname' mod='stripe_official'}"/>
+            <input name="cardholder-name" type="text"  autocomplete="off" id="stripe-card-cardholdername" class="stripe-name" data-stripe="name" value="{if isset($customer_name)}{$customer_name|escape:'htmlall':'UTF-8'}{/if}"/>
         {/if}
     {/if}
 
@@ -101,7 +101,7 @@
 
     {if $stripe_reinsurance_enabled == 'on'}
         <div id="powered_by_stripe">
-            <img src="{$module_dir}/views/img/powered_by_stripe.png" />
+            <img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/powered_by_stripe.png" />
         </div>
     {/if}
 </form>
