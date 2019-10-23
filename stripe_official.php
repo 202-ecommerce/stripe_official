@@ -173,7 +173,7 @@ class Stripe_official extends PaymentModule
         'sofort' => array(
           'name' => 'SOFORT',
           'flow' => 'redirect',
-          'countries' => array('DE', 'AT'),
+          'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
           'currencies' => array('eur'),
           'enable' => self::ENABLE_SOFORT
         ),
