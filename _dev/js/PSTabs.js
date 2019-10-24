@@ -17,8 +17,8 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    202-ecommerce <tech@202-ecommerce.com>
- * @copyright Copyright (c) Stripe
+ * @author   MIT license
+ * @copyright Copyright 2014, Codrops
  * @license   Commercial license
  */
 
