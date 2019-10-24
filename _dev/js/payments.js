@@ -132,7 +132,6 @@ $(function(){
         // Check if the Payment Request is available.
         if (await paymentRequest.canMakePayment()) {
           prButton.mount('#stripe-payment-request-button');
-          // TODO: show additional instructions
         } else {
           $('.card-payment-informations').hide();
         }
@@ -379,7 +378,6 @@ $(function(){
           break;
         case 'receiver':
           // Display the receiver address to send the funds to.
-          // TODO: move this to order confirmation
           checkoutElement.classList.add('success', 'receiver');
           const receiverInfo = confirmationElement.querySelector(
             '.receiver .info'

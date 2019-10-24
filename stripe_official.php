@@ -318,8 +318,6 @@ class Stripe_official extends PaymentModule
      */
     public function installOrderState()
     {
-        // @todo please verify condition in case of an upgrade module.
-        // Perhaps we can add in upgrade 2.0.0 an initialization of OS_SOFORT_WAITING
         if (!Configuration::get(self::OS_SOFORT_WAITING)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
             $order_state = new OrderState();
@@ -362,8 +360,6 @@ class Stripe_official extends PaymentModule
         }
 
         /* Create Order State for Stripe */
-        // @todo please verify condition in case of an upgrade module.
-        // Perhaps we can add in upgrade 2.0.0 an initialization of PARTIAL_REFUND_STATE
         if (!Configuration::get(self::PARTIAL_REFUND_STATE)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE)))) {
             $order_state = new OrderState();
@@ -552,7 +548,6 @@ class Stripe_official extends PaymentModule
             $domain = Tools::getShopDomain(true, true);
         }
 
-        // @TODO we can bundle the following js files into a single one as they are only used in this place.
         $this->context->controller->addJS($this->_path.'/views/js/faq.js');
         $this->context->controller->addJS($this->_path.'/views/js/back.js');
         $this->context->controller->addJS($this->_path.'/views/js/PSTabs.js');
@@ -859,11 +854,6 @@ class Stripe_official extends PaymentModule
         return true;
     }
 
-    /**
-     * @todo to move into upgrade 2.0.0
-     * @todo remove upgrade 1.6.0
-     * update old
-     */
     public function updateConfigurationKey($oldKey, $newKey)
     {
         if (Configuration::hasKey($oldKey)) {
@@ -959,7 +949,6 @@ class Stripe_official extends PaymentModule
 
             return $intent;
         } catch (Exception $e) {
-            // @todo change with stripe logger
             error_log($e->getMessage());
         }
     }
@@ -1084,7 +1073,6 @@ class Stripe_official extends PaymentModule
                 'hookHeader'
             );
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
-            // @todo set isWellConfigured to false to prevent display pay by stripe options on hookPaymentOptions
             return;
         }
 
