@@ -335,6 +335,7 @@ $(function(){
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            async: false,
             url: stripe_validation_return_url,
             data: {
                 response: response,
