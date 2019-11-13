@@ -132,8 +132,7 @@ $(function(){
         // Check if the Payment Request is available.
         if (await paymentRequest.canMakePayment()) {
           prButton.mount('#stripe-payment-request-button');
-        } else {
-          $('.card-payment-informations').hide();
+          $('.card-payment-informations').show();
         }
 
         prButton.on('click', function(event) {
