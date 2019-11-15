@@ -1250,7 +1250,7 @@ class Stripe_official extends PaymentModule
     public function hookDisplayPaymentEU($params)
     {
         if (!self::isWellConfigured() || !$this->active) {
-            return;
+            return array();
         }
 
         $payment = $this->hookPayment($params);
