@@ -1249,25 +1249,21 @@ class Stripe_official extends PaymentModule
 
     public function hookDisplayPaymentEU($params)
     {
-        if (!self::isWellConfigured() || !$this->active) {
+        if (!self::isWellConfigured() || !$this->active || version_compare(_PS_VERSION_, '1.7', '>=')) {
             return array();
         }
 
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $payment = $this->hookPaymentOptions($params);
-        } else {
-            $payment = $this->hookPayment($params);
+        $payment = $this->hookPayment($params);
 
-            Media::addJsDef(array(
-                'stripe_compliance' => true
-            ));
+        Media::addJsDef(array(
+            'stripe_compliance' => true
+        ));
 
-            $payment_options = array(
-                'cta_text' => $this->l('Pay by card'),
-                'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'),
-                'form' => $payment
-            );
-        }
+        $payment_options = array(
+            'cta_text' => $this->l('Pay by card'),
+            'logo' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/logo.png'),
+            'form' => $payment
+        );
 
         return $payment_options;
     }
