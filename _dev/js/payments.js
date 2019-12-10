@@ -132,8 +132,7 @@ $(function(){
         // Check if the Payment Request is available.
         if (await paymentRequest.canMakePayment()) {
           prButton.mount('#stripe-payment-request-button');
-        } else {
-          $('.card-payment-informations').hide();
+          $('.card-payment-informations').show();
         }
 
         prButton.on('click', function(event) {
@@ -145,62 +144,62 @@ $(function(){
           }
         });
       }
-    }
 
-    card.addEventListener('change', function(event) {
-        setOutcome(event);
-        cardType = event.brand;
-        if (typeof cardType != "undefined" && cardType != "unknown") {
-            if (cardType == "American Express")
-                cardType = "amex";
-            if (cardType == "Diners Club")
-                cardType = "diners";
-            if ($('.img-card').length > 0) {
-                if ($('#img-'+cardType).length > 0) {
-                    return false;
-                } else {
-                    $('.img-card').remove();
-                }
-            }
-
-            var card_logo = document.createElement('img');
-            card_logo.src = stripe_module_dir + '/views/img/cc-' + cardType.toLowerCase() +'.png';
-            card_logo.id = "img-"+cardType;
-            card_logo.className = "img-card";
-            $('#stripe-card-number').append($(card_logo));
-            $('#img-'+cardType).css({'margin-left': '-34px'});
-
-            $('.cc-icon').removeClass('enable');
-            $('.cc-icon').removeClass('disable');
-            $('.cc-icon').each(function() {
-                if ($(this).attr('rel') == cardType) {
-                    $(this).addClass('enable');
-                } else {
-                    $(this).addClass('disable');
-                }
-            });
-        } else {
-            if ($('.img-card').length > 0) {
-                $('.img-card').remove();
-            }
-            $('.cc-icon').removeClass('enable');
-            $('.cc-icon:not(.disable)').addClass('disable');
-        }
-    });
-
-    if (stripe_reinsurance_enabled == 'on') {
-      cardExpiry.addEventListener('change', function(event) {
+      card.addEventListener('change', function(event) {
           setOutcome(event);
+          cardType = event.brand;
+          if (typeof cardType != "undefined" && cardType != "unknown") {
+              if (cardType == "American Express")
+                  cardType = "amex";
+              if (cardType == "Diners Club")
+                  cardType = "diners";
+              if ($('.img-card').length > 0) {
+                  if ($('#img-'+cardType).length > 0) {
+                      return false;
+                  } else {
+                      $('.img-card').remove();
+                  }
+              }
+
+              var card_logo = document.createElement('img');
+              card_logo.src = stripe_module_dir + '/views/img/cc-' + cardType.toLowerCase() +'.png';
+              card_logo.id = "img-"+cardType;
+              card_logo.className = "img-card";
+              $('#stripe-card-number').append($(card_logo));
+              $('#img-'+cardType).css({'margin-left': '-34px'});
+
+              $('.cc-icon').removeClass('enable');
+              $('.cc-icon').removeClass('disable');
+              $('.cc-icon').each(function() {
+                  if ($(this).attr('rel') == cardType) {
+                      $(this).addClass('enable');
+                  } else {
+                      $(this).addClass('disable');
+                  }
+              });
+          } else {
+              if ($('.img-card').length > 0) {
+                  $('.img-card').remove();
+              }
+              $('.cc-icon').removeClass('enable');
+              $('.cc-icon:not(.disable)').addClass('disable');
+          }
       });
 
-      cardCvc.addEventListener('change', function(event) {
-          setOutcome(event);
-      });
-
-      if (stripe_postcode_disabled != 'on') {
-        cardPostalCode.addEventListener('change', function(event) {
+      if (stripe_reinsurance_enabled == 'on') {
+        cardExpiry.addEventListener('change', function(event) {
             setOutcome(event);
         });
+
+        cardCvc.addEventListener('change', function(event) {
+            setOutcome(event);
+        });
+
+        if (stripe_postcode_disabled != 'on') {
+          cardPostalCode.addEventListener('change', function(event) {
+              setOutcome(event);
+          });
+        }
       }
     }
 
@@ -336,6 +335,7 @@ $(function(){
         $.ajax({
             type: 'POST',
             dataType: 'json',
+            async: false,
             url: stripe_validation_return_url,
             data: {
                 response: response,

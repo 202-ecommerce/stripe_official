@@ -891,6 +891,16 @@ class Stripe_official extends PaymentModule
                     );
                 }
 
+                // Check that the currency is still correct
+                if ($intent->currency != $currency) {
+                    $intent->update(
+                        $this->context->cookie->stripe_payment_intent,
+                        array(
+                            "currency" => Tools::strtolower($this->context->currency->iso_code)
+                        )
+                    );
+                }
+
                 return $intent;
             } catch (Exception $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
@@ -1239,8 +1249,8 @@ class Stripe_official extends PaymentModule
 
     public function hookDisplayPaymentEU($params)
     {
-        if (!self::isWellConfigured() || !$this->active) {
-            return;
+        if (!self::isWellConfigured() || !$this->active || version_compare(_PS_VERSION_, '1.7', '>=')) {
+            return array();
         }
 
         $payment = $this->hookPayment($params);

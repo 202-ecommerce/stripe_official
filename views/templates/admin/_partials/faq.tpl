@@ -197,7 +197,14 @@
                     - {l s='PrestaShop is a highly customisable online shop solution with many ready to use extensions in order to fit your specific needs.' mod='stripe_official'}<br>
                     - {l s='Knowing this, it is impossible to guarantee that our module will work with all customised shops.' mod='stripe_official'}<br>
                     - {l s='This module is compatible with most of the existing modules. The only exception concerns modules altering the standard behavior of the checkout flow. If you have such modules installed in your shop, we recommend you try our module in your test environment first.' mod='stripe_official'}<br>
-                    - {l s='In case there is an incompatibility, you should reach out to your developer to make our module compatible with your shop.' mod='stripe_official'}
+                    - {l s='In case there is an incompatibility, you should reach out to your developer to make our module compatible with your shop.' mod='stripe_official'}<br>
+                    - {l s='There is a code compatibility problem with some modules that modify the checkout funnel. Stripe provides the necessary hooks for the other modules, but some of them are not able to read the hooks correctly.' mod='stripe_official'}<br>
+                    - {l s='We encountered this problem with the following modules (non-exhaustive list):' mod='stripe_official'}<br>
+                    <ul>
+                        <li>{l s='The checkout' mod='stripe_official'}</li>
+                        <li>{l s='One Page Checkout, Social Login & Mailchimp' mod='stripe_official'}</li>
+                    </ul>
+                    {l s='These modules have encountered problems with the 2.0.7 version of Stripe in October 2019, it’s possible that evolutions have been made to these modules since that date making them compatible with the Stripe module.' mod='stripe_official'}
                 </p>
             </div>
         </li>

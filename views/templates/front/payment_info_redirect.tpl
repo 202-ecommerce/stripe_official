@@ -22,4 +22,4 @@
  * @license   Commercial license
 *}
 
-<p class="notice">You’ll be redirected to the banking site to complete your payment.</p>
+<p class="notice">{l s='You\'ll be redirected to the banking site to complete your payment.' mod='stripe_official'}</p>
