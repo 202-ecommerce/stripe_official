@@ -247,16 +247,11 @@ class ValidationOrderActions extends DefaultActions
         return true;
     }
 
-
     public function chargeWebhook()
     {
         $this->context = $this->conveyor['context'];
-
-        ProcessLoggerHandler::logInfo('chargeWebhook', null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
         $this->conveyor['chargeId'] = $this->conveyor['event_json']->data->object->id;
-        ProcessLoggerHandler::logInfo('chargeId => ' . $this->conveyor['chargeId'], null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
+        ProcessLoggerHandler::logInfo('chargeWebhook with chargeId => ' . $this->conveyor['chargeId'], null, null, 'webhook');
         $stripe_payment = new StripePayment();
         $stripe_payment->getStripePaymentByCharge($this->conveyor['chargeId']);
 
@@ -266,8 +261,7 @@ class ValidationOrderActions extends DefaultActions
             return false;
         }
 
-        ProcessLoggerHandler::logInfo('$stripe_payment->id = OK', null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
+        ProcessLoggerHandler::logInfo('$stripe_payment->id = OK', 'StripePayment', $stripe_payment->id, 'webhook');
 
         $id_order = Order::getOrderByCartId($stripe_payment->id_cart);
         if ($id_order == false) {
@@ -276,28 +270,24 @@ class ValidationOrderActions extends DefaultActions
             return false;
         }
 
-        ProcessLoggerHandler::logInfo('$id_order = OK', null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
+        ProcessLoggerHandler::logInfo('$id_order = OK', 'Order', $id_order, 'webhook');
 
         $order = new Order($id_order);
 
         ProcessLoggerHandler::logInfo('current charge => '.$this->conveyor['event_json']->type, null, null, 'webhook');
-        ProcessLoggerHandler::closeLogger();
 
         if ($this->conveyor['event_json']->type == 'charge.succeeded') {
-            ProcessLoggerHandler::logInfo('setCurrentState for charge.succeeded', null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.succeeded', 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
         } elseif ($this->conveyor['event_json']->type == 'charge.canceled') {
-            ProcessLoggerHandler::logInfo('setCurrentState for charge.canceled', null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.canceled', 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
         } elseif ($this->conveyor['event_json']->type == 'charge.failed') {
-            ProcessLoggerHandler::logInfo('setCurrentState for charge.failed', null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.failed', 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         }
 
+        ProcessLoggerHandler::closeLogger();
         return true;
     }
 }
