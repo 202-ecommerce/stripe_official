@@ -226,6 +226,19 @@ class ValidationOrderActions extends DefaultActions
             $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
             $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
+            if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
+                ProcessLoggerHandler::logError('OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' .$this->conveyor['chargeId'] . ' on payment.', 'Order', $orderId, 'validation');
+                $order = new Order($orderId);
+                if (!$order->addOrderPayment($this->conveyor['amount'], null, $this->conveyor['chargeId'])) {
+                    ProcessLoggerHandler::logError('PaymentModule::validateOrder - Cannot save Order Payment', 'Order', $orderId, 'validation');
+                    ProcessLoggerHandler::closeLogger();
+                    PrestaShopLogger::addLog('PaymentModule::validateOrder - Cannot save Order Payment', 3, null, 'Cart', (int)$id_cart, true);
+                    throw new PrestaShopException('Can\'t save Order Payment');
+                }
+                ProcessLoggerHandler::closeLogger();
+                return true;
+            }
+
             $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
             $orderPayment->transaction_id = $this->conveyor['chargeId'];
             $orderPayment->save();
