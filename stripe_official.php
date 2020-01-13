@@ -1058,7 +1058,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
-        if (!in_array($this->context->controller->php_self, ['order', 'order-opc'])) {
+        $orderPageNames = ['order', 'order-opc'];
+        Hook::exec('actionStripeDefineOrderPageNames', array('orderPageNames' => &$orderPageNames));
+        if (!in_array(Tools::getvalue('controller'), $orderPageNames)) {
             return;
         }
 
