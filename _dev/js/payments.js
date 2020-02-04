@@ -100,7 +100,7 @@ $(function(){
       const paymentRequest = stripe.paymentRequest({
         country: stripe_merchant_country_code,
         currency: stripe_currency,
-        total: { label: 'Total', amount: stripe_amount },
+        total: { label: 'Total', amount: Math.round(stripe_amount) },
         requestPayerEmail: true
       });
 
