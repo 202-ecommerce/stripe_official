@@ -1072,6 +1072,10 @@ class Stripe_official extends PaymentModule
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
+        if ($amount == 0) {
+            return;
+        }
+
         // The payment intent for this order
         $intent = $this->retrievePaymentIntent($amount, $currency);
 
