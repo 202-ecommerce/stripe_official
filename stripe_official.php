@@ -542,7 +542,7 @@ class Stripe_official extends PaymentModule
             }
         }
 
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+        if (Tools::usingSecureMode()) {
             $domain = Tools::getShopDomainSsl(true, true);
         } else {
             $domain = Tools::getShopDomain(true, true);
