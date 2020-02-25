@@ -1148,6 +1148,7 @@ class Stripe_official extends PaymentModule
 
             'stripe_fullname' => $stripe_fullname,
 
+            'stripe_address' => $address,
             'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
             'stripe_email' => $this->context->customer->email,

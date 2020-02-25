@@ -56,7 +56,7 @@ $(function(){
     * Setup Stripe Elements.
     */
     // Create a Stripe client.
-    const stripe = Stripe(stripe_pk, { betas: ['payment_intent_beta_3'] });
+    const stripe = Stripe(stripe_pk);
 
     // Create an instance of Elements and prepare the CSS
     const elements = stripe.elements({
@@ -279,7 +279,23 @@ $(function(){
       if (payment === 'card') {
         // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
         const response = await stripe.handleCardPayment(
-          stripe_client_secret, card, { source_data: { owner: { name: stripe_fullname } } }
+          stripe_client_secret,
+          card,
+          {
+            payment_method_data: {
+              billing_details: {
+                address: {
+                  city: stripe_address.city,
+                  country: stripe_address_country_code,
+                  line1: stripe_address.address1,
+                  line2: stripe_address.address2,
+                  postal_code: stripe_address.postcode
+                },
+                email: stripe_email,
+                name: stripe_fullname
+              }
+            }
+          }
         );
         handlePayment(response);
       } else if (payment === 'sepa_debit') {

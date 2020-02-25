@@ -45,12 +45,13 @@ class ValidationOrderActions extends DefaultActions
         $intent = \Stripe\PaymentIntent::retrieve($response->id);
         $charges = $intent->charges->data;
 
-        $this->conveyor['token'] = $response->source;
+        $this->conveyor['currency'] = $response->currency;
+        $this->conveyor['token'] = $response->payment_method;
         $this->conveyor['id_payment_intent'] = $response->id;
         $this->conveyor['status'] = $response->status;
         $this->conveyor['chargeId'] = $charges[0]->id;
 
-        if ($this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
+        if ($this->module->isZeroDecimalCurrency($response->currency)) {
             $this->conveyor['amount'] = $charges[0]->amount;
         } else {
             $this->conveyor['amount'] = $charges[0]->amount / 100;
@@ -94,6 +95,7 @@ class ValidationOrderActions extends DefaultActions
           'source' => $source,
         ));
 
+        $this->conveyor['currency'] = $response->currency;
         $this->conveyor['token'] = $source;
         $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
         $this->conveyor['status'] = $response->status;
@@ -139,7 +141,15 @@ class ValidationOrderActions extends DefaultActions
 
         $message = 'Stripe Transaction ID: '.$this->conveyor['id_payment_intent'];
 
-        $this->conveyor['source'] = \Stripe\Source::retrieve($this->conveyor['token']);
+        if (strpos($this->conveyor['token'], 'pm_') !== false) {
+            $this->conveyor['payment_method'] = \Stripe\PaymentMethod::retrieve($this->conveyor['token']);
+            $this->conveyor['datas']['type'] = $this->conveyor['payment_method']->type;
+            $this->conveyor['datas']['owner'] = $this->conveyor['payment_method']->billing_details->name;
+        } else {
+            $this->conveyor['source'] = \Stripe\Source::retrieve($this->conveyor['token']);
+            $this->conveyor['datas']['type'] = $this->conveyor['source']->type;
+            $this->conveyor['datas']['owner'] = $this->conveyor['source']->owner->name;
+        }
 
         if (isset($this->context->customer->secure_key)) {
             $this->conveyor['secure_key'] = $this->context->customer->secure_key;
@@ -148,14 +158,14 @@ class ValidationOrderActions extends DefaultActions
         }
 
         if ($this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency())) {
-            $paid = $this->conveyor['paymentIntent']->getAmount()*100;
+            $paid = $this->conveyor['amount']*100;
         } else {
-            $paid = $this->conveyor['paymentIntent']->getAmount();
+            $paid = $this->conveyor['amount'];
         }
 
         /* Add transaction on Prestashop back Office (Order) */
-        if (!empty($this->conveyor['source']->type)
-            && $this->conveyor['source']->type == 'sofort'
+        if (!empty($this->conveyor['datas']['type'])
+            && $this->conveyor['datas']['type'] == 'sofort'
             && $this->conveyor['status'] == 'pending') {
             $orderStatus = Configuration::get('STRIPE_OS_SOFORT_WAITING');
             $this->conveyor['result'] = 4;
@@ -192,25 +202,25 @@ class ValidationOrderActions extends DefaultActions
     */
     public function addTentative()
     {
-        if ($this->conveyor['source']->type == 'American Express') {
-            $this->conveyor['source']->type = 'amex';
-        } elseif ($this->conveyor['source']->type == 'Diners Club') {
-            $this->conveyor['source']->type = 'diners';
+        if ($this->conveyor['datas']['type'] == 'American Express') {
+            $this->conveyor['datas']['type'] = 'amex';
+        } elseif ($this->conveyor['datas']['type'] == 'Diners Club') {
+            $this->conveyor['datas']['type'] = 'diners';
         }
 
-        if (!$this->module->isZeroDecimalCurrency($this->conveyor['source']->currency)) {
-            $this->conveyor['source']->amount /= 100;
+        if (!$this->module->isZeroDecimalCurrency($this->conveyor['currency'])) {
+            $this->conveyor['amount'] /= 100;
         }
 
-        $cardType = $this->conveyor['source']->type;
-        if (isset($this->conveyor['source']->card)) {
-            $cardType = $this->conveyor['source']->card->brand;
+        $cardType = $this->conveyor['datas']['type'];
+        if (isset($this->conveyor['payment_method']->card)) {
+            $cardType = $this->conveyor['payment_method']->card->brand;
         }
 
         $stripePayment = new StripePayment();
         $stripePayment->setIdStripe($this->conveyor['chargeId']);
         $stripePayment->setIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $stripePayment->setName($this->conveyor['source']->owner->name);
+        $stripePayment->setName($this->conveyor['datas']['owner']);
         $stripePayment->setIdCart((int)$this->context->cart->id);
         $stripePayment->setType(Tools::strtolower($cardType));
         $stripePayment->setAmount($this->conveyor['amount']);
