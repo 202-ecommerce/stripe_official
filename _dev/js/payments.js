@@ -357,7 +357,7 @@ $(function(){
                 response: response,
             },
             success: function(datas) {
-                if (datas['code'] == 1) {
+                if (datas['code'] == 0 || datas['code'] == 1) {
                   window.location.replace(datas['url']);
                 }
             },
