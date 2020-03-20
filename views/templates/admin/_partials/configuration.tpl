@@ -133,6 +133,50 @@
 							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
 							<label for="cardholdername">{l s='Activate display of card holder name' mod='stripe_official'}</label>
 						</div>
+
+						<div class="form-group">
+							<input type="checkbox" id="catchandauthorize" name="catchandauthorize" {if $catchandauthorize}checked="checked"{/if}/>
+							<label for="catchandauthorize">{l s='Activer l\'option d\'autorisation et capture de paiement ultérieur, ctte option permettra de déterminer à quel moment débiter votre client en fonction du statut de la commande.' mod='stripe_official'}</label>
+							<p>
+								<b>{l s='Attention, vous aurez un délai de 7 jours calendaire pour faire évoluer le statut de votre commande afin de capturer le paiement de vos clients.' mod='stripe_official'}</b>
+							</p>
+							<span>{l s='Choisissez parmis la liste de vos status de commande, les status pour lesquels vous souhaitez capturer le paiement sur la carte bancaire de vos clients. Il est conseillé de choisir plusieurs status. Il est cependant possible de faire la capture de paiement sur le dashboard Stripe si vous êtes toujours dans la période de 7 jours.' mod='stripe_official'}</span>
+							<div id="status_restrictions">
+								<br />
+								<table class="table">
+									<tr>
+										<td class="col-md-6">
+											<p>{l s='Your status' mod='stripe_official'}</p>
+											<select id="order_status_select_1" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+												{foreach from=$orderStatus.unselected item='orderStatus'}
+													<option value="{$orderStatus.id_order_state|intval}">{$orderStatus.name|escape}</option>
+												{/foreach}
+											</select>
+											<a id="order_status_select_add" class="btn btn-default btn-block clearfix" >{l s='Add' mod='stripe_official'} <i class="icon-arrow-right"></i></a>
+										</td>
+										<td class="col-md-6">
+											<p>{l s='Catch status' d='stripe_official'}</p>
+											<select name="order_status_select[]" id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+												{foreach from=$orderStatus.selected item='orderStatus'}
+													<option value="{$orderStatus.id_order_state|intval}" selected="selected">{$orderStatus.name|escape}</option>
+												{/foreach}
+											</select>
+											<a id="order_status_select_remove" class="btn btn-default btn-block clearfix"><i class="icon-arrow-left"></i> {l s='Remove' mod='stripe_official'} </a>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div>
+								<p>{l s='Capture the payment when transitioning to the following order status or statuses.' mod='stripe_official'}</p>
+								<select name="capture_expired" id="capture_expired" {if $catchandauthorize == false}disabled{/if}>
+									<option value="0">{l s='Choisir un statut'}</option>
+									{foreach from=$allOrderStatus item=status}
+										<option value="{$status.id_order_state|intval}" {if isset($captureExpire) && $captureExpire == $status.id_order_state}selected="selected"{/if}>{$status.name|escape}</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
 					</li>
 					<li>
 						<p>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</p>

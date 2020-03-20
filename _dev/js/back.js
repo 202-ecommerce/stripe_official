@@ -50,6 +50,24 @@ $(document).ready(function () {
   });
 
   initFaq();
+
+  $('#order_status_select_remove').click(function() {
+    removeOrderStateOption(this);
+    console.log('remove');
+  });
+
+  $('#order_status_select_add').click(function() {
+    addOrderStateOption(this);
+    console.log('add');
+  });
+
+  $('input#catchandauthorize').change(function(event) {
+    if ($(this).is(':checked')) {
+      $('#order_status_select_1, #order_status_select_2, #capture_expired').removeAttr('disabled');
+    } else {
+      $('#order_status_select_1, #order_status_select_2, #capture_expired').attr('disabled', 'disabled');
+    }
+  });
 });
 
 // Init faq tabs
@@ -87,4 +105,16 @@ function toggleRefundMode() {
   } else {
     $partialAmount.hide();
   }
+}
+
+function removeOrderStateOption(item)
+{
+  var id = $(item).attr('id').replace('_remove', '');
+  $('#' + id + '_2 option:selected').remove().appendTo('#' + id + '_1');
+}
+
+function addOrderStateOption(item)
+{
+  var id = $(item).attr('id').replace('_add', '');
+  $('#' + id + '_1 option:selected').remove().appendTo('#' + id + '_2');
 }

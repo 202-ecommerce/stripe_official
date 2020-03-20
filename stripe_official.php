@@ -82,6 +82,9 @@ class Stripe_official extends PaymentModule
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
     const REFUND_AMOUNT = 'STRIPE_REFUND_AMOUNT';
+    const CATCHANDAUTHORIZE = 'STRIPE_CATCHANDAUTHORIZE';
+    const CAPTURE_STATUS = 'STRIPE_CAPTURE_STATUS';
+    const CAPTURE_EXPIRE = 'STRIPE_CAPTURE_EXPIRE';
 
     /**
      * List of objectModel used in this Module
@@ -474,6 +477,16 @@ class Stripe_official extends PaymentModule
                 Configuration::updateValue(self::MODE, Tools::getValue(self::MODE));
             }
 
+            if (!Tools::getValue('catchandauthorize')) {
+                Configuration::updateValue(self::CATCHANDAUTHORIZE, null);
+            } else if (Tools::getValue('catchandauthorize') && !empty(Tools::getValue('order_status_select')) && Tools::getValue('capture_expired') != '0') {
+                Configuration::updateValue(self::CAPTURE_EXPIRE, Tools::getValue('capture_expired'));
+                Configuration::updateValue(self::CAPTURE_STATUS, implode(',', Tools::getValue('order_status_select')));
+                Configuration::updateValue(self::CATCHANDAUTHORIZE, Tools::getValue('catchandauthorize'));
+            } else {
+                $this->errors[] = $this->l('To enable the separate authorization and capture, you need to select at least one order status to trigger the capture and confirm that you understand the risk.');
+            }
+
             if (!count($this->errors)) {
                 $this->success = $this->l('Data succesfuly saved.');
             }
@@ -561,11 +574,35 @@ class Stripe_official extends PaymentModule
             $keys_configured = false;
         }
 
+        $allOrderStatus = OrderState::getOrderStates($this->context->language->id);
+        $statusSelected = array();
+        $statusUnselected = array();
+
+        if (Configuration::get(self::CAPTURE_STATUS) && Configuration::get(self::CAPTURE_STATUS) != '') {
+            $capture_status = explode(',', Configuration::get(self::CAPTURE_STATUS));
+            foreach ($allOrderStatus as $status) {
+                if (in_array($status['id_order_state'], $capture_status)) {
+                    $statusSelected[] = $status;
+                } else {
+                    $statusUnselected[] = $status;
+                }
+            }
+        } else {
+            $statusUnselected = $allOrderStatus;
+        }
+
+        $orderStatus['selected'] = $statusSelected;
+        $orderStatus['unselected'] = $statusUnselected;
+
         $this->context->smarty->assign(array(
             'logo' => $domain.__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png',
             'new_base_dir', $this->_path,
             'keys_configured' => $keys_configured,
             'link' => new Link(),
+            'catchandauthorize' => Configuration::get(self::CATCHANDAUTHORIZE),
+            'orderStatus' => $orderStatus,
+            'allOrderStatus' => $allOrderStatus,
+            'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
         ));
 
         $this->displaySomething();
