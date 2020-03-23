@@ -135,7 +135,7 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
-        if ($this->conveyor['status'] != 'succeeded' && $this->conveyor['status'] != 'pending') {
+        if ($this->conveyor['status'] != 'succeeded' && $this->conveyor['status'] != 'pending' && $this->conveyor['status'] != 'requires_capture') {
             return false;
         }
 
@@ -164,7 +164,10 @@ class ValidationOrderActions extends DefaultActions
         }
 
         /* Add transaction on Prestashop back Office (Order) */
-        if (!empty($this->conveyor['datas']['type'])
+        if ($this->conveyor['status'] == 'requires_capture') {
+            $orderStatus = Configuration::get('STRIPE_CAPTURE_WAITING');
+            $this->conveyor['result'] = 2;
+        } else if (!empty($this->conveyor['datas']['type'])
             && $this->conveyor['datas']['type'] == 'sofort'
             && $this->conveyor['status'] == 'pending') {
             $orderStatus = Configuration::get('STRIPE_OS_SOFORT_WAITING');

@@ -61,6 +61,7 @@ class Stripe_official extends PaymentModule
     const TEST_PUBLISHABLE = 'STRIPE_TEST_PUBLISHABLE';
     const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
+    const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
@@ -143,6 +144,7 @@ class Stripe_official extends PaymentModule
         'payment',
         'displayPaymentEU',
         'adminOrder',
+        'actionOrderStatusUpdate',
     );
 
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
@@ -150,35 +152,40 @@ class Stripe_official extends PaymentModule
         'card' => array(
           'name' => 'Card',
           'flow' => 'none',
-          'enable' => true
+          'enable' => true,
+          'catch_enable' => true
         ),
         'bancontact' => array(
           'name' => 'Bancontact',
           'flow' => 'redirect',
           'countries' => array('BE'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_BANCONTACT
+          'enable' => self::ENABLE_BANCONTACT,
+          'catch_enable' => false
         ),
         'giropay' => array(
           'name' => 'Giropay',
           'flow' => 'redirect',
           'countries' => array('DE'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_GIROPAY
+          'enable' => self::ENABLE_GIROPAY,
+          'catch_enable' => false
         ),
         'ideal' => array(
           'name' => 'iDEAL',
           'flow' => 'redirect',
           'countries' => array('NL'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_IDEAL
+          'enable' => self::ENABLE_IDEAL,
+          'catch_enable' => false
         ),
         'sofort' => array(
           'name' => 'SOFORT',
           'flow' => 'redirect',
           'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_SOFORT
+          'enable' => self::ENABLE_SOFORT,
+          'catch_enable' => false
         ),
     );
 
@@ -397,6 +404,43 @@ class Stripe_official extends PaymentModule
             $order_state->add();
 
             Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
+        }
+
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::CAPTURE_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('En attente de capture Stripe');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('A la espera de captura Stripe');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('Auf Festnahme Stripe warten');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('Wachten op opname van Stripe');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa di cattura Stripe');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for Stripe capture');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#03befc';
+            $order_state->add();
+
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
         }
 
         return true;
@@ -976,10 +1020,17 @@ class Stripe_official extends PaymentModule
         }
 
         try {
+            if (Configuration::get(self::CATCHANDAUTHORIZE)) {
+                $capture_method = 'manual';
+            } else {
+                $capture_method = 'automatic';
+            }
+
             $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
                 "payment_method_types" => array($options),
+                "capture_method" => $capture_method,
             ));
 
             // Keep the payment intent ID in session
@@ -1014,6 +1065,23 @@ class Stripe_official extends PaymentModule
         }
 
         return $results;
+    }
+
+    public function captureFunds($amount, $id_payment_intent)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretKey());
+
+        try {
+            $intent = \Stripe\PaymentIntent::retrieve($id_payment_intent);
+            $intent->capture(['amount_to_capture' => $amount]);
+            return true;
+        } catch (\Stripe\Error\ApiConnection $e) {
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                'Fail to capture amount. Stripe SDK return error: ' . $e
+            );
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            return false;
+        }
     }
 
     /**
@@ -1088,6 +1156,25 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
+    public function hookActionOrderStatusUpdate($params)
+    {
+        $order = new Order($params['id_order']);
+
+        if ($order->module == 'stripe_official'
+            && $order->current_state == Configuration::get(self::CAPTURE_WAITING)
+            && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
+            $stripePayment = new StripePayment();
+            $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
+            $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
+
+            if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
