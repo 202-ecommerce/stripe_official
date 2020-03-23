@@ -190,6 +190,15 @@ class ValidationOrderActions extends DefaultActions
                 false,
                 $this->conveyor['secure_key']
             );
+
+            if ($this->conveyor['status'] == 'requires_capture') {
+                $stripeCapture = new StripeCapture();
+                $stripeCapture->id_payment_intent = $this->conveyor['id_payment_intent'];
+                $stripeCapture->id_order = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
+                $stripeCapture->expired = 0;
+                $stripeCapture->date_catch = date('Y-m-d H:i:s');
+                $stripeCapture->save();
+            }
         } catch (PrestaShopException $e) {
             $this->_error[] = (string)$e->getMessage();
             return false;

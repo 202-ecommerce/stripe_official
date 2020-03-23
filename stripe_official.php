@@ -34,6 +34,7 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 */
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
+require_once dirname(__FILE__) . '/classes/StripeCapture.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -94,6 +95,7 @@ class Stripe_official extends PaymentModule
     public $objectModels = array(
         'StripePayment',
         'StripePaymentIntent',
+        'StripeCapture',
     );
 
     /**
@@ -1147,12 +1149,19 @@ class Stripe_official extends PaymentModule
     {
         $stripePayment = new StripePayment();
         $stripePayment->getStripePaymentByCart($params['order']->id_cart);
+
+        $stripeCapture = new StripeCapture();
+        $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
+
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
             'stripe_paymentIntent' => $stripePayment->getIdPaymentIntent(),
             'stripe_date' => $stripePayment->getDateAdd(),
             'stripe_dashboardUrl' => $stripePayment->getDashboardUrl(),
-            'stripe_paymentType' => $stripePayment->getType()
+            'stripe_paymentType' => $stripePayment->getType(),
+            'stripe_dateCatch' => $stripeCapture->getDateCatch(),
+            'stripe_dateAuthorize' => $stripeCapture->getDateAuthorize(),
+            'stripe_expired' => $stripeCapture->getExpired()
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
@@ -1172,6 +1181,11 @@ class Stripe_official extends PaymentModule
             if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
                 return false;
             }
+
+            $stripeCapture = new StripeCapture();
+            $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
+            $stripeCapture->date_authorize = date('Y-m-d H:i:s');
+            $stripeCapture->save();
         }
 
         return true;
