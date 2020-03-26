@@ -178,6 +178,9 @@ class ValidationOrderActions extends DefaultActions
         }
         $this->conveyor['cart'] = $this->context->cart;
 
+        ProcessLoggerHandler::logInfo('create order : '.$this->conveyor['status'], null, null, 'ValidationOrderActions');
+        ProcessLoggerHandler::closeLogger();
+
         try {
             $this->module->validateOrder(
                 (int)$this->conveyor['cart']->id,
@@ -301,8 +304,28 @@ class ValidationOrderActions extends DefaultActions
         if ($this->conveyor['event_json']->type == 'charge.succeeded') {
             ProcessLoggerHandler::logInfo('setCurrentState for charge.succeeded', 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
-        } elseif ($this->conveyor['event_json']->type == 'charge.canceled') {
-            ProcessLoggerHandler::logInfo('setCurrentState for charge.canceled', 'Order', $id_order, 'webhook');
+        } elseif ($this->conveyor['event_json']->type == 'charge.captured') {
+            ProcessLoggerHandler::logInfo('setCurrentState for charge.captured', 'Order', $id_order, 'webhook');
+            $history = new OrderHistory();
+            $history->id_order = (int) $order->id;
+            $history->id_employee = 0;
+            $history->changeIdOrderState((int)Configuration::get('PS_OS_PAYMENT'), (int) $order->id, true);
+
+            $query = new DbQuery();
+            $query->select('invoice_number, invoice_date, delivery_number, delivery_date');
+            $query->from('orders');
+            $query->where('id_order = ' . pSQL($order->id));
+            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+
+            $order->invoice_date = $res['invoice_date'];
+            $order->invoice_number = $res['invoice_number'];
+            $order->delivery_date = $res['delivery_date'];
+            $order->delivery_number = $res['delivery_number'];
+            $order->update();
+
+            $history->addWithemail();
+        } elseif ($this->conveyor['event_json']->type == 'charge.canceled' || $this->conveyor['event_json']->type == 'charge.refunded') {
+            ProcessLoggerHandler::logInfo('setCurrentState for '.$this->conveyor['event_json']->type, 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
         } elseif ($this->conveyor['event_json']->type == 'charge.failed') {
             ProcessLoggerHandler::logInfo('setCurrentState for charge.failed', 'Order', $id_order, 'webhook');

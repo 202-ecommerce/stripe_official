@@ -53,6 +53,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         );
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
+
         $event_json = json_decode($input);
         ProcessLoggerHandler::logInfo('$event_json->type => ' . $event_json->type, null, null, 'webhook');
 
@@ -77,12 +78,18 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         http_response_code(200);
-        $availlableType = array('charge.canceled', 'charge.failed', 'charge.succeeded', 'charge.pending');
+        $availlableType = array('charge.canceled', 'charge.failed', 'charge.succeeded', 'charge.pending', 'charge.captured', 'charge.refunded');
         if (!in_array($event_json->type, $availlableType)) {
             $msg = 'webhook "'.$event_json->type.'" call not yet supported';
             ProcessLoggerHandler::logInfo($msg, null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             echo $msg;
+            exit;
+        }
+
+        if ($event_json->type == 'charge.succeeded' && $event_json->data->object->captured === false) {
+            ProcessLoggerHandler::logInfo('amount not captured yet', null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
             exit;
         }
 
