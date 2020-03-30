@@ -1173,7 +1173,7 @@ class Stripe_official extends PaymentModule
         $order = new Order($params['id_order']);
 
         if ($order->module == 'stripe_official'
-            && $order->current_state == Configuration::get(self::CAPTURE_WAITING)
+            && !empty($order->getHistory($this->context->language->id, Configuration::get(self::CAPTURE_WAITING)))
             && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
             $stripePayment = new StripePayment();
             $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
