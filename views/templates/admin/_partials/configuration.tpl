@@ -24,6 +24,7 @@
 
 <form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">
+	<input type="hidden" name="order_status_select" value="{$orderStatusSelected}">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
@@ -156,9 +157,9 @@
 										</td>
 										<td class="col-md-6">
 											<p>{l s='Catch status' d='stripe_official'}</p>
-											<select name="order_status_select[]" id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+											<select id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.selected item='orderStatus'}
-													<option value="{$orderStatus.id_order_state|intval}" selected="selected">{$orderStatus.name|escape}</option>
+													<option value="{$orderStatus.id_order_state|intval}">{$orderStatus.name|escape}</option>
 												{/foreach}
 											</select>
 											<a id="order_status_select_remove" class="btn btn-default btn-block clearfix"><i class="icon-arrow-left"></i> {l s='Remove' mod='stripe_official'} </a>

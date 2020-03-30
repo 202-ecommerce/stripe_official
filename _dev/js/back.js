@@ -53,12 +53,10 @@ $(document).ready(function () {
 
   $('#order_status_select_remove').click(function() {
     removeOrderStateOption(this);
-    console.log('remove');
   });
 
   $('#order_status_select_add').click(function() {
     addOrderStateOption(this);
-    console.log('add');
   });
 
   $('input#catchandauthorize').change(function(event) {
@@ -111,10 +109,25 @@ function removeOrderStateOption(item)
 {
   var id = $(item).attr('id').replace('_remove', '');
   $('#' + id + '_2 option:selected').remove().appendTo('#' + id + '_1');
+
+  assignOrderStates(id);
 }
 
 function addOrderStateOption(item)
 {
   var id = $(item).attr('id').replace('_add', '');
   $('#' + id + '_1 option:selected').remove().appendTo('#' + id + '_2');
+
+  assignOrderStates(id);
+}
+
+function assignOrderStates(id)
+{
+  var orderStates = '';
+  $('#' + id + '_2 option').each(function(index, el) {
+    orderStates += ' '+ $(this).val();
+  });
+
+  orderStates = orderStates.trim().split(' ').join(',');
+  $('input[name="order_status_select"]').val(orderStates);
 }

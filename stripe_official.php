@@ -525,9 +525,9 @@ class Stripe_official extends PaymentModule
 
             if (!Tools::getValue('catchandauthorize')) {
                 Configuration::updateValue(self::CATCHANDAUTHORIZE, null);
-            } else if (Tools::getValue('catchandauthorize') && !empty(Tools::getValue('order_status_select')) && Tools::getValue('capture_expired') != '0') {
+            } else if (Tools::getValue('catchandauthorize') && Tools::getValue('order_status_select') != '' && Tools::getValue('capture_expired') != '0') {
                 Configuration::updateValue(self::CAPTURE_EXPIRE, Tools::getValue('capture_expired'));
-                Configuration::updateValue(self::CAPTURE_STATUS, implode(',', Tools::getValue('order_status_select')));
+                Configuration::updateValue(self::CAPTURE_STATUS, Tools::getValue('order_status_select'));
                 Configuration::updateValue(self::CATCHANDAUTHORIZE, Tools::getValue('catchandauthorize'));
             } else {
                 $this->errors[] = $this->l('To enable the separate authorization and capture, you need to select at least one order status to trigger the capture and confirm that you understand the risk.');
@@ -647,6 +647,7 @@ class Stripe_official extends PaymentModule
             'link' => new Link(),
             'catchandauthorize' => Configuration::get(self::CATCHANDAUTHORIZE),
             'orderStatus' => $orderStatus,
+            'orderStatusSelected' => Configuration::get(self::CAPTURE_STATUS),
             'allOrderStatus' => $allOrderStatus,
             'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
         ));
