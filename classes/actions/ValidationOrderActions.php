@@ -211,6 +211,43 @@ class ValidationOrderActions extends DefaultActions
 
         return true;
     }
+
+    public function saveCard()
+    {
+        if ($this->conveyor['saveCard'] === false) {
+            die('no save card');
+            return true;
+        }
+
+        $stripeCustomer = new StripeCustomer();
+        $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id);
+
+        if ($stripeCustomer->id == null) {
+            $customer = \Stripe\Customer::create([
+                'description' => 'Customer created from Prestashop Stripe module',
+                'email' => $this->context->customer->email,
+                'name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+            ]);
+
+            $stripeCustomer->id_customer = $this->context->customer->id;
+            $stripeCustomer->stripe_customer_key = $customer->id;
+            $stripeCustomer->save();
+
+            $customer = $stripeCustomer;
+        } else {
+            $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
+        }
+
+        $stripeCard = new StripeCard();
+        $stripeCard->id_customer = $customer->id;
+        $stripeCard->payment_method = $this->conveyor['token'];
+        if (!$stripeCard->save()) {
+            ProcessLoggerHandler::logError('Error during save card, card has not been registered', null, null, 'StripeCard');
+        }
+
+        return true;
+    }
+
     /*
         Input : 'id_payment_intent', 'source', 'result'
         Output :

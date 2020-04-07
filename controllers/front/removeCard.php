@@ -23,16 +23,23 @@
  * @license   Commercial license
  */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-function upgrade_module_2_1_0($module)
+class stripe_officialRemoveCardModuleFrontController extends ModuleFrontController
 {
-    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
-    $installer->installObjectModel('StripeCapture');
-    $installer->installObjectModel('StripeCustomer');
-    $installer->registerHooks();
+    /**
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        parent::initContent();
 
-    return true;
+        $stripeCard = new StripeCard();
+        $stripeCard->payment_method = Tools::getValue('id_payment_method');
+        if (!$stripeCard->delete()) {
+            echo 'Error during card delete';
+            exit;
+        }
+
+        echo 'Card deleted with success';
+        exit;
+    }
 }

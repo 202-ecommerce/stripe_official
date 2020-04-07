@@ -131,6 +131,17 @@
 						</div>
 
 						<div class="form-group">
+							<input type="checkbox" id="save_card" name="save_card" {if $save_card}checked="checked"{/if}/>
+							<label for="save_card">{l s='Enable the option for users to register their card' mod='stripe_official'}</label><br/>
+
+							<input type="radio" name="ask_customer" id="ask_yes" value="1" {if $ask_customer == 1}checked{/if}/>
+							<label for="ask_yes">{l s='Ask the customer' mod='stripe_official'}</label><br/>
+
+							<input type="radio" name="ask_customer" id="ask_no" value="0" {if $ask_customer == 0}checked{/if}/>
+							<label for="ask_no">{l s='Save without asking' mod='stripe_official'}</label>
+						</div>
+
+						<div class="form-group">
 							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
 							<label for="cardholdername">{l s='Activate display of card holder name' mod='stripe_official'}</label>
 						</div>

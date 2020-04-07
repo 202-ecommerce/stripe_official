@@ -35,6 +35,8 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 require_once dirname(__FILE__) . '/classes/StripeCapture.php';
+require_once dirname(__FILE__) . '/classes/StripeCustomer.php';
+require_once dirname(__FILE__) . '/classes/StripeCard.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -87,6 +89,8 @@ class Stripe_official extends PaymentModule
     const CATCHANDAUTHORIZE = 'STRIPE_CATCHANDAUTHORIZE';
     const CAPTURE_STATUS = 'STRIPE_CAPTURE_STATUS';
     const CAPTURE_EXPIRE = 'STRIPE_CAPTURE_EXPIRE';
+    const SAVE_CARD = 'STRIPE_SAVE_CARD';
+    const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
 
     /**
      * List of objectModel used in this Module
@@ -96,6 +100,7 @@ class Stripe_official extends PaymentModule
         'StripePayment',
         'StripePaymentIntent',
         'StripeCapture',
+        'StripeCustomer',
     );
 
     /**
@@ -128,6 +133,7 @@ class Stripe_official extends PaymentModule
       */
     public $controllers = array(
         'orderFailure',
+        'stripeCards',
     );
 
     /**
@@ -147,6 +153,8 @@ class Stripe_official extends PaymentModule
         'displayPaymentEU',
         'adminOrder',
         'actionOrderStatusUpdate',
+        'displayMyAccountBlock',
+        'displayCustomerAccount',
     );
 
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
@@ -226,6 +234,7 @@ class Stripe_official extends PaymentModule
         $this->button_label['giropay'] = $this->l('Pay by Giropay');
         $this->button_label['ideal'] = $this->l('Pay by iDEAL');
         $this->button_label['sofort'] = $this->l('Pay by SOFORT');
+        $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
         $this->displayName = $this->l('Stripe payment module', $this->name);
@@ -533,6 +542,13 @@ class Stripe_official extends PaymentModule
                 $this->errors[] = $this->l('To enable the separate authorization and capture, you need to select at least one order status to trigger the capture and confirm that you understand the risk.');
             }
 
+            if (!Tools::getValue('save_card')) {
+                Configuration::updateValue(self::SAVE_CARD, null);
+            } else {
+                Configuration::updateValue(self::SAVE_CARD, Tools::getValue('save_card'));
+                Configuration::updateValue(self::ASK_CUSTOMER, Tools::getValue('ask_customer'));
+            }
+
             if (!count($this->errors)) {
                 $this->success = $this->l('Data succesfuly saved.');
             }
@@ -650,6 +666,8 @@ class Stripe_official extends PaymentModule
             'orderStatusSelected' => Configuration::get(self::CAPTURE_STATUS),
             'allOrderStatus' => $allOrderStatus,
             'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
+            'save_card' => Configuration::get(self::SAVE_CARD),
+            'ask_customer' => Configuration::get(self::ASK_CUSTOMER),
         ));
 
         $this->displaySomething();
@@ -965,6 +983,19 @@ class Stripe_official extends PaymentModule
             try {
                 $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
+                $stripeCustomer = new StripeCustomer();
+                $stripeCustomer->getCustomerById($this->context->customer->id);
+
+                // Associate customer to PI in order to pay with saved cards
+                if ($stripeCustomer->stripe_customer_key != '') {
+                    $intent->update(
+                        $this->context->cookie->stripe_payment_intent,
+                        array(
+                            "customer" => $stripeCustomer->stripe_customer_key
+                        )
+                    );
+                }
+
                 // Check that the amount is still correct
                 if ($intent->amount != $amount) {
                     $intent->update(
@@ -1275,6 +1306,11 @@ class Stripe_official extends PaymentModule
             $stripe_fullname = $firstname . ' ' . $lastname;
         }
 
+        $auto_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '0') {
+            $auto_save_card = true;
+        }
+
         // Javacript variables needed by Elements
         Media::addJsDef(array(
             'stripe_pk' => $this->getPublishableKey(),
@@ -1293,6 +1329,8 @@ class Stripe_official extends PaymentModule
             'stripe_email' => $this->context->customer->email,
 
             'stripe_locale' => $this->context->language->iso_code,
+
+            'stripe_auto_save_card' =>$auto_save_card,
 
             'stripe_validation_return_url' => $this->context->link->getModuleLink(
                 $this->name,
@@ -1438,6 +1476,11 @@ class Stripe_official extends PaymentModule
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
         }
 
+        $show_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '1') {
+            $show_save_card = true;
+        }
+
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.7',
@@ -1447,7 +1490,9 @@ class Stripe_official extends PaymentModule
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
-            'customer_name' => $address->firstname . ' ' . $address->lastname
+            'customer_name' => $address->firstname . ' ' . $address->lastname,
+            'stripe_save_card' => Configuration::get(self::SAVE_CARD),
+            'show_save_card' => $show_save_card
         ));
 
         // Fetch country based on invoice address and currency
@@ -1500,6 +1545,35 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
+        $stripeCustomer = new StripeCustomer();
+        $stripeCustomer->getCustomerById($this->context->customer->id);
+
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+        $customerCards = $stripeCard->getAllCustomerCards();
+
+        foreach ($customerCards as $card) {
+            if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {
+                continue;
+            }
+
+            $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+            $option
+            ->setModuleName($this->name)
+            ->setCallToActionText($this->button_label['save_card'].' : '.ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+
+            $this->context->smarty->assign(array(
+                'id_payment_method' => $card->id
+            ));
+
+            $option->setForm(
+                $this->context->smarty->fetch(
+                    'module:' . $this->name . '/views/templates/front/payment_form_save_card.tpl'
+                )
+            );
+
+            $options[] = $option;
+        }
+
         return $options;
     }
 
@@ -1526,5 +1600,10 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
+    }
+
+    public function hookDisplayCustomerAccount()
+    {
+        return $this->display(__FILE__, 'my-account-stripe-cards.tpl');
     }
 }

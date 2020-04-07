@@ -64,13 +64,14 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         $handler->setConveyor(array(
                     'source' => Tools::getValue('source'),
                     'response' => Tools::getValue('response'),
+                    'saveCard' => Tools::getValue('saveCard'),
                     'module' => $this->module,
                     'context' => $this->context,
                 ));
 
         // Set list of actions to execute
         if (empty(Tools::getValue('source'))) {
-            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'addTentative');
+            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'saveCard', 'addTentative');
         } else {
             $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'addTentative');
         }

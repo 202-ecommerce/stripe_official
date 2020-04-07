@@ -1,5 +1,4 @@
-<?php
-/**
+{*
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -21,18 +20,8 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
- */
+*}
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-function upgrade_module_2_1_0($module)
-{
-    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
-    $installer->installObjectModel('StripeCapture');
-    $installer->installObjectModel('StripeCustomer');
-    $installer->registerHooks();
-
-    return true;
-}
+<form class="stripe-payment-form save_card" action="">
+    <input type="hidden" name="stripe-payment-method" value="card" data-id_payment_method="{$id_payment_method}">
+</form>

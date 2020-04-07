@@ -16,6 +16,7 @@ const config = {
     'js/back': './_dev/js/back.js',
     'js/faq': './_dev/js/faq.js',
     'js/payments': './_dev/js/payments.js',
+    'js/stripeCard': './_dev/js/stripeCard.js',
     'js/PSTabs': './_dev/js/PSTabs.js',
 
     'css/checkout': './_dev/scss/checkout.scss',

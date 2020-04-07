@@ -1,5 +1,4 @@
-<?php
-/**
+{*
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -21,18 +20,11 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
- */
+*}
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-function upgrade_module_2_1_0($module)
-{
-    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
-    $installer->installObjectModel('StripeCapture');
-    $installer->installObjectModel('StripeCustomer');
-    $installer->registerHooks();
-
-    return true;
-}
+<a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" href="{$link->getModuleLink('stripe_official', 'stripeCards')|escape:'html':'UTF-8'}" title="{l s='My cards' mod='stripe_official'}">
+    <span class="link-item">
+        <i class="material-icons md-36">payment</i>
+        {l s='My cards' mod='stripe_official'}
+    </span>
+</a>

@@ -35,6 +35,7 @@ $(function(){
     $form = $('#stripe-card-payment');
     let payment = '';
     let disableText = '';
+    let id_payment_method = '';
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
@@ -259,6 +260,7 @@ $(function(){
         /* Prestashop 1.7 */
         $form = $('.stripe-payment-form:visible');
         payment = $('input[name="stripe-payment-method"]', $form).val();
+        id_payment_method = $('input[name="stripe-payment-method"]', $form).data('id_payment_method');
         disableText = event.currentTarget;
       } else {
         /* Prestashop 1.6 */
@@ -277,27 +279,30 @@ $(function(){
       disableSubmit(disableText, 'Processing…');
 
       if (payment === 'card') {
-        // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
-        const response = await stripe.handleCardPayment(
-          stripe_client_secret,
-          card,
-          {
-            payment_method_data: {
-              billing_details: {
-                address: {
-                  city: stripe_address.city,
-                  country: stripe_address_country_code,
-                  line1: stripe_address.address1,
-                  line2: stripe_address.address2,
-                  postal_code: stripe_address.postcode
-                },
-                email: stripe_email,
-                name: stripe_fullname
-              }
+        if (typeof(id_payment_method) == 'undefined') {
+          id_payment_method = {
+            card: card,
+            billing_details: {
+              address: {
+                city: stripe_address.city,
+                country: stripe_address_country_code,
+                line1: stripe_address.address1,
+                line2: stripe_address.address2,
+                postal_code: stripe_address.postcode
+              },
+              email: stripe_email,
+              name: stripe_fullname
             }
           }
-        );
-        handlePayment(response);
+        }
+        const response = await stripe.confirmCardPayment(
+          stripe_client_secret, {
+          payment_method: id_payment_method,
+          setup_future_usage: 'off_session'
+        })
+        .then(function(response) {
+          handlePayment(response);
+        });
       } else if (payment === 'sepa_debit') {
         // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
         const response = await stripe.confirmPaymentIntent(
@@ -343,11 +348,17 @@ $(function(){
     });
 
     // Handle new PaymentIntent result
+    let saveCard;
     function handlePayment(response) {
       if (response.error) {
         updateError($submitButtons, response.error);
         enableSubmit($submitButtons);
       } else {
+        if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
+          saveCard = true;
+        } else {
+          saveCard = false;
+        }
         $.ajax({
             type: 'POST',
             dataType: 'json',
@@ -355,6 +366,7 @@ $(function(){
             url: stripe_validation_return_url,
             data: {
                 response: response,
+                saveCard: saveCard
             },
             success: function(datas) {
                 if (datas['code'] == 0 || datas['code'] == 1) {
