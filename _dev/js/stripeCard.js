@@ -1,6 +1,6 @@
 $(function(){
     $('.remove_card').click(function(event) {
-        console.log($(this).data('id_payment_method'));
+        var element = $(this).closest('tr');
         $.ajax({
             type: 'POST',
             dataType: 'text',
@@ -10,9 +10,7 @@ $(function(){
                 id_payment_method: $(this).data('id_payment_method')
             },
             success: function(datas) {
-                console.log('success');
-                console.log(datas);
-                $(this).closest('tr').remove();
+                element.remove();
             },
             error: function(err) {
                 console.log(err);

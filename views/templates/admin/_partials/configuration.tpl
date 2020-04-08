@@ -160,8 +160,8 @@
 										<td class="col-md-6">
 											<p>{l s='Your status' mod='stripe_official'}</p>
 											<select id="order_status_select_1" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
-												{foreach from=$orderStatus.unselected item='orderStatus'}
-													<option value="{$orderStatus.id_order_state|intval}">{$orderStatus.name|escape}</option>
+												{foreach from=$orderStatus.unselected item='orderState'}
+													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
 											</select>
 											<a id="order_status_select_add" class="btn btn-default btn-block clearfix" >{l s='Add' mod='stripe_official'} <i class="icon-arrow-right"></i></a>
@@ -169,8 +169,8 @@
 										<td class="col-md-6">
 											<p>{l s='Catch status' d='stripe_official'}</p>
 											<select id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
-												{foreach from=$orderStatus.selected item='orderStatus'}
-													<option value="{$orderStatus.id_order_state|intval}">{$orderStatus.name|escape}</option>
+												{foreach from=$orderStatus.selected item='orderState'}
+													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
 											</select>
 											<a id="order_status_select_remove" class="btn btn-default btn-block clearfix"><i class="icon-arrow-left"></i> {l s='Remove' mod='stripe_official'} </a>

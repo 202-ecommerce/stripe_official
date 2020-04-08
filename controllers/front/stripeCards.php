@@ -49,7 +49,11 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
             $card->card->exp_year = substr($card->card->exp_year, -2);
         }
 
-        $this->setTemplate('module:stripe_official/views/templates/front/stripe-cards.tpl');
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $this->setTemplate('module:stripe_official/views/templates/front/stripe-cards.tpl');
+        } else {
+            $this->setTemplate('stripe-cards16.tpl');
+        }
     }
 
     public function setMedia()

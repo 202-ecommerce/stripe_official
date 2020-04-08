@@ -266,6 +266,7 @@ $(function(){
         /* Prestashop 1.6 */
         $form = event.currentTarget;
         payment = event.currentTarget.dataset.method;
+        id_payment_method = event.currentTarget.dataset.id_payment_method;
         disableText = event.currentTarget;
 
         if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
@@ -279,7 +280,7 @@ $(function(){
       disableSubmit(disableText, 'Processing…');
 
       if (payment === 'card') {
-        if (typeof(id_payment_method) == 'undefined') {
+        if (typeof(id_payment_method) == 'undefined' || id_payment_method == '') {
           id_payment_method = {
             card: card,
             billing_details: {

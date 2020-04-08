@@ -21,10 +21,18 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
 *}
-
-<a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" href="{$link->getModuleLink('stripe_official', 'stripeCards')|escape:'html':'UTF-8'}" title="{l s='My cards' mod='stripe_official'}">
-    <span class="link-item">
-        <i class="material-icons md-36">payment</i>
-        {l s='My cards' mod='stripe_official'}
-    </span>
-</a>
+{if $prestashop_version == '1.7'}
+    <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" href="{$link->getModuleLink('stripe_official', 'stripeCards')|escape:'html':'UTF-8'}" title="{l s='My cards' mod='stripe_official'}">
+        <span class="link-item">
+            <i class="material-icons md-36">payment</i>
+            {l s='My cards' mod='stripe_official'}
+        </span>
+    </a>
+{else}
+    <li>
+        <a href="{$link->getModuleLink('stripe_official', 'stripeCards')|escape:'html':'UTF-8'}" title="{l s='My cards' mod='stripe_official'}">
+            <i class="icon-credit-card"></i>
+            <span>{l s='My cards' mod='stripe_official'}</span>
+        </a>
+    </li>
+{/if}

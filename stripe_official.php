@@ -1386,6 +1386,11 @@ class Stripe_official extends PaymentModule
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
         }
 
+        $show_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '1') {
+            $show_save_card = true;
+        }
+
         // Send the payment amount, it may have changed
         $this->context->smarty->assign(array(
             'stripe_amount' => Tools::ps_round($amount, 0),
@@ -1396,7 +1401,9 @@ class Stripe_official extends PaymentModule
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
-            'customer_name' => $address->firstname . ' ' . $address->lastname
+            'customer_name' => $address->firstname . ' ' . $address->lastname,
+            'stripe_save_card' => Configuration::get(self::SAVE_CARD),
+            'show_save_card' => $show_save_card
         ));
 
         // Fetch country based on invoice address and currency
@@ -1424,6 +1431,26 @@ class Stripe_official extends PaymentModule
         }
         if ($display != '') {
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
+        }
+
+        $stripeCustomer = new StripeCustomer();
+        $stripeCustomer->getCustomerById($this->context->customer->id);
+
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+        $customerCards = $stripeCard->getAllCustomerCards();
+
+        foreach ($customerCards as $card) {
+            if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {
+                continue;
+            }
+
+            $this->context->smarty->assign(array(
+                'id_payment_method' => $card->id,
+                'last4' => $card->card->last4,
+                'brand' => ucfirst($card->card->brand)
+            ));
+
+            $display .= $this->display(__FILE__, 'views/templates/front/payment_form_save_card.tpl');
         }
 
         return $display;
@@ -1604,6 +1631,16 @@ class Stripe_official extends PaymentModule
 
     public function hookDisplayCustomerAccount()
     {
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $prestashop_version = '1.7';
+        } else {
+            $prestashop_version = '1.6';
+        }
+
+        $this->context->smarty->assign(array(
+            'prestashop_version' => $prestashop_version
+        ));
+
         return $this->display(__FILE__, 'my-account-stripe-cards.tpl');
     }
 }
