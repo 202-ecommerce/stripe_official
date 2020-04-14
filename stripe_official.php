@@ -37,6 +37,7 @@ require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 require_once dirname(__FILE__) . '/classes/StripeCapture.php';
 require_once dirname(__FILE__) . '/classes/StripeCustomer.php';
 require_once dirname(__FILE__) . '/classes/StripeCard.php';
+require_once dirname(__FILE__) . '/classes/StripeWebhook.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -47,6 +48,7 @@ require_once dirname(__FILE__) . '/classes/StripeCard.php';
 *
 * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
 * // use Stripe_officialClasslib\Install\ModuleInstaller;
+* // use Stripe_officialClasslib\Actions\ActionsHandler;
 * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
 *
 * Developpers use declarative method to define objects, parameters, controllers... needed in this module
@@ -91,6 +93,7 @@ class Stripe_official extends PaymentModule
     const CAPTURE_EXPIRE = 'STRIPE_CAPTURE_EXPIRE';
     const SAVE_CARD = 'STRIPE_SAVE_CARD';
     const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
+    const WEBHOOK_SIGNATURE = 'STRIPE_WEBHOOK_SIGNATURE';
 
     /**
      * List of objectModel used in this Module
@@ -197,6 +200,15 @@ class Stripe_official extends PaymentModule
           'enable' => self::ENABLE_SOFORT,
           'catch_enable' => false
         ),
+    );
+
+    public static $webhook_events = array(
+        'charge.expired',
+        'charge.failed',
+        'charge.succeeded',
+        'charge.pending',
+        'charge.captured',
+        'charge.refunded'
     );
 
     /* refund */
@@ -494,85 +506,15 @@ class Stripe_official extends PaymentModule
 
         /* Do Log In  */
         if (Tools::isSubmit('submit_login')) {
-            if (Tools::getValue(self::MODE) == 1) {
-                $secret_key = trim(Tools::getValue(self::TEST_KEY));
-                $publishable_key = trim(Tools::getValue(self::TEST_PUBLISHABLE));
+            $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
+            $handler->setConveyor(array(
+                        'context' => $this->context,
+                        'module' => $this
+                    ));
 
-                if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, '_test_') !== false && strpos($publishable_key, '_test_') !== false) {
-                        if ($this->checkApiConnection($secret_key)) {
-                            Configuration::updateValue(self::TEST_KEY, $secret_key);
-                            Configuration::updateValue(self::TEST_PUBLISHABLE, $publishable_key);
-                        }
-                    } else {
-                        $this->errors[] = $this->l('mode test with API key live');
-                    }
-                } else {
-                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
-                }
+            $handler->addActions('registerKeys', 'registerCatchAndAuthorize', 'registerSaveCard', 'registerOtherConfigurations', 'registerApplePayDomain', 'registerWebhookSignature');
 
-                Configuration::updateValue(self::MODE, Tools::getValue(self::MODE));
-            } else {
-                $secret_key = trim(Tools::getValue(self::KEY));
-                $publishable_key = trim(Tools::getValue(self::PUBLISHABLE));
-
-                if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, '_live_') !== false && strpos($publishable_key, '_live_') !== false) {
-                        if ($this->checkApiConnection($secret_key)) {
-                            Configuration::updateValue(self::KEY, $secret_key);
-                            Configuration::updateValue(self::PUBLISHABLE, $publishable_key);
-                        }
-                    } else {
-                        $this->errors['keys'] = $this->l('mode live with API key test');
-                    }
-                } else {
-                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
-                }
-
-                Configuration::updateValue(self::MODE, Tools::getValue(self::MODE));
-            }
-
-            if (!Tools::getValue('catchandauthorize')) {
-                Configuration::updateValue(self::CATCHANDAUTHORIZE, null);
-            } else if (Tools::getValue('catchandauthorize') && Tools::getValue('order_status_select') != '' && Tools::getValue('capture_expired') != '0') {
-                Configuration::updateValue(self::CAPTURE_EXPIRE, Tools::getValue('capture_expired'));
-                Configuration::updateValue(self::CAPTURE_STATUS, Tools::getValue('order_status_select'));
-                Configuration::updateValue(self::CATCHANDAUTHORIZE, Tools::getValue('catchandauthorize'));
-            } else {
-                $this->errors[] = $this->l('To enable the separate authorization and capture, you need to select at least one order status to trigger the capture and confirm that you understand the risk.');
-            }
-
-            if (!Tools::getValue('save_card')) {
-                Configuration::updateValue(self::SAVE_CARD, null);
-            } else {
-                Configuration::updateValue(self::SAVE_CARD, Tools::getValue('save_card'));
-                Configuration::updateValue(self::ASK_CUSTOMER, Tools::getValue('ask_customer'));
-            }
-
-            if (!count($this->errors)) {
-                $this->success = $this->l('Data succesfuly saved.');
-            }
-
-            Configuration::updateValue(self::ENABLE_IDEAL, Tools::getValue('ideal'));
-            Configuration::updateValue(self::ENABLE_SOFORT, Tools::getValue('sofort'));
-            Configuration::updateValue(self::ENABLE_GIROPAY, Tools::getValue('giropay'));
-            Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
-            Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
-            Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
-            Configuration::updateValue(self::CARDHOLDERNAME, Tools::getValue('cardholdername'));
-            Configuration::updateValue(self::REINSURANCE, Tools::getValue('reinsurance'));
-            Configuration::updateValue(self::VISA, Tools::getValue('visa'));
-            Configuration::updateValue(self::MASTERCARD, Tools::getValue('mastercard'));
-            Configuration::updateValue(self::AMERICAN_EXPRESS, Tools::getValue('american_express'));
-            Configuration::updateValue(self::CB, Tools::getValue('cb'));
-            Configuration::updateValue(self::DINERS_CLUB, Tools::getValue('diners_club'));
-            Configuration::updateValue(self::UNION_PAY, Tools::getValue('union_pay'));
-            Configuration::updateValue(self::JCB, Tools::getValue('jcb'));
-            Configuration::updateValue(self::DISCOVERS, Tools::getValue('discovers'));
-
-            if (Configuration::get(self::KEY) && Configuration::get(self::KEY) != '') {
-                $this->addAppleDomainAssociation(Configuration::get(self::KEY));
-            }
+            $handler->process('Configuration');
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -939,7 +881,7 @@ class Stripe_official extends PaymentModule
         }
     }
 
-    protected function checkApiConnection($secretKey = null)
+    public function checkApiConnection($secretKey = null)
     {
         if (!$secretKey) {
             $secretKey = $this->getSecretKey();

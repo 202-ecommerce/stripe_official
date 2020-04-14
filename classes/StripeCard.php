@@ -46,7 +46,7 @@ class StripeCard extends ObjectModel
         $this->stripe_card_key = $stripe_card_key;
     }
 
-    public function save()
+    public function save($null_values = false, $auto_date = true)
     {
         try {
             $payment_method = \Stripe\PaymentMethod::retrieve(

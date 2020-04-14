@@ -361,7 +361,7 @@ class ValidationOrderActions extends DefaultActions
             $order->update();
 
             $history->addWithemail();
-        } elseif ($this->conveyor['event_json']->type == 'charge.canceled' || $this->conveyor['event_json']->type == 'charge.refunded') {
+        } elseif ($this->conveyor['event_json']->type == 'charge.expired' || $this->conveyor['event_json']->type == 'charge.refunded') {
             ProcessLoggerHandler::logInfo('setCurrentState for '.$this->conveyor['event_json']->type, 'Order', $id_order, 'webhook');
             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
         } elseif ($this->conveyor['event_json']->type == 'charge.failed') {

@@ -23,25 +23,28 @@
  * @license   Commercial license
  */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
-
-function upgrade_module_2_1_0($module)
+class StripeWebhook extends ObjectModel
 {
-    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
-    $installer->installObjectModel('StripeCapture');
-    $installer->installObjectModel('StripeCustomer');
-    $installer->registerHooks();
+    public static function create()
+    {
+        try {
+            $context = Context::getContext();
 
-    $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
-    $handler->setConveyor(array(
-                'context' => Context::getContext()
-            ));
-    $handler->addActions('registerWebhookSignature');
-    $handler->process('Configuration');
+            $webhookEndpoint = \Stripe\WebhookEndpoint::create([
+                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true),
+                'enabled_events' => Stripe_official::$webhook_events,
+            ]);
 
-    return true;
+            Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
+        } catch (PrestaShopException $e) {
+            $this->_error[] = (string)$e->getMessage();
+            ProcessLoggerHandler::logError('Create webhook endpoint - '.(string)$e->getMessage(), null, null, 'StripeWebhook');
+            return false;
+        }
+    }
+
+    public static function getWebhookList()
+    {
+        return \Stripe\WebhookEndpoint::all();
+    }
 }

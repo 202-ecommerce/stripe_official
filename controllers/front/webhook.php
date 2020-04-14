@@ -51,24 +51,37 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             null,
             'webhook'
         );
+
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE);
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
 
-        $event_json = json_decode($input);
-        ProcessLoggerHandler::logInfo('$event_json->type => ' . $event_json->type, null, null, 'webhook');
+        $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+        $event = null;
 
         try {
-            \Stripe\Event::retrieve($event_json->id);
-        } catch (Exception $e) {
-            ProcessLoggerHandler::logError($e->getMessage(), null, null, 'webhook');
+            $event = \Stripe\Webhook::constructEvent(
+                $input, $sig_header, $endpoint_secret
+            );
+        } catch(\UnexpectedValueException $e) {
+            // Invalid payload
+            ProcessLoggerHandler::logError('Invalid payload : '.$e->getMessage(), null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
-            http_response_code(500);
+            http_response_code(400);
             echo $e->getMessage();
-            exit;
+            exit();
+        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+            // Invalid signature
+            ProcessLoggerHandler::logError('Invalid signature : '.$e->getMessage(), null, null, 'webhook');
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(400);
+            echo $e->getMessage();
+            exit();
         }
-        ProcessLoggerHandler::logInfo('event ' . $event_json->id . ' retrieved', null, null, 'webhook');
 
-        if (!$event_json) {
+        ProcessLoggerHandler::logInfo('event ' . $event->id . ' retrieved', null, null, 'webhook');
+
+        if (!$event) {
             $msg = 'JSON not valid';
             ProcessLoggerHandler::logError($msg, null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
@@ -78,16 +91,15 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         http_response_code(200);
-        $availlableType = array('charge.canceled', 'charge.failed', 'charge.succeeded', 'charge.pending', 'charge.captured', 'charge.refunded');
-        if (!in_array($event_json->type, $availlableType)) {
-            $msg = 'webhook "'.$event_json->type.'" call not yet supported';
+        if (!in_array($event->type, Stripe_official::$webhook_events)) {
+            $msg = 'webhook "'.$event->type.'" call not yet supported';
             ProcessLoggerHandler::logInfo($msg, null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             echo $msg;
             exit;
         }
 
-        if ($event_json->type == 'charge.succeeded' && $event_json->data->object->captured === false) {
+        if ($event->type == 'charge.succeeded' && $event->data->object->captured === false) {
             ProcessLoggerHandler::logInfo('amount not captured yet', null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             exit;
@@ -98,7 +110,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         // Create the handler
         $handler = new ActionsHandler();
         $handler->setConveyor(array(
-                    'event_json' => $event_json,
+                    'event' => $event,
                     'module' => $this->module,
                     'context' => $this->context,
                 ));
