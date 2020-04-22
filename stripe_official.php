@@ -1378,8 +1378,16 @@ class Stripe_official extends PaymentModule
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
+        if ($stripeCustomer->id == null) {
+            return $options;
+        }
+
         $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
+
+        if (empty($customerCards)) {
+            return $options;
+        }
 
         foreach ($customerCards as $card) {
             if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {
@@ -1517,8 +1525,16 @@ class Stripe_official extends PaymentModule
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
+        if ($stripeCustomer->id == null) {
+            return $options;
+        }
+
         $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
+
+        if (empty($customerCards)) {
+            return $options;
+        }
 
         foreach ($customerCards as $card) {
             if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {

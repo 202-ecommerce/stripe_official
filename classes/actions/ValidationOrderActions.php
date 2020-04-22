@@ -215,7 +215,6 @@ class ValidationOrderActions extends DefaultActions
     public function saveCard()
     {
         if ($this->conveyor['saveCard'] === false) {
-            die('no save card');
             return true;
         }
 
