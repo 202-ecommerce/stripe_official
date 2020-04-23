@@ -83,6 +83,14 @@ $_MODULE['<{stripe_official}prestashop>configuration_2f9c176d2def385f41e1ebd57b0
 $_MODULE['<{stripe_official}prestashop>configuration_04cdecad3493646701ed01647741b78f'] = 'Demander aux utilisateurs';
 $_MODULE['<{stripe_official}prestashop>configuration_0275d5a919dc2906f576e72335d1faf1'] = 'Sauvegarder sans demander aux utilisateurs';
 $_MODULE['<{stripe_official}prestashop>configuration_a1ab4b80cc2050fcbf9ec6a75721d005'] = 'Afficher le champ demandant le nom complet du porteur de carte';
+$_MODULE['<{stripe_official}prestashop>configuration_33bcccaf7654c09d4a90ee486c45cfd2'] = 'Activer l\'option d\'autorisation et capture de paiement ultérieur, cette option permettra de déterminer à quel moment débiter votre client en fonction du statut de la commande.';
+$_MODULE['<{stripe_official}prestashop>configuration_73a5b8196763ea2e1043092e8f9c015e'] = 'Attention, vous aurez un délai de 7 jours calendaire pour faire évoluer le statut de votre commande afin de capturer le paiement de vos clients.';
+$_MODULE['<{stripe_official}prestashop>configuration_1097f096a2eedb06b25489aed19a2ae7'] = 'Choisissez parmis la liste de vos status de commande, les status pour lesquels vous souhaitez capturer le paiement sur la carte bancaire de vos clients. Il est conseillé de choisir plusieurs status. Il est cependant possible de faire la capture de paiement sur le dashboard Stripe si vous êtes toujours dans la période de 7 jours.';
+$_MODULE['<{stripe_official}prestashop>configuration_160341e19f4199f98bae44696b547c48'] = 'Vos statuts';
+$_MODULE['<{stripe_official}prestashop>configuration_ec211f7c20af43e742bf2570c3cb84f9'] = 'Ajouter';
+$_MODULE['<{stripe_official}prestashop>configuration_cea9034a11c05369bf41177de1bf7220'] = 'Statuts de capture';
+$_MODULE['<{stripe_official}prestashop>configuration_1063e38cb53d94d386f21227fcd84717'] = 'Retirer';
+$_MODULE['<{stripe_official}prestashop>configuration_c5aab817a800aee77f58051978896fc7'] = 'À quel statut de commande souhaitez-vous retourner si le délais de 7 jours pour effectuer la capture est expiré.';
 $_MODULE['<{stripe_official}prestashop>configuration_77efb82ffbc0671e65f439985d603f7a'] = 'Autres moyens de paiement (pour les utilisateurs en Europe uniquement) : iDEAL, Bancontact, SOFORT et Giropay.';
 $_MODULE['<{stripe_official}prestashop>configuration_dfca57b13d6e6901548338c1a842d55b'] = 'Ce plugin prend en charge ces moyens de paiement pour les utilisateurs d\'Europe uniquement. Pour les activer, suivez ces [b]trois étapes :[/b]';
 $_MODULE['<{stripe_official}prestashop>configuration_ab13c23b9e0b23a84d9639f61d3cc895'] = 'Sélectionnez ci-dessous tous les moyens de paiement que vous souhaitez proposer sur votre site Web :';

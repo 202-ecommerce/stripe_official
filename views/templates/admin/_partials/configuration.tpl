@@ -148,11 +148,11 @@
 
 						<div class="form-group">
 							<input type="checkbox" id="catchandauthorize" name="catchandauthorize" {if $catchandauthorize}checked="checked"{/if}/>
-							<label for="catchandauthorize">{l s='Activer l\'option d\'autorisation et capture de paiement ultérieur, ctte option permettra de déterminer à quel moment débiter votre client en fonction du statut de la commande.' mod='stripe_official'}</label>
+							<label for="catchandauthorize">{l s='Enable separate authorization and capture. If enabled, Stripe will place a hold on the card for the amount of the order during checkout. That authorization will be captured and the money settled to your account when the order transitions to the status of your choice.' mod='stripe_official'}</label>
 							<p>
-								<b>{l s='Attention, vous aurez un délai de 7 jours calendaire pour faire évoluer le statut de votre commande afin de capturer le paiement de vos clients.' mod='stripe_official'}</b>
+								<b>{l s='Warning: you have 7 calendar days to capture the authorization before it expires and the hold on the card is released.' mod='stripe_official'}</b>
 							</p>
-							<span>{l s='Choisissez parmis la liste de vos status de commande, les status pour lesquels vous souhaitez capturer le paiement sur la carte bancaire de vos clients. Il est conseillé de choisir plusieurs status. Il est cependant possible de faire la capture de paiement sur le dashboard Stripe si vous êtes toujours dans la période de 7 jours.' mod='stripe_official'}</span>
+							<span>{l s='Capture the payment when transitioning to the following order statuses.' mod='stripe_official'}</span>
 							<div id="status_restrictions">
 								<br />
 								<table class="table">
@@ -167,7 +167,7 @@
 											<a id="order_status_select_add" class="btn btn-default btn-block clearfix" >{l s='Add' mod='stripe_official'} <i class="icon-arrow-right"></i></a>
 										</td>
 										<td class="col-md-6">
-											<p>{l s='Catch status' d='stripe_official'}</p>
+											<p>{l s='Catch status' mod='stripe_official'}</p>
 											<select id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.selected item='orderState'}
 													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
