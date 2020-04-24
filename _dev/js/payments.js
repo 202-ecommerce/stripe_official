@@ -249,6 +249,8 @@ $(function(){
     * or Apple Pay, Google Pay, and Microsoft Pay since they provide name and
     * shipping information directly.
     */
+    let saveCard;
+    let cardPayment;
     $submit.click(async event => {
       if (!$('.stripe-payment-form:visible').length) {
         return true;
@@ -296,11 +298,24 @@ $(function(){
             }
           }
         }
+
+        if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
+          cardPayment = {
+            payment_method: id_payment_method,
+            setup_future_usage: 'on_session'
+          }
+          saveCard = true;
+        } else {
+          cardPayment = {
+            payment_method: id_payment_method
+          }
+          saveCard = false;
+        }
+
         const response = await stripe.confirmCardPayment(
-          stripe_client_secret, {
-          payment_method: id_payment_method,
-          setup_future_usage: 'off_session'
-        })
+          stripe_client_secret,
+          cardPayment
+        )
         .then(function(response) {
           handlePayment(response);
         });
@@ -349,17 +364,11 @@ $(function(){
     });
 
     // Handle new PaymentIntent result
-    let saveCard;
     function handlePayment(response) {
       if (response.error) {
         updateError($submitButtons, response.error);
         enableSubmit($submitButtons);
       } else {
-        if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
-          saveCard = true;
-        } else {
-          saveCard = false;
-        }
         $.ajax({
             type: 'POST',
             dataType: 'json',

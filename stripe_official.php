@@ -1379,14 +1379,14 @@ class Stripe_official extends PaymentModule
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
         if ($stripeCustomer->id == null) {
-            return $options;
+            return $display;
         }
 
         $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
 
         if (empty($customerCards)) {
-            return $options;
+            return $display;
         }
 
         foreach ($customerCards as $card) {
