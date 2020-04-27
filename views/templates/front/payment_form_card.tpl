@@ -118,7 +118,7 @@
                 {/if}
             </div>
         {elseif $show_save_card === false}
-            <span class="label">{l s='Your card details will be saved automatically for your next purchase.' mod='stripe_official'}</span><br/>
+            <span class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if}">{l s='Your card details will be saved automatically for your next purchase.' mod='stripe_official'}</span><br/>
         {/if}
     {/if}
 
