@@ -217,25 +217,6 @@
 
 							</li>
 							<li>
-								{l s='To track correctly charges performed with these payment methods, you’ll need to add a “webhook”. A webhook is a way to be notified when an event (such as a successful payment) happens on your website.' mod='stripe_official'}
-								<br><br>
-								<ul>
-									<li>
-										{{l s='Go on the webhook page of your Stripe dashboard: [a @href1@]https://dashboard.stripe.com/account/webhooks[/a]' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/webhooks'}, '@target@' => {'target="blank"'}]}
-									</li>
-									<li>{l s='Click on "Add Endpoint" and copy/paste this URL in the "URL to be called" field:' mod='stripe_official'} {$url_webhhoks|escape:'htmlall':'UTF-8'}</li>
-									<li>{l s='Set the "Events to send" radion button to "Live events"' mod='stripe_official'}</li>
-									<li>{l s='Set the "Filter event" radio button to "Send all event types"' mod='stripe_official'}</li>
-									<li>{l s='Click on "Add endpoint"' mod='stripe_official'}<br>
-										<img class="img-example1" src="/modules/stripe_official//views/img/example1.png">
-									</li>
-									<li>{l s='Ultimately, your webhook dashboard page should look like this:' mod='stripe_official'}<br>
-										<img class="img-example2" src="/modules/stripe_official//views/img/example2.png">
-									</li>
-								</ul>
-							</li>
-							<br>
-							<li>
 								{{l s='Activate these payment methods on your [a @href1@]Stripe dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
 							</li>
 							<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
