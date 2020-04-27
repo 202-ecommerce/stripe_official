@@ -214,7 +214,7 @@ class ValidationOrderActions extends DefaultActions
 
     public function saveCard()
     {
-        if ($this->conveyor['saveCard'] === false) {
+        if ($this->conveyor['saveCard'] == 'false') {
             return true;
         }
 
@@ -231,14 +231,12 @@ class ValidationOrderActions extends DefaultActions
             $stripeCustomer->id_customer = $this->context->customer->id;
             $stripeCustomer->stripe_customer_key = $customer->id;
             $stripeCustomer->save();
-
-            $customer = $stripeCustomer;
-        } else {
-            $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
         }
 
+        $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
+
         $stripeCard = new StripeCard();
-        $stripeCard->id_customer = $customer->id;
+        $stripeCard->stripe_customer_key = $customer->id;
         $stripeCard->payment_method = $this->conveyor['token'];
         if (!$stripeCard->save()) {
             ProcessLoggerHandler::logError('Error during save card, card has not been registered', null, null, 'StripeCard');
