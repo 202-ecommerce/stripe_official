@@ -536,7 +536,7 @@ class Stripe_official extends PaymentModule
                 $query->where('id_stripe = "'.pSQL($refund_id).'"');
                 $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
             } else {
-                $this->errors[] = $this->l('Please make sure to put a Stripe Id');
+                $this->errors[] = $this->l('The Stripe Payment ID can\'t be empty.');
                 return false;
             }
 
@@ -545,7 +545,7 @@ class Stripe_official extends PaymentModule
                 Configuration::updateValue(self::REFUND_ID, Tools::getValue(self::REFUND_ID));
             } else {
                 $this->refund = 0;
-                $this->errors[] = $this->l('This Stripe ID doesn\'t exist, please check it again');
+                $this->errors[] = $this->l('Unknown Stripe Payment ID.');
                 Configuration::updateValue(self::REFUND_ID, '');
             }
 
@@ -692,7 +692,7 @@ class Stripe_official extends PaymentModule
     {
         if (!is_dir(_PS_ROOT_DIR_.'/.well-known')) {
             if (!mkdir(_PS_ROOT_DIR_.'/.well-known')) {
-                $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                $this->warning[] = $this->l('Settings updated successfully.');
                 return false;
             }
         }

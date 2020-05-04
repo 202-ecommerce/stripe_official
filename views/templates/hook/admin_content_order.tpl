@@ -24,25 +24,21 @@
 
 <div class="tab-pane" id="StripePayment">
     <p>
-        <span><strong>{l s='Charge' mod='stripe_official'}</strong></span><br/>
+        <span><strong>{l s='Payment ID' mod='stripe_official'}</strong></span><br/>
         <span><a href="{$stripe_dashboardUrl.charge|escape:'htmlall'}" target="blank">{$stripe_charge}</a></span>
-    </p>
-    <p>
-        <span><strong>{l s='Payment Intent' mod='stripe_official'}</strong></span><br/>
-        <span><a href="{$stripe_dashboardUrl.paymentIntent|escape:'htmlall'}" target="blank">{$stripe_paymentIntent}</a></span>
     </p>
     <p>
         <span><strong>{l s='Payment date' mod='stripe_official'}</strong></span><br/>
         <span>{$stripe_date|escape:'htmlall':'UTF-8'}</span>
     </p>
     <p>
-        <span><strong>{l s='Payment Type' mod='stripe_official'}</strong></span><br/>
+        <span><strong>{l s='Payment method' mod='stripe_official'}</strong></span><br/>
         <span><img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/cc-{$stripe_paymentType|escape:'htmlall':'UTF-8'}.png" alt="payment method" style="width:43px;"/></span>
     </p>
 
     {if isset($stripe_dateCatch) && $stripe_dateCatch != '0000-00-00 00:00:00'}
         <p>
-            <span><strong>{l s='Catch date' mod='stripe_official'}</strong></span><br/>
+            <span><strong>{l s='Capture date' mod='stripe_official'}</strong></span><br/>
             <span>{$stripe_dateCatch|escape:'htmlall':'UTF-8'}</span>
         </p>
     {/if}

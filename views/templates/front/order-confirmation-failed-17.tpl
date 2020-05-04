@@ -27,6 +27,6 @@
 {block name='content'}
     <p>
         {l s='An error occured during your payment.' mod='stripe_official'}<br />
-        {l s='Please [1][url][2]try again[/1] or contact the website owner.' sprintf=['[1]' => '<a href="', '[/1]' => '</a>', '[2]' => '">', '[url]' => {$stripe_order_url|escape:'htmlall'}] mod='stripe_official'}
+        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
     </p>
 {/block}

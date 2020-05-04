@@ -26,13 +26,12 @@
 <h3><i class="icon-info-sign"></i> {l s='THANKS FOR CHOOSING STRIPE' mod='stripe_official'}</h3>
 <div class="form-group">
     <br>
-    {l s='If you run into any issue after having installed this plugin, please first read our below FAQ and make sure :' mod='stripe_official'}
+    {l s='If you run into any issue after installing this module, please read our FAQ below and make sure that:' mod='stripe_official'}
     <br>
     <ol type="1">
-        <li>{l s='You have entered your API keys in the “Connection” tab of the Stripe module (we recommend checking that there is no space in the field).' mod='stripe_official'}</li>
-        <li>{l s='You are using test cards in Test mode and live cards in Live mode.' mod='stripe_official'}</li>
-        <li>{l s='If you’ve recently updated the module, you have refreshed your cache.' mod='stripe_official'}</li>
-        <li>{l s='You’re not using any other plugin that could impact payments.' mod='stripe_official'}</li>
+        <li>{l s='You configured your API keys in the "Connection" tab (make sure there is no extra space in the field).' mod='stripe_official'}</li>
+        <li>{l s='You refreshed your cache if you recently updated the module.' mod='stripe_official'}</li>
+        <li>{l s='You\'re not using another module that might conflict with payment modules.' mod='stripe_official'}</li>
     </ol>
     <br>
     {l s='You can also check out our support website:' mod='stripe_official'}

@@ -29,7 +29,7 @@
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
 				{assign var='stripe_url' value='https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]='}
-				{{l s='[a @href1@]Create your Stripe account in 10 minutes[/a] and immediately start accepting payments via Visa, MasterCard and American Express (no additional contract/merchant ID needed from your bank).' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_url|cat:$return_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}<br>
+				{{l s='[a @href1@]Create your Stripe account in 10 minutes[/a] and immediately start accepting card payments as well as local payment methods (no additional contract/merchant ID needed from your bank).' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_url|cat:$return_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}<br>
 
 				<div class="connect_btn">
 					<a href="https://partners-subscribe.prestashop.com/stripe/connect.php?params[return_url]={$return_url|escape:'htmlall':'UTF-8'}" class="stripe-connect">
@@ -50,33 +50,31 @@
 					</span>
 					<p class="help-block"></p>
 				</div>
-				<span>{l s='Now that you have created your Stripe account, you have to enter below your API keys in both test and live mode.' mod='stripe_official'}</span>
-				<br/>
 				<span>
-					{{l s='These API keys can be found and managed from your Stripe [a @href1@]dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/apikeys'}, '@target@' => {'target="blank"'}]}
+					{{l s='You can find your API keys in the Developers section of your Stripe [a @href1@]dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/apikeys'}, '@target@' => {'target="blank"'}]}
 				</span>
 			</div>
 
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
-				<label class="control-label col-lg-3 required">{l s='Stripe Publishable Key' mod='stripe_official'}</label>
+				<label class="control-label col-lg-3 required">{l s='Publishable key (live mode)' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<input type="text" name="STRIPE_PUBLISHABLE" id="public_key" value="{$stripe_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group" {if $stripe_mode == 1}style="display: none;"{/if}>
-				<label class="control-label col-lg-3 required">{l s='Stripe Secrey Key' mod='stripe_official'}</label>
+				<label class="control-label col-lg-3 required">{l s='Secret key (live mode)' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<input type="password" name="STRIPE_KEY" id="secret_key" value="{$stripe_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
-				<label class="control-label col-lg-3 required">{l s='Stripe Test Publishable Key' mod='stripe_official'}</label>
+				<label class="control-label col-lg-3 required">{l s='Publishable key (test mode)' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<input type="text" name="STRIPE_TEST_PUBLISHABLE" id="test_public_key" value="{$stripe_test_publishable|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
 			</div>
 			<div class="form-group"{if $stripe_mode == 0}style="display: none;"{/if}>
-				<label class="control-label col-lg-3 required">{l s='Stripe Test Secrey Key' mod='stripe_official'}</label>
+				<label class="control-label col-lg-3 required">{l s='Secret key (test mode)' mod='stripe_official'}</label>
 				<div class="col-lg-9">
 					<input type="password" name="STRIPE_TEST_KEY" id="test_secret_key" value="{$stripe_test_key|escape:'htmlall':'UTF-8'}" class="fixed-width-xxl" size="20" required="required">
 				</div>
@@ -87,24 +85,24 @@
 				<ul>
 					<li>{l s='Toggle the button above to Test Mode.' mod='stripe_official'}</li>
 					<li>
-						{{l s='To perform test payments, you can use test card numbers available in our [a @href1@]documentation[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'http://www.stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}
+						{{l s='You\'ll find test card numbers in our [a @href1@]documentation[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'http://www.stripe.com/docs/testing'}, '@target@' => {'target="blank"'}]}
 					</li>
-					<li>{l s='In Test Mode, you can not run live charges.' mod='stripe_official'}</li>
+					<li>{l s='In test mode, real cards are not accepted.' mod='stripe_official'}</li>
 				</ul>
-				<p><b>{l s='Using Stripe Live' mod='stripe_official'}</b></p>
+				<p><b>{l s='Going live with Stripe' mod='stripe_official'}</b></p>
 				<ul>
 					<li>{l s='Toggle the button above to Live Mode.' mod='stripe_official'}</li>
-					<li>{l s='In Live Mode, you can not run test charges.' mod='stripe_official'}</li>
+					<li>{l s='In live mode, tests are no longer allowed.' mod='stripe_official'}</li>
 				</ul>
 
-				<p><b>{l s='Set up the form' mod='stripe_official'}</b></p>
+				<p><b>{l s='Payment form settings' mod='stripe_official'}</b></p>
 				<ol item="1">
 					<li>
-						<p>{l s='Options for the card payment form' mod='stripe_official'}</p>
+						<p>{l s='Cards' mod='stripe_official'}</p>
 
 						<div class="form-group">
 							<input type="checkbox" id="reinsurance" name="reinsurance" {if $reinsurance}checked="checked"{/if}/>
-							<label for="reinsurance">{l s='Activate extended display containing reinsurance elements (logo of cards. You must choose to display the cards you configured on Stripe\'s dashboard)' mod='stripe_official'}</label><br/>
+							<label for="reinsurance">{l s='Display an extended version of the form with card logos instead of the compact version. Choose the logos to display below based on the brands accepted by your Stripe account.' mod='stripe_official'}</label><br/>
 
 							<input type="checkbox" id="visa" name="visa" {if $visa}checked="checked"{/if}/>
 							<label for="visa">{l s='Visa' mod='stripe_official'}</label><br/>
@@ -126,13 +124,13 @@
 
 						<div class="form-group">
 							<input type="checkbox" id="postcode" name="postcode" {if $postcode}checked="checked"{/if}/>
-							<label for="postcode">{l s='Disable the Postal Code field for cards from the United States, United Kingdom and Canada (not recommended *).' mod='stripe_official'}</label><br/>
-							<span>*{l s='Collecting postal code optimizes the chances of successful payment for these countries.' mod='stripe_official'}</span>
+							<label for="postcode">{l s='Never collect the postal code (not recommended*).' mod='stripe_official'}</label><br/>
+							<span>*{l s='This information improves the acceptance rates for cards issued in the United States, the United Kingdom and Canada.' mod='stripe_official'}</span>
 						</div>
 
 						<div class="form-group">
 							<input type="checkbox" id="save_card" name="save_card" {if $save_card}checked="checked"{/if}/>
-							<label for="save_card">{l s='Enable the option for users to register their card' mod='stripe_official'}</label><br/>
+							<label for="save_card">{l s='Save customer cards (for later one-click payments)' mod='stripe_official'}</label><br/>
 
 							<input type="radio" name="ask_customer" id="ask_yes" value="1" {if $ask_customer == 1}checked{/if}/>
 							<label for="ask_yes">{l s='Ask the customer' mod='stripe_official'}</label><br/>
@@ -143,7 +141,7 @@
 
 						<div class="form-group">
 							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
-							<label for="cardholdername">{l s='Activate display of card holder name' mod='stripe_official'}</label>
+							<label for="cardholdername">{l s='Collect the card holder name' mod='stripe_official'}</label>
 						</div>
 
 						<div class="form-group">
@@ -191,36 +189,35 @@
 						</div>
 					</li>
 					<li>
-						<p>{l s='Additional payment methods (For users in Europe only): iDEAL, Bancontact, SOFORT and Giropay.' mod='stripe_official'}</p>
+						<p>{l s='Local payment methods' mod='stripe_official'}</p>
 						<p>
-							{{l s='These payment methods are available within this plugin for our European users only. To activate them, follow these [b]three steps:[/b]' mod='stripe_official'}|stripelreplace}
+							{l s='Only European merchants can use these payment methods at the moment. To start accepting them, follow these steps:' mod='stripe_official'}
 						</p>
 
 						<ol type="A">
 							<li>
-								{l s='Select below each payment method you wish to offer on your website :' mod='stripe_official'}
+								{l s='Enable the relevant payment methods in this module:' mod='stripe_official'}
 								<br><br>
 								<div class="form-group">
 									<input type="checkbox" id="ideal" name="ideal" {if $ideal}checked="checked"{/if}/>
-									<label for="ideal">{l s='Activate iDEAL (if you have Dutch customers)' mod='stripe_official'}</label><br>
+									<label for="ideal">{l s='iDEAL (if you have Dutch customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="bancontact" name="bancontact" {if $bancontact}checked="checked"{/if}/>
-									<label for="bancontact">{l s='Activate Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
+									<label for="bancontact">{l s='Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
-									<label for="sofort">{l s='Activate SOFORT (if you have German, Austrian customers)' mod='stripe_official'}</label><br>
+									<label for="sofort">{l s='SOFORT (if you have German or Austrian customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-									<label for="giropay">{l s='Activate Giropay (if you have German customers)' mod='stripe_official'}</label><br>
+									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
 									<label for="applepay_googlepay">
-										{{l s='Enable Payment Request Buttons. (Apple Pay/Google Pay)[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
+										{{l s='Digital wallets, i.e. Apple Pay, Google Pay and Microsoft Pay.[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
 									</label>
 								</div>
 
 							</li>
 							<li>
-								{{l s='Activate these payment methods on your [a @href1@]Stripe dashboard[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
+								{{l s='Go to your [a @href1@]payment methods settings[/a] in your Stripe Dashboard and activate the relevant payment methods.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
 							</li>
-							<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to activate.' mod='stripe_official'}
-								{l s='Once you\'ve submitted this form, the payment method will move from pending to live within 10 minutes.' mod='stripe_official'}</p>
+							<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to be activated.' mod='stripe_official'}</p>
 						</ol>
 					</li>
 				</ol>

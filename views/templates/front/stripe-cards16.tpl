@@ -21,7 +21,7 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
 *}
-<h2>{l s='My Cards' mod='stripe_official'}</h2>
+<h2>{l s='My cards' mod='stripe_official'}</h2>
 
 {if $cards|@count > 0}
     <table class="table table-striped table-bordered table-labeled table-responsive-lg">

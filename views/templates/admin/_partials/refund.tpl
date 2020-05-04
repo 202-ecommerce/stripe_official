@@ -36,7 +36,7 @@
                 <div class="col-lg-9">
                     <input type="text" name="STRIPE_REFUND_ID" id="STRIPE_REFUND_ID" value="" class="fixed-width-xxl" required="required">
                     <p class="help-block">
-                        <i>{l s='To process a refund, please input Stripe\'s payment ID below, which can be found in the « Payments » tab of this plugin' mod='stripe_official'}</i>
+                        <i>{l s='You can find that ID in the Stripe tab of the order you\'d like to refund. It starts with "ch_" or "py_".' mod='stripe_official'}</i>
                     </p>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="STRIPE_REFUND_MODE" id="active_off_refund" value="0">{l s='Partial Refund' mod='stripe_official'}
+                            <input type="radio" name="STRIPE_REFUND_MODE" id="active_off_refund" value="0">{l s='Partial refund' mod='stripe_official'}
                         </label>
                     </div>
                     <p class="help-block">

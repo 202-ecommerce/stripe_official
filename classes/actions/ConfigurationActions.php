@@ -51,7 +51,7 @@ class ConfigurationActions extends DefaultActions
                         Configuration::updateValue(Stripe_official::TEST_PUBLISHABLE, $publishable_key);
                     }
                 } else {
-                    $this->module->errors[] = $this->module->l('mode test with API key live');
+                    $this->module->errors[] = $this->module->l('Live API keys provided instead of test API keys');
                 }
             } else {
                 $this->module->errors[] = $this->module->l('Client ID and Secret Key fields are mandatory');
@@ -69,7 +69,7 @@ class ConfigurationActions extends DefaultActions
                         Configuration::updateValue(Stripe_official::PUBLISHABLE, $publishable_key);
                     }
                 } else {
-                    $this->module->errors['keys'] = $this->module->l('mode live with API key test');
+                    $this->module->errors['keys'] = $this->module->l('Test API keys provided instead of live API keys');
                 }
             } else {
                 $this->module->errors[] = $this->module->l('Client ID and Secret Key fields are mandatory');
@@ -94,7 +94,7 @@ class ConfigurationActions extends DefaultActions
             Configuration::updateValue(Stripe_official::CAPTURE_STATUS, Tools::getValue('order_status_select'));
             Configuration::updateValue(Stripe_official::CATCHANDAUTHORIZE, Tools::getValue('catchandauthorize'));
         } else {
-            $this->module->errors[] = $this->module->l('To enable the separate authorization and capture, you need to select at least one order status to trigger the capture and confirm that you understand the risk.');
+            $this->module->errors[] = $this->module->l('Enable separate authorization and capture.');
         }
 
         return true;
@@ -140,7 +140,7 @@ class ConfigurationActions extends DefaultActions
         Configuration::updateValue(Stripe_official::DISCOVERS, Tools::getValue('discovers'));
 
         if (!count($this->module->errors)) {
-            $this->module->success = $this->module->l('Data succesfuly saved.');
+            $this->module->success = $this->module->l('Settings updated successfully.');
         }
 
         return true;
