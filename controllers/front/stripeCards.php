@@ -32,22 +32,26 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
     {
         parent::initContent();
 
-        $stripeCustomer = new StripeCustomer();
-        $stripeCustomer->getCustomerById($this->context->customer->id);
+        $allCards = array();
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        $allCards = $stripeCard->getAllCustomerCards();
+        if ($this->context->customer->id != null) {
+            $stripeCustomer = new StripeCustomer();
+            $stripeCustomer->getCustomerById($this->context->customer->id);
+
+            $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+            $allCards = $stripeCard->getAllCustomerCards();
+
+            foreach ($allCards as &$card) {
+                if ($card->card->exp_month < 10) {
+                    $card->card->exp_month = '0'.$card->card->exp_month;
+                }
+                $card->card->exp_year = substr($card->card->exp_year, -2);
+            }
+        }
 
         $this->context->smarty->assign(array(
             'cards' => $allCards
         ));
-
-        foreach ($allCards as &$card) {
-            if ($card->card->exp_month < 10) {
-                $card->card->exp_month = '0'.$card->card->exp_month;
-            }
-            $card->card->exp_year = substr($card->card->exp_year, -2);
-        }
 
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $this->setTemplate('module:stripe_official/views/templates/front/stripe-cards.tpl');
