@@ -123,9 +123,21 @@
 						</div>
 
 						<div class="form-group">
+							<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
+							<label for="applepay_googlepay">
+								{{l s='Digital wallets, i.e. Apple Pay, Google Pay and Microsoft Pay.[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
+							</label>
+						</div>
+
+						<div class="form-group">
 							<input type="checkbox" id="postcode" name="postcode" {if $postcode}checked="checked"{/if}/>
 							<label for="postcode">{l s='Never collect the postal code (not recommended*).' mod='stripe_official'}</label><br/>
 							<span>*{l s='This information improves the acceptance rates for cards issued in the United States, the United Kingdom and Canada.' mod='stripe_official'}</span>
+						</div>
+
+						<div class="form-group">
+							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
+							<label for="cardholdername">{l s='Collect the card holder name' mod='stripe_official'}</label>
 						</div>
 
 						<div class="form-group">
@@ -137,11 +149,6 @@
 
 							<input type="radio" name="ask_customer" id="ask_no" value="0" {if $ask_customer == 0}checked{/if}/>
 							<label for="ask_no">{l s='Save without asking' mod='stripe_official'}</label>
-						</div>
-
-						<div class="form-group">
-							<input type="checkbox" id="cardholdername" name="cardholdername" {if $cardholdername}checked="checked"{/if}/>
-							<label for="cardholdername">{l s='Collect the card holder name' mod='stripe_official'}</label>
 						</div>
 
 						<div class="form-group">
@@ -206,13 +213,8 @@
 									<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
 									<label for="sofort">{l s='SOFORT (if you have German or Austrian customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="applepay_googlepay" name="applepay_googlepay" {if $applepay_googlepay}checked="checked"{/if}/>
-									<label for="applepay_googlepay">
-										{{l s='Digital wallets, i.e. Apple Pay, Google Pay and Microsoft Pay.[br]By using Apple Pay, you agree to [a @href1@]Stripe[/a] and [a @href2@]Apple[/a]\'s terms of service.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://stripe.com/us/legal'}, '@href2@' => {'https://www.apple.com/legal/internet-services/terms/site.html'}, '@target@' => {'target="blank"'}]}
-									</label>
+									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label>
 								</div>
-
 							</li>
 							<li>
 								{{l s='Go to your [a @href1@]payment methods settings[/a] in your Stripe Dashboard and activate the relevant payment methods.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
