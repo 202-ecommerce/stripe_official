@@ -953,7 +953,7 @@ class Stripe_official extends PaymentModule
                 }
 
                 // Check that the currency is still correct
-                if ($intent->currency != $currency) {
+                if ($intent->currency != Tools::strtolower($currency)) {
                     $intent->update(
                         $this->context->cookie->stripe_payment_intent,
                         array(
