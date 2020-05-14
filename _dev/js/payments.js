@@ -107,24 +107,37 @@ $(function(){
 
       if ($('#stripe-payment-request-button').length > 0) {
         // Callback when a source is created.
-        paymentRequest.on('source', async event => {
-          // Confirm the PaymentIntent with the source returned from the payment request.
-          const { error } = await stripe.confirmPaymentIntent(
-            stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
-          );
-
-          if (error) {
-            // Report to the browser that the payment failed.
-            event.complete('fail');
+        paymentRequest.on('paymentmethod', function(event) {
+          if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
+            cardPayment = {
+              payment_method: event.paymentMethod.id,
+              setup_future_usage: 'on_session'
+            }
+            saveCard = true;
           } else {
-            // Report to the browser that the confirmation was successful, prompting
-            // it to close the browser payment method collection interface.
-            event.complete('success');
-            $submit.attr('disabled', 'disabled');
-            // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
-            const response = await stripe.handleCardPayment(stripe_client_secret);
-            handlePayment(response);
+            cardPayment = {
+              payment_method: event.paymentMethod.id
+            }
+            saveCard = false;
           }
+
+          // Confirm the PaymentIntent.
+          stripe.confirmCardPayment(
+            stripe_client_secret,
+            cardPayment
+          ).then(function(response) {
+            if (response.error) {
+              // Report to the browser that the payment failed, prompting it to
+              // re-show the payment interface, or show an error message and close
+              // the payment interface.
+              event.complete('fail');
+            } else {
+              // Report to the browser that the confirmation was successful, prompting
+              // it to close the browser payment method collection interface.
+              event.complete('success');
+              handlePayment(response);
+            }
+          });
         });
 
         // Create the Payment Request Button.
