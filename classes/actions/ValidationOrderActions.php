@@ -85,6 +85,7 @@ class ValidationOrderActions extends DefaultActions
         \Stripe\Stripe::setApiKey($secret_key);
 
         $amount = $this->context->cart->getOrderTotal();
+
         if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
             $amount = $amount * 100;
         }
@@ -100,7 +101,7 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
         $this->conveyor['status'] = $response->status;
         $this->conveyor['chargeId'] = $response->id;
-        $this->conveyor['amount'] = $amount;
+        $this->conveyor['amount'] = $this->context->cart->getOrderTotal();
 
         return true;
     }
