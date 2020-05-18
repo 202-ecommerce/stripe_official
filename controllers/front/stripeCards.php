@@ -38,14 +38,16 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
             $stripeCustomer = new StripeCustomer();
             $stripeCustomer->getCustomerById($this->context->customer->id);
 
-            $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-            $allCards = $stripeCard->getAllCustomerCards();
+            if ($stripeCustomer->id != null) {
+                $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+                $allCards = $stripeCard->getAllCustomerCards();
 
-            foreach ($allCards as &$card) {
-                if ($card->card->exp_month < 10) {
-                    $card->card->exp_month = '0'.$card->card->exp_month;
+                foreach ($allCards as &$card) {
+                    if ($card->card->exp_month < 10) {
+                        $card->card->exp_month = '0'.$card->card->exp_month;
+                    }
+                    $card->card->exp_year = substr($card->card->exp_year, -2);
                 }
-                $card->card->exp_year = substr($card->card->exp_year, -2);
             }
         }
 
