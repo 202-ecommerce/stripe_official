@@ -924,6 +924,30 @@ class Stripe_official extends PaymentModule
     */
     protected function retrievePaymentIntent($amount, $currency)
     {
+        $address = new Address($this->context->cart->id_address_invoice);
+        $country = Country::getIsoById($address->id_country);
+        $currency = Tools::strtolower($this->context->currency->iso_code);
+
+        $options = array();
+        foreach (self::$paymentMethods as $name => $paymentMethod) {
+            // Check if the payment method is enabled
+            if ($paymentMethod['enable'] !== true && Configuration::get($paymentMethod['enable']) != 'on') {
+                continue;
+            }
+
+            // Check for country support
+            if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
+                continue;
+            }
+
+            // Check for currency support
+            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
+                continue;
+            }
+
+            $options[] = $name;
+        }
+
         if (isset($this->context->cookie->stripe_payment_intent)
             && !empty($this->context->cookie->stripe_payment_intent)) {
             try {
@@ -962,6 +986,13 @@ class Stripe_official extends PaymentModule
                     );
                 }
 
+                $intent->update(
+                    $this->context->cookie->stripe_payment_intent,
+                    array(
+                        "payment_method_types" => array($options)
+                    )
+                );
+
                 return $intent;
             } catch (Exception $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
@@ -973,30 +1004,6 @@ class Stripe_official extends PaymentModule
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 unset($this->context->cookie->stripe_payment_intent);
             }
-        }
-
-        $address = new Address($this->context->cart->id_address_invoice);
-        $country = Country::getIsoById($address->id_country);
-        $currency = Tools::strtolower($this->context->currency->iso_code);
-
-        $options = array();
-        foreach (self::$paymentMethods as $name => $paymentMethod) {
-            // Check if the payment method is enabled
-            if ($paymentMethod['enable'] !== true && Configuration::get($paymentMethod['enable']) != 'on') {
-                continue;
-            }
-
-            // Check for country support
-            if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
-                continue;
-            }
-
-            // Check for currency support
-            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
-                continue;
-            }
-
-            $options[] = $name;
         }
 
         try {
@@ -1281,6 +1288,13 @@ class Stripe_official extends PaymentModule
             'stripe_validation_return_url' => $this->context->link->getModuleLink(
                 $this->name,
                 'validation',
+                array(),
+                true
+            ),
+
+            'stripe_retrieve_intent_url' => $this->context->link->getModuleLink(
+                $this->name,
+                'updateIntent',
                 array(),
                 true
             ),

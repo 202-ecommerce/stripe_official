@@ -325,12 +325,28 @@ $(function(){
           saveCard = false;
         }
 
-        const response = await stripe.confirmCardPayment(
-          stripe_client_secret,
-          cardPayment
-        )
-        .then(function(response) {
-          handlePayment(response);
+        $.ajax({
+            type: 'POST',
+            dataType: 'text',
+            async: false,
+            url: stripe_retrieve_intent_url,
+            data: {
+                id_payment_intent: stripe_payment_id,
+                payment: payment
+            },
+            success: function(datas) {
+              console.log('success');
+                const response = stripe.confirmCardPayment(
+                stripe_client_secret,
+                cardPayment
+              )
+              .then(function(response) {
+                handlePayment(response);
+              });
+            },
+            error: function(err) {
+                console.log(err);
+            }
         });
       } else if (payment === 'sepa_debit') {
         // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
@@ -355,9 +371,33 @@ $(function(){
         // Add extra source information which are specific to a payment method.
         switch (payment) {
           case 'ideal':
-            // iDEAL: Add the selected Bank from the iDEAL Bank Element.
-            const {source} = await stripe.createSource(idealBank, sourceData);
-            handleSourceActivation(source, $form);
+            disableSubmit(disableText, 'Redirecting…');
+            stripe.confirmIdealPayment(
+              stripe_client_secret,
+              {
+                payment_method: {
+                  ideal: idealBank,
+                  billing_details: {
+                    address: {
+                      city: stripe_address.city,
+                      country: stripe_address_country_code,
+                      line1: stripe_address.address1,
+                      line2: stripe_address.address2,
+                      postal_code: stripe_address.postcode
+                    },
+                    email: stripe_email,
+                    name: stripe_fullname
+                  }
+                },
+                return_url: stripe_validation_return_url
+              }
+            ).then(function(result) {
+              console.log(result);
+              if (result.error) {
+                // Inform the customer that there was an error.
+                console.log('error confirmidealpayment');
+              }
+            });
             return;
             break;
           case 'sofort':

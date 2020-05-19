@@ -107,6 +107,32 @@ class ValidationOrderActions extends DefaultActions
     }
 
     /*
+        Input : 'id_payment_intent', 'context', 'module'
+        Output : 'currency', token', 'status', 'chargeId', 'amount'
+     */
+    public function prepareFlowRedirectPaymentIntent()
+    {
+        $this->context = $this->conveyor['context'];
+        $this->module = $this->conveyor['module'];
+
+        $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
+        $charges = $intent->charges->data;
+
+        $this->conveyor['currency'] = $charges[0]->currency;
+        $this->conveyor['token'] = $charges[0]->payment_method;
+        $this->conveyor['status'] = $charges[0]->status;
+        $this->conveyor['chargeId'] = $charges[0]->id;
+
+        if ($this->module->isZeroDecimalCurrency($charges[0]->currency)) {
+            $this->conveyor['amount'] = $charges[0]->amount;
+        } else {
+            $this->conveyor['amount'] = $charges[0]->amount / 100;
+        }
+
+        return true;
+    }
+
+    /*
         Input : 'id_payment_intent', 'status'
         Output : 'paymentIntent'
      */
