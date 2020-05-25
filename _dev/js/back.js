@@ -59,14 +59,24 @@ $(document).ready(function () {
     addOrderStateOption(this);
   });
 
-  $('input#catchandauthorize').change(function(event) {
-    if ($(this).is(':checked')) {
-      $('#order_status_select_1, #order_status_select_2, #capture_expired').removeAttr('disabled');
-    } else {
-      $('#order_status_select_1, #order_status_select_2, #capture_expired').attr('disabled', 'disabled');
-    }
+  $('input#catchandauthorize, input#save_card, input#reinsurance').change(function(event) {
+    disableInputs($(this));
   });
+
+  disableInputs($('input#catchandauthorize'));
+  disableInputs($('input#save_card'));
+  disableInputs($('input#reinsurance'));
 });
+
+function disableInputs(element) {
+  if (element.is(':checked')) {
+    element.closest('.form-group').find('.child').removeAttr('disabled');
+    element.closest('.form-group').find('.left20').css('display', 'inline-block');
+  } else {
+    element.closest('.form-group').find('.child').attr('disabled', 'disabled');
+    element.closest('.form-group').find('.left20').css('display', 'none');
+  }
+}
 
 // Init faq tabs
 // Opens/closes answer on click.
