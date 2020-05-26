@@ -166,7 +166,7 @@
 									<tr>
 										<td class="col-md-6">
 											<p>{l s='Your status' mod='stripe_official'}</p>
-											<select id="order_status_select_1" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+											<select id="order_status_select_1" class="input-large child" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.unselected item='orderState'}
 													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
@@ -175,7 +175,7 @@
 										</td>
 										<td class="col-md-6">
 											<p>{l s='Catch status' mod='stripe_official'}</p>
-											<select id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+											<select id="order_status_select_2" class="input-large child" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.selected item='orderState'}
 													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
@@ -188,7 +188,7 @@
 
 							<div class="left20">
 								<p>{l s='Capture the payment when transitioning to the following order status or statuses.' mod='stripe_official'}</p>
-								<select name="capture_expired" id="capture_expired" {if $catchandauthorize == false}disabled{/if}>
+								<select name="capture_expired" id="capture_expired" class="child" {if $catchandauthorize == false}disabled{/if}>
 									<option value="0">{l s='Choisir un statut'}</option>
 									{foreach from=$allOrderStatus item=status}
 										<option value="{$status.id_order_state|intval}" {if isset($captureExpire) && $captureExpire == $status.id_order_state}selected="selected"{/if}>{$status.name|escape}</option>
