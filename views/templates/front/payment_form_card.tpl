@@ -100,7 +100,7 @@
             <div id="save_card">
                 <p class="checkbox">
                     <input type="checkbox" name="stripe_save_card" id="stripe_save_card" value="1">
-                    <label for="stripe_save_card" class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if}">{l s='Save card for future purchases' mod='stripe_official'}</label><br/>
+                    <label for="stripe_save_card" class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if} ml-2">{l s='Save card for future purchases' mod='stripe_official'}</label><br/>
                     <span class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if}">{l s='Your card details are protected using PCI DSS v3.2 security standards.' mod='stripe_official'}</span>
                 </p>
             </div>
