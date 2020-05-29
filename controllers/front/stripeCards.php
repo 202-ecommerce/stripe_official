@@ -44,7 +44,7 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
 
                 foreach ($allCards as &$card) {
                     $card->card->exp_month = sprintf('%02d', $card->card->exp_month);
-                    $card->card->exp_year = substr($card->card->exp_year, -2);
+                    $card->card->exp_year = Tools::substr($card->card->exp_year, -2);
                 }
             }
         }
