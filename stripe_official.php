@@ -1401,7 +1401,7 @@ class Stripe_official extends PaymentModule
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id,
                 'last4' => $card->card->last4,
-                'brand' => ucfirst($card->card->brand)
+                'brand' => Tools::ucfirst($card->card->brand)
             ));
 
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_save_card.tpl');
@@ -1548,7 +1548,7 @@ class Stripe_official extends PaymentModule
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
             ->setModuleName($this->name)
-            ->setCallToActionText($this->button_label['save_card'].' : '.ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+            ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
 
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id
