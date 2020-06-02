@@ -22,11 +22,11 @@
  * @license   Commercial license
 *}
 
-{extends file=$layout}
-
-{block name='content'}
-    <p>
-        {l s='An error occured during your payment.' mod='stripe_official'}<br />
-        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
-    </p>
-{/block}
+<form class="stripe-payment-form save_card" action="">
+    {if $prestashop_version == '1.7'}
+        <input type="hidden" name="stripe-payment-method" value="card" data-id_payment_method="{$id_payment_method}">
+    {else}
+        <p>{l s='Pay by card:' mod='stripe_official'} {$brand} **** **** **** {$last4}</p>
+        <button class="stripe-submit-button" data-method="card" data-id_payment_method="{$id_payment_method}">{l s='Buy now' mod='stripe_official'}</button>
+    {/if}
+</form>

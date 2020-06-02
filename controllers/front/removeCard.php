@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,13 +21,25 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-{extends file=$layout}
+class stripe_officialRemoveCardModuleFrontController extends ModuleFrontController
+{
+    /**
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        parent::initContent();
 
-{block name='content'}
-    <p>
-        {l s='An error occured during your payment.' mod='stripe_official'}<br />
-        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
-    </p>
-{/block}
+        $stripeCard = new StripeCard();
+        $stripeCard->payment_method = Tools::getValue('id_payment_method');
+        if (!$stripeCard->delete()) {
+            echo 'Error during card delete';
+            exit;
+        }
+
+        echo 'Card deleted with success';
+        exit;
+    }
+}

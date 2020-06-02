@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,13 +21,27 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-{extends file=$layout}
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-{block name='content'}
-    <p>
-        {l s='An error occured during your payment.' mod='stripe_official'}<br />
-        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
-    </p>
-{/block}
+use Stripe_officialClasslib\Actions\ActionsHandler;
+
+function upgrade_module_2_1_0($module)
+{
+    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+    $installer->installObjectModel('StripeCapture');
+    $installer->installObjectModel('StripeCustomer');
+    $installer->registerHooks();
+
+    $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
+    $handler->setConveyor(array(
+                'context' => Context::getContext()
+            ));
+    $handler->addActions('registerWebhookSignature');
+    $handler->process('Configuration');
+
+    return true;
+}

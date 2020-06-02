@@ -34,6 +34,10 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 */
 require_once dirname(__FILE__) . '/classes/StripePayment.php';
 require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
+require_once dirname(__FILE__) . '/classes/StripeCapture.php';
+require_once dirname(__FILE__) . '/classes/StripeCustomer.php';
+require_once dirname(__FILE__) . '/classes/StripeCard.php';
+require_once dirname(__FILE__) . '/classes/StripeWebhook.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -44,6 +48,7 @@ require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
 *
 * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
 * // use Stripe_officialClasslib\Install\ModuleInstaller;
+* // use Stripe_officialClasslib\Actions\ActionsHandler;
 * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
 *
 * Developpers use declarative method to define objects, parameters, controllers... needed in this module
@@ -61,6 +66,7 @@ class Stripe_official extends PaymentModule
     const TEST_PUBLISHABLE = 'STRIPE_TEST_PUBLISHABLE';
     const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
+    const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
@@ -82,6 +88,12 @@ class Stripe_official extends PaymentModule
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
     const REFUND_AMOUNT = 'STRIPE_REFUND_AMOUNT';
+    const CATCHANDAUTHORIZE = 'STRIPE_CATCHANDAUTHORIZE';
+    const CAPTURE_STATUS = 'STRIPE_CAPTURE_STATUS';
+    const CAPTURE_EXPIRE = 'STRIPE_CAPTURE_EXPIRE';
+    const SAVE_CARD = 'STRIPE_SAVE_CARD';
+    const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
+    const WEBHOOK_SIGNATURE = 'STRIPE_WEBHOOK_SIGNATURE';
 
     /**
      * List of objectModel used in this Module
@@ -90,6 +102,8 @@ class Stripe_official extends PaymentModule
     public $objectModels = array(
         'StripePayment',
         'StripePaymentIntent',
+        'StripeCapture',
+        'StripeCustomer',
     );
 
     /**
@@ -122,6 +136,7 @@ class Stripe_official extends PaymentModule
       */
     public $controllers = array(
         'orderFailure',
+        'stripeCards',
     );
 
     /**
@@ -140,6 +155,9 @@ class Stripe_official extends PaymentModule
         'payment',
         'displayPaymentEU',
         'adminOrder',
+        'actionOrderStatusUpdate',
+        'displayMyAccountBlock',
+        'displayCustomerAccount',
     );
 
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
@@ -147,36 +165,50 @@ class Stripe_official extends PaymentModule
         'card' => array(
           'name' => 'Card',
           'flow' => 'none',
-          'enable' => true
+          'enable' => true,
+          'catch_enable' => true
         ),
         'bancontact' => array(
           'name' => 'Bancontact',
           'flow' => 'redirect',
           'countries' => array('BE'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_BANCONTACT
+          'enable' => self::ENABLE_BANCONTACT,
+          'catch_enable' => false
         ),
         'giropay' => array(
           'name' => 'Giropay',
           'flow' => 'redirect',
           'countries' => array('DE'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_GIROPAY
+          'enable' => self::ENABLE_GIROPAY,
+          'catch_enable' => false
         ),
         'ideal' => array(
           'name' => 'iDEAL',
           'flow' => 'redirect',
           'countries' => array('NL'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_IDEAL
+          'enable' => self::ENABLE_IDEAL,
+          'catch_enable' => false
         ),
         'sofort' => array(
           'name' => 'SOFORT',
           'flow' => 'redirect',
           'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
           'currencies' => array('eur'),
-          'enable' => self::ENABLE_SOFORT
+          'enable' => self::ENABLE_SOFORT,
+          'catch_enable' => false
         ),
+    );
+
+    public static $webhook_events = array(
+        'charge.expired',
+        'charge.failed',
+        'charge.succeeded',
+        'charge.pending',
+        'charge.captured',
+        'charge.refunded'
     );
 
     /* refund */
@@ -214,6 +246,7 @@ class Stripe_official extends PaymentModule
         $this->button_label['giropay'] = $this->l('Pay by Giropay');
         $this->button_label['ideal'] = $this->l('Pay by iDEAL');
         $this->button_label['sofort'] = $this->l('Pay by SOFORT');
+        $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
         $this->displayName = $this->l('Stripe payment module', $this->name);
@@ -396,6 +429,47 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
         }
 
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::CAPTURE_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('En attente de capture Stripe');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('A la espera de captura Stripe');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('Auf Festnahme Stripe warten');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('Wachten op opname van Stripe');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa di cattura Stripe');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for Stripe capture');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#03befc';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
+        }
+
         return true;
     }
 
@@ -436,68 +510,15 @@ class Stripe_official extends PaymentModule
 
         /* Do Log In  */
         if (Tools::isSubmit('submit_login')) {
-            if (Tools::getValue(self::MODE) == 1) {
-                $secret_key = trim(Tools::getValue(self::TEST_KEY));
-                $publishable_key = trim(Tools::getValue(self::TEST_PUBLISHABLE));
+            $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
+            $handler->setConveyor(array(
+                        'context' => $this->context,
+                        'module' => $this
+                    ));
 
-                if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, '_test_') !== false && strpos($publishable_key, '_test_') !== false) {
-                        if ($this->checkApiConnection($secret_key)) {
-                            Configuration::updateValue(self::TEST_KEY, $secret_key);
-                            Configuration::updateValue(self::TEST_PUBLISHABLE, $publishable_key);
-                        }
-                    } else {
-                        $this->errors[] = $this->l('mode test with API key live');
-                    }
-                } else {
-                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
-                }
+            $handler->addActions('registerKeys', 'registerCatchAndAuthorize', 'registerSaveCard', 'registerOtherConfigurations', 'registerApplePayDomain', 'registerWebhookSignature');
 
-                Configuration::updateValue(self::MODE, Tools::getValue(self::MODE));
-            } else {
-                $secret_key = trim(Tools::getValue(self::KEY));
-                $publishable_key = trim(Tools::getValue(self::PUBLISHABLE));
-
-                if (!empty($secret_key) && !empty($publishable_key)) {
-                    if (strpos($secret_key, '_live_') !== false && strpos($publishable_key, '_live_') !== false) {
-                        if ($this->checkApiConnection($secret_key)) {
-                            Configuration::updateValue(self::KEY, $secret_key);
-                            Configuration::updateValue(self::PUBLISHABLE, $publishable_key);
-                        }
-                    } else {
-                        $this->errors['keys'] = $this->l('mode live with API key test');
-                    }
-                } else {
-                    $this->errors[] = $this->l('Client ID and Secret Key fields are mandatory');
-                }
-
-                Configuration::updateValue(self::MODE, Tools::getValue(self::MODE));
-            }
-
-            if (!count($this->errors)) {
-                $this->success = $this->l('Data succesfuly saved.');
-            }
-
-            Configuration::updateValue(self::ENABLE_IDEAL, Tools::getValue('ideal'));
-            Configuration::updateValue(self::ENABLE_SOFORT, Tools::getValue('sofort'));
-            Configuration::updateValue(self::ENABLE_GIROPAY, Tools::getValue('giropay'));
-            Configuration::updateValue(self::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
-            Configuration::updateValue(self::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
-            Configuration::updateValue(self::POSTCODE, Tools::getValue('postcode'));
-            Configuration::updateValue(self::CARDHOLDERNAME, Tools::getValue('cardholdername'));
-            Configuration::updateValue(self::REINSURANCE, Tools::getValue('reinsurance'));
-            Configuration::updateValue(self::VISA, Tools::getValue('visa'));
-            Configuration::updateValue(self::MASTERCARD, Tools::getValue('mastercard'));
-            Configuration::updateValue(self::AMERICAN_EXPRESS, Tools::getValue('american_express'));
-            Configuration::updateValue(self::CB, Tools::getValue('cb'));
-            Configuration::updateValue(self::DINERS_CLUB, Tools::getValue('diners_club'));
-            Configuration::updateValue(self::UNION_PAY, Tools::getValue('union_pay'));
-            Configuration::updateValue(self::JCB, Tools::getValue('jcb'));
-            Configuration::updateValue(self::DISCOVERS, Tools::getValue('discovers'));
-
-            if (Configuration::get(self::KEY) && Configuration::get(self::KEY) != '') {
-                $this->addAppleDomainAssociation(Configuration::get(self::KEY));
-            }
+            $handler->process('Configuration');
         }
 
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
@@ -515,7 +536,7 @@ class Stripe_official extends PaymentModule
                 $query->where('id_stripe = "'.pSQL($refund_id).'"');
                 $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
             } else {
-                $this->errors[] = $this->l('Please make sure to put a Stripe Id');
+                $this->errors[] = $this->l('The Stripe Payment ID can\'t be empty.');
                 return false;
             }
 
@@ -524,7 +545,7 @@ class Stripe_official extends PaymentModule
                 Configuration::updateValue(self::REFUND_ID, Tools::getValue(self::REFUND_ID));
             } else {
                 $this->refund = 0;
-                $this->errors[] = $this->l('This Stripe ID doesn\'t exist, please check it again');
+                $this->errors[] = $this->l('Unknown Stripe Payment ID.');
                 Configuration::updateValue(self::REFUND_ID, '');
             }
 
@@ -542,7 +563,7 @@ class Stripe_official extends PaymentModule
             }
         }
 
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+        if (Tools::usingSecureMode()) {
             $domain = Tools::getShopDomainSsl(true, true);
         } else {
             $domain = Tools::getShopDomain(true, true);
@@ -561,11 +582,38 @@ class Stripe_official extends PaymentModule
             $keys_configured = false;
         }
 
+        $allOrderStatus = OrderState::getOrderStates($this->context->language->id);
+        $statusSelected = array();
+        $statusUnselected = array();
+
+        if (Configuration::get(self::CAPTURE_STATUS) && Configuration::get(self::CAPTURE_STATUS) != '') {
+            $capture_status = explode(',', Configuration::get(self::CAPTURE_STATUS));
+            foreach ($allOrderStatus as $status) {
+                if (in_array($status['id_order_state'], $capture_status)) {
+                    $statusSelected[] = $status;
+                } else {
+                    $statusUnselected[] = $status;
+                }
+            }
+        } else {
+            $statusUnselected = $allOrderStatus;
+        }
+
+        $orderStatus['selected'] = $statusSelected;
+        $orderStatus['unselected'] = $statusUnselected;
+
         $this->context->smarty->assign(array(
             'logo' => $domain.__PS_BASE_URI__.basename(_PS_MODULE_DIR_).'/'.$this->name.'/views/img/Stripe_logo.png',
             'new_base_dir', $this->_path,
             'keys_configured' => $keys_configured,
             'link' => new Link(),
+            'catchandauthorize' => Configuration::get(self::CATCHANDAUTHORIZE),
+            'orderStatus' => $orderStatus,
+            'orderStatusSelected' => Configuration::get(self::CAPTURE_STATUS),
+            'allOrderStatus' => $allOrderStatus,
+            'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
+            'save_card' => Configuration::get(self::SAVE_CARD),
+            'ask_customer' => Configuration::get(self::ASK_CUSTOMER),
         ));
 
         $this->displaySomething();
@@ -644,7 +692,7 @@ class Stripe_official extends PaymentModule
     {
         if (!is_dir(_PS_ROOT_DIR_.'/.well-known')) {
             if (!mkdir(_PS_ROOT_DIR_.'/.well-known')) {
-                $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                $this->warning[] = $this->l('Settings updated successfully.');
                 return false;
             }
         }
@@ -837,7 +885,7 @@ class Stripe_official extends PaymentModule
         }
     }
 
-    protected function checkApiConnection($secretKey = null)
+    public function checkApiConnection($secretKey = null)
     {
         if (!$secretKey) {
             $secretKey = $this->getSecretKey();
@@ -881,6 +929,19 @@ class Stripe_official extends PaymentModule
             try {
                 $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
 
+                $stripeCustomer = new StripeCustomer();
+                $stripeCustomer->getCustomerById($this->context->customer->id);
+
+                // Associate customer to PI in order to pay with saved cards
+                if ($stripeCustomer->stripe_customer_key != '') {
+                    $intent->update(
+                        $this->context->cookie->stripe_payment_intent,
+                        array(
+                            "customer" => $stripeCustomer->stripe_customer_key
+                        )
+                    );
+                }
+
                 // Check that the amount is still correct
                 if ($intent->amount != $amount) {
                     $intent->update(
@@ -892,7 +953,7 @@ class Stripe_official extends PaymentModule
                 }
 
                 // Check that the currency is still correct
-                if ($intent->currency != $currency) {
+                if ($intent->currency != Tools::strtolower($currency)) {
                     $intent->update(
                         $this->context->cookie->stripe_payment_intent,
                         array(
@@ -939,10 +1000,17 @@ class Stripe_official extends PaymentModule
         }
 
         try {
+            if (Configuration::get(self::CATCHANDAUTHORIZE)) {
+                $capture_method = 'manual';
+            } else {
+                $capture_method = 'automatic';
+            }
+
             $intent = \Stripe\PaymentIntent::create(array(
                 "amount" => $amount,
                 "currency" => $currency,
                 "payment_method_types" => array($options),
+                "capture_method" => $capture_method,
             ));
 
             // Keep the payment intent ID in session
@@ -977,6 +1045,23 @@ class Stripe_official extends PaymentModule
         }
 
         return $results;
+    }
+
+    public function captureFunds($amount, $id_payment_intent)
+    {
+        \Stripe\Stripe::setApiKey($this->getSecretKey());
+
+        try {
+            $intent = \Stripe\PaymentIntent::retrieve($id_payment_intent);
+            $intent->capture(['amount_to_capture' => $amount]);
+            return true;
+        } catch (\Stripe\Error\ApiConnection $e) {
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                'Fail to capture amount. Stripe SDK return error: ' . $e
+            );
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            return false;
+        }
     }
 
     /**
@@ -1042,15 +1127,46 @@ class Stripe_official extends PaymentModule
     {
         $stripePayment = new StripePayment();
         $stripePayment->getStripePaymentByCart($params['order']->id_cart);
+
+        $stripeCapture = new StripeCapture();
+        $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
+
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
             'stripe_paymentIntent' => $stripePayment->getIdPaymentIntent(),
             'stripe_date' => $stripePayment->getDateAdd(),
             'stripe_dashboardUrl' => $stripePayment->getDashboardUrl(),
-            'stripe_paymentType' => $stripePayment->getType()
+            'stripe_paymentType' => $stripePayment->getType(),
+            'stripe_dateCatch' => $stripeCapture->getDateCatch(),
+            'stripe_dateAuthorize' => $stripeCapture->getDateAuthorize(),
+            'stripe_expired' => $stripeCapture->getExpired()
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
+    public function hookActionOrderStatusUpdate($params)
+    {
+        $order = new Order($params['id_order']);
+
+        if ($order->module == 'stripe_official'
+            && !empty($order->getHistory($this->context->language->id, Configuration::get(self::CAPTURE_WAITING)))
+            && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
+            $stripePayment = new StripePayment();
+            $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
+            $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
+
+            if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+                return false;
+            }
+
+            $stripeCapture = new StripeCapture();
+            $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
+            $stripeCapture->date_authorize = date('Y-m-d H:i:s');
+            $stripeCapture->save();
+        }
+
+        return true;
     }
 
     /**
@@ -1071,6 +1187,10 @@ class Stripe_official extends PaymentModule
         $amount = $this->context->cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+
+        if ($amount == 0) {
+            return;
+        }
 
         // The payment intent for this order
         $intent = $this->retrievePaymentIntent($amount, $currency);
@@ -1132,6 +1252,11 @@ class Stripe_official extends PaymentModule
             $stripe_fullname = $firstname . ' ' . $lastname;
         }
 
+        $auto_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '0') {
+            $auto_save_card = true;
+        }
+
         // Javacript variables needed by Elements
         Media::addJsDef(array(
             'stripe_pk' => $this->getPublishableKey(),
@@ -1144,11 +1269,14 @@ class Stripe_official extends PaymentModule
 
             'stripe_fullname' => $stripe_fullname,
 
+            'stripe_address' => $address,
             'stripe_address_country_code' => Country::getIsoById($address->id_country),
 
             'stripe_email' => $this->context->customer->email,
 
             'stripe_locale' => $this->context->language->iso_code,
+
+            'stripe_auto_save_card' =>$auto_save_card,
 
             'stripe_validation_return_url' => $this->context->link->getModuleLink(
                 $this->name,
@@ -1204,6 +1332,11 @@ class Stripe_official extends PaymentModule
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
         }
 
+        $show_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '1') {
+            $show_save_card = true;
+        }
+
         // Send the payment amount, it may have changed
         $this->context->smarty->assign(array(
             'stripe_amount' => Tools::ps_round($amount, 0),
@@ -1214,7 +1347,9 @@ class Stripe_official extends PaymentModule
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
-            'customer_name' => $address->firstname . ' ' . $address->lastname
+            'customer_name' => $address->firstname . ' ' . $address->lastname,
+            'stripe_save_card' => Configuration::get(self::SAVE_CARD),
+            'show_save_card' => $show_save_card
         ));
 
         // Fetch country based on invoice address and currency
@@ -1242,6 +1377,34 @@ class Stripe_official extends PaymentModule
         }
         if ($display != '') {
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
+        }
+
+        $stripeCustomer = new StripeCustomer();
+        $stripeCustomer->getCustomerById($this->context->customer->id);
+
+        if ($stripeCustomer->id == null) {
+            return $display;
+        }
+
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+        $customerCards = $stripeCard->getAllCustomerCards();
+
+        if (empty($customerCards)) {
+            return $display;
+        }
+
+        foreach ($customerCards as $card) {
+            if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {
+                continue;
+            }
+
+            $this->context->smarty->assign(array(
+                'id_payment_method' => $card->id,
+                'last4' => $card->card->last4,
+                'brand' => Tools::ucfirst($card->card->brand)
+            ));
+
+            $display .= $this->display(__FILE__, 'views/templates/front/payment_form_save_card.tpl');
         }
 
         return $display;
@@ -1294,6 +1457,11 @@ class Stripe_official extends PaymentModule
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
         }
 
+        $show_save_card = false;
+        if (Configuration::get(self::SAVE_CARD) == 'on' && Configuration::get(self::ASK_CUSTOMER) == '1') {
+            $show_save_card = true;
+        }
+
         $this->context->smarty->assign(array(
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.7',
@@ -1303,7 +1471,9 @@ class Stripe_official extends PaymentModule
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
-            'customer_name' => $address->firstname . ' ' . $address->lastname
+            'customer_name' => $address->firstname . ' ' . $address->lastname,
+            'stripe_save_card' => Configuration::get(self::SAVE_CARD),
+            'show_save_card' => $show_save_card
         ));
 
         // Fetch country based on invoice address and currency
@@ -1356,6 +1526,43 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
+        $stripeCustomer = new StripeCustomer();
+        $stripeCustomer->getCustomerById($this->context->customer->id);
+
+        if ($stripeCustomer->id == null) {
+            return $options;
+        }
+
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
+        $customerCards = $stripeCard->getAllCustomerCards();
+
+        if (empty($customerCards)) {
+            return $options;
+        }
+
+        foreach ($customerCards as $card) {
+            if ($card->card->exp_month < date('m') && $card->card->exp_year <= date('Y')) {
+                continue;
+            }
+
+            $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+            $option
+            ->setModuleName($this->name)
+            ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+
+            $this->context->smarty->assign(array(
+                'id_payment_method' => $card->id
+            ));
+
+            $option->setForm(
+                $this->context->smarty->fetch(
+                    'module:' . $this->name . '/views/templates/front/payment_form_save_card.tpl'
+                )
+            );
+
+            $options[] = $option;
+        }
+
         return $options;
     }
 
@@ -1382,5 +1589,20 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
+    }
+
+    public function hookDisplayCustomerAccount()
+    {
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $prestashop_version = '1.7';
+        } else {
+            $prestashop_version = '1.6';
+        }
+
+        $this->context->smarty->assign(array(
+            'prestashop_version' => $prestashop_version
+        ));
+
+        return $this->display(__FILE__, 'my-account-stripe-cards.tpl');
     }
 }

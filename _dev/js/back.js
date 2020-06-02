@@ -50,7 +50,34 @@ $(document).ready(function () {
   });
 
   initFaq();
+
+  $('#order_status_select_remove').click(function() {
+    removeOrderStateOption(this);
+  });
+
+  $('#order_status_select_add').click(function() {
+    addOrderStateOption(this);
+  });
+
+  $('input#catchandauthorize, input#save_card, input#reinsurance').change(function(event) {
+    disableInputs($(this));
+  });
+
+  disableInputs($('input#catchandauthorize'));
+  disableInputs($('input#save_card'));
+  disableInputs($('input#reinsurance'));
 });
+
+function disableInputs(element) {
+  if (element.is(':checked')) {
+    element.closest('.form-group').find('.child').removeAttr('disabled');
+    element.closest('.form-group').find('.left20').css('display', 'inline-block');
+    element.closest('.form-group').find('div.left20').css('display', 'block');
+  } else {
+    element.closest('.form-group').find('.child').attr('disabled', 'disabled');
+    element.closest('.form-group').find('.left20').css('display', 'none');
+  }
+}
 
 // Init faq tabs
 // Opens/closes answer on click.
@@ -87,4 +114,31 @@ function toggleRefundMode() {
   } else {
     $partialAmount.hide();
   }
+}
+
+function removeOrderStateOption(item)
+{
+  var id = $(item).attr('id').replace('_remove', '');
+  $('#' + id + '_2 option:selected').remove().appendTo('#' + id + '_1');
+
+  assignOrderStates(id);
+}
+
+function addOrderStateOption(item)
+{
+  var id = $(item).attr('id').replace('_add', '');
+  $('#' + id + '_1 option:selected').remove().appendTo('#' + id + '_2');
+
+  assignOrderStates(id);
+}
+
+function assignOrderStates(id)
+{
+  var orderStates = '';
+  $('#' + id + '_2 option').each(function(index, el) {
+    orderStates += ' '+ $(this).val();
+  });
+
+  orderStates = orderStates.trim().split(' ').join(',');
+  $('input[name="order_status_select"]').val(orderStates);
 }

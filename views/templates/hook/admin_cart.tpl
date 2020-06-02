@@ -24,7 +24,7 @@
 
 </div>
 <div id="StripeAdminCart" class="panel">
-    <h3>{l s='Stripe Informations' mod='stripe_official'}</h3>
+    <h3>{l s='Payment information' mod='stripe_official'}</h3>
     <table class="table table-transaction">
         <thead>
             <tr>

@@ -124,7 +124,7 @@
     position: relative;
 }
 
-.stripe-payment-form label {
+body#checkout section.checkout-step .payment-options .stripe-payment-form #save_card .checkbox label {
     display: inline-block;
     margin-bottom: 4px;
     font-size: 14px;
@@ -157,6 +157,7 @@ form#stripe-card-payment #cards-logos {
 
 .stripe-payment-form .form-row {
     margin: 0 auto;
+    display: block;
 }
 
 #stripe-card-number img.img-card {
@@ -218,4 +219,12 @@ form#stripe-card-payment #cards-logos {
 
 #stripe-card-cardholdername {
     width: 50%;
+}
+
+#stripe-card-payment .label16 {
+    padding: 0px;
+    letter-spacing: 0px;
+    color: #777777;
+    font-size: 14px;
+    font-weight: normal;
 }

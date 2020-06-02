@@ -95,6 +95,20 @@
         {/if}
     {/if}
 
+    {if $stripe_save_card == 'on'}
+        {if $show_save_card === true}
+            <div id="save_card">
+                <p class="checkbox">
+                    <input type="checkbox" name="stripe_save_card" id="stripe_save_card" value="1">
+                    <label for="stripe_save_card" class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if} ml-2">{l s='Save card for future purchases' mod='stripe_official'}</label><br/>
+                    <span class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if}">{l s='Your card details are protected using PCI DSS v3.2 security standards.' mod='stripe_official'}</span>
+                </p>
+            </div>
+        {elseif $show_save_card === false}
+            <span class="{if isset($prestashop_version) && $prestashop_version == '1.6'}label16{else}label{/if}">{l s='Your card details will be saved automatically for your next purchase.' mod='stripe_official'}</span><br/>
+        {/if}
+    {/if}
+
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <button class="stripe-submit-button" data-method="card">{l s='Buy now' mod='stripe_official'}</button>
     {/if}

@@ -35,6 +35,7 @@ $(function(){
     $form = $('#stripe-card-payment');
     let payment = '';
     let disableText = '';
+    let id_payment_method = '';
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
@@ -56,7 +57,7 @@ $(function(){
     * Setup Stripe Elements.
     */
     // Create a Stripe client.
-    const stripe = Stripe(stripe_pk, { betas: ['payment_intent_beta_3'] });
+    const stripe = Stripe(stripe_pk);
 
     // Create an instance of Elements and prepare the CSS
     const elements = stripe.elements({
@@ -100,30 +101,43 @@ $(function(){
       const paymentRequest = stripe.paymentRequest({
         country: stripe_merchant_country_code,
         currency: stripe_currency,
-        total: { label: 'Total', amount: stripe_amount },
+        total: { label: 'Total', amount: Math.round(stripe_amount) },
         requestPayerEmail: true
       });
 
       if ($('#stripe-payment-request-button').length > 0) {
         // Callback when a source is created.
-        paymentRequest.on('source', async event => {
-          // Confirm the PaymentIntent with the source returned from the payment request.
-          const { error } = await stripe.confirmPaymentIntent(
-            stripe_client_secret, { source: event.source.id, use_stripe_sdk: true }
-          );
-
-          if (error) {
-            // Report to the browser that the payment failed.
-            event.complete('fail');
+        paymentRequest.on('paymentmethod', function(event) {
+          if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
+            cardPayment = {
+              payment_method: event.paymentMethod.id,
+              setup_future_usage: 'on_session'
+            }
+            saveCard = true;
           } else {
-            // Report to the browser that the confirmation was successful, prompting
-            // it to close the browser payment method collection interface.
-            event.complete('success');
-            $submit.attr('disabled', 'disabled');
-            // Let Stripe.js handle the rest of the payment flow, including 3D Secure if needed.
-            const response = await stripe.handleCardPayment(stripe_client_secret);
-            handlePayment(response);
+            cardPayment = {
+              payment_method: event.paymentMethod.id
+            }
+            saveCard = false;
           }
+
+          // Confirm the PaymentIntent.
+          stripe.confirmCardPayment(
+            stripe_client_secret,
+            cardPayment
+          ).then(function(response) {
+            if (response.error) {
+              // Report to the browser that the payment failed, prompting it to
+              // re-show the payment interface, or show an error message and close
+              // the payment interface.
+              event.complete('fail');
+            } else {
+              // Report to the browser that the confirmation was successful, prompting
+              // it to close the browser payment method collection interface.
+              event.complete('success');
+              handlePayment(response);
+            }
+          });
         });
 
         // Create the Payment Request Button.
@@ -248,6 +262,8 @@ $(function(){
     * or Apple Pay, Google Pay, and Microsoft Pay since they provide name and
     * shipping information directly.
     */
+    let saveCard;
+    let cardPayment;
     $submit.click(async event => {
       if (!$('.stripe-payment-form:visible').length) {
         return true;
@@ -259,11 +275,13 @@ $(function(){
         /* Prestashop 1.7 */
         $form = $('.stripe-payment-form:visible');
         payment = $('input[name="stripe-payment-method"]', $form).val();
+        id_payment_method = $('input[name="stripe-payment-method"]', $form).data('id_payment_method');
         disableText = event.currentTarget;
       } else {
         /* Prestashop 1.6 */
         $form = event.currentTarget;
         payment = event.currentTarget.dataset.method;
+        id_payment_method = event.currentTarget.dataset.id_payment_method;
         disableText = event.currentTarget;
 
         if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
@@ -277,11 +295,43 @@ $(function(){
       disableSubmit(disableText, 'Processing…');
 
       if (payment === 'card') {
-        // Let Stripe.js handle the confirmation of the PaymentIntent with the card Element.
-        const response = await stripe.handleCardPayment(
-          stripe_client_secret, card, { source_data: { owner: { name: stripe_fullname } } }
-        );
-        handlePayment(response);
+        if (typeof(id_payment_method) == 'undefined' || id_payment_method == '') {
+          id_payment_method = {
+            card: card,
+            billing_details: {
+              address: {
+                city: stripe_address.city,
+                country: stripe_address_country_code,
+                line1: stripe_address.address1,
+                line2: stripe_address.address2,
+                postal_code: stripe_address.postcode
+              },
+              email: stripe_email,
+              name: stripe_fullname
+            }
+          }
+        }
+
+        if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
+          cardPayment = {
+            payment_method: id_payment_method,
+            setup_future_usage: 'on_session'
+          }
+          saveCard = true;
+        } else {
+          cardPayment = {
+            payment_method: id_payment_method
+          }
+          saveCard = false;
+        }
+
+        const response = await stripe.confirmCardPayment(
+          stripe_client_secret,
+          cardPayment
+        )
+        .then(function(response) {
+          handlePayment(response);
+        });
       } else if (payment === 'sepa_debit') {
         // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
         const response = await stripe.confirmPaymentIntent(
@@ -339,9 +389,10 @@ $(function(){
             url: stripe_validation_return_url,
             data: {
                 response: response,
+                saveCard: saveCard
             },
             success: function(datas) {
-                if (datas['code'] == 1) {
+                if (datas['code'] == 0 || datas['code'] == 1) {
                   window.location.replace(datas['url']);
                 }
             },

@@ -26,13 +26,12 @@
 <h3><i class="icon-info-sign"></i> {l s='THANKS FOR CHOOSING STRIPE' mod='stripe_official'}</h3>
 <div class="form-group">
     <br>
-    {l s='If you run into any issue after having installed this plugin, please first read our below FAQ and make sure :' mod='stripe_official'}
+    {l s='If you run into any issue after installing this module, please read our FAQ below and make sure that:' mod='stripe_official'}
     <br>
     <ol type="1">
-        <li>{l s='You have entered your API keys in the “Connection” tab of the Stripe module (we recommend checking that there is no space in the field).' mod='stripe_official'}</li>
-        <li>{l s='You are using test cards in Test mode and live cards in Live mode.' mod='stripe_official'}</li>
-        <li>{l s='If you’ve recently updated the module, you have refreshed your cache.' mod='stripe_official'}</li>
-        <li>{l s='You’re not using any other plugin that could impact payments.' mod='stripe_official'}</li>
+        <li>{l s='You configured your API keys in the "Connection" tab (make sure there is no extra space in the field).' mod='stripe_official'}</li>
+        <li>{l s='You refreshed your cache if you recently updated the module.' mod='stripe_official'}</li>
+        <li>{l s='You\'re not using another module that might conflict with payment modules.' mod='stripe_official'}</li>
     </ol>
     <br>
     {l s='You can also check out our support website:' mod='stripe_official'}
@@ -172,6 +171,27 @@
                 </p>
             </div>
         </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Can customers choose to save their card for faster later checkout?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Yes, since version 2.1 of the module, customers can save one or multiple cards during checkout. Cards can be deleted directly from their account settings.' mod='stripe_official'}<br/>
+                    {l s='You can enable this feature in the module settings.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Can I just authorize card payments during checkout and later on debit the amount?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Yes, since version 2.1 of the module, you can choose in the settings to only debit the authorization on a specific order status. Note that you have 7 calendar days to debit the card after the authorization. After this delay, the hold on the card is released and the customer has to restart the checkout process to confirm the order.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
     </ul>
 
     <span class="faq-title">{l s='Installation' mod='stripe_official'}</span>
@@ -257,6 +277,26 @@
                     ({l s='Additional step : make sure you have the file "apple-developer-merchantid-domain-association" on the root of your website in the folder ".well-known/". If no, please follow the steps 2 and 3 in the popup "Add new domain."' mod='stripe_official'})<br/>
                     E : {l s='Add your domain by clicking thebutton "Add".' mod='stripe_official'}<br/><br/>
                     <img class="add_domain" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/stripe_add_domain.png" />
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Do I need to configure Stripe webhooks?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Since version 2.1 of the module, you do not need to manually create the webhook in your Stripe Dashboard. If you already created the webhook the module will automatically refresh it and no further action is requested from you.' mod='stripe_official'}
+                </p>
+            </div>
+        </li>
+
+        <li class="faq-item">
+            <span class="faq-trigger">{l s='Why do you need webhooks?' mod='stripe_official'}</span>
+            <span class="expand pull-right">+</span>
+            <div class="faq-content">
+                <p>
+                    {l s='Some payment actions are asynchronous and webhooks are the only way to keep your orders up to date automatically.' mod='stripe_official'}
                 </p>
             </div>
         </li>
