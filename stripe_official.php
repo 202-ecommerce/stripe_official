@@ -490,6 +490,13 @@ class Stripe_official extends PaymentModule
             );
         }
 
+        if (StripeWebhook::countWebhooksList() >= 16) {
+            $this->warning[] = $this->l(
+                'You reached the limit of 16 webhook endpoints registered in your Dashboard Stripe for this account. Please remove one of them if you want to register this domain.',
+                $this->name
+            );
+        }
+
         /* Check if TLS is enabled and the TLS version used is 1.2 */
         if (self::isWellConfigured()) {
             $secret_key = trim(Tools::getValue(self::TEST_KEY));

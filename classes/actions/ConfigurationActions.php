@@ -159,7 +159,7 @@ class ConfigurationActions extends DefaultActions
     {
         $this->context = $this->conveyor['context'];
 
-        if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == '') {
+        if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == '' && StripeWebhook::countWebhooksList() < 16) {
             $webhooksList = StripeWebhook::getWebhookList();
 
             foreach ($webhooksList as $webhookEndpoint) {

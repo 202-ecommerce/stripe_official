@@ -27,6 +27,7 @@ class StripeWebhook extends ObjectModel
 {
     public static function create()
     {
+        $module = Module::getInstanceByName('stripe_official');
         try {
             $context = Context::getContext();
 
@@ -36,8 +37,7 @@ class StripeWebhook extends ObjectModel
             ]);
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
-        } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
+        } catch (Exception $e) {
             ProcessLoggerHandler::logError('Create webhook endpoint - '.(string)$e->getMessage(), null, null, 'StripeWebhook');
             return false;
         }
@@ -45,6 +45,16 @@ class StripeWebhook extends ObjectModel
 
     public static function getWebhookList()
     {
-        return \Stripe\WebhookEndpoint::all();
+        return \Stripe\WebhookEndpoint::all(
+            [
+                'limit' => 16
+            ]
+        );
+    }
+
+    public static function countWebhooksList()
+    {
+        $list = self::getWebhookList();
+        return count($list->data);
     }
 }
