@@ -109,7 +109,7 @@ function toggleRefundMode() {
   const isPartialRefund = $('input[name="STRIPE_REFUND_MODE"]:checked').val();
   const $partialAmount = $('.partial-amount');
 
-  if (isPartialRefund) {
+  if (isPartialRefund == '0') {
     $partialAmount.show();
   } else {
     $partialAmount.hide();
