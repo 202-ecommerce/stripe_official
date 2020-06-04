@@ -195,6 +195,23 @@ class ValidationOrderActions extends DefaultActions
                 $this->conveyor['secure_key']
             );
 
+            $idOrder = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
+            if (empty($this->conveyor['source'])) {
+                \Stripe\PaymentIntent::update(
+                    $this->conveyor['id_payment_intent'],
+                    [
+                        'description' => $this->context->shop->name.' #'.$idOrder
+                    ]
+                );
+            } else {
+                \Stripe\Charge::update(
+                    $this->conveyor['chargeId'],
+                    [
+                        'description' => $this->context->shop->name.' #'.$idOrder
+                    ]
+                );
+            }
+
             if ($this->conveyor['status'] == 'requires_capture') {
                 $stripeCapture = new StripeCapture();
                 $stripeCapture->id_payment_intent = $this->conveyor['id_payment_intent'];
