@@ -150,6 +150,8 @@ class Stripe_official extends PaymentModule
         'displayBackOfficeHeader',
         'displayAdminOrderTabOrder',
         'displayAdminOrderContentOrder',
+        'displayAdminOrderTabLink',
+        'displayAdminOrderTabContent',
         'displayAdminCartsView',
         'paymentOptions',
         'payment',
@@ -1126,6 +1128,11 @@ class Stripe_official extends PaymentModule
         return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
     }
 
+    public function hookDisplayAdminOrderTabLink($params)
+    {
+        return $this->hookDisplayAdminOrderTabOrder($params);
+    }
+
     /**
      * Add a tab to controle intents on an order details admin page (tab content)
      * @return html
@@ -1150,6 +1157,11 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
+    public function hookDisplayAdminOrderTabContent($params)
+    {
+        return $this->hookDisplayAdminOrderContentOrder($params);
     }
 
     public function hookActionOrderStatusUpdate($params)

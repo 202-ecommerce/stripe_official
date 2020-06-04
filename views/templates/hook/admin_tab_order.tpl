@@ -22,8 +22,8 @@
  * @license   Commercial license
 *}
 
-<li>
-    <a href="#StripePayment">
+<li class="nav-item">
+    <a href="#StripePayment" class="nav-link" data-toggle="tab" role="tab" aria-controls="StripePayment">
         <i class="icon-money"></i>
         {l s='Stripe' mod='stripe_official'} <span class="badge">1</span>
     </a>
