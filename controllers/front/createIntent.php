@@ -39,6 +39,13 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $capture_method = 'automatic';
             }
 
+            $datasIntent = array(
+                "amount" => Tools::getValue('amount'),
+                "currency" => Tools::getValue('currency'),
+                "payment_method_types" => array(Tools::getValue('payment_option')),
+                "capture_method" => $capture_method
+            );
+
             if (!Tools::getValue('id_payment_method')) {
                 if (version_compare(_PS_VERSION_, '1.7', '>=')) {
                     $firstname = str_replace('"', '\\"', $this->context->customer->firstname);
@@ -67,6 +74,9 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 );
             } else {
                 $payment_method = Tools::getValue('id_payment_method');
+                $stripeCustomer = new StripeCustomer();
+                $customer = $stripeCustomer->getCustomerById($this->context->customer->id);
+                $datasIntent['customer'] = $customer->stripe_customer_key;
             }
 
             $cardPayment = array(
@@ -74,10 +84,13 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             $saveCard = false;
 
-            if ((Tools::getValue('card_form_payment') === true && Tools::getValue('save_card_form') === true) || Tools::getValue('stripe_auto_save_card') === true) {
+            if (((Tools::getValue('card_form_payment') == 'true' && Tools::getValue('save_card_form') == 'true')
+                || (Tools::getValue('card_form_payment') == 'true' && Tools::getValue('stripe_auto_save_card') == 'true')
+                && (!Tools::getValue('id_payment_method') || Tools::getValue('payment_request') == 'true')
+                && Tools::getValue('payment_option') == 'card')) {
                 $cardPayment['setup_future_usage'] = 'on_session';
                 $saveCard = true;
-            } elseif (Tools::getValue('card_form_payment') !== true) {
+            } elseif (Tools::getValue('payment_option') != 'card') {
                 $stripe_validation_return_url = $this->context->link->getModuleLink(
                     'stripe_official',
                     'validation',
@@ -88,10 +101,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             $intent = \Stripe\PaymentIntent::create(array(
-                "amount" => Tools::getValue('amount'),
-                "currency" => Tools::getValue('currency'),
-                "payment_method_types" => array(Tools::getValue('payment_option')),
-                "capture_method" => $capture_method,
+                $datasIntent
             ));
 
             // Keep the payment intent ID in session

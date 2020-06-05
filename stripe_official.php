@@ -1430,7 +1430,6 @@ class Stripe_official extends PaymentModule
                 );
             }
 
-
             // Payment methods with embedded form fields
             $option->setForm(
                 $this->context->smarty->fetch(
@@ -1441,10 +1440,16 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
+
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
         if ($stripeCustomer->id == null) {
+            return $options;
+        }
+
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        if ($stripeCustomerExists === false) {
             return $options;
         }
 

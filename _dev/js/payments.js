@@ -42,6 +42,11 @@ $(function(){
 
     let cardType;
 
+    let saveCard;
+    let cardPayment;
+    let cardDatas;
+    let paymentIntentDatas;
+
     // Get Stripe amount. On PS1.6 with OPC, the checkout page isn't refreshed
     // when updating cart quantity / carrier, so we need to update our data.
     if ($('#stripe-amount').length) {
@@ -108,35 +113,14 @@ $(function(){
       if ($('#stripe-payment-request-button').length > 0) {
         // Callback when a source is created.
         paymentRequest.on('paymentmethod', function(event) {
-          if (($('input[data-module-name="stripe_official"]').is(':checked') === true && $('#stripe_save_card').is(':checked') === true) || stripe_auto_save_card === true) {
-            cardPayment = {
-              payment_method: event.paymentMethod.id,
-              setup_future_usage: 'on_session'
-            }
-            saveCard = true;
-          } else {
-            cardPayment = {
-              payment_method: event.paymentMethod.id
-            }
-            saveCard = false;
-          }
+          createPaymentIntent('card', event.paymentMethod.id, true);
 
-          // Confirm the PaymentIntent.
-          stripe.confirmCardPayment(
-            stripe_client_secret,
-            cardPayment
-          ).then(function(response) {
-            if (response.error) {
-              // Report to the browser that the payment failed, prompting it to
-              // re-show the payment interface, or show an error message and close
-              // the payment interface.
-              event.complete('fail');
-            } else {
-              // Report to the browser that the confirmation was successful, prompting
-              // it to close the browser payment method collection interface.
-              event.complete('success');
-              handlePayment(response);
-            }
+          const response = stripe.confirmCardPayment(
+            paymentIntentDatas.intent.client_secret,
+            paymentIntentDatas.cardPayment
+          )
+          .then(function(response) {
+            handlePayment(response);
           });
         });
 
@@ -280,10 +264,6 @@ $(function(){
     * or Apple Pay, Google Pay, and Microsoft Pay since they provide name and
     * shipping information directly.
     */
-    let saveCard;
-    let cardPayment;
-    let cardDatas;
-    let paymentIntentDatas;
     $submit.click(async event => {
       if (!$('.stripe-payment-form:visible').length) {
         return true;
@@ -313,36 +293,16 @@ $(function(){
 
       // Disable the Pay button to prevent multiple click events.
       disableSubmit(disableText, 'Processing…');
-
-      $.ajax({
-          type: 'POST',
-          dataType: 'json',
-          async: false,
-          url: stripe_create_intent_url,
-          data: {
-              payment_option: payment,
-              amount: stripe_amount,
-              currency: stripe_currency,
-              id_payment_method: id_payment_method,
-              stripe_auto_save_card: stripe_auto_save_card,
-              card_form_payment: $('input[data-module-name="stripe_official"]').is(':checked'),
-              save_card_form: $('#stripe_save_card').is(':checked')
-          },
-          success: function(datas) {
-              paymentIntentDatas = datas;
-              saveCard = datas.saveCard;
-          },
-          error: function(err) {
-              console.log(err);
-          }
-      });
+      createPaymentIntent(payment, id_payment_method, false);
 
       if (payment === 'card') {
-        cardDatas = {
-          card: card
+        if (typeof id_payment_method == 'undefined') {
+          // card payment via stripe form
+          cardDatas = {
+            card: card
+          }
+          paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
         }
-        paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
-        console.log(paymentIntentDatas);
 
         const response = stripe.confirmCardPayment(
           paymentIntentDatas.intent.client_secret,
@@ -363,14 +323,6 @@ $(function(){
         );
         handlePayment(response);
       } else {
-        // Prepare all the Stripe source common data.
-        // const sourceData = {
-        //   type: payment, amount: stripe_amount, currency: stripe_currency,
-        //   owner: { name: stripe_fullname, email: stripe_email },
-        //   redirect: { return_url: stripe_validation_return_url },
-        //   metadata: { paymentIntent: stripe_payment_id }
-        // };
-
         // Add extra source information which are specific to a payment method.
         disableSubmit(disableText, 'Redirecting…');
 
@@ -423,8 +375,20 @@ $(function(){
             break;
 
           case 'sofort':
+            // Prepare all the Stripe source common data.
+            const sourceData = {
+              type: payment, amount: stripe_amount, currency: stripe_currency,
+              owner: { name: stripe_fullname, email: stripe_email },
+              redirect: { return_url: stripe_validation_return_url },
+              metadata: { paymentIntent: stripe_payment_id }
+            };
+
             // SOFORT: The country is required before redirecting to the bank.
             sourceData.sofort = { country: stripe_address_country_code };
+
+            // Create a Stripe source with the common data and extra information.
+            const {source} = await stripe.createSource(sourceData);
+            handleSourceActivation(source, $form);
             break;
 
           case 'fpx':
@@ -474,16 +438,38 @@ $(function(){
             return;
             break;
         }
-
-        // Create a Stripe source with the common data and extra information.
-        // const {source} = await stripe.createSource(sourceData);
-        // handleSourceActivation(source, $form);
       }
 
       event.stopPropagation();
 
       return false;
     });
+
+    function createPaymentIntent(payment, id_payment_method, payment_request) {
+      $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: stripe_create_intent_url,
+          data: {
+              payment_option: payment,
+              amount: stripe_amount,
+              currency: stripe_currency,
+              id_payment_method: id_payment_method,
+              stripe_auto_save_card: stripe_auto_save_card,
+              card_form_payment: $('input[data-module-name="stripe_official"]').is(':checked'),
+              save_card_form: $('#stripe_save_card').is(':checked'),
+              payment_request: payment_request
+          },
+          success: function(datas) {
+              paymentIntentDatas = datas;
+              saveCard = datas.saveCard;
+          },
+          error: function(err) {
+              console.log(err);
+          }
+      });
+    }
 
     // Handle new PaymentIntent result
     function handlePayment(response) {
