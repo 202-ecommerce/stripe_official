@@ -213,7 +213,13 @@
 									<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
 									<label for="sofort">{l s='SOFORT (if you have German or Austrian customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label>
+									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label><br>
+									<input type="checkbox" id="fpx" name="fpx" {if $fpx}checked="checked"{/if}/>
+									<label for="fpx">{l s='FPX (if you have Malaysian customers)' mod='stripe_official'}</label><br>
+									<input type="checkbox" id="eps" name="eps" {if $eps}checked="checked"{/if}/>
+									<label for="eps">{l s='EPS (if you have Austrian customers)' mod='stripe_official'}</label><br>
+									<input type="checkbox" id="p24" name="p24" {if $p24}checked="checked"{/if}/>
+									<label for="p24">{l s='P24 (if you have Polish customers)' mod='stripe_official'}</label>
 								</div>
 							</li>
 							<li>
