@@ -301,7 +301,6 @@ $(function(){
             billing_details: {
               address: {
                 city: stripe_address.city,
-                country: stripe_address_country_code,
                 line1: stripe_address.address1,
                 line2: stripe_address.address2,
                 postal_code: stripe_address.postcode
@@ -309,6 +308,10 @@ $(function(){
               email: stripe_email,
               name: stripe_fullname
             }
+          }
+          if(stripe_address_country_code)
+          {
+            id_payment_method.billing_details.address.country = stripe_address_country_code;
           }
         }
 
