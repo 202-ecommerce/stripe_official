@@ -86,4 +86,21 @@ class StripeCustomer extends ObjectModel
 
         return $this;
     }
+
+    public function stripeCustomerExists($email, $stripe_customer_id)
+    {
+        $customersList = \Stripe\Customer::all(
+            [
+                'email' => $email
+            ]
+        );
+
+        foreach ($customersList as $customer) {
+            if ($customer['id'] == $stripe_customer_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

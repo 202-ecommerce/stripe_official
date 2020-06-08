@@ -1407,11 +1407,12 @@ class Stripe_official extends PaymentModule
             return $display;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        if ($stripeCard->id == null) {
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        if ($stripeCustomerExists === false) {
             return $display;
         }
 
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
 
         if (empty($customerCards)) {
@@ -1558,11 +1559,12 @@ class Stripe_official extends PaymentModule
             return $options;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        if ($stripeCard->id == null) {
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        if ($stripeCustomerExists === false) {
             return $options;
         }
 
+        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
 
         if (empty($customerCards)) {
