@@ -57,4 +57,26 @@ class StripeWebhook extends ObjectModel
         $list = self::getWebhookList();
         return count($list->data);
     }
+
+    public static function webhookCanBeRegistered()
+    {
+        $context = Context::getContext();
+
+        $webhooksList = self::getWebhookList();
+        $webhookUrl = $context->link->getModuleLink('stripe_official', 'webhook', array(), true);
+        $webhookExists = false;
+
+        foreach ($webhooksList->data as $webhook) {
+            if ($webhook->url == $webhookUrl) {
+                $webhookExists = true;
+                break;
+            }
+        }
+
+        if (self::countWebhooksList() >= 16 && $webhookExists === false) {
+            return false;
+        }
+
+        return true;
+    }
 }
