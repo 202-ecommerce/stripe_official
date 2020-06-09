@@ -525,7 +525,14 @@ class Stripe_official extends PaymentModule
                         'module' => $this
                     ));
 
-            $handler->addActions('registerKeys', 'registerCatchAndAuthorize', 'registerSaveCard', 'registerOtherConfigurations', 'registerApplePayDomain', 'registerWebhookSignature');
+            $handler->addActions(
+                'registerKeys',
+                'registerCatchAndAuthorize',
+                'registerSaveCard',
+                'registerOtherConfigurations',
+                'registerApplePayDomain',
+                'registerWebhookSignature'
+            );
 
             $handler->process('Configuration');
         }
@@ -608,6 +615,7 @@ class Stripe_official extends PaymentModule
             $statusUnselected = $allOrderStatus;
         }
 
+        $orderStatus = array();
         $orderStatus['selected'] = $statusSelected;
         $orderStatus['unselected'] = $statusUnselected;
 
@@ -1347,7 +1355,7 @@ class Stripe_official extends PaymentModule
         // Create or update the payment intent for this order
         $this->retrievePaymentIntent($amount, $currency_iso_code);
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1407,7 +1415,10 @@ class Stripe_official extends PaymentModule
             return $display;
         }
 
-        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
         if ($stripeCustomerExists === false) {
             return $display;
         }
@@ -1477,7 +1488,7 @@ class Stripe_official extends PaymentModule
 
         $address = new Address($params['cart']->id_address_invoice);
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1559,7 +1570,10 @@ class Stripe_official extends PaymentModule
             return $options;
         }
 
-        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
         if ($stripeCustomerExists === false) {
             return $options;
         }

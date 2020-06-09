@@ -27,7 +27,6 @@ class StripeWebhook extends ObjectModel
 {
     public static function create()
     {
-        $module = Module::getInstanceByName('stripe_official');
         try {
             $context = Context::getContext();
 
@@ -38,7 +37,12 @@ class StripeWebhook extends ObjectModel
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
         } catch (Exception $e) {
-            ProcessLoggerHandler::logError('Create webhook endpoint - '.(string)$e->getMessage(), null, null, 'StripeWebhook');
+            ProcessLoggerHandler::logError(
+                'Create webhook endpoint - '.(string)$e->getMessage(),
+                null,
+                null,
+                'StripeWebhook'
+            );
             return false;
         }
     }

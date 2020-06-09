@@ -37,7 +37,7 @@
             {foreach from=$cards item=card}
                 <tr>
                     <td class="text-center" data-label="{l s='Type' mod='stripe_official'}">
-                        {$card.card->brand|ucfirst}
+                        {$card.card->brand|capitalize}
                     </td>
                     <td class="text-center" data-label="{l s='Card number' mod='stripe_official'}">
                         **** **** **** {$card.card->last4}
