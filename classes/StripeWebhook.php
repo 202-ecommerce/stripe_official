@@ -62,6 +62,10 @@ class StripeWebhook extends ObjectModel
     {
         $context = Context::getContext();
 
+        if (Stripe_official::isWellConfigured() === false) {
+            return false;
+        }
+
         $webhooksList = self::getWebhookList();
         $webhookUrl = $context->link->getModuleLink('stripe_official', 'webhook', array(), true);
         $webhookExists = false;
