@@ -134,7 +134,7 @@ $(function(){
         }
 
         prButton.on('click', function(event) {
-          if (prestashop_version == '1.7') {
+          if (ps_version == '1.7') {
             if ($submit.attr('disabled') == "disabled") {
               $('.stripe-payment-request-button-warning').modal('show');
               event.preventDefault();
@@ -271,7 +271,7 @@ $(function(){
       event.preventDefault();
 
       // Retrieve the payment method.
-      if (prestashop_version == '1.7') {
+      if (ps_version == '1.7') {
         /* Prestashop 1.7 */
         $form = $('.stripe-payment-form:visible');
         payment = $('input[name="stripe-payment-method"]', $form).val();
@@ -570,14 +570,14 @@ $(function(){
       var elementError = $(element).siblings('.stripe-error-message');
       var disableElement = $(element).siblings('.stripe-submit-button');
       if (error) {
-        if (prestashop_version == '1.6') {
+        if (ps_version == '1.6') {
           $(elementError).text(error.message).show();
           enableSubmit($submitButtons);
         } else {
           $error.text(error.message).show();
         }
       } else {
-        if (prestashop_version == '1.6') {
+        if (ps_version == '1.6') {
           $(elementError).text("").hide();
         } else {
           $error.text("").hide();
