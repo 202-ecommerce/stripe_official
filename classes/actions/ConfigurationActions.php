@@ -166,7 +166,7 @@ class ConfigurationActions extends DefaultActions
             $webhooksList = StripeWebhook::getWebhookList();
 
             foreach ($webhooksList as $webhookEndpoint) {
-                if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true)) {
+                if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
                     $webhookEndpoint->delete();
                 }
             }
