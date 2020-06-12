@@ -24,7 +24,7 @@
 
 <form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">
-	<input type="hidden" name="order_status_select" value="{$orderStatusSelected}">
+	<input type="hidden" name="order_status_select" value="{$orderStatusSelected|escape:'htmlall':'UTF-8'}">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
