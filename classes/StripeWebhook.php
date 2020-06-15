@@ -32,7 +32,14 @@ class StripeWebhook extends ObjectModel
             $context = Context::getContext();
 
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')),
+                'url' => $context->link->getModuleLink(
+                    'stripe_official',
+                    'webhook',
+                    array(),
+                    true,
+                    Configuration::get('PS_LANG_DEFAULT'),
+                    Configuration::get('PS_SHOP_DEFAULT')
+                ),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 

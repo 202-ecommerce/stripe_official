@@ -67,6 +67,8 @@ class Stripe_official extends PaymentModule
     const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
+    const SEPA_WAITING = 'STRIPE_SEPA_WAITING';
+    const SEPA_DISPUTE = 'STRIPE_SEPA_DISPUTE';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
@@ -87,6 +89,7 @@ class Stripe_official extends PaymentModule
     const ENABLE_FPX = 'STRIPE_ENABLE_FPX';
     const ENABLE_EPS = 'STRIPE_ENABLE_EPS';
     const ENABLE_P24 = 'STRIPE_ENABLE_P24';
+    const ENABLE_SEPA = 'STRIPE_ENABLE_SEPA';
     const ENABLE_APPLEPAY_GOOGLEPAY = 'STRIPE_ENABLE_APPLEPAY_GOOGLEPAY';
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
@@ -227,6 +230,14 @@ class Stripe_official extends PaymentModule
           'enable' => self::ENABLE_P24,
           'catch_enable' => false
         ),
+        'sepa_debit' => array(
+          'name' => 'SEPA Direct Debit',
+          'flow' => 'none',
+          'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE'),
+          'currencies' => array('eur'),
+          'enable' => self::ENABLE_SEPA,
+          'catch_enable' => false
+        ),
     );
 
     public static $webhook_events = array(
@@ -235,7 +246,8 @@ class Stripe_official extends PaymentModule
         'charge.succeeded',
         'charge.pending',
         'charge.captured',
-        'charge.refunded'
+        'charge.refunded',
+        'charge.dispute.created'
     );
 
     /* refund */
@@ -276,6 +288,7 @@ class Stripe_official extends PaymentModule
         $this->button_label['fpx'] = $this->l('Pay by FPX');
         $this->button_label['eps'] = $this->l('Pay by EPS');
         $this->button_label['p24'] = $this->l('Pay by P24');
+        $this->button_label['sepa_debit'] = $this->l('Pay by SEPA Direct Debit');
         $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
@@ -346,7 +359,8 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0)
             || !Configuration::updateValue(self::ENABLE_FPX, 0)
             || !Configuration::updateValue(self::ENABLE_EPS, 0)
-            || !Configuration::updateValue(self::ENABLE_P24, 0)) {
+            || !Configuration::updateValue(self::ENABLE_P24, 0)
+            || !Configuration::updateValue(self::ENABLE_SEPA, 0)) {
                  return false;
         }
 
@@ -378,7 +392,8 @@ class Stripe_official extends PaymentModule
             && Configuration::deleteByName(self::ENABLE_BANCONTACT)
             && Configuration::deleteByName(self::ENABLE_FPX)
             && Configuration::deleteByName(self::ENABLE_EPS)
-            && Configuration::deleteByName(self::ENABLE_P24);
+            && Configuration::deleteByName(self::ENABLE_P24)
+            && Configuration::deleteByName(self::ENABLE_SEPA);
     }
 
     /**
@@ -506,6 +521,88 @@ class Stripe_official extends PaymentModule
             Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
         }
 
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::SEPA_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#fcba03';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::SEPA_WAITING, $order_state->id);
+        }
+
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::SEPA_DISPUTE)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#e3e1dc';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id);
+        }
+
         return true;
     }
 
@@ -559,7 +656,14 @@ class Stripe_official extends PaymentModule
                         'module' => $this
                     ));
 
-            $handler->addActions('registerKeys', 'registerCatchAndAuthorize', 'registerSaveCard', 'registerOtherConfigurations', 'registerApplePayDomain', 'registerWebhookSignature');
+            $handler->addActions(
+                'registerKeys',
+                'registerCatchAndAuthorize',
+                'registerSaveCard',
+                'registerOtherConfigurations',
+                'registerApplePayDomain',
+                'registerWebhookSignature'
+            );
 
             $handler->process('Configuration');
         }
@@ -706,6 +810,7 @@ class Stripe_official extends PaymentModule
             'fpx' => Configuration::get(self::ENABLE_FPX),
             'eps' => Configuration::get(self::ENABLE_EPS),
             'p24' => Configuration::get(self::ENABLE_P24),
+            'sepa_debit' => Configuration::get(self::ENABLE_SEPA),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
@@ -1308,6 +1413,14 @@ class Stripe_official extends PaymentModule
             return $display;
         }
 
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
+        if ($stripeCustomerExists === false) {
+            return $display;
+        }
+
         $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
         $customerCards = $stripeCard->getAllCustomerCards();
 
@@ -1447,7 +1560,6 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
-
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
@@ -1455,7 +1567,10 @@ class Stripe_official extends PaymentModule
             return $options;
         }
 
-        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists($this->context->customer->email, $stripeCustomer->stripe_customer_key);
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
         if ($stripeCustomerExists === false) {
             return $options;
         }

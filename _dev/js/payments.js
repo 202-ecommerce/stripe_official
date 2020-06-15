@@ -313,15 +313,18 @@ $(function(){
         });
       } else if (payment === 'sepa_debit') {
         // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
-        const response = await stripe.confirmPaymentIntent(
-          stripe_client_secret, iban, {
-            source_data: {
-              type: 'sepa_debit', owner: { name: stripe_fullname, email: stripe_email },
-              mandate: { notification_method: 'email' }
-            }
-          }
-        );
-        handlePayment(response);
+        cardDatas = {
+          sepa_debit: iban
+        }
+        paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
+
+        const response = stripe.confirmSepaDebitPayment(
+          paymentIntentDatas.intent.client_secret,
+          paymentIntentDatas.cardPayment
+        )
+        .then(function(response) {
+          handlePayment(response);
+        });
       } else {
         // Add extra source information which are specific to a payment method.
         disableSubmit(disableText, 'Redirecting…');
@@ -380,7 +383,7 @@ $(function(){
               type: payment, amount: stripe_amount, currency: stripe_currency,
               owner: { name: stripe_fullname, email: stripe_email },
               redirect: { return_url: stripe_validation_return_url },
-              metadata: { paymentIntent: stripe_payment_id }
+              metadata: { paymentIntent: paymentIntentDatas.intent.id }
             };
 
             // SOFORT: The country is required before redirecting to the bank.
