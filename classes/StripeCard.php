@@ -23,6 +23,8 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class StripeCard extends ObjectModel
 {
     /** @var int */
