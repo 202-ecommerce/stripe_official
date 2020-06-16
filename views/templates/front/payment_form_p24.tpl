@@ -30,7 +30,6 @@
             <p title="{l s='Pay by P24' mod='stripe_official'}">
                 <img id="p24" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/p24.png" alt="{l s='Pay by P24' mod='stripe_official'}" />
                 {l s='Pay by P24' mod='stripe_official'}
-                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
             </p>
         </div>
     {/if}

@@ -34,7 +34,6 @@
             <p title="{l s='Pay by FPX' mod='stripe_official'}">
                 <img id="fpx" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/fpx.png" alt="{l s='Pay by FPX' mod='stripe_official'}" />
                 {l s='Pay by FPX' mod='stripe_official'}
-                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
             </p>
         </div>
         <span id="stripe-fpx-bank-element" class="field"></span>

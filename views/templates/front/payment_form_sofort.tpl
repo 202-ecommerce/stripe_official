@@ -30,7 +30,6 @@
             <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
                 <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
                 {l s='Pay by SOFORT' mod='stripe_official'}
-                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
             </p>
         </div>
     {/if}

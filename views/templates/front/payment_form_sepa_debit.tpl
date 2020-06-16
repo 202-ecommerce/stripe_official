@@ -34,7 +34,6 @@
             <p title="{l s='Pay by SEPA Direct Debit' mod='stripe_official'}">
                 <img id="sepa_debit" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sepa_debit.png" alt="{l s='Pay by SEPA Direct Debit' mod='stripe_official'}" />
                 {l s='Pay by SEPA Direct Debit' mod='stripe_official'}
-                <input type="hidden" class="stripe-publishable-key" value="{$publishableKey|escape:'htmlall':'UTF-8'}"/>
             </p>
         </div>
         <span id="stripe-iban-element" class="field"></span>
