@@ -118,6 +118,11 @@ class ValidationOrderActions extends DefaultActions
         $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
         $charges = $intent->charges->data;
 
+        // Payment failed for redirect payment methods
+        if (empty($charges)) {
+            return false;
+        }
+
         $this->conveyor['currency'] = $charges[0]->currency;
         $this->conveyor['token'] = $charges[0]->payment_method;
         $this->conveyor['status'] = $charges[0]->status;
