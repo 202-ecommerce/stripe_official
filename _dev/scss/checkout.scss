@@ -207,7 +207,8 @@ form#stripe-card-payment #cards-logos {
 }
 
 #stripe-card-element,
-#stripe-card-cardholdername {
+#stripe-card-cardholdername,
+#stripe-sepa-element {
     padding: 6px 12px;
     margin-bottom: 8px;
     border: 1px solid #ccc;

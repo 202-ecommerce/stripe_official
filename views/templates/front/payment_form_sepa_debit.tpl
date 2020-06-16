@@ -22,7 +22,7 @@
  * @license   Commercial license
 *}
 
-<form class="stripe-payment-form" action="">
+<form class="stripe-payment-form" id="stripe-sepa-element" action="">
     <input type="hidden" name="stripe-payment-method" value="sepa_debit">
 
     {if isset($prestashop_version) && $prestashop_version == '1.7'}
