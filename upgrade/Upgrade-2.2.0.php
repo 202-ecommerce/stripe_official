@@ -29,8 +29,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_2_0($module)
 {
-    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
-    $installer->installOrderState();
+    $module->installOrderState();
 
     return true;
 }
