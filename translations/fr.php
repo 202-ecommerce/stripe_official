@@ -111,7 +111,8 @@ $_MODULE['<{stripe_official}prestashop>configuration_160341e19f4199f98bae44696b5
 $_MODULE['<{stripe_official}prestashop>configuration_ec211f7c20af43e742bf2570c3cb84f9'] = 'Ajouter';
 $_MODULE['<{stripe_official}prestashop>configuration_cea9034a11c05369bf41177de1bf7220'] = 'État de capture';
 $_MODULE['<{stripe_official}prestashop>configuration_1063e38cb53d94d386f21227fcd84717'] = 'Supprimer';
-$_MODULE['<{stripe_official}prestashop>configuration_c5aab817a800aee77f58051978896fc7'] = 'Capturer le paiement lors du passage à l\'état ou aux états de commande suivants.';
+$_MODULE['<{stripe_official}prestashop>configuration_aa6c823b025adf0a6038cbe782fa2ea9'] = 'Passez à l\'état de commande suivant si l\'autorisation expire avant qu\'elle ne soit capturée.';
+$_MODULE['<{stripe_official}prestashop>configuration_5ed7d8757f51d8e13f2b5251de9055c7'] = 'Sélectionner un état';
 $_MODULE['<{stripe_official}prestashop>configuration_019d235906cab8dd39702ff1ed63b0ce'] = 'Moyens de paiement locaux';
 $_MODULE['<{stripe_official}prestashop>configuration_8f1a111030bf835a13969e7d91bb5721'] = 'Seuls les marchands européens peuvent utiliser ces moyens de paiement pour le moment. Pour commencer à accepter ces moyens de paiement, suivez ces étapes :';
 $_MODULE['<{stripe_official}prestashop>configuration_dbc0bde38ae3629dada4bb5f28baa4f5'] = 'Activez les moyens de paiement adéquats dans ce module :';
