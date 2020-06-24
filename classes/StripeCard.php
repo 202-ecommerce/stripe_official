@@ -55,7 +55,7 @@ class StripeCard extends ObjectModel
                 $this->payment_method
             );
 
-            $saveCard = $payment_method->attach([
+            $payment_method->attach([
                 'customer' => $this->stripe_customer_key,
             ]);
         } catch (PrestaShopException $e) {

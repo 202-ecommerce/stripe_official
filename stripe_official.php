@@ -156,6 +156,8 @@ class Stripe_official extends PaymentModule
         'displayBackOfficeHeader',
         'displayAdminOrderTabOrder',
         'displayAdminOrderContentOrder',
+        'displayAdminOrderTabLink',
+        'displayAdminOrderTabContent',
         'displayAdminCartsView',
         'paymentOptions',
         'payment',
@@ -746,6 +748,7 @@ class Stripe_official extends PaymentModule
             $statusUnselected = $allOrderStatus;
         }
 
+        $orderStatus = array();
         $orderStatus['selected'] = $statusSelected;
         $orderStatus['unselected'] = $statusUnselected;
 
@@ -1158,6 +1161,11 @@ class Stripe_official extends PaymentModule
         return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
     }
 
+    public function hookDisplayAdminOrderTabLink($params)
+    {
+        return $this->hookDisplayAdminOrderTabOrder($params);
+    }
+
     /**
      * Add a tab to controle intents on an order details admin page (tab content)
      * @return html
@@ -1182,6 +1190,11 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
+    public function hookDisplayAdminOrderTabContent($params)
+    {
+        return $this->hookDisplayAdminOrderContentOrder($params);
     }
 
     public function hookActionOrderStatusUpdate($params)
@@ -1213,7 +1226,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
-        if (!in_array($this->context->controller->php_self, ['order', 'order-opc'])) {
+        $orderPageNames = ['order', 'order-opc'];
+        Hook::exec('actionStripeDefineOrderPageNames', array('orderPageNames' => &$orderPageNames));
+        if (!in_array(Tools::getvalue('controller'), $orderPageNames)) {
             return;
         }
 
@@ -1353,7 +1368,7 @@ class Stripe_official extends PaymentModule
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1436,7 +1451,7 @@ class Stripe_official extends PaymentModule
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id,
                 'last4' => $card->card->last4,
-                'brand' => ucfirst($card->card->brand)
+                'brand' => Tools::ucfirst($card->card->brand)
             ));
 
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_save_card.tpl');
@@ -1486,7 +1501,7 @@ class Stripe_official extends PaymentModule
 
         $address = new Address($params['cart']->id_address_invoice);
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1590,7 +1605,7 @@ class Stripe_official extends PaymentModule
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
             ->setModuleName($this->name)
-            ->setCallToActionText($this->button_label['save_card'].' : '.ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+            ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
 
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id

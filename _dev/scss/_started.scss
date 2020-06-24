@@ -400,6 +400,13 @@ label[for="applepay_googlepay"] {
   vertical-align: top;
 }
 
+.form-group span.left20,
+.form-group input.left20,
+.form-group div.left20,
+.form-group p.left20 {
+    margin-left: 20px;
+}
+
 /* Retina support */
 @media only screen and (resolution: 150dpi) {
   .stripe-connect span::before,

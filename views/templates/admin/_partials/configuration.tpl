@@ -24,7 +24,7 @@
 
 <form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">
-	<input type="hidden" name="order_status_select" value="{$orderStatusSelected}">
+	<input type="hidden" name="order_status_select" value="{$orderStatusSelected|escape:'htmlall':'UTF-8'}">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
@@ -103,23 +103,24 @@
 						<div class="form-group">
 							<input type="checkbox" id="reinsurance" name="reinsurance" {if $reinsurance}checked="checked"{/if}/>
 							<label for="reinsurance">{l s='Display an extended version of the form with card logos instead of the compact version. Choose the logos to display below based on the brands accepted by your Stripe account.' mod='stripe_official'}</label><br/>
-
-							<input type="checkbox" id="visa" name="visa" {if $visa}checked="checked"{/if}/>
-							<label for="visa">{l s='Visa' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="mastercard" name="mastercard" {if $mastercard}checked="checked"{/if}/>
-							<label for="mastercard">{l s='Mastercard' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="american_express" name="american_express" {if $american_express}checked="checked"{/if}/>
-							<label for="american_express">{l s='American Express' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="cb" name="cb" {if $cb}checked="checked"{/if}/>
-							<label for="cb">{l s='CB (Cartes Bancaires)' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="diners_club" name="diners_club" {if $diners_club}checked="checked"{/if}/>
-							<label for="diners_club">{l s='Diners Club / Discover' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="union_pay" name="union_pay" {if $union_pay}checked="checked"{/if}/>
-							<label for="union_pay">{l s='China UnionPay' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="jcb" name="jcb" {if $jcb}checked="checked"{/if}/>
-							<label for="jcb">{l s='JCB' mod='stripe_official'}</label><br/>
-							<input type="checkbox" id="discovers" name="discovers" {if $discovers}checked="checked"{/if}/>
-							<label for="discovers">{l s='Discovers' mod='stripe_official'}</label><br/>
+							<div class="left20">
+								<input type="checkbox" id="visa" name="visa" class="child" {if $visa}checked="checked"{/if}/>
+								<label for="visa">{l s='Visa' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="mastercard" name="mastercard" class="child" {if $mastercard}checked="checked"{/if}/>
+								<label for="mastercard">{l s='Mastercard' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="american_express" name="american_express" class="child" {if $american_express}checked="checked"{/if}/>
+								<label for="american_express">{l s='American Express' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="cb" name="cb" class="child" {if $cb}checked="checked"{/if}/>
+								<label for="cb">{l s='CB (Cartes Bancaires)' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="diners_club" name="diners_club" class="child" {if $diners_club}checked="checked"{/if}/>
+								<label for="diners_club">{l s='Diners Club / Discover' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="union_pay" name="union_pay" class="child" {if $union_pay}checked="checked"{/if}/>
+								<label for="union_pay">{l s='China UnionPay' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="jcb" name="jcb" class="child" {if $jcb}checked="checked"{/if}/>
+								<label for="jcb">{l s='JCB' mod='stripe_official'}</label><br/>
+								<input type="checkbox" id="discovers" name="discovers" class="child" {if $discovers}checked="checked"{/if}/>
+								<label for="discovers">{l s='Discovers' mod='stripe_official'}</label>
+							</div>
 						</div>
 
 						<div class="form-group">
@@ -132,7 +133,7 @@
 						<div class="form-group">
 							<input type="checkbox" id="postcode" name="postcode" {if $postcode}checked="checked"{/if}/>
 							<label for="postcode">{l s='Never collect the postal code (not recommended*).' mod='stripe_official'}</label><br/>
-							<span>*{l s='This information improves the acceptance rates for cards issued in the United States, the United Kingdom and Canada.' mod='stripe_official'}</span>
+							<span class="left20">*{l s='This information improves the acceptance rates for cards issued in the United States, the United Kingdom and Canada.' mod='stripe_official'}</span>
 						</div>
 
 						<div class="form-group">
@@ -143,28 +144,29 @@
 						<div class="form-group">
 							<input type="checkbox" id="save_card" name="save_card" {if $save_card}checked="checked"{/if}/>
 							<label for="save_card">{l s='Save customer cards (for later one-click payments)' mod='stripe_official'}</label><br/>
+							<div class="left20">
+								<input type="radio" name="ask_customer" id="ask_yes" value="1" class="child" {if $ask_customer == 1}checked{/if}/>
+								<label for="ask_yes">{l s='Ask the customer' mod='stripe_official'}</label><br/>
 
-							<input type="radio" name="ask_customer" id="ask_yes" value="1" {if $ask_customer == 1}checked{/if}/>
-							<label for="ask_yes">{l s='Ask the customer' mod='stripe_official'}</label><br/>
-
-							<input type="radio" name="ask_customer" id="ask_no" value="0" {if $ask_customer == 0}checked{/if}/>
-							<label for="ask_no">{l s='Save without asking' mod='stripe_official'}</label>
+								<input type="radio" name="ask_customer" id="ask_no" value="0" class="child" {if $ask_customer == 0}checked{/if}/>
+								<label for="ask_no">{l s='Save without asking' mod='stripe_official'}</label>
+							</div>
 						</div>
 
 						<div class="form-group">
 							<input type="checkbox" id="catchandauthorize" name="catchandauthorize" {if $catchandauthorize}checked="checked"{/if}/>
 							<label for="catchandauthorize">{l s='Enable separate authorization and capture. If enabled, Stripe will place a hold on the card for the amount of the order during checkout. That authorization will be captured and the money settled to your account when the order transitions to the status of your choice.' mod='stripe_official'}</label>
-							<p>
+							<p class="left20">
 								<b>{l s='Warning: you have 7 calendar days to capture the authorization before it expires and the hold on the card is released.' mod='stripe_official'}</b>
 							</p>
-							<span>{l s='Capture the payment when transitioning to the following order statuses.' mod='stripe_official'}</span>
-							<div id="status_restrictions">
+							<span class="left20">{l s='Capture the payment when transitioning to the following order statuses.' mod='stripe_official'}</span>
+							<div id="status_restrictions" class="left20">
 								<br />
 								<table class="table">
 									<tr>
 										<td class="col-md-6">
 											<p>{l s='Your status' mod='stripe_official'}</p>
-											<select id="order_status_select_1" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+											<select id="order_status_select_1" class="input-large child" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.unselected item='orderState'}
 													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
@@ -173,7 +175,7 @@
 										</td>
 										<td class="col-md-6">
 											<p>{l s='Catch status' mod='stripe_official'}</p>
-											<select id="order_status_select_2" class="input-large" multiple {if $catchandauthorize == false}disabled{/if}>
+											<select id="order_status_select_2" class="input-large child" multiple {if $catchandauthorize == false}disabled{/if}>
 												{foreach from=$orderStatus.selected item='orderState'}
 													<option value="{$orderState.id_order_state|intval}">{$orderState.name|escape}</option>
 												{/foreach}
@@ -184,10 +186,10 @@
 								</table>
 							</div>
 
-							<div>
-								<p>{l s='Capture the payment when transitioning to the following order status or statuses.' mod='stripe_official'}</p>
-								<select name="capture_expired" id="capture_expired" {if $catchandauthorize == false}disabled{/if}>
-									<option value="0">{l s='Choisir un statut'}</option>
+							<div class="left20">
+								<p>{l s='Transition to the following order status if the authorization expires before being captured.' mod='stripe_official'}</p>
+								<select name="capture_expired" id="capture_expired" class="child" {if $catchandauthorize == false}disabled{/if}>
+									<option value="0">{l s='Select a status' mod='stripe_official'}</option>
 									{foreach from=$allOrderStatus item=status}
 										<option value="{$status.id_order_state|intval}" {if isset($captureExpire) && $captureExpire == $status.id_order_state}selected="selected"{/if}>{$status.name|escape}</option>
 									{/foreach}

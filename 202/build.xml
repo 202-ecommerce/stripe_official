@@ -27,7 +27,7 @@
 
     <target name="psvalidator" description="Send Prestashop Validator">
         <echo>Send Prestashop Validator</echo>
-        <exec executable="php" failonerror="true">
+        <exec executable="php" failonerror="false">
             <arg value="${env.TOTBUILDER_PATH}console"/>
             <arg value="psvalidator:validate"/>
             <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip"/>

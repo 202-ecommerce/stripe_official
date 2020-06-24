@@ -61,16 +61,18 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $input, $sig_header, $endpoint_secret
+                $input,
+                $sig_header,
+                $endpoint_secret
             );
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // Invalid payload
             ProcessLoggerHandler::logError('Invalid payload : '.$e->getMessage(), null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
             echo $e->getMessage();
             exit();
-        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
             // Invalid signature
             ProcessLoggerHandler::logError('Invalid signature : '.$e->getMessage(), null, null, 'webhook');
             ProcessLoggerHandler::closeLogger();

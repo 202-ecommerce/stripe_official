@@ -43,10 +43,8 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
                 $allCards = $stripeCard->getAllCustomerCards();
 
                 foreach ($allCards as &$card) {
-                    if ($card->card->exp_month < 10) {
-                        $card->card->exp_month = '0'.$card->card->exp_month;
-                    }
-                    $card->card->exp_year = substr($card->card->exp_year, -2);
+                    $card->card->exp_month = sprintf('%02d', $card->card->exp_month);
+                    $card->card->exp_year = Tools::substr($card->card->exp_year, -2);
                 }
             }
         }
@@ -60,6 +58,22 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
         } else {
             $this->setTemplate('stripe-cards16.tpl');
         }
+    }
+
+    public function getBreadcrumbLinks()
+    {
+        $breadcrumb = parent::getBreadcrumbLinks();
+        $breadcrumb['links'][] = $this->addMyAccountToBreadcrumb();
+        $breadcrumb['links'][] = [
+            'title' => $this->l('Cards', 'stripe_official'),
+            'url' => $this->context->link->getModuleLink(
+                'stripe_official',
+                'stripeCards',
+                array(),
+                true
+            ),
+        ];
+        return $breadcrumb;
     }
 
     public function setMedia()

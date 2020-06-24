@@ -124,7 +124,7 @@
     position: relative;
 }
 
-.stripe-payment-form label {
+body#checkout section.checkout-step .payment-options .stripe-payment-form #save_card .checkbox label {
     display: inline-block;
     margin-bottom: 4px;
     font-size: 14px;
