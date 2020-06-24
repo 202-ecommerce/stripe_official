@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,18 +21,15 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-<form class="stripe-payment-form" action="">
-    <input type="hidden" name="stripe-payment-method" value="sofort">
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-    {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="sofort">
-            <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
-                <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
-                {l s='Pay by SOFORT' mod='stripe_official'}
-            </p>
-        </div>
-    {/if}
+function upgrade_module_2_2_0($module)
+{
+    $module->installOrderState();
 
-</form>
+    return true;
+}

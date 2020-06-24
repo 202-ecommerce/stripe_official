@@ -23,15 +23,21 @@
 *}
 
 <form class="stripe-payment-form" action="">
-    <input type="hidden" name="stripe-payment-method" value="sofort">
+    <input type="hidden" name="stripe-payment-method" value="fpx">
+
+    {if isset($prestashop_version) && $prestashop_version == '1.7'}
+        <div id="stripe-fpx-bank-element" class="field"></div>
+    {/if}
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="sofort">
-            <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
-                <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
-                {l s='Pay by SOFORT' mod='stripe_official'}
+        <div class="payment_module stripe-europe-payments" data-method="fpx">
+            <p title="{l s='Pay by FPX' mod='stripe_official'}">
+                <img id="fpx" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/fpx.png" alt="{l s='Pay by FPX' mod='stripe_official'}" />
+                {l s='Pay by FPX' mod='stripe_official'}
             </p>
         </div>
+        <span id="stripe-fpx-bank-element" class="field"></span>
+        <button class="fpx-submit-button" data-method="fpx">{l s='Buy now' mod='stripe_official'}</button>
     {/if}
 
 </form>

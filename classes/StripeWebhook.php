@@ -23,21 +23,31 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class StripeWebhook extends ObjectModel
 {
     public static function create()
     {
+        $module = Module::getInstanceByName('stripe_official');
         try {
             $context = Context::getContext();
 
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')),
+                'url' => $context->link->getModuleLink(
+                    'stripe_official',
+                    'webhook',
+                    array(),
+                    true,
+                    Configuration::get('PS_LANG_DEFAULT'),
+                    Configuration::get('PS_SHOP_DEFAULT')
+                ),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
         } catch (Exception $e) {
-            ProcessLoggerHandler::logError(
+          ProcessLoggerHandler::logError(
                 'Create webhook endpoint - '.(string)$e->getMessage(),
                 null,
                 null,

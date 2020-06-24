@@ -112,7 +112,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         // Create the handler
         $handler = new ActionsHandler();
         $handler->setConveyor(array(
-                    'event' => $event,
+                    'event_json' => $event,
                     'module' => $this->module,
                     'context' => $this->context,
                 ));

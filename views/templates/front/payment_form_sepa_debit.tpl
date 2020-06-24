@@ -22,16 +22,22 @@
  * @license   Commercial license
 *}
 
-<form class="stripe-payment-form" action="">
-    <input type="hidden" name="stripe-payment-method" value="sofort">
+<form class="stripe-payment-form" id="stripe-sepa-element" action="">
+    <input type="hidden" name="stripe-payment-method" value="sepa_debit">
+
+    {if isset($prestashop_version) && $prestashop_version == '1.7'}
+        <div id="stripe-iban-element" class="field"></div>
+    {/if}
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="sofort">
-            <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
-                <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
-                {l s='Pay by SOFORT' mod='stripe_official'}
+        <div class="payment_module stripe-europe-payments" data-method="sepa_debit">
+            <p title="{l s='Pay by SEPA Direct Debit' mod='stripe_official'}">
+                <img id="sepa_debit" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sepa_debit.png" alt="{l s='Pay by SEPA Direct Debit' mod='stripe_official'}" />
+                {l s='Pay by SEPA Direct Debit' mod='stripe_official'}
             </p>
         </div>
+        <span id="stripe-iban-element" class="field"></span>
+        <button class="sepa_debit-submit-button" data-method="sepa_debit">{l s='Buy now' mod='stripe_official'}</button>
     {/if}
 
 </form>

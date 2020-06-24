@@ -128,6 +128,10 @@ class ConfigurationActions extends DefaultActions
         Configuration::updateValue(Stripe_official::ENABLE_SOFORT, Tools::getValue('sofort'));
         Configuration::updateValue(Stripe_official::ENABLE_GIROPAY, Tools::getValue('giropay'));
         Configuration::updateValue(Stripe_official::ENABLE_BANCONTACT, Tools::getValue('bancontact'));
+        Configuration::updateValue(Stripe_official::ENABLE_FPX, Tools::getValue('fpx'));
+        Configuration::updateValue(Stripe_official::ENABLE_EPS, Tools::getValue('eps'));
+        Configuration::updateValue(Stripe_official::ENABLE_P24, Tools::getValue('p24'));
+        Configuration::updateValue(Stripe_official::ENABLE_SEPA, Tools::getValue('sepa_debit'));
         Configuration::updateValue(Stripe_official::ENABLE_APPLEPAY_GOOGLEPAY, Tools::getValue('applepay_googlepay'));
         Configuration::updateValue(Stripe_official::POSTCODE, Tools::getValue('postcode'));
         Configuration::updateValue(Stripe_official::CARDHOLDERNAME, Tools::getValue('cardholdername'));
