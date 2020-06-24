@@ -24,9 +24,9 @@
 
 <form class="stripe-payment-form save_card" action="">
     {if $prestashop_version == '1.7'}
-        <input type="hidden" name="stripe-payment-method" value="card" data-id_payment_method="{$id_payment_method}">
+        <input type="hidden" name="stripe-payment-method" value="card" data-id_payment_method="{$id_payment_method|escape:'htmlall':'UTF-8'}">
     {else}
-        <p>{l s='Pay by card:' mod='stripe_official'} {$brand} **** **** **** {$last4}</p>
-        <button class="stripe-submit-button" data-method="card" data-id_payment_method="{$id_payment_method}">{l s='Buy now' mod='stripe_official'}</button>
+        <p>{l s='Pay by card:' mod='stripe_official'} {$brand|escape:'htmlall':'UTF-8'} **** **** **** {$last4|escape:'htmlall':'UTF-8'}</p>
+        <button class="stripe-submit-button" data-method="card" data-id_payment_method="{$id_payment_method|escape:'htmlall':'UTF-8'}">{l s='Buy now' mod='stripe_official'}</button>
     {/if}
 </form>

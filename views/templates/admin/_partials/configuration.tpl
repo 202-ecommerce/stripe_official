@@ -24,7 +24,7 @@
 
 <form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">
-	<input type="hidden" name="order_status_select" value="{$orderStatusSelected}">
+	<input type="hidden" name="order_status_select" value="{$orderStatusSelected|escape:'htmlall':'UTF-8'}">
 	<div class="panel" id="fieldset_0">
 		<div class="form-wrapper">
 			<div class="form-group stripe-connection">
@@ -187,9 +187,9 @@
 							</div>
 
 							<div class="left20">
-								<p>{l s='Capture the payment when transitioning to the following order status or statuses.' mod='stripe_official'}</p>
+								<p>{l s='Transition to the following order status if the authorization expires before being captured.' mod='stripe_official'}</p>
 								<select name="capture_expired" id="capture_expired" class="child" {if $catchandauthorize == false}disabled{/if}>
-									<option value="0">{l s='Choisir un statut'}</option>
+									<option value="0">{l s='Select a status' mod='stripe_official'}</option>
 									{foreach from=$allOrderStatus item=status}
 										<option value="{$status.id_order_state|intval}" {if isset($captureExpire) && $captureExpire == $status.id_order_state}selected="selected"{/if}>{$status.name|escape}</option>
 									{/foreach}

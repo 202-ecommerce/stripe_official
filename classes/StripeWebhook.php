@@ -31,20 +31,60 @@ class StripeWebhook extends ObjectModel
             $context = Context::getContext();
 
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true),
+                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
-        } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
-            ProcessLoggerHandler::logError('Create webhook endpoint - '.(string)$e->getMessage(), null, null, 'StripeWebhook');
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                'Create webhook endpoint - '.(string)$e->getMessage(),
+                null,
+                null,
+                'StripeWebhook'
+            );
             return false;
         }
     }
 
     public static function getWebhookList()
     {
-        return \Stripe\WebhookEndpoint::all();
+        return \Stripe\WebhookEndpoint::all(
+            [
+                'limit' => 16
+            ]
+        );
+    }
+
+    public static function countWebhooksList()
+    {
+        $list = self::getWebhookList();
+        return count($list->data);
+    }
+
+    public static function webhookCanBeRegistered()
+    {
+        $context = Context::getContext();
+
+        if (Stripe_official::isWellConfigured() === false) {
+            return false;
+        }
+
+        $webhooksList = self::getWebhookList();
+        $webhookUrl = $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+        $webhookExists = false;
+
+        foreach ($webhooksList->data as $webhook) {
+            if ($webhook->url == $webhookUrl) {
+                $webhookExists = true;
+                break;
+            }
+        }
+
+        if (self::countWebhooksList() >= 16 && $webhookExists === false) {
+            return false;
+        }
+
+        return true;
     }
 }

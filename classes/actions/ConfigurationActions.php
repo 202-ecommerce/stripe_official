@@ -89,7 +89,9 @@ class ConfigurationActions extends DefaultActions
     {
         if (!Tools::getValue('catchandauthorize')) {
             Configuration::updateValue(Stripe_official::CATCHANDAUTHORIZE, null);
-        } else if (Tools::getValue('catchandauthorize') && Tools::getValue('order_status_select') != '' && Tools::getValue('capture_expired') != '0') {
+        } elseif (Tools::getValue('catchandauthorize')
+            && Tools::getValue('order_status_select') != ''
+            && Tools::getValue('capture_expired') != '0') {
             Configuration::updateValue(Stripe_official::CAPTURE_EXPIRE, Tools::getValue('capture_expired'));
             Configuration::updateValue(Stripe_official::CAPTURE_STATUS, Tools::getValue('order_status_select'));
             Configuration::updateValue(Stripe_official::CATCHANDAUTHORIZE, Tools::getValue('catchandauthorize'));
@@ -159,11 +161,13 @@ class ConfigurationActions extends DefaultActions
     {
         $this->context = $this->conveyor['context'];
 
-        if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == '') {
+        if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE)
+            || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == ''
+            && StripeWebhook::countWebhooksList() < 16) {
             $webhooksList = StripeWebhook::getWebhookList();
 
             foreach ($webhooksList as $webhookEndpoint) {
-                if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true)) {
+                if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
                     $webhookEndpoint->delete();
                 }
             }

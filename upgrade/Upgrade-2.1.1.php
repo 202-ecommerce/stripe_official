@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,11 +21,18 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-<li class="nav-item">
-    <a href="#StripePayment" class="nav-link" data-toggle="tab" role="tab" aria-controls="StripePayment">
-        <i class="icon-money"></i>
-        {l s='Stripe' mod='stripe_official'} <span class="badge">1</span>
-    </a>
-</li>
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+function upgrade_module_2_1_1($module)
+{
+    if (version_compare(_PS_VERSION_, '1.7.7', '>=')) {
+        $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+        $installer->registerHooks();
+    }
+
+    return true;
+}
