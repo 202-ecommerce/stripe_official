@@ -29,7 +29,6 @@ class StripeWebhook extends ObjectModel
 {
     public static function create()
     {
-        $module = Module::getInstanceByName('stripe_official');
         try {
             $context = Context::getContext();
 
