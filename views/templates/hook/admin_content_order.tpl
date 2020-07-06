@@ -38,14 +38,14 @@
 
     {if isset($stripe_dateCatch) && $stripe_dateCatch != '0000-00-00 00:00:00'}
         <p>
-            <span><strong>{l s='Capture date' mod='stripe_official'}</strong></span><br/>
+            <span><strong>{l s='Authorize date' mod='stripe_official'}</strong></span><br/>
             <span>{$stripe_dateCatch|escape:'htmlall':'UTF-8'}</span>
         </p>
     {/if}
 
     {if (isset($stripe_dateAuthorize) && $stripe_dateAuthorize != '0000-00-00 00:00:00') || (isset($stripe_expired) && $stripe_expired == 1)}
         <p>
-            <span><strong>{l s='Authorize date' mod='stripe_official'}</strong></span><br/>
+            <span><strong>{l s='Capture date' mod='stripe_official'}</strong></span><br/>
             {if $stripe_dateAuthorize != '0000-00-00 00:00:00'}
                 <span>{$stripe_dateAuthorize|escape:'htmlall':'UTF-8'}</span>
             {else}
