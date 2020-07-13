@@ -111,7 +111,8 @@ $_MODULE['<{stripe_official}prestashop>configuration_160341e19f4199f98bae44696b5
 $_MODULE['<{stripe_official}prestashop>configuration_ec211f7c20af43e742bf2570c3cb84f9'] = 'Hinzufügen';
 $_MODULE['<{stripe_official}prestashop>configuration_cea9034a11c05369bf41177de1bf7220'] = 'Catch-Status';
 $_MODULE['<{stripe_official}prestashop>configuration_1063e38cb53d94d386f21227fcd84717'] = 'Entfernen';
-$_MODULE['<{stripe_official}prestashop>configuration_c5aab817a800aee77f58051978896fc7'] = 'Die Zahlung erfassen, wenn der folgende/die folgenden Bestellstatus eingenommen werden.';
+$_MODULE['<{stripe_official}prestashop>configuration_aa6c823b025adf0a6038cbe782fa2ea9'] = 'Zum folgenden Bestellstatus wechseln, wenn die Autorisierung abläuft, bevor sie erfasst wird.';
+$_MODULE['<{stripe_official}prestashop>configuration_5ed7d8757f51d8e13f2b5251de9055c7'] = 'Status auswählen';
 $_MODULE['<{stripe_official}prestashop>configuration_019d235906cab8dd39702ff1ed63b0ce'] = 'Lokale Zahlungsmethoden';
 $_MODULE['<{stripe_official}prestashop>configuration_8f1a111030bf835a13969e7d91bb5721'] = 'Diese Zahlungsmethoden können derzeit nur von europäischen Händlern genutzt werden. Folgen Sie der nachfolgenden Anleitung, um mit dem Akzeptieren zu beginnen:';
 $_MODULE['<{stripe_official}prestashop>configuration_dbc0bde38ae3629dada4bb5f28baa4f5'] = 'Aktivieren Sie die gewünschten Zahlungsmethoden in diesem Modul:';
