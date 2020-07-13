@@ -150,6 +150,8 @@ class Stripe_official extends PaymentModule
         'displayBackOfficeHeader',
         'displayAdminOrderTabOrder',
         'displayAdminOrderContentOrder',
+        'displayAdminOrderTabLink',
+        'displayAdminOrderTabContent',
         'displayAdminCartsView',
         'paymentOptions',
         'payment',
@@ -490,6 +492,13 @@ class Stripe_official extends PaymentModule
             );
         }
 
+        if (StripeWebhook::webhookCanBeRegistered() === false && self::isWellConfigured() === true) {
+            $this->warning[] = $this->l(
+                'You reached the limit of 16 webhook endpoints registered in your Dashboard Stripe for this account. Please remove one of them if you want to register this domain.',
+                $this->name
+            );
+        }
+
         /* Check if TLS is enabled and the TLS version used is 1.2 */
         if (self::isWellConfigured()) {
             $secret_key = trim(Tools::getValue(self::TEST_KEY));
@@ -516,7 +525,14 @@ class Stripe_official extends PaymentModule
                         'module' => $this
                     ));
 
-            $handler->addActions('registerKeys', 'registerCatchAndAuthorize', 'registerSaveCard', 'registerOtherConfigurations', 'registerApplePayDomain', 'registerWebhookSignature');
+            $handler->addActions(
+                'registerKeys',
+                'registerCatchAndAuthorize',
+                'registerSaveCard',
+                'registerOtherConfigurations',
+                'registerApplePayDomain',
+                'registerWebhookSignature'
+            );
 
             $handler->process('Configuration');
         }
@@ -599,6 +615,7 @@ class Stripe_official extends PaymentModule
             $statusUnselected = $allOrderStatus;
         }
 
+        $orderStatus = array();
         $orderStatus['selected'] = $statusSelected;
         $orderStatus['unselected'] = $statusUnselected;
 
@@ -1119,6 +1136,11 @@ class Stripe_official extends PaymentModule
         return $this->display(__FILE__, 'views/templates/hook/admin_tab_order.tpl');
     }
 
+    public function hookDisplayAdminOrderTabLink($params)
+    {
+        return $this->hookDisplayAdminOrderTabOrder($params);
+    }
+
     /**
      * Add a tab to controle intents on an order details admin page (tab content)
      * @return html
@@ -1143,6 +1165,11 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
+    }
+
+    public function hookDisplayAdminOrderTabContent($params)
+    {
+        return $this->hookDisplayAdminOrderContentOrder($params);
     }
 
     public function hookActionOrderStatusUpdate($params)
@@ -1174,7 +1201,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
-        if (!in_array($this->context->controller->php_self, ['order', 'order-opc'])) {
+        $orderPageNames = ['order', 'order-opc'];
+        Hook::exec('actionStripeDefineOrderPageNames', array('orderPageNames' => &$orderPageNames));
+        if (!in_array(Tools::getValue('controller'), $orderPageNames)) {
             return;
         }
 
@@ -1287,7 +1316,7 @@ class Stripe_official extends PaymentModule
 
             'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
 
-            'prestashop_version' => $prestashop_version,
+            'ps_version' => $prestashop_version,
 
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
@@ -1326,7 +1355,7 @@ class Stripe_official extends PaymentModule
         // Create or update the payment intent for this order
         $this->retrievePaymentIntent($amount, $currency_iso_code);
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1383,6 +1412,14 @@ class Stripe_official extends PaymentModule
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
         if ($stripeCustomer->id == null) {
+            return $display;
+        }
+
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
+        if ($stripeCustomerExists === false) {
             return $display;
         }
 
@@ -1451,7 +1488,7 @@ class Stripe_official extends PaymentModule
 
         $address = new Address($params['cart']->id_address_invoice);
 
-        if (Configuration::get(self::POSTCODE) == NULL) {
+        if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
             $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
@@ -1530,6 +1567,14 @@ class Stripe_official extends PaymentModule
         $stripeCustomer->getCustomerById($this->context->customer->id);
 
         if ($stripeCustomer->id == null) {
+            return $options;
+        }
+
+        $stripeCustomerExists = $stripeCustomer->stripeCustomerExists(
+            $this->context->customer->email,
+            $stripeCustomer->stripe_customer_key
+        );
+        if ($stripeCustomerExists === false) {
             return $options;
         }
 

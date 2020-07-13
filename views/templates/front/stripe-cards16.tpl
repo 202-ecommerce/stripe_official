@@ -37,16 +37,16 @@
             {foreach from=$cards item=card}
                 <tr>
                     <td class="text-center" data-label="{l s='Type' mod='stripe_official'}">
-                        {$card.card->brand|ucfirst}
+                        {$card.card->brand|capitalize|escape:'htmlall':'UTF-8'}
                     </td>
                     <td class="text-center" data-label="{l s='Card number' mod='stripe_official'}">
-                        **** **** **** {$card.card->last4}
+                        **** **** **** {$card.card->last4|escape:'htmlall':'UTF-8'}
                     </td>
                     <td class="text-center" data-label="{l s='Validity' mod='stripe_official'}">
-                        {$card.card->exp_month}/{$card.card->exp_year}
+                        {$card.card->exp_month|escape:'htmlall':'UTF-8'}/{$card.card->exp_year|escape:'htmlall':'UTF-8'}
                     </td>
                     <td class="text-center" data-label="{l s='Type' mod='stripe_official'}">
-                        <span class="remove_card" data-id_payment_method="{$card.id}">
+                        <span class="remove_card" data-id_payment_method="{$card.id|escape:'htmlall':'UTF-8'}">
                             <i class="icon-trash-o"></i>
                         </span>
                     </td>

@@ -5,7 +5,7 @@
     <property name="src-dir" value="${basedir}" />
     <property name="TARGETNAME" value="stripe_official" />
     <property name="TARGETBRANCH" value="${env.GIT_BRANCH}" />
-    <property name="TARGETVERSION" value="2.1.0" />
+    <property name="TARGETVERSION" value="2.1.1" />
     <property name="PHPVERSION" value="5.6" />
     <property name="PSVERSION" value="1.7.5.x" />
 
@@ -27,7 +27,7 @@
 
     <target name="psvalidator" description="Send Prestashop Validator">
         <echo>Send Prestashop Validator</echo>
-        <exec executable="php" failonerror="true">
+        <exec executable="php" failonerror="false">
             <arg value="${env.TOTBUILDER_PATH}console"/>
             <arg value="psvalidator:validate"/>
             <arg value="${env.WORKSPACE}/202/build/packages/v${TARGETVERSION}-prod-${TARGETNAME}.zip"/>
