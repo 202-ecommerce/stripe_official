@@ -371,7 +371,7 @@ class ValidationOrderActions extends DefaultActions
                         3,
                         null,
                         'Cart',
-                        (int)$$this->context->cart->id,
+                        (int)$this->context->cart->id,
                         true
                     );
                     throw new PrestaShopException('Can\'t save Order Payment');
@@ -452,8 +452,6 @@ class ValidationOrderActions extends DefaultActions
             null,
             'webhook'
         );
-
-        if ($this->conveyor['event_json']->type == 'charge.succeeded') {
 
         if ($this->conveyor['event_json']->type == 'charge.dispute.created') {
             $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
