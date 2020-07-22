@@ -58,11 +58,21 @@ class StripeWebhook extends ObjectModel
 
     public static function getWebhookList()
     {
-        return \Stripe\WebhookEndpoint::all(
-            [
-                'limit' => 16
-            ]
-        );
+        try {
+            return \Stripe\WebhookEndpoint::all(
+                [
+                    'limit' => 16
+                ]
+            );
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                'getWebhookList - '.(string)$e->getMessage(),
+                null,
+                null,
+                'StripeWebhook'
+            );
+            return false;
+        }
     }
 
     public static function countWebhooksList()
