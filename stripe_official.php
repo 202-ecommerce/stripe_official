@@ -32,12 +32,6 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 /**
 * Stripe object model
 */
-require_once dirname(__FILE__) . '/classes/StripePayment.php';
-require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
-require_once dirname(__FILE__) . '/classes/StripeCapture.php';
-require_once dirname(__FILE__) . '/classes/StripeCustomer.php';
-require_once dirname(__FILE__) . '/classes/StripeCard.php';
-require_once dirname(__FILE__) . '/classes/StripeWebhook.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
