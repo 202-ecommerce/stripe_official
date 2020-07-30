@@ -25,7 +25,7 @@
 <div class="tab-pane" id="StripePayment">
     <p>
         <span><strong>{l s='Payment ID' mod='stripe_official'}</strong></span><br/>
-        <span><a href="{$stripe_dashboardUrl.charge|escape:'htmlall'}" target="blank">{$stripe_charge}</a></span>
+        <span><a href="{$stripe_dashboardUrl.charge|escape:'htmlall'}" target="blank">{$stripe_charge|escape:'htmlall':'UTF-8'}</a></span>
     </p>
     <p>
         <span><strong>{l s='Payment date' mod='stripe_official'}</strong></span><br/>

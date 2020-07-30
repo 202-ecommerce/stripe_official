@@ -46,7 +46,7 @@ class StripeWebhook extends ObjectModel
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
         } catch (Exception $e) {
-          ProcessLoggerHandler::logError(
+            ProcessLoggerHandler::logError(
                 'Create webhook endpoint - '.(string)$e->getMessage(),
                 null,
                 null,

@@ -73,7 +73,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         // Set list of actions to execute
         if (Tools::getValue('source')) {
             $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'addTentative');
-        } else if (Tools::getValue('payment_intent')) {
+        } elseif (Tools::getValue('payment_intent')) {
             $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'addTentative');
         } else {
             $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'saveCard', 'addTentative');

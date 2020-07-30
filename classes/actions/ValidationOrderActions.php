@@ -207,7 +207,7 @@ class ValidationOrderActions extends DefaultActions
             && $this->conveyor['status'] == 'pending') {
             $orderStatus = Configuration::get('STRIPE_OS_SOFORT_WAITING');
             $this->conveyor['result'] = 4;
-        } else if ($this->conveyor['datas']['type'] == 'sepa_debit') {
+        } elseif ($this->conveyor['datas']['type'] == 'sepa_debit') {
             $orderStatus = Configuration::get(Stripe_official::SEPA_WAITING);
             $this->conveyor['result'] = 3;
         } else {
@@ -474,12 +474,12 @@ class ValidationOrderActions extends DefaultActions
             $order->update();
 
             $history->addWithemail();
-        } elseif ($this->conveyor['event_json']->type == 'charge.expired' || $this->conveyor['event_json']->type == 'charge.refunded') {
+        } elseif ($this->conveyor['event_json']->type == 'charge.expired'
+            || $this->conveyor['event_json']->type == 'charge.refunded') {
             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
         } elseif ($this->conveyor['event_json']->type == 'charge.succeeded') {
             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
         } elseif ($this->conveyor['event_json']->type == 'charge.failed') {
-
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         }
 
