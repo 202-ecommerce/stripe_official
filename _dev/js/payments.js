@@ -36,6 +36,7 @@ $(function(){
     let payment = '';
     let disableText = '';
     let id_payment_method = '';
+    let cardFormPayment;
 
     // Global variable to store the PaymentIntent object.
     let paymentIntent;
@@ -277,12 +278,19 @@ $(function(){
         payment = $('input[name="stripe-payment-method"]', $form).val();
         id_payment_method = $('input[name="stripe-payment-method"]', $form).data('id_payment_method');
         disableText = event.currentTarget;
+        cardFormPayment = $('input[data-module-name="stripe_official"]').is(':checked');
       } else {
         /* Prestashop 1.6 */
         $form = event.currentTarget;
         payment = event.currentTarget.dataset.method;
         id_payment_method = event.currentTarget.dataset.id_payment_method;
         disableText = event.currentTarget;
+
+        if ($submit.parents('#stripe-card-payment').length > 0) {
+          cardFormPayment = true;
+        } else {
+          cardFormPayment = false;
+        }
 
         if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
           var error = { "message" : 'Please accept the CGV' };
@@ -460,7 +468,7 @@ $(function(){
               currency: stripe_currency,
               id_payment_method: id_payment_method,
               stripe_auto_save_card: stripe_auto_save_card,
-              card_form_payment: $('input[data-module-name="stripe_official"]').is(':checked'),
+              card_form_payment: cardFormPayment,
               save_card_form: $('#stripe_save_card').is(':checked'),
               payment_request: payment_request
           },
