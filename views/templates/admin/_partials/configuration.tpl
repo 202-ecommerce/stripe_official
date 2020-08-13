@@ -223,7 +223,9 @@
 									<input type="checkbox" id="p24" name="p24" {if $p24}checked="checked"{/if}/>
 									<label for="p24">{l s='P24 (if you have Polish customers)' mod='stripe_official'}</label><br>
 									<input type="checkbox" id="sepa_debit" name="sepa_debit" {if $sepa_debit}checked="checked"{/if}/>
-									<label for="sepa_debit">{l s='SEPA Direct Debit (if you have French, German, Spanish, Belgian, Dutch, Luxembourg, Italian, Portuguese, Austrian or Irish customers)' mod='stripe_official'}</label>
+									<label for="sepa_debit">{l s='SEPA Direct Debit (if you have French, German, Spanish, Belgian, Dutch, Luxembourg, Italian, Portuguese, Austrian or Irish customers)' mod='stripe_official'}</label><br>
+									<input type="checkbox" id="alipay" name="alipay" {if $alipay}checked="checked"{/if}/>
+									<label for="alipay">{l s='Alipay (if you have Chinese customers)' mod='stripe_official'}</label>
 								</div>
 							</li>
 							<li>
