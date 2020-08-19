@@ -85,10 +85,14 @@ class StripeCard extends ObjectModel
 
     public function getAllCustomerCards()
     {
-        $allCards = \Stripe\PaymentMethod::all([
-            'customer' => $this->stripe_customer_key,
-            'type' => 'card',
-        ]);
+        try {
+            $allCards = \Stripe\PaymentMethod::all([
+                'customer' => $this->stripe_customer_key,
+                'type' => 'card',
+            ]);
+        } catch (Exception $e) {
+            return array();
+        }
 
         return $allCards->data;
     }
