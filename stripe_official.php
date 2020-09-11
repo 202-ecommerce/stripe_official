@@ -1172,6 +1172,9 @@ class Stripe_official extends PaymentModule
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
+        $stripeDispute = new StripeDispute();
+        $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
             'stripe_paymentIntent' => $stripePayment->getIdPaymentIntent(),
@@ -1180,7 +1183,8 @@ class Stripe_official extends PaymentModule
             'stripe_paymentType' => $stripePayment->getType(),
             'stripe_dateCatch' => $stripeCapture->getDateCatch(),
             'stripe_dateAuthorize' => $stripeCapture->getDateAuthorize(),
-            'stripe_expired' => $stripeCapture->getExpired()
+            'stripe_expired' => $stripeCapture->getExpired(),
+            'stripe_dispute' => $dispute
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
