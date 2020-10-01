@@ -1335,7 +1335,13 @@ class Stripe_official extends PaymentModule
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
-            'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
+            'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
+
+            'stripe_message' => array(
+                'processing' => $this->l('Processing…'),
+                'accept_cgv' => $this->l('Please accept the CGV'),
+                'redirecting' => $this->l('Redirecting…')
+            )
         ));
     }
 
