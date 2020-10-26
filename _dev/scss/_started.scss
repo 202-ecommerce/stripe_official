@@ -407,6 +407,17 @@ label[for="applepay_googlepay"] {
     margin-left: 20px;
 }
 
+#conf-payment-methods span.payment_method_name
+#conf-payment-methods img {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#conf-payment-methods img {
+  width: 32px;
+  margin-left: 5px;
+}
+
 /* Retina support */
 @media only screen and (resolution: 150dpi) {
   .stripe-connect span::before,

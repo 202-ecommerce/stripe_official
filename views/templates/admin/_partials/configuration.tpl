@@ -217,7 +217,10 @@
 													   {if $key}checked="checked"{/if}/>
 											</td>
 											<td>
-												{$payment_method.name|escape:'htmlall':'UTF-8'}
+												<span class="payment_method_name">{$payment_method.name|escape:'htmlall':'UTF-8'}</span>
+												{if $payment_method.new_payment == 'Yes'}
+													<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/new_payment.png" />
+												{/if}
 											</td>
 											<td>
 												{if isset($payment_method.countries_names.{$language_iso_code})}
@@ -227,7 +230,11 @@
 												{/if}
 											</td>
 											<td>
-												{$payment_method.require_activation|escape:'htmlall':'UTF-8'}
+												{if $payment_method.require_activation == 'No'}
+													{l s='No' mod='stripe_official'}
+												{else}
+													{l s='Yes' mod='stripe_official'}
+												{/if}
 											</td>
 										</tr>
 									{/if}
