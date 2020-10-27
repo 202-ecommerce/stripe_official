@@ -1,11 +1,17 @@
 {
+    "config": {
+        "prepend-autoloader": false
+    },
 	"require": {
-		"stripe/stripe-php": "^6.30"
+		"stripe/stripe-php": "^7.33"
 	},
     "autoload": {
         "psr-4": {
           "Stripe_officialClasslib\\": "vendor/totpsclasslib/src/"
-        }
+        },
+        "classmap": [
+            "classes/"
+        ]
     },
     "scripts": {
         "pre-autoload-dump": "if [ ${TOTPSCLASSLIB_DEV_PATH} ]; then php ${TOTPSCLASSLIB_DEV_PATH}/classlib/refresh.php .; fi"

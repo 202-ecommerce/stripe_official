@@ -32,12 +32,6 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 /**
 * Stripe object model
 */
-require_once dirname(__FILE__) . '/classes/StripePayment.php';
-require_once dirname(__FILE__) . '/classes/StripePaymentIntent.php';
-require_once dirname(__FILE__) . '/classes/StripeCapture.php';
-require_once dirname(__FILE__) . '/classes/StripeCustomer.php';
-require_once dirname(__FILE__) . '/classes/StripeCard.php';
-require_once dirname(__FILE__) . '/classes/StripeWebhook.php';
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -67,6 +61,8 @@ class Stripe_official extends PaymentModule
     const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
+    const SEPA_WAITING = 'STRIPE_SEPA_WAITING';
+    const SEPA_DISPUTE = 'STRIPE_SEPA_DISPUTE';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
@@ -84,6 +80,10 @@ class Stripe_official extends PaymentModule
     const ENABLE_SOFORT = 'STRIPE_ENABLE_SOFORT';
     const ENABLE_GIROPAY = 'STRIPE_ENABLE_GIROPAY';
     const ENABLE_BANCONTACT = 'STRIPE_ENABLE_BANCONTACT';
+    const ENABLE_FPX = 'STRIPE_ENABLE_FPX';
+    const ENABLE_EPS = 'STRIPE_ENABLE_EPS';
+    const ENABLE_P24 = 'STRIPE_ENABLE_P24';
+    const ENABLE_SEPA = 'STRIPE_ENABLE_SEPA';
     const ENABLE_APPLEPAY_GOOGLEPAY = 'STRIPE_ENABLE_APPLEPAY_GOOGLEPAY';
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
@@ -165,42 +165,163 @@ class Stripe_official extends PaymentModule
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
     public static $paymentMethods = array(
         'card' => array(
-          'name' => 'Card',
-          'flow' => 'none',
-          'enable' => true,
-          'catch_enable' => true
+            'name' => 'Card',
+            'flow' => 'none',
+            'enable' => true,
+            'catch_enable' => true,
+            'display_in_back_office' => false
         ),
         'bancontact' => array(
-          'name' => 'Bancontact',
-          'flow' => 'redirect',
-          'countries' => array('BE'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_BANCONTACT,
-          'catch_enable' => false
+            'name' => 'Bancontact',
+            'flow' => 'redirect',
+            'countries' => array('BE'),
+            'countries_names' => array(
+                'en' => 'Belgium',
+                'fr' => 'Belgique',
+                'de' => 'Belgien',
+                'es' => 'Bélgica',
+                'it' => 'Belgio',
+                'nl' => 'België',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_BANCONTACT,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'eps' => array(
+            'name' => 'EPS',
+            'flow' => 'redirect',
+            'countries' => array('AT'),
+            'countries_names' => array(
+                'en' => 'Austria',
+                'fr' => 'Autriche',
+                'de' => 'Österreich',
+                'es' => 'Austria',
+                'it' => 'Austria',
+                'nl' => 'Oostenrijk',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_EPS,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'fpx' => array(
+            'name' => 'FPX',
+            'flow' => 'redirect',
+            'countries' => array('MY'),
+            'countries_names' => array(
+                'en' => 'Malaysia',
+                'fr' => 'Malaisie',
+                'de' => 'Malaysia',
+                'es' => 'Malasia',
+                'it' => 'Malesia',
+                'nl' => 'Malaysia',
+            ),
+            'currencies' => array('myr'),
+            'enable' => self::ENABLE_FPX,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'Yes',
+            'new_payment' => 'Yes'
         ),
         'giropay' => array(
-          'name' => 'Giropay',
-          'flow' => 'redirect',
-          'countries' => array('DE'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_GIROPAY,
-          'catch_enable' => false
+            'name' => 'Giropay',
+            'flow' => 'redirect',
+            'countries' => array('DE'),
+            'countries_names' => array(
+                'en' => 'Germany',
+                'fr' => 'Allemagne',
+                'de' => 'Deutschland',
+                'es' => 'Alemania',
+                'it' => 'Germania',
+                'nl' => 'Duitsland',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_GIROPAY,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
         'ideal' => array(
-          'name' => 'iDEAL',
-          'flow' => 'redirect',
-          'countries' => array('NL'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_IDEAL,
-          'catch_enable' => false
+            'name' => 'iDEAL',
+            'flow' => 'redirect',
+            'countries' => array('NL'),
+            'countries_names' => array(
+                'en' => 'Netherlands',
+                'fr' => 'Pays-Bas',
+                'de' => 'Niederlande',
+                'es' => 'Países Bajos',
+                'it' => 'Paesi Bassi',
+                'nl' => 'Nederlande',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_IDEAL,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'p24' => array(
+            'name' => 'P24',
+            'flow' => 'redirect',
+            'countries' => array('PL'),
+            'countries_names' => array(
+                'en' => 'Poland',
+                'fr' => 'Pologne',
+                'de' => 'Polen',
+                'es' => 'Polonia',
+                'it' => 'Polonia',
+                'nl' => 'Polen',
+            ),
+            'currencies' => array('pln'),
+            'enable' => self::ENABLE_P24,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'sepa_debit' => array(
+            'name' => 'SEPA Direct Debit',
+            'flow' => 'none',
+            'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE'),
+            'countries_names' => array(
+                'en' => 'France, Germany, Spain, Belgium, Netherlands, Luxembourg, Italy, Portugal, Austria, Ireland',
+                'fr' => 'France, Allemagne, Espagne, Belgique, Pays-Bas, Luxembourg, Italie, Portugal, Autriche, Irlande',
+                'de' => 'Frankreich, Deutschland, Spanien, Belgien, Niederlande, Luxemburg, Italien, Portugal, Österreich, Irland',
+                'es' => 'Francia, Alemania, España, Bélgica, Países Bajos, Luxemburgo, Italia, Portugal, Austria, Irlanda',
+                'it' => 'Francia, Germania, Spagna, Belgio, Paesi Bassi, Lussemburgo, Italia, Portogallo, Austria, Irlanda',
+                'nl' => 'Frankrijk, Duitsland, Spanje, België, Nederland, Luxemburg, Italië, Portugal, Oostenrijk, Ierland',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_SEPA,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
         'sofort' => array(
-          'name' => 'SOFORT',
-          'flow' => 'redirect',
-          'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_SOFORT,
-          'catch_enable' => false
+            'name' => 'SOFORT',
+            'flow' => 'redirect',
+            'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
+            'countries_names' => array(
+                'en' => 'Austria, Belgium, Germany, Italy, Netherlands, Spain',
+                'fr' => 'Autriche, Belgique, Allemagne, Italie, Pays-Bas, Espagne',
+                'de' => 'Österreich, Belgien, Deutschland, Italien, Niederlande, Spanien',
+                'es' => 'Austria, Bélgica, Alemania, Italia, Países Bajos, España',
+                'it' => 'Austria, Belgio, Germania, Italia, Paesi Bassi, Spagna',
+                'nl' => 'Österreich, België, Deutschland, Italië, Nederland, Spanje',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_SOFORT,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
     );
 
@@ -210,7 +331,8 @@ class Stripe_official extends PaymentModule
         'charge.succeeded',
         'charge.pending',
         'charge.captured',
-        'charge.refunded'
+        'charge.refunded',
+        'charge.dispute.created'
     );
 
     /* refund */
@@ -248,6 +370,10 @@ class Stripe_official extends PaymentModule
         $this->button_label['giropay'] = $this->l('Pay by Giropay');
         $this->button_label['ideal'] = $this->l('Pay by iDEAL');
         $this->button_label['sofort'] = $this->l('Pay by SOFORT');
+        $this->button_label['fpx'] = $this->l('Pay by FPX');
+        $this->button_label['eps'] = $this->l('Pay by EPS');
+        $this->button_label['p24'] = $this->l('Pay by P24');
+        $this->button_label['sepa_debit'] = $this->l('Pay by SEPA Direct Debit');
         $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
@@ -315,7 +441,11 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue(self::ENABLE_IDEAL, 0)
             || !Configuration::updateValue(self::ENABLE_SOFORT, 0)
             || !Configuration::updateValue(self::ENABLE_GIROPAY, 0)
-            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0)) {
+            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0)
+            || !Configuration::updateValue(self::ENABLE_FPX, 0)
+            || !Configuration::updateValue(self::ENABLE_EPS, 0)
+            || !Configuration::updateValue(self::ENABLE_P24, 0)
+            || !Configuration::updateValue(self::ENABLE_SEPA, 0)) {
                  return false;
         }
 
@@ -344,7 +474,11 @@ class Stripe_official extends PaymentModule
             && Configuration::deleteByName(self::ENABLE_IDEAL)
             && Configuration::deleteByName(self::ENABLE_SOFORT)
             && Configuration::deleteByName(self::ENABLE_GIROPAY)
-            && Configuration::deleteByName(self::ENABLE_BANCONTACT);
+            && Configuration::deleteByName(self::ENABLE_BANCONTACT)
+            && Configuration::deleteByName(self::ENABLE_FPX)
+            && Configuration::deleteByName(self::ENABLE_EPS)
+            && Configuration::deleteByName(self::ENABLE_P24)
+            && Configuration::deleteByName(self::ENABLE_SEPA);
     }
 
     /**
@@ -470,6 +604,88 @@ class Stripe_official extends PaymentModule
             }
 
             Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
+        }
+
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::SEPA_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#fcba03';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::SEPA_WAITING, $order_state->id);
+        }
+
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::SEPA_DISPUTE)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#e3e1dc';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id);
         }
 
         return true;
@@ -631,6 +847,9 @@ class Stripe_official extends PaymentModule
             'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
             'save_card' => Configuration::get(self::SAVE_CARD),
             'ask_customer' => Configuration::get(self::ASK_CUSTOMER),
+            'payment_methods' => Stripe_official::$paymentMethods,
+            'language_iso_code' => $this->context->language->iso_code,
+            'stripe_payments_url' => 'https://dashboard.stripe.com/settings/payments'
         ));
 
         $this->displaySomething();
@@ -677,6 +896,10 @@ class Stripe_official extends PaymentModule
             'sofort' => Configuration::get(self::ENABLE_SOFORT),
             'giropay' => Configuration::get(self::ENABLE_GIROPAY),
             'bancontact' => Configuration::get(self::ENABLE_BANCONTACT),
+            'fpx' => Configuration::get(self::ENABLE_FPX),
+            'eps' => Configuration::get(self::ENABLE_EPS),
+            'p24' => Configuration::get(self::ENABLE_P24),
+            'sepa_debit' => Configuration::get(self::ENABLE_SEPA),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
@@ -936,118 +1159,6 @@ class Stripe_official extends PaymentModule
         }
     }
 
-    /**
-    * Retrieve the current payment intent or create a new one
-    */
-    protected function retrievePaymentIntent($amount, $currency)
-    {
-        if (isset($this->context->cookie->stripe_payment_intent)
-            && !empty($this->context->cookie->stripe_payment_intent)) {
-            try {
-                $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
-
-                $stripeCustomer = new StripeCustomer();
-                $stripeCustomer->getCustomerById($this->context->customer->id);
-
-                // Associate customer to PI in order to pay with saved cards
-                if ($stripeCustomer->stripe_customer_key != '') {
-                    $intent->update(
-                        $this->context->cookie->stripe_payment_intent,
-                        array(
-                            "customer" => $stripeCustomer->stripe_customer_key
-                        )
-                    );
-                }
-
-                // Check that the amount is still correct
-                if ($intent->amount != $amount) {
-                    $intent->update(
-                        $this->context->cookie->stripe_payment_intent,
-                        array(
-                            "amount" => $amount
-                        )
-                    );
-                }
-
-                // Check that the currency is still correct
-                if ($intent->currency != Tools::strtolower($currency)) {
-                    $intent->update(
-                        $this->context->cookie->stripe_payment_intent,
-                        array(
-                            "currency" => Tools::strtolower($this->context->currency->iso_code)
-                        )
-                    );
-                }
-
-                return $intent;
-            } catch (Exception $e) {
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
-                    $e->getMessage(),
-                    null,
-                    null,
-                    'retrievePaymentIntent'
-                );
-                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
-                unset($this->context->cookie->stripe_payment_intent);
-            }
-        }
-
-        $address = new Address($this->context->cart->id_address_invoice);
-        $country = Country::getIsoById($address->id_country);
-        $currency = Tools::strtolower($this->context->currency->iso_code);
-
-        $options = array();
-        foreach (self::$paymentMethods as $name => $paymentMethod) {
-            // Check if the payment method is enabled
-            if ($paymentMethod['enable'] !== true && Configuration::get($paymentMethod['enable']) != 'on') {
-                continue;
-            }
-
-            // Check for country support
-            if (isset($paymentMethod['countries']) && !in_array($country, $paymentMethod['countries'])) {
-                continue;
-            }
-
-            // Check for currency support
-            if (isset($paymentMethod['currencies']) && !in_array($currency, $paymentMethod['currencies'])) {
-                continue;
-            }
-
-            $options[] = $name;
-        }
-
-        try {
-            if (Configuration::get(self::CATCHANDAUTHORIZE)) {
-                $capture_method = 'manual';
-            } else {
-                $capture_method = 'automatic';
-            }
-
-            $intent = \Stripe\PaymentIntent::create(array(
-                "amount" => $amount,
-                "currency" => $currency,
-                "payment_method_types" => array($options),
-                "capture_method" => $capture_method,
-            ));
-
-            // Keep the payment intent ID in session
-            $this->context->cookie->stripe_payment_intent = $intent->id;
-
-            $paymentIntent = new StripePaymentIntent();
-            $paymentIntent->setIdPaymentIntent($intent->id);
-            $paymentIntent->setStatus($intent->status);
-            $paymentIntent->setAmount($intent->amount);
-            $paymentIntent->setCurrency($intent->currency);
-            $paymentIntent->setDateAdd(date("Y-m-d H:i:s", $intent->created));
-            $paymentIntent->setDateUpd(date("Y-m-d H:i:s", $intent->created));
-            $paymentIntent->save(false, false);
-
-            return $intent;
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-        }
-    }
-
     public function getPaymentMethods()
     {
         $query = new DbQuery();
@@ -1201,9 +1312,9 @@ class Stripe_official extends PaymentModule
      */
     public function hookHeader()
     {
-        $orderPageNames = ['order', 'order-opc'];
+        $orderPageNames = ['order', 'orderopc'];
         Hook::exec('actionStripeDefineOrderPageNames', array('orderPageNames' => &$orderPageNames));
-        if (!in_array(Tools::getValue('controller'), $orderPageNames)) {
+        if (!in_array(Dispatcher::getInstance()->getController(), $orderPageNames)) {
             return;
         }
 
@@ -1218,20 +1329,6 @@ class Stripe_official extends PaymentModule
         $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
 
         if ($amount == 0) {
-            return;
-        }
-
-        // The payment intent for this order
-        $intent = $this->retrievePaymentIntent($amount, $currency);
-
-        if (!$intent) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
-                'Payment Intent not retrieve. amount: '. $amount . ' currency: '.$currency . ' Round precision:' . _PS_PRICE_COMPUTE_PRECISION_,
-                null,
-                null,
-                'hookHeader'
-            );
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return;
         }
 
@@ -1290,8 +1387,6 @@ class Stripe_official extends PaymentModule
         Media::addJsDef(array(
             'stripe_pk' => $this->getPublishableKey(),
             'stripe_merchant_country_code' => $merchantCountry->iso_code,
-            'stripe_payment_id' => $intent->id,
-            'stripe_client_secret' => $intent->client_secret,
 
             'stripe_currency' => Tools::strtolower($currency),
             'stripe_amount' => Tools::ps_round($amount, 2),
@@ -1314,9 +1409,16 @@ class Stripe_official extends PaymentModule
                 true
             ),
 
+            'stripe_create_intent_url' => $this->context->link->getModuleLink(
+                $this->name,
+                'createIntent',
+                array(),
+                true
+            ),
+
             'stripe_css' => '{"base": {"iconColor": "#666ee8","color": "#31325f","fontWeight": 400,"fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif","fontSmoothing": "antialiased","fontSize": "15px","::placeholder": { "color": "#aab7c4" },":-webkit-autofill": { "color": "#666ee8" }}}',
 
-            'ps_version' => $prestashop_version,
+            'stripe_ps_version' => $prestashop_version,
 
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
@@ -1351,9 +1453,6 @@ class Stripe_official extends PaymentModule
         $amount = $this->context->cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
-
-        // Create or update the payment intent for this order
-        $this->retrievePaymentIntent($amount, $currency_iso_code);
 
         if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
@@ -1551,7 +1650,6 @@ class Stripe_official extends PaymentModule
                     )
                 );
             }
-
 
             // Payment methods with embedded form fields
             $option->setForm(

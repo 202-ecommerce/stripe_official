@@ -64,16 +64,19 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         $handler->setConveyor(array(
                     'source' => Tools::getValue('source'),
                     'response' => Tools::getValue('response'),
+                    'id_payment_intent' => Tools::getValue('payment_intent'),
                     'saveCard' => Tools::getValue('saveCard'),
                     'module' => $this->module,
                     'context' => $this->context,
                 ));
 
         // Set list of actions to execute
-        if (empty(Tools::getValue('source'))) {
-            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'saveCard', 'addTentative');
-        } else {
+        if (Tools::getValue('source')) {
             $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'addTentative');
+        } elseif (Tools::getValue('payment_intent')) {
+            $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'addTentative');
+        } else {
+            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'saveCard', 'addTentative');
         }
 
         // Process actions chain
@@ -103,7 +106,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             )
         );
 
-        if (!empty(Tools::getValue('source'))) {
+        if (!empty(Tools::getValue('source')) || !empty(Tools::getValue('payment_intent'))) {
             Tools::redirect($url);
             exit;
         }

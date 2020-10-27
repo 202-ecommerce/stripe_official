@@ -23,6 +23,8 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class StripeWebhook extends ObjectModel
 {
     public static function create()
@@ -31,7 +33,14 @@ class StripeWebhook extends ObjectModel
             $context = Context::getContext();
 
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')),
+                'url' => $context->link->getModuleLink(
+                    'stripe_official',
+                    'webhook',
+                    array(),
+                    true,
+                    Configuration::get('PS_LANG_DEFAULT'),
+                    Configuration::get('PS_SHOP_DEFAULT')
+                ),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
@@ -49,11 +58,21 @@ class StripeWebhook extends ObjectModel
 
     public static function getWebhookList()
     {
-        return \Stripe\WebhookEndpoint::all(
-            [
-                'limit' => 16
-            ]
-        );
+        try {
+            return \Stripe\WebhookEndpoint::all(
+                [
+                    'limit' => 16
+                ]
+            );
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                'getWebhookList - '.(string)$e->getMessage(),
+                null,
+                null,
+                'StripeWebhook'
+            );
+            return false;
+        }
     }
 
     public static function countWebhooksList()

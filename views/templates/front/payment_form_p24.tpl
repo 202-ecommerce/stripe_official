@@ -23,13 +23,13 @@
 *}
 
 <form class="stripe-payment-form" action="">
-    <input type="hidden" name="stripe-payment-method" value="sofort">
+    <input type="hidden" name="stripe-payment-method" value="p24">
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="sofort">
-            <p title="{l s='Pay by SOFORT' mod='stripe_official'}">
-                <img id="sofort" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/sofort.png" alt="{l s='Pay by SOFORT' mod='stripe_official'}" />
-                {l s='Pay by SOFORT' mod='stripe_official'}
+        <div class="payment_module stripe-europe-payments" data-method="p24">
+            <p title="{l s='Pay by P24' mod='stripe_official'}">
+                <img id="p24" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/p24.png" alt="{l s='Pay by P24' mod='stripe_official'}" />
+                {l s='Pay by P24' mod='stripe_official'}
             </p>
         </div>
     {/if}

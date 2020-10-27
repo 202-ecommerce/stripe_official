@@ -72,7 +72,7 @@ function disableInputs(element) {
   if (element.is(':checked')) {
     element.closest('.form-group').find('.child').removeAttr('disabled');
     element.closest('.form-group').find('.left20').css('display', 'inline-block');
-    element.closest('.form-group').find('div.left20').css('display', 'block');
+    element.closest('.form-group').find('div.left20, span.left20').css('display', 'block');
   } else {
     element.closest('.form-group').find('.child').attr('disabled', 'disabled');
     element.closest('.form-group').find('.left20').css('display', 'none');
