@@ -124,7 +124,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_a57244b3910a511e885d0750379
 $_MODULE['<{stripe_official}prestashop>configuration_9dd810bd2e3bd1db689ace1de85336ee'] = 'Aktivierung erforderlich';
 $_MODULE['<{stripe_official}prestashop>configuration_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Nein';
 $_MODULE['<{stripe_official}prestashop>configuration_93cba07454f06a4a960172bbd6e2a435'] = 'Ja';
-$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Zuerst müssen Sie diese Zahlungsmethoden in Ihrem Stripe-Dashboard aktivieren.';
+$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Zuerst müssen Sie diese Zahlungsmethoden in Ihrem [a @href2@]Stripe-Dashboard[/a] aktivieren.';
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Speichern';
 $_MODULE['<{stripe_official}prestashop>faq_4f9791995f69e4cbac73f76129811f4b'] = 'VIELEN DANK, DASS SIE SICH FÜR STRIPE ENTSCHIEDEN HABEN';
 $_MODULE['<{stripe_official}prestashop>faq_5c8a80077bfb3a84dc99043066cc1a72'] = 'Falls nach der Installation dieses Moduls Probleme auftreten, lesen Sie bitte unsere FAQ und überprüfen Sie folgende Punkte:';

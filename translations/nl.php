@@ -124,7 +124,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_a57244b3910a511e885d0750379
 $_MODULE['<{stripe_official}prestashop>configuration_9dd810bd2e3bd1db689ace1de85336ee'] = 'Activering vereist';
 $_MODULE['<{stripe_official}prestashop>configuration_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Nee';
 $_MODULE['<{stripe_official}prestashop>configuration_93cba07454f06a4a960172bbd6e2a435'] = 'Ja';
-$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'U moet deze betaalmethoden eerst op uw Stripe-dashboard reserveren.';
+$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'U moet deze betaalmethoden eerst op uw [a @href2@]Stripe-dashboard[/a] reserveren.';
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Opslaan';
 $_MODULE['<{stripe_official}prestashop>faq_4f9791995f69e4cbac73f76129811f4b'] = 'BEDANKT DAT U VOOR STRIPE HEBT GEKOZEN';
 $_MODULE['<{stripe_official}prestashop>faq_5c8a80077bfb3a84dc99043066cc1a72'] = 'Als er na installatie van deze module een probleem optreedt, lees dan onze veelgestelde vragen hieronder en controleer of u aan de volgende voorwaarden voldoet:';

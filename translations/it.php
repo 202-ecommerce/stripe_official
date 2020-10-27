@@ -124,7 +124,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_a57244b3910a511e885d0750379
 $_MODULE['<{stripe_official}prestashop>configuration_9dd810bd2e3bd1db689ace1de85336ee'] = 'Richiede attivazion';
 $_MODULE['<{stripe_official}prestashop>configuration_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
 $_MODULE['<{stripe_official}prestashop>configuration_93cba07454f06a4a960172bbd6e2a435'] = 'Sì';
-$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Tali modalità di pagamento vanno prima attivate su Stripe Dashboard.';
+$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Tali modalità di pagamento vanno prima attivate su [a @href2@]Stripe Dashboard[/a].';
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Salva';
 $_MODULE['<{stripe_official}prestashop>faq_4f9791995f69e4cbac73f76129811f4b'] = 'GRAZIE PER AVER SCELTO STRIPE';
 $_MODULE['<{stripe_official}prestashop>faq_5c8a80077bfb3a84dc99043066cc1a72'] = 'In caso di problemi dopo aver installato questo modulo, leggi innanzitutto le domande frequenti riportate di seguito e accertati di quanto segue:';

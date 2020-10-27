@@ -124,7 +124,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_a57244b3910a511e885d0750379
 $_MODULE['<{stripe_official}prestashop>configuration_9dd810bd2e3bd1db689ace1de85336ee'] = 'Nécessite une activation';
 $_MODULE['<{stripe_official}prestashop>configuration_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Non';
 $_MODULE['<{stripe_official}prestashop>configuration_93cba07454f06a4a960172bbd6e2a435'] = 'Oui';
-$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Vous devez commencer par activer ces moyens de paiement dans votre Dashboard Stripe.';
+$_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Vous devez commencer par activer ces moyens de paiement dans votre [a @href2@]Dashboard Stripe[/a].';
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>faq_4f9791995f69e4cbac73f76129811f4b'] = 'MERCI D\'AVOIR CHOISI STRIPE';
 $_MODULE['<{stripe_official}prestashop>faq_5c8a80077bfb3a84dc99043066cc1a72'] = 'Si vous rencontrez des problèmes suite à l\'installation de ce module, consultez d\'abord notre FAQ ci-dessous et vérifiez ce qui suit :';
