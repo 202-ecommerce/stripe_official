@@ -63,7 +63,7 @@ $(function(){
     * Setup Stripe Elements.
     */
     // Create a Stripe client.
-    const stripe = Stripe(stripe_pk);
+    const stripe = Stripe(stripe_pk, {betas: ['alipay_pm_beta_1'], apiVersion: '2020-03-02;alipay_beta=v1'});
 
     // Create an instance of Elements and prepare the CSS
     const elements = stripe.elements({
@@ -443,6 +443,20 @@ $(function(){
               if (result.error) {
                 // Inform the customer that there was an error.
                 console.log('error confirmP24Payment');
+                console.log(result.error);
+              }
+            });
+            return;
+            break;
+
+          case 'alipay':
+            stripe.confirmAlipayPayment(
+              paymentIntentDatas.intent.client_secret,
+              {return_url: stripe_validation_return_url}
+            ).then(function(result) {
+              if (result.error) {
+                // Inform the customer that there was an error.
+                console.log('error confirmAlipayPayment');
                 console.log(result.error);
               }
             });
