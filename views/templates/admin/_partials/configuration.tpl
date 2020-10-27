@@ -199,38 +199,49 @@
 					</li>
 					<li>
 						<p>{l s='Local payment methods' mod='stripe_official'}</p>
-						<p>
-							{l s='Only European merchants can use these payment methods at the moment. To start accepting them, follow these steps:' mod='stripe_official'}
-						</p>
-
-						<ol type="A">
-							<li>
-								{l s='Enable the relevant payment methods in this module:' mod='stripe_official'}
-								<br><br>
-								<div class="form-group">
-									<input type="checkbox" id="ideal" name="ideal" {if $ideal}checked="checked"{/if}/>
-									<label for="ideal">{l s='iDEAL (if you have Dutch customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="bancontact" name="bancontact" {if $bancontact}checked="checked"{/if}/>
-									<label for="bancontact">{l s='Bancontact (if you have Belgian customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="sofort" name="sofort" {if $sofort}checked="checked"{/if}/>
-									<label for="sofort">{l s='SOFORT (if you have German or Austrian customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="giropay" name="giropay" {if $giropay}checked="checked"{/if}/>
-									<label for="giropay">{l s='Giropay (if you have German customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="fpx" name="fpx" {if $fpx}checked="checked"{/if}/>
-									<label for="fpx">{l s='FPX (if you have Malaysian customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="eps" name="eps" {if $eps}checked="checked"{/if}/>
-									<label for="eps">{l s='EPS (if you have Austrian customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="p24" name="p24" {if $p24}checked="checked"{/if}/>
-									<label for="p24">{l s='P24 (if you have Polish customers)' mod='stripe_official'}</label><br>
-									<input type="checkbox" id="sepa_debit" name="sepa_debit" {if $sepa_debit}checked="checked"{/if}/>
-									<label for="sepa_debit">{l s='SEPA Direct Debit (if you have French, German, Spanish, Belgian, Dutch, Luxembourg, Italian, Portuguese, Austrian or Irish customers)' mod='stripe_official'}</label>
-								</div>
-							</li>
-							<li>
-								{{l s='Go to your [a @href1@]payment methods settings[/a] in your Stripe Dashboard and activate the relevant payment methods.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://dashboard.stripe.com/account/payments/settings'}, '@target@' => {'target="blank"'}]}
-							</li>
-							<p>{l s='After clicking "Activate", the payment method is shown as pending with an indication of how long it might take to be activated.' mod='stripe_official'}</p>
-						</ol>
+						<table class="table">
+							<thead>
+								<th class="col-md-1">{l s='Enable' mod='stripe_official'}</th>
+								<th class="col-md-2">{l s='Payment method' mod='stripe_official'}</th>
+								<th class="col-md-6">{l s='Relevant countries' mod='stripe_official'}</th>
+								<th class="col-md-3">{l s='Require activation' mod='stripe_official'} *</th>
+							</thead>
+							<tbody>
+								{foreach from=$payment_methods item=payment_method key=key}
+									{if $payment_method.display_in_back_office}
+										<tr>
+											<td class="center">
+												<input type="checkbox"
+													   id="{$key|escape:'htmlall':'UTF-8'}"
+													   name="{$key|escape:'htmlall':'UTF-8'}"
+													   {if $key}checked="checked"{/if}/>
+											</td>
+											<td>
+												<span class="payment_method_name">{$payment_method.name|escape:'htmlall':'UTF-8'}</span>
+												{if $payment_method.new_payment == 'Yes'}
+													<img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/new_payment.png" />
+												{/if}
+											</td>
+											<td>
+												{if isset($payment_method.countries_names.{$language_iso_code})}
+													{$payment_method.countries_names.{$language_iso_code}|escape:'htmlall':'UTF-8'}
+												{else}
+													{$payment_method.countries_names.en|escape:'htmlall':'UTF-8'}
+												{/if}
+											</td>
+											<td>
+												{if $payment_method.require_activation == 'No'}
+													{l s='No' mod='stripe_official'}
+												{else}
+													{l s='Yes' mod='stripe_official'}
+												{/if}
+											</td>
+										</tr>
+									{/if}
+								{/foreach}
+							</tbody>
+						</table><br/>
+						<p>* {{l s='You need to activate these payments methods in your [a @href2@]Stripe Dashboard[/a] first' mod='stripe_official'}|stripelreplace:['@href2@' => {{$stripe_payments_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}</p>
 					</li>
 				</ol>
 

@@ -165,74 +165,163 @@ class Stripe_official extends PaymentModule
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
     public static $paymentMethods = array(
         'card' => array(
-          'name' => 'Card',
-          'flow' => 'none',
-          'enable' => true,
-          'catch_enable' => true
+            'name' => 'Card',
+            'flow' => 'none',
+            'enable' => true,
+            'catch_enable' => true,
+            'display_in_back_office' => false
         ),
         'bancontact' => array(
-          'name' => 'Bancontact',
-          'flow' => 'redirect',
-          'countries' => array('BE'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_BANCONTACT,
-          'catch_enable' => false
-        ),
-        'giropay' => array(
-          'name' => 'Giropay',
-          'flow' => 'redirect',
-          'countries' => array('DE'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_GIROPAY,
-          'catch_enable' => false
-        ),
-        'ideal' => array(
-          'name' => 'iDEAL',
-          'flow' => 'redirect',
-          'countries' => array('NL'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_IDEAL,
-          'catch_enable' => false
-        ),
-        'sofort' => array(
-          'name' => 'SOFORT',
-          'flow' => 'redirect',
-          'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_SOFORT,
-          'catch_enable' => false
-        ),
-        'fpx' => array(
-          'name' => 'FPX',
-          'flow' => 'redirect',
-          'countries' => array('MY'),
-          'currencies' => array('myr'),
-          'enable' => self::ENABLE_FPX,
-          'catch_enable' => false
+            'name' => 'Bancontact',
+            'flow' => 'redirect',
+            'countries' => array('BE'),
+            'countries_names' => array(
+                'en' => 'Belgium',
+                'fr' => 'Belgique',
+                'de' => 'Belgien',
+                'es' => 'Bélgica',
+                'it' => 'Belgio',
+                'nl' => 'België',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_BANCONTACT,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
         'eps' => array(
-          'name' => 'EPS',
-          'flow' => 'redirect',
-          'countries' => array('AT'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_EPS,
-          'catch_enable' => false
+            'name' => 'EPS',
+            'flow' => 'redirect',
+            'countries' => array('AT'),
+            'countries_names' => array(
+                'en' => 'Austria',
+                'fr' => 'Autriche',
+                'de' => 'Österreich',
+                'es' => 'Austria',
+                'it' => 'Austria',
+                'nl' => 'Oostenrijk',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_EPS,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'fpx' => array(
+            'name' => 'FPX',
+            'flow' => 'redirect',
+            'countries' => array('MY'),
+            'countries_names' => array(
+                'en' => 'Malaysia',
+                'fr' => 'Malaisie',
+                'de' => 'Malaysia',
+                'es' => 'Malasia',
+                'it' => 'Malesia',
+                'nl' => 'Malaysia',
+            ),
+            'currencies' => array('myr'),
+            'enable' => self::ENABLE_FPX,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'Yes',
+            'new_payment' => 'Yes'
+        ),
+        'giropay' => array(
+            'name' => 'Giropay',
+            'flow' => 'redirect',
+            'countries' => array('DE'),
+            'countries_names' => array(
+                'en' => 'Germany',
+                'fr' => 'Allemagne',
+                'de' => 'Deutschland',
+                'es' => 'Alemania',
+                'it' => 'Germania',
+                'nl' => 'Duitsland',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_GIROPAY,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'ideal' => array(
+            'name' => 'iDEAL',
+            'flow' => 'redirect',
+            'countries' => array('NL'),
+            'countries_names' => array(
+                'en' => 'Netherlands',
+                'fr' => 'Pays-Bas',
+                'de' => 'Niederlande',
+                'es' => 'Países Bajos',
+                'it' => 'Paesi Bassi',
+                'nl' => 'Nederlande',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_IDEAL,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
         'p24' => array(
-          'name' => 'P24',
-          'flow' => 'redirect',
-          'countries' => array('PL'),
-          'currencies' => array('pln'),
-          'enable' => self::ENABLE_P24,
-          'catch_enable' => false
+            'name' => 'P24',
+            'flow' => 'redirect',
+            'countries' => array('PL'),
+            'countries_names' => array(
+                'en' => 'Poland',
+                'fr' => 'Pologne',
+                'de' => 'Polen',
+                'es' => 'Polonia',
+                'it' => 'Polonia',
+                'nl' => 'Polen',
+            ),
+            'currencies' => array('pln'),
+            'enable' => self::ENABLE_P24,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
         'sepa_debit' => array(
-          'name' => 'SEPA Direct Debit',
-          'flow' => 'none',
-          'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE'),
-          'currencies' => array('eur'),
-          'enable' => self::ENABLE_SEPA,
-          'catch_enable' => false
+            'name' => 'SEPA Direct Debit',
+            'flow' => 'none',
+            'countries' => array('FR', 'DE', 'ES', 'BE', 'NL', 'LU', 'IT', 'PT', 'AT', 'IE'),
+            'countries_names' => array(
+                'en' => 'France, Germany, Spain, Belgium, Netherlands, Luxembourg, Italy, Portugal, Austria, Ireland',
+                'fr' => 'France, Allemagne, Espagne, Belgique, Pays-Bas, Luxembourg, Italie, Portugal, Autriche, Irlande',
+                'de' => 'Frankreich, Deutschland, Spanien, Belgien, Niederlande, Luxemburg, Italien, Portugal, Österreich, Irland',
+                'es' => 'Francia, Alemania, España, Bélgica, Países Bajos, Luxemburgo, Italia, Portugal, Austria, Irlanda',
+                'it' => 'Francia, Germania, Spagna, Belgio, Paesi Bassi, Lussemburgo, Italia, Portogallo, Austria, Irlanda',
+                'nl' => 'Frankrijk, Duitsland, Spanje, België, Nederland, Luxemburg, Italië, Portugal, Oostenrijk, Ierland',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_SEPA,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
+        ),
+        'sofort' => array(
+            'name' => 'SOFORT',
+            'flow' => 'redirect',
+            'countries' => array('AT', 'BE', 'DE', 'IT', 'NL', 'ES'),
+            'countries_names' => array(
+                'en' => 'Austria, Belgium, Germany, Italy, Netherlands, Spain',
+                'fr' => 'Autriche, Belgique, Allemagne, Italie, Pays-Bas, Espagne',
+                'de' => 'Österreich, Belgien, Deutschland, Italien, Niederlande, Spanien',
+                'es' => 'Austria, Bélgica, Alemania, Italia, Países Bajos, España',
+                'it' => 'Austria, Belgio, Germania, Italia, Paesi Bassi, Spagna',
+                'nl' => 'Österreich, België, Deutschland, Italië, Nederland, Spanje',
+            ),
+            'currencies' => array('eur'),
+            'enable' => self::ENABLE_SOFORT,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'No',
+            'new_payment' => 'No'
         ),
     );
 
@@ -758,6 +847,9 @@ class Stripe_official extends PaymentModule
             'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
             'save_card' => Configuration::get(self::SAVE_CARD),
             'ask_customer' => Configuration::get(self::ASK_CUSTOMER),
+            'payment_methods' => Stripe_official::$paymentMethods,
+            'language_iso_code' => $this->context->language->iso_code,
+            'stripe_payments_url' => 'https://dashboard.stripe.com/settings/payments'
         ));
 
         $this->displaySomething();
