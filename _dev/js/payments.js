@@ -63,7 +63,7 @@ $(function(){
     * Setup Stripe Elements.
     */
     // Create a Stripe client.
-    const stripe = Stripe(stripe_pk, {betas: ['alipay_pm_beta_1'], apiVersion: '2020-03-02;alipay_beta=v1'});
+    const stripe = Stripe(stripe_pk);
 
     // Create an instance of Elements and prepare the CSS
     const elements = stripe.elements({
