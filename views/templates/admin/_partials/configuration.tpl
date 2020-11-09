@@ -214,7 +214,7 @@
 												<input type="checkbox"
 													   id="{$key|escape:'htmlall':'UTF-8'}"
 													   name="{$key|escape:'htmlall':'UTF-8'}"
-													   {if $key}checked="checked"{/if}/>
+													   {if ${$key}}checked="checked"{/if}/>
 											</td>
 											<td>
 												<span class="payment_method_name">{$payment_method.name|escape:'htmlall':'UTF-8'}</span>
