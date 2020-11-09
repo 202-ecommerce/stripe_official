@@ -293,14 +293,14 @@ $(function(){
         }
 
         if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
-          var error = { "message" : 'Please accept the CGV' };
+          var error = { "message" : stripe_message.accept_cgv };
           updateError($submitButtons, error);
           return false;
         }
       }
 
       // Disable the Pay button to prevent multiple click events.
-      disableSubmit(disableText, 'Processing…');
+      disableSubmit(disableText, stripe_message.processing);
       createPaymentIntent(payment, id_payment_method, false);
 
       if (payment === 'card') {
@@ -335,7 +335,7 @@ $(function(){
         });
       } else {
         // Add extra source information which are specific to a payment method.
-        disableSubmit(disableText, 'Redirecting…');
+        disableSubmit(disableText, stripe_message.redirecting);
 
         switch (payment) {
           case 'bancontact':
@@ -448,6 +448,20 @@ $(function(){
             });
             return;
             break;
+
+          case 'alipay':
+            stripe.confirmAlipayPayment(
+              paymentIntentDatas.intent.client_secret,
+              {return_url: stripe_validation_return_url}
+            ).then(function(result) {
+              if (result.error) {
+                // Inform the customer that there was an error.
+                console.log('error confirmAlipayPayment');
+                console.log(result.error);
+              }
+            });
+            return;
+            break;
         }
       }
 
@@ -530,7 +544,7 @@ $(function(){
           }
           break;
         case 'redirect':
-          disableSubmit(disableText, 'Redirecting…');
+          disableSubmit(disableText, stripe_message.redirecting);
           window.location.replace(source.redirect.url);
           break;
         case 'receiver':

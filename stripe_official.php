@@ -84,6 +84,7 @@ class Stripe_official extends PaymentModule
     const ENABLE_EPS = 'STRIPE_ENABLE_EPS';
     const ENABLE_P24 = 'STRIPE_ENABLE_P24';
     const ENABLE_SEPA = 'STRIPE_ENABLE_SEPA';
+    const ENABLE_ALIPAY = 'STRIPE_ENABLE_ALIPAY';
     const ENABLE_APPLEPAY_GOOGLEPAY = 'STRIPE_ENABLE_APPLEPAY_GOOGLEPAY';
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
@@ -323,6 +324,14 @@ class Stripe_official extends PaymentModule
             'require_activation' => 'No',
             'new_payment' => 'No'
         ),
+        'alipay' => array(
+          'name' => 'Alipay',
+          'flow' => 'redirect',
+          'countries' => array('CN'),
+          'currencies' => array('cny', 'aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'sgd', 'myr', 'nzd', 'usd'),
+          'enable' => self::ENABLE_ALIPAY,
+          'catch_enable' => false
+        ),
     );
 
     public static $webhook_events = array(
@@ -374,6 +383,7 @@ class Stripe_official extends PaymentModule
         $this->button_label['eps'] = $this->l('Pay by EPS');
         $this->button_label['p24'] = $this->l('Pay by P24');
         $this->button_label['sepa_debit'] = $this->l('Pay by SEPA Direct Debit');
+        $this->button_label['alipay'] = $this->l('Pay by Alipay');
         $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
@@ -445,7 +455,8 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue(self::ENABLE_FPX, 0)
             || !Configuration::updateValue(self::ENABLE_EPS, 0)
             || !Configuration::updateValue(self::ENABLE_P24, 0)
-            || !Configuration::updateValue(self::ENABLE_SEPA, 0)) {
+            || !Configuration::updateValue(self::ENABLE_SEPA, 0)
+            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0)) {
                  return false;
         }
 
@@ -478,7 +489,8 @@ class Stripe_official extends PaymentModule
             && Configuration::deleteByName(self::ENABLE_FPX)
             && Configuration::deleteByName(self::ENABLE_EPS)
             && Configuration::deleteByName(self::ENABLE_P24)
-            && Configuration::deleteByName(self::ENABLE_SEPA);
+            && Configuration::deleteByName(self::ENABLE_SEPA)
+            && Configuration::deleteByName(self::ENABLE_ALIPAY);
     }
 
     /**
@@ -900,6 +912,7 @@ class Stripe_official extends PaymentModule
             'eps' => Configuration::get(self::ENABLE_EPS),
             'p24' => Configuration::get(self::ENABLE_P24),
             'sepa_debit' => Configuration::get(self::ENABLE_SEPA),
+            'alipay' => Configuration::get(self::ENABLE_ALIPAY),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
@@ -1264,6 +1277,9 @@ class Stripe_official extends PaymentModule
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
+        $stripeDispute = new StripeDispute();
+        $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
             'stripe_paymentIntent' => $stripePayment->getIdPaymentIntent(),
@@ -1272,7 +1288,8 @@ class Stripe_official extends PaymentModule
             'stripe_paymentType' => $stripePayment->getType(),
             'stripe_dateCatch' => $stripeCapture->getDateCatch(),
             'stripe_dateAuthorize' => $stripeCapture->getDateAuthorize(),
-            'stripe_expired' => $stripeCapture->getExpired()
+            'stripe_expired' => $stripeCapture->getExpired(),
+            'stripe_dispute' => $dispute
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
@@ -1423,7 +1440,13 @@ class Stripe_official extends PaymentModule
             'stripe_postcode_disabled' => Configuration::get(self::POSTCODE),
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
             'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
-            'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name)
+            'stripe_module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
+
+            'stripe_message' => array(
+                'processing' => $this->l('Processing…'),
+                'accept_cgv' => $this->l('Please accept the CGV'),
+                'redirecting' => $this->l('Redirecting…')
+            )
         ));
     }
 

@@ -53,4 +53,13 @@
             {/if}
         </p>
     {/if}
+
+    <p>
+        <span><strong>{l s='Payment dispute' mod='stripe_official'}</strong></span><br/>
+        {if $stripe_dispute === true}
+            <span><a href="{$stripe_dashboardUrl.charge|escape:'htmlall'}" target="blank">{l s='check your dispute here' mod='stripe_official'}</a></span>
+        {else}
+            <span>{l s='No dispute' mod='stripe_official'}</span>
+        {/if}
+    </p>
 </div>
