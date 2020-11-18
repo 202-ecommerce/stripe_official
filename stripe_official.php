@@ -63,6 +63,7 @@ class Stripe_official extends PaymentModule
     const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
     const SEPA_WAITING = 'STRIPE_SEPA_WAITING';
     const SEPA_DISPUTE = 'STRIPE_SEPA_DISPUTE';
+    const OXXO_WAITING = 'STRIPE_OXXO_WAITING';
     const MODE = 'STRIPE_MODE';
     const MINIMUM_AMOUNT_3DS = 'STRIPE_MINIMUM_AMOUNT_3DS';
     const POSTCODE = 'STRIPE_POSTCODE';
@@ -85,6 +86,7 @@ class Stripe_official extends PaymentModule
     const ENABLE_P24 = 'STRIPE_ENABLE_P24';
     const ENABLE_SEPA = 'STRIPE_ENABLE_SEPA';
     const ENABLE_ALIPAY = 'STRIPE_ENABLE_ALIPAY';
+    const ENABLE_OXXO = 'STRIPE_ENABLE_OXXO';
     const ENABLE_APPLEPAY_GOOGLEPAY = 'STRIPE_ENABLE_APPLEPAY_GOOGLEPAY';
     const REFUND_ID = 'STRIPE_REFUND_ID';
     const REFUND_MODE = 'STRIPE_REFUND_MODE';
@@ -172,6 +174,25 @@ class Stripe_official extends PaymentModule
             'catch_enable' => true,
             'display_in_back_office' => false
         ),
+        'alipay' => array(
+            'name' => 'Alipay',
+            'flow' => 'redirect',
+            'countries' => array('CN'),
+            'countries_names' => array(
+                'en' => 'China',
+                'fr' => 'Chine',
+                'de' => 'China',
+                'es' => 'China',
+                'it' => 'Cina',
+                'nl' => 'China',
+            ),
+            'currencies' => array('cny', 'aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'sgd', 'myr', 'nzd', 'usd'),
+            'enable' => self::ENABLE_ALIPAY,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'Yes',
+            'new_payment' => 'Yes'
+        ),
         'bancontact' => array(
             'name' => 'Bancontact',
             'flow' => 'redirect',
@@ -227,7 +248,7 @@ class Stripe_official extends PaymentModule
             'catch_enable' => false,
             'display_in_back_office' => true,
             'require_activation' => 'Yes',
-            'new_payment' => 'Yes'
+            'new_payment' => 'No'
         ),
         'giropay' => array(
             'name' => 'Giropay',
@@ -266,6 +287,25 @@ class Stripe_official extends PaymentModule
             'display_in_back_office' => true,
             'require_activation' => 'No',
             'new_payment' => 'No'
+        ),
+        'oxxo' => array(
+            'name' => 'OXXO',
+            'flow' => 'voucher',
+            'countries' => array('MX'),
+            'countries_names' => array(
+                'en' => 'Mexico',
+                'fr' => 'Mexique',
+                'de' => 'Mexico',
+                'es' => 'Mexico',
+                'it' => 'Mexico',
+                'nl' => 'Mexico',
+            ),
+            'currencies' => array('mxn'),
+            'enable' => self::ENABLE_OXXO,
+            'catch_enable' => false,
+            'display_in_back_office' => true,
+            'require_activation' => 'Yes',
+            'new_payment' => 'Yes'
         ),
         'p24' => array(
             'name' => 'P24',
@@ -324,14 +364,6 @@ class Stripe_official extends PaymentModule
             'require_activation' => 'No',
             'new_payment' => 'No'
         ),
-        'alipay' => array(
-          'name' => 'Alipay',
-          'flow' => 'redirect',
-          'countries' => array('CN'),
-          'currencies' => array('cny', 'aud', 'cad', 'eur', 'gbp', 'hkd', 'jpy', 'sgd', 'myr', 'nzd', 'usd'),
-          'enable' => self::ENABLE_ALIPAY,
-          'catch_enable' => false
-        ),
     );
 
     public static $webhook_events = array(
@@ -384,6 +416,7 @@ class Stripe_official extends PaymentModule
         $this->button_label['p24'] = $this->l('Pay by P24');
         $this->button_label['sepa_debit'] = $this->l('Pay by SEPA Direct Debit');
         $this->button_label['alipay'] = $this->l('Pay by Alipay');
+        $this->button_label['oxxo'] = $this->l('Pay by OXXO');
         $this->button_label['save_card'] = $this->l('Pay with card');
 
         $this->meta_title = $this->l('Stripe', $this->name);
@@ -456,7 +489,8 @@ class Stripe_official extends PaymentModule
             || !Configuration::updateValue(self::ENABLE_EPS, 0)
             || !Configuration::updateValue(self::ENABLE_P24, 0)
             || !Configuration::updateValue(self::ENABLE_SEPA, 0)
-            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0)) {
+            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0)
+            || !Configuration::updateValue(self::ENABLE_OXXO, 0)) {
                  return false;
         }
 
@@ -490,7 +524,8 @@ class Stripe_official extends PaymentModule
             && Configuration::deleteByName(self::ENABLE_EPS)
             && Configuration::deleteByName(self::ENABLE_P24)
             && Configuration::deleteByName(self::ENABLE_SEPA)
-            && Configuration::deleteByName(self::ENABLE_ALIPAY);
+            && Configuration::deleteByName(self::ENABLE_ALIPAY)
+            && Configuration::deleteByName(self::ENABLE_OXXO);
     }
 
     /**
@@ -698,6 +733,47 @@ class Stripe_official extends PaymentModule
             }
 
             Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id);
+        }
+
+        /* Create Order State for Stripe */
+        if (!Configuration::get(self::OXXO_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OXXO_WAITING)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'fr':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+                    case 'es':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+                    case 'de':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+                    case 'nl':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#C23416';
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue(self::OXXO_WAITING, $order_state->id);
         }
 
         return true;
@@ -913,6 +989,7 @@ class Stripe_official extends PaymentModule
             'p24' => Configuration::get(self::ENABLE_P24),
             'sepa_debit' => Configuration::get(self::ENABLE_SEPA),
             'alipay' => Configuration::get(self::ENABLE_ALIPAY),
+            'oxxo' => Configuration::get(self::ENABLE_OXXO),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
@@ -1233,7 +1310,7 @@ class Stripe_official extends PaymentModule
         $stripePayment = new StripePayment();
         $paymentInformations = $stripePayment->getStripePaymentByCart($params['cart']->id);
 
-        if (empty($paymentInformations->getIdStripe())) {
+        if (empty($paymentInformations->getIdPaymentIntent())) {
             return;
         }
 
@@ -1289,7 +1366,9 @@ class Stripe_official extends PaymentModule
             'stripe_dateCatch' => $stripeCapture->getDateCatch(),
             'stripe_dateAuthorize' => $stripeCapture->getDateAuthorize(),
             'stripe_expired' => $stripeCapture->getExpired(),
-            'stripe_dispute' => $dispute
+            'stripe_dispute' => $dispute,
+            'stripe_voucher_expire' => $stripePayment->getVoucherExpire(),
+            'stripe_voucher_validate' => $stripePayment->getVoucherValidate()
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/admin_content_order.tpl');
@@ -1749,9 +1828,13 @@ class Stripe_official extends PaymentModule
             return;
         }
 
+        $stripePayment = new StripePayment();
+        $stripePayment->getStripePaymentByCart($order->id_cart);
+
         $this->context->smarty->assign(array(
             'stripe_order_reference' => pSQL($order->reference),
-            'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version,
+            'stripePayment' => $stripePayment
         ));
 
         return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');

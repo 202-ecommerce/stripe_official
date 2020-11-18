@@ -47,6 +47,12 @@ class StripePayment extends ObjectModel
     public $result;
     /** @var int */
     public $state;
+    /** @var string */
+    public $voucher_url;
+    /** @var date */
+    public $voucher_expire;
+    /** @var date */
+    public $voucher_validate;
     /** @var date */
     public $date_add;
 
@@ -113,6 +119,19 @@ class StripePayment extends ObjectModel
                 'type'     => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
                 'size'     => 1,
+            ),
+            'voucher_url'  => array(
+                'type'     => ObjectModel::TYPE_STRING,
+                'validate' => 'isString',
+                'size'     => 255,
+            ),
+            'voucher_expire'  => array(
+                'type'     => ObjectModel::TYPE_DATE,
+                'validate' => 'isDate',
+            ),
+            'voucher_validate'  => array(
+                'type'     => ObjectModel::TYPE_DATE,
+                'validate' => 'isDate',
             ),
             'date_add'  => array(
                 'type'     => ObjectModel::TYPE_DATE,
@@ -231,6 +250,36 @@ class StripePayment extends ObjectModel
         return $this->state;
     }
 
+    public function setVoucherUrl($voucher_url)
+    {
+        $this->voucher_url = $voucher_url;
+    }
+
+    public function getVoucherUrl()
+    {
+        return $this->voucher_url;
+    }
+
+    public function setVoucherExpire($voucher_expire)
+    {
+        $this->voucher_expire = $voucher_expire;
+    }
+
+    public function getVoucherExpire()
+    {
+        return $this->voucher_expire;
+    }
+
+    public function setVoucherValidate($voucher_validate)
+    {
+        $this->voucher_validate = $voucher_validate;
+    }
+
+    public function getVoucherValidate()
+    {
+        return $this->voucher_validate;
+    }
+
     public function setDateAdd($date_add)
     {
         $this->date_add = $date_add;
@@ -258,12 +307,12 @@ class StripePayment extends ObjectModel
         return $this;
     }
 
-    public function getStripePaymentByCharge($id_charge)
+    public function getStripePaymentByPaymentIntent($id_payment_intent)
     {
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_stripe = "' . pSQL($id_charge) . '"');
+        $query->where('id_payment_intent = "' . pSQL($id_payment_intent) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
