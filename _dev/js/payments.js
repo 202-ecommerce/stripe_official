@@ -333,6 +333,30 @@ $(function(){
         .then(function(response) {
           handlePayment(response);
         });
+      } else if (payment === 'oxxo') {
+        const response = stripe.confirmOxxoPayment(
+          paymentIntentDatas.intent.client_secret,
+          {
+            payment_method: {
+              billing_details: {
+                name: $('#oxxo-name').val(),
+                email: $('#oxxo-email').val(),
+              },
+            },
+          },
+          {
+            handleActions: false
+          })
+          .then(function(response) {
+            // This promise resolves when the customer closes the modal
+            if (response.error) {
+              // Display error to your customer
+              var errorMsg = document.getElementById('error-message');
+              errorMsg.innerText = response.error.message;
+            } else {
+              handlePayment(response);
+            }
+        });
       } else {
         // Add extra source information which are specific to a payment method.
         disableSubmit(disableText, stripe_message.redirecting);
