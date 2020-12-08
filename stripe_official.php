@@ -190,7 +190,7 @@ class Stripe_official extends PaymentModule
             'enable' => self::ENABLE_ALIPAY,
             'catch_enable' => false,
             'display_in_back_office' => true,
-            'require_activation' => 'Yes',
+            'require_activation' => 'No',
             'new_payment' => 'Yes'
         ),
         'bancontact' => array(
