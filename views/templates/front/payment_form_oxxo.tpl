@@ -26,17 +26,11 @@
     <input type="hidden" name="stripe-payment-method" value="oxxo">
 
     <div class="form-row">
-        <label for="oxxo-name">
-          Name
-        </label>
-        <input id="oxxo-name" name="oxxo-name" required>
+        <input id="oxxo-name" name="oxxo-name" placeholder="{l s='Name' mod='stripe_official'}" required>
     </div>
 
     <div class="form-row">
-        <label for="oxxo-email">
-            Email
-        </label>
-        <input id="oxxo-email" name="oxxo-email" required>
+        <input id="oxxo-email" name="oxxo-email" placeholder="{l s='Email' mod='stripe_official'}" required>
     </div>
 
     <!-- Used to display form errors. -->
