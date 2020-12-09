@@ -37,5 +37,9 @@ function upgrade_module_2_3_0($module)
         return false;
     }
 
+    if (!$module->installOrderState()) {
+        return false;
+    }
+
     return true;
 }
