@@ -91,7 +91,8 @@ class StripeCustomer extends ObjectModel
     {
         $customersList = \Stripe\Customer::all(
             [
-                'email' => $email
+                'email' => $email,
+                'limit' => 100
             ]
         );
 
