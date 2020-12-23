@@ -39,8 +39,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $capture_method = 'automatic';
             }
 
+            $amount = Tools::ps_round(Tools::getValue('amount'));
+
             $datasIntent = array(
-                "amount" => Tools::getValue('amount'),
+                "amount" => $amount,
                 "currency" => Tools::getValue('currency'),
                 "payment_method_types" => array(Tools::getValue('payment_option')),
                 "capture_method" => $capture_method
