@@ -1184,7 +1184,7 @@ class Stripe_official extends PaymentModule
             'XOF',
             'XPF'
         );
-        return in_array($currency, $zeroDecimalCurrencies);
+        return in_array(Tools::strtoupper($currency), $zeroDecimalCurrencies);
     }
 
     /**

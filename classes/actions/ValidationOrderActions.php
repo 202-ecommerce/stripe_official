@@ -197,11 +197,7 @@ class ValidationOrderActions extends DefaultActions
             $this->conveyor['secure_key'] = false;
         }
 
-        if ($this->module->isZeroDecimalCurrency($this->conveyor['paymentIntent']->getCurrency())) {
-            $paid = $this->conveyor['amount']*100;
-        } else {
-            $paid = $this->conveyor['amount'];
-        }
+        $paid = $this->context->cart->getOrderTotal();
 
         /* Add transaction on Prestashop back Office (Order) */
         if ($this->conveyor['status'] == 'requires_capture') {
