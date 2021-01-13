@@ -331,8 +331,10 @@ class ValidationOrderActions extends DefaultActions
             return true;
         }
 
+        $stripeAccount = \Stripe\Account::retrieve();
+
         $stripeCustomer = new StripeCustomer();
-        $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id);
+        $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
         if ($stripeCustomer->id == null) {
             $customer = \Stripe\Customer::create([
@@ -343,6 +345,7 @@ class ValidationOrderActions extends DefaultActions
 
             $stripeCustomer->id_customer = $this->context->customer->id;
             $stripeCustomer->stripe_customer_key = $customer->id;
+            $stripeCustomer->id_account = $stripeAccount->id;
             $stripeCustomer->save();
         }
 

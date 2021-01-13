@@ -29,6 +29,8 @@ class StripeCustomer extends ObjectModel
     public $id_customer;
     /** @var string */
     public $stripe_customer_key;
+    /** @var string */
+    public $id_account;
 
     /**
      * @see ObjectModel::$definition
@@ -43,6 +45,11 @@ class StripeCustomer extends ObjectModel
                 'size' => 10,
             ),
             'stripe_customer_key'  => array(
+                'type'     => ObjectModel::TYPE_STRING,
+                'validate' => 'isString',
+                'size'     => 50,
+            ),
+            'id_account'  => array(
                 'type'     => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
                 'size'     => 50,
@@ -70,12 +77,23 @@ class StripeCustomer extends ObjectModel
         return $this->stripe_customer_key;
     }
 
-    public function getCustomerById($id_customer)
+    public function setIdAccount($id_account)
+    {
+        $this->id_account = $id_account;
+    }
+
+    public function getIdAccount()
+    {
+        return $this->id_account;
+    }
+
+    public function getCustomerById($id_customer, $id_account)
     {
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
         $query->where('id_customer = '.pSQL($id_customer));
+        $query->where('id_account = "'.pSQL($id_account).'"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {

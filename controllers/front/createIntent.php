@@ -76,8 +76,9 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 );
             } else {
                 $payment_method = Tools::getValue('id_payment_method');
+                $stripeAccount = \Stripe\Account::retrieve();
                 $stripeCustomer = new StripeCustomer();
-                $customer = $stripeCustomer->getCustomerById($this->context->customer->id);
+                $customer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
                 $datasIntent['customer'] = $customer->stripe_customer_key;
             }
 

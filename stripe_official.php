@@ -1609,8 +1609,9 @@ class Stripe_official extends PaymentModule
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
         }
 
+        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
-        $stripeCustomer->getCustomerById($this->context->customer->id);
+        $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
         if ($stripeCustomer->id == null) {
             return $display;
@@ -1763,8 +1764,9 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
+        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
-        $stripeCustomer->getCustomerById($this->context->customer->id);
+        $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
         if ($stripeCustomer->id == null) {
             return $options;

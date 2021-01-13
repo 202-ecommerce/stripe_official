@@ -35,8 +35,9 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
         $allCards = array();
 
         if ($this->context->customer->id != null) {
+            $stripeAccount = \Stripe\Account::retrieve();
             $stripeCustomer = new StripeCustomer();
-            $stripeCustomer->getCustomerById($this->context->customer->id);
+            $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
             if ($stripeCustomer->id != null) {
                 $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);

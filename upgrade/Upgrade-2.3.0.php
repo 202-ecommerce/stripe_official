@@ -37,6 +37,12 @@ function upgrade_module_2_3_0($module)
         return false;
     }
 
+    $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_customer
+            ADD id_account varchar(255) AFTER stripe_customer_key';
+    if (!Db::getInstance()->execute($sql)) {
+        return false;
+    }
+
     if (!$module->installOrderState()) {
         return false;
     }
