@@ -35,24 +35,25 @@ class StripeDispute extends ObjectModel
         $this->stripe_dispute_id = $stripe_dispute_id;
     }
 
-    public function getAllDisputes()
+    public function getAllDisputes($id_shop)
     {
         $module = Module::getInstanceByName('stripe_official');
+        $key = $module->getSecretKey($id_shop);
 
-        $stripe = new \Stripe\StripeClient(
-            $module->getSecretKey()
-        );
+        if(empty($key)) return false;
+
+        $stripe = new \Stripe\StripeClient($key);
 
         return $stripe->disputes->all();
     }
 
-    public function orderHasDispute($id_charge)
+    public function orderHasDispute($id_charge, $id_shop)
     {
-        $disputes = $this->getAllDisputes();
-
-        foreach ($disputes->data as $dispute) {
-            if ($dispute->charge == $id_charge) {
-                return true;
+        if($disputes = $this->getAllDisputes($id_shop)) {
+            foreach ($disputes->data as $dispute) {
+                if ($dispute->charge == $id_charge) {
+                    return true;
+                }
             }
         }
 
