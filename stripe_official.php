@@ -1354,8 +1354,11 @@ class Stripe_official extends PaymentModule
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
-        $stripeDispute = new StripeDispute();
-        $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+        $dispute = false;
+        if(!empty($stripePayment->getIdStripe())) {
+            $stripeDispute = new StripeDispute();
+            $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+        }
 
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
