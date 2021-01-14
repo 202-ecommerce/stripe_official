@@ -35,4 +35,6 @@
 
     <!-- Used to display form errors. -->
     <div id="error-message" role="alert"></div>
+
+    <div class="stripe-error-message alert alert-danger"></div>
 </form>

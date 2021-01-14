@@ -334,29 +334,31 @@ $(function(){
           handlePayment(response);
         });
       } else if (payment === 'oxxo') {
-        const response = stripe.confirmOxxoPayment(
-          paymentIntentDatas.intent.client_secret,
-          {
-            payment_method: {
-              billing_details: {
-                name: $('#oxxo-name').val(),
-                email: $('#oxxo-email').val(),
+        if (typeof paymentIntentDatas != 'undefined') {
+          const response = stripe.confirmOxxoPayment(
+            paymentIntentDatas.intent.client_secret,
+            {
+              payment_method: {
+                billing_details: {
+                  name: $('#oxxo-name').val(),
+                  email: $('#oxxo-email').val(),
+                },
               },
             },
-          },
-          {
-            handleActions: false
-          })
-          .then(function(response) {
-            // This promise resolves when the customer closes the modal
-            if (response.error) {
-              // Display error to your customer
-              var errorMsg = document.getElementById('error-message');
-              errorMsg.innerText = response.error.message;
-            } else {
-              handlePayment(response);
-            }
-        });
+            {
+              handleActions: false
+            })
+            .then(function(response) {
+              // This promise resolves when the customer closes the modal
+              if (response.error) {
+                // Display error to your customer
+                var errorMsg = document.getElementById('error-message');
+                errorMsg.innerText = response.error.message;
+              } else {
+                handlePayment(response);
+              }
+          });
+        }
       } else {
         // Add extra source information which are specific to a payment method.
         disableSubmit(disableText, stripe_message.redirecting);
@@ -515,7 +517,11 @@ $(function(){
               saveCard = datas.saveCard;
           },
           error: function(err) {
-              console.log(err);
+              console.log(err.responseText);
+              var error = {
+                'message': err.responseText
+              }
+              updateError($('#stripe-'+payment+'element'), error);
           }
       });
     }
@@ -621,10 +627,13 @@ $(function(){
       if (error) {
         if (stripe_ps_version == '1.6') {
           $(elementError).text(error.message).show();
-          enableSubmit($submitButtons);
         } else {
           $error.text(error.message).show();
+          $([document.documentElement, document.body]).animate({
+            scrollTop: $("#checkout-payment-step").offset().top
+          }, 1000);
         }
+        enableSubmit($submitButtons);
       } else {
         if (stripe_ps_version == '1.6') {
           $(elementError).text("").hide();
