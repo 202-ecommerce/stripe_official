@@ -1,22 +1,20 @@
 {shop_url}
 
-Hi {firstname} {lastname},
+Hi {name},
 
 Thank you for shopping with {shop_name}!
 
-Order ID {order_name} - Awaiting payment by check
+Order ID {order_id} - Awaiting payment by OXXO
 
-Your order with the reference {order_name} has been placed successfully. You can expect delivery as soon as your payment is received.
+Your order with the reference {order_ref} has been placed successfully. You can expect delivery as soon as your payment is received.
 
-Payment method: check
+Payment method: OXXO
 
-You have decided to pay by bank check. Here is the information you need for your check:
+You have decided to pay by bank OXXO. Here is the information you need for your OXXO payment:
 
 Amount:  {total_paid}
 
-Payable to the order of:  {check_name}
-
-Please mail your check to:  {check_address_html}
+Voucher URL:  {voucher_url}
 
 Follow your order and download your invoice on our shop, go to the [Order history and details]({history_url}) section of your customer account.
 
