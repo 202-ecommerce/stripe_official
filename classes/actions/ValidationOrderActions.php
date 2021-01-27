@@ -41,7 +41,11 @@ class ValidationOrderActions extends DefaultActions
         $this->context = $this->conveyor['context'];
         $this->module = $this->conveyor['module'];
 
-        $response = (object)$this->conveyor['response']['paymentIntent'];
+        if (isset($this->conveyor['response']['paymentIntent'])) {
+            $response = (object)$this->conveyor['response']['paymentIntent'];
+        } else {
+            $response = (object)$this->conveyor['response'];
+        }
         $intent = \Stripe\PaymentIntent::retrieve($response->id);
         $charges = $intent->charges->data;
 
@@ -273,6 +277,7 @@ class ValidationOrderActions extends DefaultActions
         }
 
         unset($this->context->cookie->stripe_payment_intent);
+        unset($this->context->cookie->stripe_idempotency_key);
 
         return true;
     }

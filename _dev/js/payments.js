@@ -303,192 +303,196 @@ $(function(){
       disableSubmit(disableText, stripe_message.processing);
       createPaymentIntent(payment, id_payment_method, false);
 
-      if (payment === 'card') {
-        if (typeof id_payment_method == 'undefined') {
-          // card payment via stripe form
+      if (paymentIntentDatas.intent.status != 'succeeded') {
+        if (payment === 'card') {
+          if (typeof id_payment_method == 'undefined') {
+            // card payment via stripe form
+            cardDatas = {
+              card: card
+            }
+            paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
+          }
+
+          const response = stripe.confirmCardPayment(
+            paymentIntentDatas.intent.client_secret,
+            paymentIntentDatas.cardPayment
+          )
+          .then(function(response) {
+            handlePayment(response);
+          });
+        } else if (payment === 'sepa_debit') {
+          // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
           cardDatas = {
-            card: card
+            sepa_debit: iban
           }
           paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
-        }
 
-        const response = stripe.confirmCardPayment(
-          paymentIntentDatas.intent.client_secret,
-          paymentIntentDatas.cardPayment
-        )
-        .then(function(response) {
-          handlePayment(response);
-        });
-      } else if (payment === 'sepa_debit') {
-        // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
-        cardDatas = {
-          sepa_debit: iban
-        }
-        paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
-
-        const response = stripe.confirmSepaDebitPayment(
-          paymentIntentDatas.intent.client_secret,
-          paymentIntentDatas.cardPayment
-        )
-        .then(function(response) {
-          handlePayment(response);
-        });
-      } else if (payment === 'oxxo') {
-        if (typeof paymentIntentDatas != 'undefined') {
-          const response = stripe.confirmOxxoPayment(
+          const response = stripe.confirmSepaDebitPayment(
             paymentIntentDatas.intent.client_secret,
-            {
-              payment_method: {
-                billing_details: {
-                  name: $('#oxxo-name').val(),
-                  email: $('#oxxo-email').val(),
+            paymentIntentDatas.cardPayment
+          )
+          .then(function(response) {
+            handlePayment(response);
+          });
+        } else if (payment === 'oxxo') {
+          if (typeof paymentIntentDatas != 'undefined') {
+            const response = stripe.confirmOxxoPayment(
+              paymentIntentDatas.intent.client_secret,
+              {
+                payment_method: {
+                  billing_details: {
+                    name: $('#oxxo-name').val(),
+                    email: $('#oxxo-email').val(),
+                  },
                 },
               },
-            },
-            {
-              handleActions: false
-            })
-            .then(function(response) {
-              // This promise resolves when the customer closes the modal
-              if (response.error) {
-                // Display error to your customer
-                var errorMsg = document.getElementById('error-message');
-                errorMsg.innerText = response.error.message;
-              } else {
-                handlePayment(response);
+              {
+                handleActions: false
+              })
+              .then(function(response) {
+                // This promise resolves when the customer closes the modal
+                if (response.error) {
+                  // Display error to your customer
+                  var errorMsg = document.getElementById('error-message');
+                  errorMsg.innerText = response.error.message;
+                } else {
+                  handlePayment(response);
+                }
+            });
+          }
+        } else {
+          // Add extra source information which are specific to a payment method.
+          disableSubmit(disableText, stripe_message.redirecting);
+
+          switch (payment) {
+            case 'bancontact':
+              stripe.confirmBancontactPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmBancontactPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'giropay':
+              stripe.confirmGiropayPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmGiropayPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'ideal':
+              cardDatas = {
+                ideal: idealBank
               }
-          });
+              paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
+
+              stripe.confirmIdealPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmIdealPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'sofort':
+              // Prepare all the Stripe source common data.
+              const sourceData = {
+                type: payment, amount: stripe_amount, currency: stripe_currency,
+                owner: { name: stripe_fullname, email: stripe_email },
+                redirect: { return_url: stripe_validation_return_url },
+                metadata: { paymentIntent: paymentIntentDatas.intent.id }
+              };
+
+              // SOFORT: The country is required before redirecting to the bank.
+              sourceData.sofort = { country: stripe_address_country_code };
+
+              // Create a Stripe source with the common data and extra information.
+              const {source} = await stripe.createSource(sourceData);
+              handleSourceActivation(source, $form);
+              break;
+
+            case 'fpx':
+              cardDatas = {
+                fpx: fpxBank
+              }
+              paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
+
+              stripe.confirmFpxPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmFpxPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'eps':
+              stripe.confirmEpsPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmEpsPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'p24':
+              stripe.confirmP24Payment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmP24Payment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+
+            case 'alipay':
+              stripe.confirmAlipayPayment(
+                paymentIntentDatas.intent.client_secret,
+                {return_url: stripe_validation_return_url}
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmAlipayPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
+              break;
+          }
         }
       } else {
-        // Add extra source information which are specific to a payment method.
-        disableSubmit(disableText, stripe_message.redirecting);
-
-        switch (payment) {
-          case 'bancontact':
-            stripe.confirmBancontactPayment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmBancontactPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'giropay':
-            stripe.confirmGiropayPayment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmGiropayPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'ideal':
-            cardDatas = {
-              ideal: idealBank
-            }
-            paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
-
-            stripe.confirmIdealPayment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmIdealPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'sofort':
-            // Prepare all the Stripe source common data.
-            const sourceData = {
-              type: payment, amount: stripe_amount, currency: stripe_currency,
-              owner: { name: stripe_fullname, email: stripe_email },
-              redirect: { return_url: stripe_validation_return_url },
-              metadata: { paymentIntent: paymentIntentDatas.intent.id }
-            };
-
-            // SOFORT: The country is required before redirecting to the bank.
-            sourceData.sofort = { country: stripe_address_country_code };
-
-            // Create a Stripe source with the common data and extra information.
-            const {source} = await stripe.createSource(sourceData);
-            handleSourceActivation(source, $form);
-            break;
-
-          case 'fpx':
-            cardDatas = {
-              fpx: fpxBank
-            }
-            paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
-
-            stripe.confirmFpxPayment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmFpxPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'eps':
-            stripe.confirmEpsPayment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmEpsPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'p24':
-            stripe.confirmP24Payment(
-              paymentIntentDatas.intent.client_secret,
-              paymentIntentDatas.cardPayment
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmP24Payment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-
-          case 'alipay':
-            stripe.confirmAlipayPayment(
-              paymentIntentDatas.intent.client_secret,
-              {return_url: stripe_validation_return_url}
-            ).then(function(result) {
-              if (result.error) {
-                // Inform the customer that there was an error.
-                console.log('error confirmAlipayPayment');
-                console.log(result.error);
-              }
-            });
-            return;
-            break;
-        }
+        handlePayment(paymentIntentDatas.intent);
       }
 
       event.stopPropagation();
