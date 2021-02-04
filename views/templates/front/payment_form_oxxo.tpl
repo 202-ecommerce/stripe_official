@@ -22,12 +22,19 @@
  * @license   Commercial license
 *}
 
-<p><b>{l s='Congratulations, your order has been placed and will be processed soon.' mod='stripe_official'}</b><br /><br />
+<form class="stripe-payment-form" id="stripe-oxxo-element" action="">
+    <input type="hidden" name="stripe-payment-method" value="oxxo">
 
-{{l s='Your order reference is [b]@target@[/b], you should receive a confirmation e-mail shortly.' mod='stripe_official'}|stripelreplace:['@target@' => {{$stripe_order_reference|escape:'htmlall'}}] nofilter}<br /><br />
+    <div class="form-row">
+        <input id="oxxo-name" name="oxxo-name" placeholder="{l s='Name' mod='stripe_official'}" required>
+    </div>
 
-{if $stripePayment->type == 'oxxo'}
-    {{l s='Your can see your OXXO voucher [a @href1@]here[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripePayment->voucher_url|escape:'htmlall'}}, '@target@' => {'target="blank"'}] nofilter}<br /><br />
-{/if}
+    <div class="form-row">
+        <input id="oxxo-email" name="oxxo-email" placeholder="{l s='Email' mod='stripe_official'}" required>
+    </div>
 
-{l s='We appreciate your business.' mod='stripe_official'}<br /><br /></p>
+    <!-- Used to display form errors. -->
+    <div id="error-message" role="alert"></div>
+
+    <div class="stripe-error-message alert alert-danger"></div>
+</form>

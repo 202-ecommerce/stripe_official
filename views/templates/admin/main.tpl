@@ -38,10 +38,6 @@
 			  	<i class="icon-ticket pstab-icon"></i>
 			  	{l s='Refund' mod='stripe_official'}
 			</a>
-			<a class="list-group-item migration-tab" href="#stripe_step_3">
-			  	<i class="icon-question pstab-icon"></i>
-			  	{l s='Contact and FAQ' mod='stripe_official'}
-			</a>
 		</nav>
 	</div>
 
@@ -52,9 +48,6 @@
 			</section>
 			<section id="section-shape-2">
 				{include file="./_partials/refund.tpl"}
-			</section>
-			<section id="section-shape-3">
-				{include file="./_partials/faq.tpl"}
 			</section>
 		</div>
 	</div>

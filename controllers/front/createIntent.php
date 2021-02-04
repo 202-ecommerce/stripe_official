@@ -39,8 +39,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $capture_method = 'automatic';
             }
 
+            $amount = Tools::ps_round(Tools::getValue('amount'));
+
             $datasIntent = array(
-                "amount" => Tools::getValue('amount'),
+                "amount" => $amount,
                 "currency" => Tools::getValue('currency'),
                 "payment_method_types" => array(Tools::getValue('payment_option')),
                 "capture_method" => $capture_method
@@ -74,8 +76,9 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 );
             } else {
                 $payment_method = Tools::getValue('id_payment_method');
+                $stripeAccount = \Stripe\Account::retrieve();
                 $stripeCustomer = new StripeCustomer();
-                $customer = $stripeCustomer->getCustomerById($this->context->customer->id);
+                $customer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
                 $datasIntent['customer'] = $customer->stripe_customer_key;
             }
 
@@ -100,12 +103,26 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $cardPayment['return_url'] = $stripe_validation_return_url;
             }
 
-            $intent = \Stripe\PaymentIntent::create(array(
-                $datasIntent
-            ));
+            if (!isset($this->context->cookie->stripe_idempotency_key)) {
+                $idempotency_key = $this->context->cart->id.'_'.uniqid();
 
-            // Keep the payment intent ID in session
-            $this->context->cookie->stripe_payment_intent = $intent->id;
+                $intent = \Stripe\PaymentIntent::create(
+                    $datasIntent,
+                    [
+                      'idempotency_key' => $idempotency_key
+                    ]
+                );
+
+                // Keep the idempotency_key ID in session
+                $this->context->cookie->stripe_idempotency_key = $idempotency_key;
+
+                // Keep the payment intent ID in session
+                $this->context->cookie->stripe_payment_intent = $intent->id;
+            } else {
+                $idempotency_key = $this->context->cookie->stripe_idempotency_key;
+
+                $intent = \Stripe\PaymentIntent::retrieve($this->context->cookie->stripe_payment_intent);
+            }
 
             $paymentIntent = new StripePaymentIntent();
             $paymentIntent->setIdPaymentIntent($intent->id);

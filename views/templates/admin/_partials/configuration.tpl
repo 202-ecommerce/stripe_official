@@ -94,6 +94,12 @@
 					<li>{l s='Toggle the button above to Live Mode.' mod='stripe_official'}</li>
 					<li>{l s='In live mode, tests are no longer allowed.' mod='stripe_official'}</li>
 				</ul>
+				<p><b>{l s='Getting support' mod='stripe_official'}</b></p>
+				<ul>
+					<li>{{l s='If you have any questions, please check out [a @href1@]our FAQs[/a] first.' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://support.stripe.com/questions/prestashop'}, '@target@' => {'target="blank"'}] nofilter}</li>
+					<li>{{l s='For questions regarding the module itself, feel free to [a @href1@]each out to the developers[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://addons.prestashop.com/en/contact-us?id_product=24922'}, '@target@' => {'target="blank"'}] nofilter}</li>
+					<li>{{l s='For questions regarding your Stripe account, contact the [a @href1@]Stripe support[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {'https://support.stripe.com/contact'}, '@target@' => {'target="blank"'}] nofilter}</li>
+				</ul>
 
 				<p><b>{l s='Payment form settings' mod='stripe_official'}</b></p>
 				<ol item="1">
@@ -214,7 +220,7 @@
 												<input type="checkbox"
 													   id="{$key|escape:'htmlall':'UTF-8'}"
 													   name="{$key|escape:'htmlall':'UTF-8'}"
-													   {if $key}checked="checked"{/if}/>
+													   {if ${$key}}checked="checked"{/if}/>
 											</td>
 											<td>
 												<span class="payment_method_name">{$payment_method.name|escape:'htmlall':'UTF-8'}</span>

@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,14 +21,31 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-<p><b>{l s='Congratulations, your order has been placed and will be processed soon.' mod='stripe_official'}</b><br /><br />
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-{{l s='Your order reference is [b]@target@[/b], you should receive a confirmation e-mail shortly.' mod='stripe_official'}|stripelreplace:['@target@' => {{$stripe_order_reference|escape:'htmlall'}}] nofilter}<br /><br />
+function upgrade_module_2_3_0($module)
+{
+    $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment
+            ADD voucher_url varchar(255) AFTER state,
+            ADD voucher_expire varchar(255) AFTER voucher_url,
+            ADD voucher_validate varchar(255) AFTER voucher_expire';
+    if (!Db::getInstance()->execute($sql)) {
+        return false;
+    }
 
-{if $stripePayment->type == 'oxxo'}
-    {{l s='Your can see your OXXO voucher [a @href1@]here[/a].' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripePayment->voucher_url|escape:'htmlall'}}, '@target@' => {'target="blank"'}] nofilter}<br /><br />
-{/if}
+    $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_customer
+            ADD id_account varchar(255) AFTER stripe_customer_key';
+    if (!Db::getInstance()->execute($sql)) {
+        return false;
+    }
 
-{l s='We appreciate your business.' mod='stripe_official'}<br /><br /></p>
+    if (!$module->installOrderState()) {
+        return false;
+    }
+
+    return true;
+}

@@ -62,4 +62,15 @@
             <span>{l s='No dispute' mod='stripe_official'}</span>
         {/if}
     </p>
+
+    {if (isset($stripe_paymentType) && $stripe_paymentType == 'oxxo')}
+        <p>
+            <span><strong>{l s='Voucher Validation' mod='stripe_official'}</strong></span><br/>
+            {if $stripe_voucher_validate != '0000-00-00'}
+                <span>{l s='Voucher validate on :' mod='stripe_official'} {$stripe_voucher_validate|escape:'htmlall':'UTF-8'}</span>
+            {else}
+                <span>{l s='Voucher will expire on :' mod='stripe_official'} {$stripe_voucher_expire|escape:'htmlall':'UTF-8'}</span>
+            {/if}
+        </p>
+    {/if}
 </div>

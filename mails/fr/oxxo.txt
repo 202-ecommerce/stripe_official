@@ -1,0 +1,25 @@
+{shop_url}
+
+Hi {name},
+
+Thank you for shopping with {shop_name}!
+
+Order ID {order_id} - Awaiting payment by OXXO
+
+Your order with the reference {order_ref} has been placed successfully. You can expect delivery as soon as your payment is received.
+
+Payment method: OXXO
+
+You have decided to pay by bank OXXO. Here is the information you need for your OXXO payment:
+
+Amount:  {total_paid}
+
+Voucher URL:  {voucher_url}
+
+Follow your order and download your invoice on our shop, go to the [Order history and details]({history_url}) section of your customer account.
+
+If you have a guest account, you can follow your order via the [Guest Tracking]({guest_tracking_url}) section on our shop.
+
+[{shop_name}]({shop_url})
+
+Powered by [PrestaShop](https://www.prestashop.com/?utm_source=marchandprestashop&utm_medium=e-mail=utm_campaign=footer_1-7)

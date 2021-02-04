@@ -208,7 +208,9 @@ form#stripe-card-payment #cards-logos {
 
 #stripe-card-element,
 #stripe-card-cardholdername,
-#stripe-sepa-element {
+#stripe-sepa-element,
+#stripe-oxxo-element #oxxo-name,
+#stripe-oxxo-element #oxxo-email {
     padding: 6px 12px;
     margin-bottom: 8px;
     border: 1px solid #ccc;
