@@ -245,6 +245,9 @@ class ValidationOrderActions extends DefaultActions
                 $this->conveyor['secure_key']
             );
 
+            unset($this->context->cookie->stripe_payment_intent);
+            unset($this->context->cookie->stripe_idempotency_key);
+
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
             $order = new Order($idOrder);
             if (empty($this->conveyor['source'])) {
@@ -271,13 +274,16 @@ class ValidationOrderActions extends DefaultActions
                 $stripeCapture->date_catch = date('Y-m-d H:i:s');
                 $stripeCapture->save();
             }
-        } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                (string)$e->getMessage(),
+                null,
+                null,
+                'createOrder'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
         }
-
-        unset($this->context->cookie->stripe_payment_intent);
-        unset($this->context->cookie->stripe_idempotency_key);
 
         return true;
     }
