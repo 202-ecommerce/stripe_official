@@ -788,6 +788,16 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
+        /* Alter table for beta-tests before next version release */
+        $query = new DbQuery();
+        $result = Db::getInstance()->executeS('SHOW FIELDS FROM ps_stripe_official_processlogger');
+
+        if ($result[2]['Type'] == 'varchar(255)') {
+            $query = new DbQuery();
+            $result = Db::getInstance()->execute('ALTER TABLE ps_stripe_official_processlogger MODIFY msg TEXT');
+        }
+        /* Fin Alter table for beta-tests before next version release */
+
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->warning[] = $this->l(
