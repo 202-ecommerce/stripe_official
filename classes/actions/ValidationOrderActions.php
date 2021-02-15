@@ -329,9 +329,6 @@ class ValidationOrderActions extends DefaultActions
             );
             ProcessLoggerHandler::closeLogger();
 
-            unset($this->context->cookie->stripe_payment_intent);
-            unset($this->context->cookie->stripe_idempotency_key);
-
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
             $order = new Order($idOrder);
             if (empty($this->conveyor['source'])) {
