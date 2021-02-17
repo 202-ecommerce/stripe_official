@@ -27,6 +27,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/../classes/StripeCapture.php';
+require_once dirname(__FILE__) . '/../classes/StripeCustomer.php';
+
 use Stripe_officialClasslib\Actions\ActionsHandler;
 
 function upgrade_module_2_1_0($module)

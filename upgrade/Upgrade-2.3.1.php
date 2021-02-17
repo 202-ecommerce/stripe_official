@@ -27,6 +27,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/../classes/StripeIdempotencyKey.php';
+
 function upgrade_module_2_3_1($module)
 {
     $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
