@@ -82,6 +82,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         ProcessLoggerHandler::logInfo('event ' . $event->id . ' retrieved', null, null, 'webhook');
+        ProcessLoggerHandler::logInfo('event type : ' . $event->type, null, null, 'webhook');
 
         if (!$event) {
             $msg = 'JSON not valid';
@@ -109,12 +110,22 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
         ProcessLoggerHandler::logInfo('starting webhook actions', null, null, 'webhook');
 
+        $events_states = array(
+            'charge.expired' => Configuration::get('PS_OS_CANCELED'),
+            'charge.failed' => Configuration::get('PS_OS_ERROR'),
+            'charge.succeeded' => Configuration::get('PS_OS_PAYMENT'),
+            'charge.captured' => Configuration::get('PS_OS_PAYMENT'),
+            'charge.refunded' => Configuration::get('PS_OS_CANCELED'),
+            'charge.dispute.created' => Configuration::get(Stripe_official::SEPA_DISPUTE)
+        );
+
         // Create the handler
         $handler = new ActionsHandler();
         $handler->setConveyor(array(
                     'event_json' => $event,
                     'module' => $this->module,
                     'context' => $this->context,
+                    'events_states' => $events_states,
                 ));
 
         $handler->addActions('chargeWebhook');
