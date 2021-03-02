@@ -41,7 +41,7 @@ function upgrade_module_2_3_1($module)
     }
 
     $query = new DbQuery();
-    $results = Db::getInstance()->executeS('SHOW INDEX FROM ps_stripe_idempotency_key');
+    $results = Db::getInstance()->executeS('SHOW INDEX FROM '._DB_PREFIX_.'stripe_idempotency_key');
 
     $index_exists = false;
     foreach ($results as $result) {
