@@ -33,10 +33,29 @@ function upgrade_module_2_3_1($module)
 {
     $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
     $installer->installObjectModel('StripeIdempotencyKey');
+    $installer->installObjectModel('StripePayment');
 
-    $sql = 'ALTER TABLE ps_stripe_official_processlogger MODIFY msg TEXT';
+    $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_official_processlogger` MODIFY msg TEXT';
     if (!Db::getInstance()->execute($sql)) {
         return false;
+    }
+
+    $query = new DbQuery();
+    $results = Db::getInstance()->executeS('SHOW INDEX FROM ps_stripe_idempotency_key');
+
+    $index_exists = false;
+    foreach ($results as $result) {
+        if ($result['Column_name'] == 'idempotency_key') {
+            $index_exists = true;
+        }
+    }
+
+    if ($index_exists === false) {
+        $query = new DbQuery();
+        $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_idempotency_key` ADD INDEX( `idempotency_key`)';
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
     }
 
     return true;

@@ -23,6 +23,8 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class stripe_officialCreateIntentModuleFrontController extends ModuleFrontController
 {
     /**
@@ -33,6 +35,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         parent::initContent();
 
         try {
+            if ($this->context->cart->id == NULL) {
+                throw new Exception("cart ID is empty", 1);
+            }
+
             if (Configuration::get(Stripe_official::CATCHANDAUTHORIZE) && Tools::getValue('payment_option') == 'card') {
                 $capture_method = 'manual';
             } else {
@@ -134,6 +140,13 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
         } catch (Exception $e) {
             error_log($e->getMessage());
+            ProcessLoggerHandler::logError(
+                "cart ID is empty",
+                null,
+                null,
+                'createIntent'
+            );
+            ProcessLoggerHandler::closeLogger();
             die($e->getMessage());
         }
 
