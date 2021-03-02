@@ -40,19 +40,28 @@ function upgrade_module_2_3_1($module)
         return false;
     }
 
+    $indexes = array(
+        'id_idempotency_key',
+        'id_cart',
+        'idempotency_key',
+        'id_payment_intent'
+    );
+    $already_indexed = array();
     $query = new DbQuery();
     $results = Db::getInstance()->executeS('SHOW INDEX FROM '._DB_PREFIX_.'stripe_idempotency_key');
 
-    $index_exists = false;
     foreach ($results as $result) {
-        if ($result['Column_name'] == 'idempotency_key') {
-            $index_exists = true;
-        }
+        array_push($already_indexed, $result['Column_name']);
     }
 
-    if ($index_exists === false) {
-        $query = new DbQuery();
-        $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_idempotency_key` ADD INDEX( `idempotency_key`)';
+    $to_index = array_diff($indexes, $already_indexed);
+
+    if (!empty($to_index)) {
+        $sql = '';
+        foreach ($to_index as $index) {
+            $sql .= 'ALTER TABLE `'._DB_PREFIX_.'stripe_idempotency_key` ADD INDEX( `'.$index.'`);';
+        }
+
         if (!Db::getInstance()->execute($sql)) {
             return false;
         }

@@ -90,11 +90,11 @@ class StripeIdempotencyKey extends ObjectModel
     public function getByIdCart($id_cart)
     {
         $query = new DbQuery();
-        $query->select('idempotency_key');
+        $query->select('*');
         $query->from(static::$definition['table']);
         $query->where('id_cart = '.pSQL($id_cart));
 
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
             return $this;
         }
