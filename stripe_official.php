@@ -107,6 +107,7 @@ class Stripe_official extends PaymentModule
         'StripePaymentIntent',
         'StripeCapture',
         'StripeCustomer',
+        'StripeIdempotencyKey',
     );
 
     /**

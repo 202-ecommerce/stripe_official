@@ -38,31 +38,50 @@ class ValidationOrderActions extends DefaultActions
      */
     public function prepareFlowNone()
     {
-        $this->context = $this->conveyor['context'];
-        $this->module = $this->conveyor['module'];
+        try {
+            $this->context = $this->conveyor['context'];
+            $this->module = $this->conveyor['module'];
 
-        if (isset($this->conveyor['response']['paymentIntent'])) {
-            $response = (object)$this->conveyor['response']['paymentIntent'];
-        } else {
-            $response = (object)$this->conveyor['response'];
-        }
-        $intent = \Stripe\PaymentIntent::retrieve($response->id);
-        $charges = $intent->charges->data;
+            if (isset($this->conveyor['response']['paymentIntent'])) {
+                $response = (object)$this->conveyor['response']['paymentIntent'];
+            } else {
+                $response = (object)$this->conveyor['response'];
+            }
+            $intent = \Stripe\PaymentIntent::retrieve($response->id);
+            $charges = $intent->charges->data;
 
-        $this->conveyor['currency'] = $response->currency;
-        $this->conveyor['token'] = $response->payment_method;
-        $this->conveyor['id_payment_intent'] = $response->id;
-        $this->conveyor['status'] = $response->status;
-        if (!empty($charges)) {
-            $this->conveyor['chargeId'] = $charges[0]->id;
-        } else {
-            $this->conveyor['chargeId'] = '';
-        }
+            $this->conveyor['currency'] = $response->currency;
+            $this->conveyor['token'] = $response->payment_method;
+            $this->conveyor['id_payment_intent'] = $response->id;
+            $this->conveyor['status'] = $response->status;
+            if (!empty($charges)) {
+                $this->conveyor['chargeId'] = $charges[0]->id;
+            } else {
+                $this->conveyor['chargeId'] = '';
+            }
 
-        if ($this->module->isZeroDecimalCurrency($response->currency)) {
-            $this->conveyor['amount'] = $intent->amount;
-        } else {
-            $this->conveyor['amount'] = $intent->amount / 100;
+            if ($this->module->isZeroDecimalCurrency($response->currency)) {
+                $this->conveyor['amount'] = $intent->amount;
+            } else {
+                $this->conveyor['amount'] = $intent->amount / 100;
+            }
+
+            ProcessLoggerHandler::logInfo(
+                'prepareFlowNone : OK',
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowNone'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowNone'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
 
         return true;
@@ -74,42 +93,61 @@ class ValidationOrderActions extends DefaultActions
      */
     public function prepareFlowRedirect()
     {
-        $this->context = $this->conveyor['context'];
-        $this->module = $this->conveyor['module'];
-        $source = $this->conveyor['source'];
+        try {
+            $this->context = $this->conveyor['context'];
+            $this->module = $this->conveyor['module'];
+            $source = $this->conveyor['source'];
 
-        $sourceRetrieve = \Stripe\Source::retrieve($source);
-        ProcessLoggerHandler::logInfo($sourceRetrieve);
-        ProcessLoggerHandler::closeLogger();
+            $sourceRetrieve = \Stripe\Source::retrieve($source);
+            ProcessLoggerHandler::logInfo($sourceRetrieve);
+            ProcessLoggerHandler::closeLogger();
 
-        if ($sourceRetrieve->status == 'failed') {
-            ProcessLoggerHandler::logInfo($source . " => status failed", 'Cart', $this->context->cart->id);
+            if ($sourceRetrieve->status == 'failed') {
+                ProcessLoggerHandler::logInfo($source . " => status failed", 'Cart', $this->context->cart->id);
+                ProcessLoggerHandler::closeLogger();
+                return false;
+            }
+
+            $secret_key = $this->module->getSecretKey();
+
+            \Stripe\Stripe::setApiKey($secret_key);
+
+            $amount = $this->context->cart->getOrderTotal();
+
+            if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
+                $amount = $amount * 100;
+            }
+
+            $response = \Stripe\Charge::create(array(
+              'amount' => $amount,
+              'currency' => $this->context->currency->iso_code,
+              'source' => $source,
+            ));
+
+            $this->conveyor['currency'] = $response->currency;
+            $this->conveyor['token'] = $source;
+            $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
+            $this->conveyor['status'] = $response->status;
+            $this->conveyor['chargeId'] = $response->id;
+            $this->conveyor['amount'] = $this->context->cart->getOrderTotal();
+
+            ProcessLoggerHandler::logInfo(
+                'prepareFlowRedirect : OK',
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowRedirect'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowRedirect'
+            );
             ProcessLoggerHandler::closeLogger();
             return false;
         }
-
-        $secret_key = $this->module->getSecretKey();
-
-        \Stripe\Stripe::setApiKey($secret_key);
-
-        $amount = $this->context->cart->getOrderTotal();
-
-        if (!$this->module->isZeroDecimalCurrency($this->context->currency->iso_code)) {
-            $amount = $amount * 100;
-        }
-
-        $response = \Stripe\Charge::create(array(
-          'amount' => $amount,
-          'currency' => $this->context->currency->iso_code,
-          'source' => $source,
-        ));
-
-        $this->conveyor['currency'] = $response->currency;
-        $this->conveyor['token'] = $source;
-        $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
-        $this->conveyor['status'] = $response->status;
-        $this->conveyor['chargeId'] = $response->id;
-        $this->conveyor['amount'] = $this->context->cart->getOrderTotal();
 
         return true;
     }
@@ -120,26 +158,45 @@ class ValidationOrderActions extends DefaultActions
      */
     public function prepareFlowRedirectPaymentIntent()
     {
-        $this->context = $this->conveyor['context'];
-        $this->module = $this->conveyor['module'];
+        try {
+            $this->context = $this->conveyor['context'];
+            $this->module = $this->conveyor['module'];
 
-        $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
-        $charges = $intent->charges->data;
+            $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['id_payment_intent']);
+            $charges = $intent->charges->data;
 
-        // Payment failed for redirect payment methods
-        if (empty($charges)) {
+            // Payment failed for redirect payment methods
+            if (empty($charges)) {
+                return false;
+            }
+
+            $this->conveyor['currency'] = $charges[0]->currency;
+            $this->conveyor['token'] = $charges[0]->payment_method;
+            $this->conveyor['status'] = $charges[0]->status;
+            $this->conveyor['chargeId'] = $charges[0]->id;
+
+            if ($this->module->isZeroDecimalCurrency($charges[0]->currency)) {
+                $this->conveyor['amount'] = $charges[0]->amount;
+            } else {
+                $this->conveyor['amount'] = $charges[0]->amount / 100;
+            }
+
+            ProcessLoggerHandler::logInfo(
+                'prepareFlowRedirectPaymentIntent : OK',
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowRedirectPaymentIntent'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowRedirectPaymentIntent'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
-        }
-
-        $this->conveyor['currency'] = $charges[0]->currency;
-        $this->conveyor['token'] = $charges[0]->payment_method;
-        $this->conveyor['status'] = $charges[0]->status;
-        $this->conveyor['chargeId'] = $charges[0]->id;
-
-        if ($this->module->isZeroDecimalCurrency($charges[0]->currency)) {
-            $this->conveyor['amount'] = $charges[0]->amount;
-        } else {
-            $this->conveyor['amount'] = $charges[0]->amount / 100;
         }
 
         return true;
@@ -151,20 +208,39 @@ class ValidationOrderActions extends DefaultActions
      */
     public function updatePaymentIntent()
     {
-        $amount = $this->conveyor['amount'];
-        if (strstr($this->conveyor['chargeId'], 'ch_')) {
-            $amount = $amount*100;
+        try {
+            $amount = $this->conveyor['amount'];
+            if (strstr($this->conveyor['chargeId'], 'ch_')) {
+                $amount = $amount*100;
+            }
+
+            $paymentIntent = new StripePaymentIntent();
+            $paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']);
+            $paymentIntent->setAmount($amount);
+            $paymentIntent->setStatus($this->conveyor['status']);
+            $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
+
+            $paymentIntent->update();
+
+            $this->conveyor['paymentIntent'] = $paymentIntent;
+
+            ProcessLoggerHandler::logInfo(
+                'updatePaymentIntent : OK',
+                null,
+                null,
+                'ValidationOrderActions - updatePaymentIntent'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - updatePaymentIntent'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
-
-        $paymentIntent = new StripePaymentIntent();
-        $paymentIntent->findByIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $paymentIntent->setAmount($amount);
-        $paymentIntent->setStatus($this->conveyor['status']);
-        $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
-
-        $paymentIntent->update();
-
-        $this->conveyor['paymentIntent'] = $paymentIntent;
 
         return true;
     }
@@ -225,10 +301,10 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['cart'] = $this->context->cart;
 
         ProcessLoggerHandler::logInfo(
-            'create order : '.$this->conveyor['status'],
+            'create Stripe order : '.$this->conveyor['status'],
             null,
             null,
-            'ValidationOrderActions'
+            'ValidationOrderActions - createOrder'
         );
         ProcessLoggerHandler::closeLogger();
 
@@ -244,6 +320,14 @@ class ValidationOrderActions extends DefaultActions
                 false,
                 $this->conveyor['secure_key']
             );
+
+            ProcessLoggerHandler::logInfo(
+                'Prestashop order created',
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+            ProcessLoggerHandler::closeLogger();
 
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
             $order = new Order($idOrder);
@@ -271,60 +355,90 @@ class ValidationOrderActions extends DefaultActions
                 $stripeCapture->date_catch = date('Y-m-d H:i:s');
                 $stripeCapture->save();
             }
-        } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
+
+            ProcessLoggerHandler::logInfo(
+                'createOrder : OK',
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
         }
-
-        unset($this->context->cookie->stripe_payment_intent);
-        unset($this->context->cookie->stripe_idempotency_key);
 
         return true;
     }
 
     public function sendMail()
     {
-        if ($this->conveyor['payment_method']->type != 'oxxo') {
-            return true;
-        }
+        try {
+            if ($this->conveyor['payment_method']->type != 'oxxo') {
+                return true;
+            }
 
-        $dir_mail = false;
-        if (file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.txt') &&
-            file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.html')) {
-            $dir_mail = dirname(__FILE__).'/../../mails/';
-        }
+            $dir_mail = false;
+            if (file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.txt') &&
+                file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.html')) {
+                $dir_mail = dirname(__FILE__).'/../../mails/';
+            }
 
-        $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
-        $order = new Order((int)$orderId);
+            $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
+            $order = new Order((int)$orderId);
 
-        $template_vars = array(
-            '{name}' => $this->conveyor['payment_method']->billing_details->name,
-            '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
-            '{order_id}' => $order->id,
-            '{voucher_url}' => $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'],
-            '{order_ref}' => $order->reference,
-            '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
-        );
-
-        $this->conveyor['voucher_url'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'];
-        $this->conveyor['voucher_expire'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['expires_after'];
-
-        if ($dir_mail) {
-            Mail::Send(
-                $this->context->language->id,
-                'oxxo',
-                sprintf(Mail::l('New order : #%d - %s', $this->context->language->id), $order->id, $order->reference),
-                $template_vars,
-                $this->conveyor['payment_method']->billing_details->email,
-                null,
-                Configuration::get('PS_SHOP_EMAIL'),
-                Configuration::get('PS_SHOP_NAME'),
-                null,
-                null,
-                $dir_mail,
-                null,
-                $this->context->shop->id
+            $template_vars = array(
+                '{name}' => $this->conveyor['payment_method']->billing_details->name,
+                '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
+                '{order_id}' => $order->id,
+                '{voucher_url}' => $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'],
+                '{order_ref}' => $order->reference,
+                '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
             );
+
+            $this->conveyor['voucher_url'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'];
+            $this->conveyor['voucher_expire'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['expires_after'];
+
+            if ($dir_mail) {
+                Mail::Send(
+                    $this->context->language->id,
+                    'oxxo',
+                    sprintf(Mail::l('New order : #%d - %s', $this->context->language->id), $order->id, $order->reference),
+                    $template_vars,
+                    $this->conveyor['payment_method']->billing_details->email,
+                    null,
+                    Configuration::get('PS_SHOP_EMAIL'),
+                    Configuration::get('PS_SHOP_NAME'),
+                    null,
+                    null,
+                    $dir_mail,
+                    null,
+                    $this->context->shop->id
+                );
+            }
+
+            ProcessLoggerHandler::logInfo(
+                'sendMail : OK',
+                null,
+                null,
+                'ValidationOrderActions - sendMail'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - sendMail'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
 
         return true;
@@ -332,40 +446,59 @@ class ValidationOrderActions extends DefaultActions
 
     public function saveCard()
     {
-        if ($this->conveyor['saveCard'] == 'false') {
-            return true;
-        }
+        try {
+            if ($this->conveyor['saveCard'] == 'false') {
+                return true;
+            }
 
-        $stripeAccount = \Stripe\Account::retrieve();
+            $stripeAccount = \Stripe\Account::retrieve();
 
-        $stripeCustomer = new StripeCustomer();
-        $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
+            $stripeCustomer = new StripeCustomer();
+            $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
-        if ($stripeCustomer->id == null) {
-            $customer = \Stripe\Customer::create([
-                'description' => 'Customer created from Prestashop Stripe module',
-                'email' => $this->context->customer->email,
-                'name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
-            ]);
+            if ($stripeCustomer->id == null) {
+                $customer = \Stripe\Customer::create([
+                    'description' => 'Customer created from Prestashop Stripe module',
+                    'email' => $this->context->customer->email,
+                    'name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                ]);
 
-            $stripeCustomer->id_customer = $this->context->customer->id;
-            $stripeCustomer->stripe_customer_key = $customer->id;
-            $stripeCustomer->id_account = $stripeAccount->id;
-            $stripeCustomer->save();
-        }
+                $stripeCustomer->id_customer = $this->context->customer->id;
+                $stripeCustomer->stripe_customer_key = $customer->id;
+                $stripeCustomer->id_account = $stripeAccount->id;
+                $stripeCustomer->save();
+            }
 
-        $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
+            $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
 
-        $stripeCard = new StripeCard();
-        $stripeCard->stripe_customer_key = $customer->id;
-        $stripeCard->payment_method = $this->conveyor['token'];
-        if (!$stripeCard->save()) {
-            ProcessLoggerHandler::logError(
-                'Error during save card, card has not been registered',
+            $stripeCard = new StripeCard();
+            $stripeCard->stripe_customer_key = $customer->id;
+            $stripeCard->payment_method = $this->conveyor['token'];
+            if (!$stripeCard->save()) {
+                ProcessLoggerHandler::logError(
+                    'Error during save card, card has not been registered',
+                    null,
+                    null,
+                    'StripeCard'
+                );
+            }
+
+            ProcessLoggerHandler::logInfo(
+                'saveCard : OK',
                 null,
                 null,
-                'StripeCard'
+                'ValidationOrderActions - saveCard'
             );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - saveCard'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
 
         return true;
@@ -377,73 +510,92 @@ class ValidationOrderActions extends DefaultActions
     */
     public function addTentative()
     {
-        if ($this->conveyor['datas']['type'] == 'American Express') {
-            $this->conveyor['datas']['type'] = 'amex';
-        } elseif ($this->conveyor['datas']['type'] == 'Diners Club') {
-            $this->conveyor['datas']['type'] = 'diners';
-        }
+        try {
+            if ($this->conveyor['datas']['type'] == 'American Express') {
+                $this->conveyor['datas']['type'] = 'amex';
+            } elseif ($this->conveyor['datas']['type'] == 'Diners Club') {
+                $this->conveyor['datas']['type'] = 'diners';
+            }
 
-        $cardType = $this->conveyor['datas']['type'];
-        if (isset($this->conveyor['payment_method']->card)) {
-            $cardType = $this->conveyor['payment_method']->card->brand;
-        }
+            $cardType = $this->conveyor['datas']['type'];
+            if (isset($this->conveyor['payment_method']->card)) {
+                $cardType = $this->conveyor['payment_method']->card->brand;
+            }
 
-        $stripePayment = new StripePayment();
-        $stripePayment->setIdStripe($this->conveyor['chargeId']);
-        $stripePayment->setIdPaymentIntent($this->conveyor['id_payment_intent']);
-        $stripePayment->setName($this->conveyor['datas']['owner']);
-        $stripePayment->setIdCart((int)$this->context->cart->id);
-        $stripePayment->setType(Tools::strtolower($cardType));
-        $stripePayment->setAmount($this->conveyor['amount']);
-        $stripePayment->setRefund((int)0);
-        $stripePayment->setCurrency(Tools::strtolower($this->context->currency->iso_code));
-        $stripePayment->setResult((int)$this->conveyor['result']);
-        $stripePayment->setState((int)Configuration::get('STRIPE_MODE'));
-        if (isset($this->conveyor['voucher_url']) && isset($this->conveyor['voucher_expire'])) {
-            $stripePayment->setVoucherUrl($this->conveyor['voucher_url']);
-            $stripePayment->setVoucherExpire(date("Y-m-d H:i:s", $this->conveyor['voucher_expire']));
-        }
-        $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
-        $stripePayment->save();
+            $stripePayment = new StripePayment();
+            $stripePayment->setIdStripe($this->conveyor['chargeId']);
+            $stripePayment->setIdPaymentIntent($this->conveyor['id_payment_intent']);
+            $stripePayment->setName($this->conveyor['datas']['owner']);
+            $stripePayment->setIdCart((int)$this->context->cart->id);
+            $stripePayment->setType(Tools::strtolower($cardType));
+            $stripePayment->setAmount($this->conveyor['amount']);
+            $stripePayment->setRefund((int)0);
+            $stripePayment->setCurrency(Tools::strtolower($this->context->currency->iso_code));
+            $stripePayment->setResult((int)$this->conveyor['result']);
+            $stripePayment->setState((int)Configuration::get('STRIPE_MODE'));
+            if (isset($this->conveyor['voucher_url']) && isset($this->conveyor['voucher_expire'])) {
+                $stripePayment->setVoucherUrl($this->conveyor['voucher_url']);
+                $stripePayment->setVoucherExpire(date("Y-m-d H:i:s", $this->conveyor['voucher_expire']));
+            }
+            $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
+            $stripePayment->save();
 
-        // Payent with Sofort is not accepted yet so we can't get his orderPayment
-        if (Tools::strtolower($cardType) != 'sofort') {
-            $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
-            $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
+            // Payent with Sofort is not accepted yet so we can't get his orderPayment
+            if (Tools::strtolower($cardType) != 'sofort') {
+                $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
+                $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
-            if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
-                ProcessLoggerHandler::logError(
-                    'OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' .$this->conveyor['chargeId'] . ' on payment.',
-                    'Order',
-                    $orderId,
-                    'validation'
-                );
-                $order = new Order($orderId);
-                if (!$order->addOrderPayment($this->conveyor['amount'], null, $this->conveyor['chargeId'])) {
+                if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
                     ProcessLoggerHandler::logError(
-                        'PaymentModule::validateOrder - Cannot save Order Payment',
+                        'OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' .$this->conveyor['chargeId'] . ' on payment.',
                         'Order',
                         $orderId,
                         'validation'
                     );
+                    $order = new Order($orderId);
+                    if (!$order->addOrderPayment($this->conveyor['amount'], null, $this->conveyor['chargeId'])) {
+                        ProcessLoggerHandler::logError(
+                            'PaymentModule::validateOrder - Cannot save Order Payment',
+                            'Order',
+                            $orderId,
+                            'validation'
+                        );
+                        ProcessLoggerHandler::closeLogger();
+                        PrestaShopLogger::addLog(
+                            'PaymentModule::validateOrder - Cannot save Order Payment',
+                            3,
+                            null,
+                            'Cart',
+                            (int)$this->context->cart->id,
+                            true
+                        );
+                        throw new PrestaShopException('Can\'t save Order Payment');
+                    }
                     ProcessLoggerHandler::closeLogger();
-                    PrestaShopLogger::addLog(
-                        'PaymentModule::validateOrder - Cannot save Order Payment',
-                        3,
-                        null,
-                        'Cart',
-                        (int)$this->context->cart->id,
-                        true
-                    );
-                    throw new PrestaShopException('Can\'t save Order Payment');
+                    return true;
                 }
-                ProcessLoggerHandler::closeLogger();
-                return true;
+
+                $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
+                $orderPayment->transaction_id = $this->conveyor['chargeId'];
+                $orderPayment->save();
             }
 
-            $orderPayment = new OrderPayment($orderPaymentDatas[0]->id);
-            $orderPayment->transaction_id = $this->conveyor['chargeId'];
-            $orderPayment->save();
+            ProcessLoggerHandler::logInfo(
+                'addTentative : OK',
+                null,
+                null,
+                'ValidationOrderActions - addTentative'
+            );
+            ProcessLoggerHandler::closeLogger();
+        } catch (Exception $e) {
+            ProcessLoggerHandler::logError(
+                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                null,
+                null,
+                'ValidationOrderActions - addTentative'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
 
         return true;
@@ -501,6 +653,17 @@ class ValidationOrderActions extends DefaultActions
         );
 
         $order = new Order($id_order);
+
+        if ($this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
+            ProcessLoggerHandler::logInfo(
+                'Order status is already the good one',
+                null,
+                null,
+                'webhook'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return true;
+        }
 
         ProcessLoggerHandler::logInfo(
             'current charge => '.$this->conveyor['event_json']->type,

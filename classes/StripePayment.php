@@ -76,7 +76,7 @@ class StripePayment extends ObjectModel
             'name'  => array(
                 'type'     => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 30,
+                'size'     => 255,
             ),
             'id_cart' => array(
                 'type'     => ObjectModel::TYPE_INT,

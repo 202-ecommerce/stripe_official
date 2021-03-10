@@ -27,6 +27,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/../classes/StripePayment.php';
+require_once dirname(__FILE__) . '/../classes/StripePaymentIntent.php';
+
 function upgrade_module_2_0_0($module)
 {
     $module->updateConfigurationKey('_PS_STRIPE_mode', 'STRIPE_MODE');
