@@ -31,13 +31,15 @@ require_once dirname(__FILE__) . '/../classes/StripeWebhook.php';
 
 function upgrade_module_2_3_2($module)
 {
+    $context = Context::getContext();
+
     $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
     $installer->registerHooks();
 
     $webhooksList = StripeWebhook::getWebhookList();
 
     foreach ($webhooksList as $webhookEndpoint) {
-        if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
+        if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
             $webhookEndpoint->update(
                 $webhookEndpoint->id,
                 [
