@@ -42,25 +42,45 @@ class ValidationOrderActions extends DefaultActions
             $this->context = $this->conveyor['context'];
             $this->module = $this->conveyor['module'];
 
-            if (isset($this->conveyor['response']['paymentIntent'])) {
-                $response = (object)$this->conveyor['response']['paymentIntent'];
-            } else {
-                $response = (object)$this->conveyor['response'];
-            }
-            $intent = \Stripe\PaymentIntent::retrieve($response->id);
-            $charges = $intent->charges->data;
+            // if (isset($this->conveyor['response']['paymentIntent'])) {
+            //     $response = (object)$this->conveyor['response']['paymentIntent'];
+            // } else {
+            //     $response = (object)$this->conveyor['response'];
+            // }
 
-            $this->conveyor['currency'] = $response->currency;
-            $this->conveyor['token'] = $response->payment_method;
-            $this->conveyor['id_payment_intent'] = $response->id;
-            $this->conveyor['status'] = $response->status;
-            if (!empty($charges)) {
-                $this->conveyor['chargeId'] = $charges[0]->id;
+            $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
+
+            ProcessLoggerHandler::logInfo(
+                '$intent : '.$intent,
+                null,
+                null,
+                'ValidationOrderActions - prepareFlowNone'
+            );
+
+            // $charges = $intent->charges->data[0];
+
+            // if (!empty($charges)) {
+            if (isset($intent->charges->data[0])) {
+                $charges = $intent->charges->data[0];
+                $this->conveyor['chargeId'] = $charges->id;
+                $this->conveyor['token'] = $charges->payment_method;
+                $this->conveyor['status'] = $charges->status;
             } else {
+                // for OXXO
                 $this->conveyor['chargeId'] = '';
+                $this->conveyor['token'] = $intent->payment_method;
+                $this->conveyor['status'] = $intent->status;
             }
 
-            if ($this->module->isZeroDecimalCurrency($response->currency)) {
+            $this->conveyor['currency'] = $intent->currency;
+            $this->conveyor['id_payment_intent'] = $intent->id;
+            $this->conveyor['saveCard'] = $intent->setup_future_usage;
+
+            $stripeIdempotencyKey = new StripeIdempotencyKey();
+            $stripeIdempotencyKey->getByIdPaymentIntent($intent->id);
+            $this->conveyor['id_cart'] = $stripeIdempotencyKey->id_cart;
+
+            if ($this->module->isZeroDecimalCurrency($intent->currency)) {
                 $this->conveyor['amount'] = $intent->amount;
             } else {
                 $this->conveyor['amount'] = $intent->amount / 100;
@@ -124,12 +144,16 @@ class ValidationOrderActions extends DefaultActions
               'source' => $source,
             ));
 
+            return false;
+
             $this->conveyor['currency'] = $response->currency;
             $this->conveyor['token'] = $source;
             $this->conveyor['id_payment_intent'] = $response->source->metadata->paymentIntent;
             $this->conveyor['status'] = $response->status;
             $this->conveyor['chargeId'] = $response->id;
             $this->conveyor['amount'] = $this->context->cart->getOrderTotal();
+            $this->conveyor['saveCard'] = null;
+            $this->conveyor['id_cart'] = $this->context->cart->id;
 
             ProcessLoggerHandler::logInfo(
                 'prepareFlowRedirect : OK',
@@ -170,10 +194,15 @@ class ValidationOrderActions extends DefaultActions
                 return false;
             }
 
+            $stripeIdempotencyKey = new StripeIdempotencyKey();
+            $stripeIdempotencyKey->getByIdPaymentIntent($intent->id);
+            $this->conveyor['id_cart'] = $stripeIdempotencyKey->id_cart;
+
             $this->conveyor['currency'] = $charges[0]->currency;
             $this->conveyor['token'] = $charges[0]->payment_method;
             $this->conveyor['status'] = $charges[0]->status;
             $this->conveyor['chargeId'] = $charges[0]->id;
+            $this->conveyor['saveCard'] = null;
 
             if ($this->module->isZeroDecimalCurrency($charges[0]->currency)) {
                 $this->conveyor['amount'] = $charges[0]->amount;
@@ -222,7 +251,7 @@ class ValidationOrderActions extends DefaultActions
 
             $paymentIntent->update();
 
-            $this->conveyor['paymentIntent'] = $paymentIntent;
+            // $this->conveyor['paymentIntent'] = $paymentIntent;
 
             ProcessLoggerHandler::logInfo(
                 'updatePaymentIntent : OK',
@@ -271,16 +300,20 @@ class ValidationOrderActions extends DefaultActions
             $this->conveyor['datas']['owner'] = $this->conveyor['source']->owner->name;
         }
 
-        if (isset($this->context->customer->secure_key)) {
-            $this->conveyor['secure_key'] = $this->context->customer->secure_key;
+        $this->conveyor['cart'] = new Cart((int)$this->conveyor['id_cart']);
+
+        $customer = new Customer($this->conveyor['cart']->id);
+
+        if (isset($customer->secure_key)) {
+            $this->conveyor['secure_key'] = $customer->secure_key;
         } else {
             $this->conveyor['secure_key'] = false;
         }
 
-        $paid = $this->context->cart->getOrderTotal();
+        $paid = $this->conveyor['amount'];
 
         /* Add transaction on Prestashop back Office (Order) */
-        if ($this->conveyor['status'] == 'requires_capture') {
+        if ($this->conveyor['datas']['type'] == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == 'on') {
             $orderStatus = Configuration::get('STRIPE_CAPTURE_WAITING');
             $this->conveyor['result'] = 2;
         } elseif ($this->conveyor['status'] == 'requires_action') {
@@ -298,10 +331,10 @@ class ValidationOrderActions extends DefaultActions
             $orderStatus = Configuration::get('PS_OS_PAYMENT');
             $this->conveyor['result'] = 1;
         }
-        $this->conveyor['cart'] = $this->context->cart;
+        // $this->conveyor['cart'] = $this->context->cart;
 
         ProcessLoggerHandler::logInfo(
-            'create Stripe order : '.$this->conveyor['status'],
+            'Beginning of validateOrder',
             null,
             null,
             'ValidationOrderActions - createOrder'
@@ -310,7 +343,7 @@ class ValidationOrderActions extends DefaultActions
 
         try {
             $this->module->validateOrder(
-                (int)$this->conveyor['cart']->id,
+                (int)$this->conveyor['id_cart'],
                 (int)$orderStatus,
                 $paid,
                 $this->module->l(Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name']).' via Stripe', 'ValidationOrderActions'),
@@ -329,7 +362,7 @@ class ValidationOrderActions extends DefaultActions
             );
             ProcessLoggerHandler::closeLogger();
 
-            $idOrder = Order::getOrderByCartId((int)$this->conveyor['cart']->id);
+            $idOrder = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order($idOrder);
             if (empty($this->conveyor['source'])) {
                 \Stripe\PaymentIntent::update(
@@ -380,7 +413,7 @@ class ValidationOrderActions extends DefaultActions
     public function sendMail()
     {
         try {
-            if ($this->conveyor['payment_method']->type != 'oxxo') {
+            if ($this->conveyor['datas']['type'] != 'oxxo') {
                 return true;
             }
 
@@ -390,20 +423,20 @@ class ValidationOrderActions extends DefaultActions
                 $dir_mail = dirname(__FILE__).'/../../mails/';
             }
 
-            $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
+            $orderId = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order((int)$orderId);
 
             $template_vars = array(
                 '{name}' => $this->conveyor['payment_method']->billing_details->name,
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{order_id}' => $order->id,
-                '{voucher_url}' => $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'],
+                '{voucher_url}' => $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url,
                 '{order_ref}' => $order->reference,
                 '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
             );
 
-            $this->conveyor['voucher_url'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['hosted_voucher_url'];
-            $this->conveyor['voucher_expire'] = $this->conveyor['response']['paymentIntent']['next_action']['oxxo_display_details']['expires_after'];
+            $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
+            $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
 
             if ($dir_mail) {
                 Mail::Send(
@@ -447,7 +480,7 @@ class ValidationOrderActions extends DefaultActions
     public function saveCard()
     {
         try {
-            if ($this->conveyor['saveCard'] == 'false') {
+            if ($this->conveyor['saveCard'] == null) {
                 return true;
             }
 
@@ -604,7 +637,15 @@ class ValidationOrderActions extends DefaultActions
     public function chargeWebhook()
     {
         $this->context = $this->conveyor['context'];
-        $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->payment_intent;
+
+        $stripe_payment = new StripePayment();
+        if (isset($this->conveyor['event_json']->data->object->payment_intent)) {
+            $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->payment_intent;
+            $stripe_payment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
+        } else {
+            $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->id;
+            $stripe_payment->getStripePaymentByIdStripe($this->conveyor['IdPaymentIntent']);
+        }
 
         ProcessLoggerHandler::logInfo(
             'chargeWebhook with IdPaymentIntent => ' . $this->conveyor['IdPaymentIntent'],
@@ -612,8 +653,6 @@ class ValidationOrderActions extends DefaultActions
             null,
             'webhook'
         );
-        $stripe_payment = new StripePayment();
-        $stripe_payment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
 
         if ($stripe_payment->id == false) {
             ProcessLoggerHandler::logError(

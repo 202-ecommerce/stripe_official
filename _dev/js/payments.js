@@ -121,7 +121,7 @@ $(function(){
             paymentIntentDatas.cardPayment
           )
           .then(function(response) {
-            handlePayment(response);
+            redirectAfterOrder(response);
           });
         });
 
@@ -318,7 +318,7 @@ $(function(){
             paymentIntentDatas.cardPayment
           )
           .then(function(response) {
-            handlePayment(response);
+            redirectAfterOrder(response);
           });
         } else if (payment === 'sepa_debit') {
           // Confirm the PaymentIntent with the IBAN Element and additional SEPA Debit source data.
@@ -332,7 +332,7 @@ $(function(){
             paymentIntentDatas.cardPayment
           )
           .then(function(response) {
-            handlePayment(response);
+            redirectAfterOrder(response);
           });
         } else if (payment === 'oxxo') {
           if (typeof paymentIntentDatas != 'undefined') {
@@ -356,7 +356,7 @@ $(function(){
                   var errorMsg = document.getElementById('error-message');
                   errorMsg.innerText = response.error.message;
                 } else {
-                  handlePayment(response);
+                  redirectAfterOrder(response);
                 }
             });
           }
@@ -413,20 +413,40 @@ $(function(){
               break;
 
             case 'sofort':
-              // Prepare all the Stripe source common data.
-              const sourceData = {
-                type: payment, amount: stripe_amount, currency: stripe_currency,
-                owner: { name: stripe_fullname, email: stripe_email },
-                redirect: { return_url: stripe_validation_return_url },
-                metadata: { paymentIntent: paymentIntentDatas.intent.id }
-              };
+              // // Prepare all the Stripe source common data.
+              // const sourceData = {
+              //   type: payment, amount: stripe_amount, currency: stripe_currency,
+              //   owner: { name: stripe_fullname, email: stripe_email },
+              //   redirect: { return_url: stripe_validation_return_url },
+              //   metadata: { paymentIntent: paymentIntentDatas.intent.id }
+              // };
 
-              // SOFORT: The country is required before redirecting to the bank.
-              sourceData.sofort = { country: stripe_address_country_code };
+              // // SOFORT: The country is required before redirecting to the bank.
+              // sourceData.sofort = { country: stripe_address_country_code };
 
-              // Create a Stripe source with the common data and extra information.
-              const {source} = await stripe.createSource(sourceData);
-              handleSourceActivation(source, $form);
+              // // Create a Stripe source with the common data and extra information.
+              // const {source} = await stripe.createSource(sourceData);
+              // handleSourceActivation(source, $form);
+
+              // // SOFORT: The country is required before redirecting to the bank.
+              // sourceData.sofort = { country: stripe_address_country_code };
+
+              cardDatas = {
+                sofort: { country: stripe_address_country_code }
+              }
+              paymentIntentDatas.cardPayment.payment_method = Object.assign(paymentIntentDatas.cardPayment.payment_method, cardDatas);
+
+              stripe.confirmSofortPayment(
+                paymentIntentDatas.intent.client_secret,
+                paymentIntentDatas.cardPayment
+              ).then(function(result) {
+                if (result.error) {
+                  // Inform the customer that there was an error.
+                  console.log('error confirmSofortPayment');
+                  console.log(result.error);
+                }
+              });
+              return;
               break;
 
             case 'fpx':
@@ -491,9 +511,10 @@ $(function(){
               break;
           }
         }
-      } else {
-        handlePayment(paymentIntentDatas.intent);
       }
+      //  else {
+      //   handlePayment(paymentIntentDatas.intent);
+      // }
 
       event.stopPropagation();
 
@@ -531,7 +552,7 @@ $(function(){
     }
 
     // Handle new PaymentIntent result
-    function handlePayment(response) {
+    function redirectAfterOrder(response) {
       if (response.error) {
         updateError($submitButtons, response.error);
         enableSubmit($submitButtons);
@@ -540,15 +561,19 @@ $(function(){
             type: 'POST',
             dataType: 'json',
             async: false,
-            url: stripe_validation_return_url,
+            url: stripe_order_confirmation_return_url,
             data: {
-                response: response,
-                saveCard: saveCard
+                paymentIntent: response.paymentIntent.id
             },
-            success: function(datas) {
-                if (datas['code'] == 0 || datas['code'] == 1) {
-                  window.location.replace(datas['url']);
-                }
+            success: function(data) {
+              console.log(data);
+              if (data == 'retry') {
+                setTimeout(function(){
+                  redirectAfterOrder(response);
+                }, 5000 );
+              } else {
+                window.location.replace(data);
+              }
             },
             error: function(err) {
                 console.log(err);

@@ -164,6 +164,7 @@ class Stripe_official extends PaymentModule
         'actionOrderStatusUpdate',
         'displayMyAccountBlock',
         'displayCustomerAccount',
+        'actionValidateOrder'
     );
 
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
@@ -374,7 +375,8 @@ class Stripe_official extends PaymentModule
         'charge.pending',
         'charge.captured',
         'charge.refunded',
-        'charge.dispute.created'
+        'charge.dispute.created',
+        'payment_intent.requires_action'
     );
 
     /* refund */
@@ -1506,6 +1508,13 @@ class Stripe_official extends PaymentModule
                 true
             ),
 
+            'stripe_order_confirmation_return_url' => $this->context->link->getModuleLink(
+                $this->name,
+                'orderConfirmationReturn',
+                array(),
+                true
+            ),
+
             'stripe_create_intent_url' => $this->context->link->getModuleLink(
                 $this->name,
                 'createIntent',
@@ -1841,6 +1850,54 @@ class Stripe_official extends PaymentModule
         ));
 
         return $this->display(__FILE__, 'views/templates/front/order-confirmation.tpl');
+    }
+
+    public function hookActionValidateOrder($params)
+    {
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $order = $params['order'];
+            $prestashop_version = '1.7';
+        } else {
+            $order = $params['objOrder'];
+            $prestashop_version = '1.6';
+        }
+
+        if (!self::isWellConfigured() || !$this->active || $order->module != $this->name) {
+            return;
+        }
+
+        $stripeIdempotencyKey = new StripeIdempotencyKey();
+        $stripeIdempotencyKey->getByIdCart($order->id_cart);
+
+        $intent = \Stripe\PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo(
+            'payment method => '.$intent->payment_method_types[0],
+            null,
+            null,
+            'hookActionValidateOrder'
+        );
+
+        if (($intent->payment_method_types[0] == 'card' && Configuration::get(self::CATCHANDAUTHORIZE) != NULL) || $intent->payment_method_types[0] != 'card') {
+            return;
+        }
+
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+
+        $currency = new Currency($order->id_currency, $this->context->language->id, $this->context->shop->id);
+
+        $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $order->total_paid : $order->total_paid * 100;
+
+        if (!$this->captureFunds($amount, $stripeIdempotencyKey->id_payment_intent)) {
+            return false;
+        }
+
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo(
+            'Payment captured',
+            null,
+            null,
+            'hookActionValidateOrder'
+        );
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
     }
 
     public function hookDisplayCustomerAccount()
