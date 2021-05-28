@@ -1193,14 +1193,15 @@ class Stripe_official extends PaymentModule
     /**
      * get Secret Key according MODE staging or live
      *
+     * @param null $id_shop Optional, if set, get the secret key of the specified shop
      * @return string
      */
-    public function getSecretKey()
+    public function getSecretKey($id_shop = null)
     {
-        if (Configuration::get(self::MODE)) {
-            return Configuration::get(self::TEST_KEY);
+        if (Configuration::get(self::MODE, null, null, $id_shop)) {
+            return Configuration::get(self::TEST_KEY, null, null, $id_shop);
         } else {
-            return Configuration::get(self::KEY);
+            return Configuration::get(self::KEY, null, null, $id_shop);
         }
     }
 
@@ -1358,8 +1359,11 @@ class Stripe_official extends PaymentModule
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
-        $stripeDispute = new StripeDispute();
-        $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+        $dispute = false;
+        if(!empty($stripePayment->getIdStripe())) {
+            $stripeDispute = new StripeDispute();
+            $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe(), $params['order']->id_shop);
+        }
 
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
