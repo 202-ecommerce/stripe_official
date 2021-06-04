@@ -43,35 +43,37 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
     {
         parent::initContent();
 
-        $paymentIntent = Tools::getValue('paymentIntent');
+        if (Tools::getValue('redirect_status') == 'failed') {
+            $url = Context::getContext()->link->getModuleLink(
+                'stripe_official',
+                'orderFailure',
+                array(),
+                true
+            );
+        } else {
+            $paymentIntentDatas = Tools::getValue('paymentIntentDatas');
 
-        $stripeIdempotencyKey = new StripeIdempotencyKey();
-        $stripeIdempotencyKey->getByIdPaymentIntent($paymentIntent);
+            $datas = array(
+                'payment_method' => Tools::getValue('payment_option')
+            );
 
-        $id_order = Order::getOrderByCartId($stripeIdempotencyKey->id_cart);
+            if (Tools::getValue('payment_option') == 'oxxo') {
+                $datas['voucher_url'] = $paymentIntentDatas['next_action']['oxxo_display_details']['hosted_voucher_url'];
+            }
 
-        if ($id_order == NULL) {
-            echo Tools::jsonEncode('retry');
+            $url = Context::getContext()->link->getModuleLink(
+                'stripe_official',
+                'orderSuccess',
+                $datas,
+                true
+            );
+        }
+
+        // for redirect payments
+        if (Stripe_official::$paymentMethods[Tools::getValue('payment_option')]['flow'] == 'redirect') {
+            Tools::redirect($url);
             exit;
         }
-
-        if (isset($this->context->customer->secure_key)) {
-            $secure_key = $this->context->customer->secure_key;
-        } else {
-            $secure_key = false;
-        }
-
-        $url = Context::getContext()->link->getPageLink(
-            'order-confirmation',
-            true,
-            null,
-            array(
-                'id_cart' => (int)$stripeIdempotencyKey->id_cart,
-                'id_module' => (int)$this->module->id,
-                'id_order' => (int)$id_order,
-                'key' => $secure_key
-            )
-        );
 
         echo Tools::jsonEncode($url);
         exit;

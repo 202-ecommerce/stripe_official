@@ -563,17 +563,12 @@ $(function(){
             async: false,
             url: stripe_order_confirmation_return_url,
             data: {
-                paymentIntent: response.paymentIntent.id
+                payment_option: payment,
+                paymentIntent: response.paymentIntent.id,
+                paymentIntentDatas: response.paymentIntent
             },
             success: function(data) {
-              console.log(data);
-              if (data == 'retry') {
-                setTimeout(function(){
-                  redirectAfterOrder(response);
-                }, 5000 );
-              } else {
                 window.location.replace(data);
-              }
             },
             error: function(err) {
                 console.log(err);

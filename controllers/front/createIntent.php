@@ -51,7 +51,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "amount" => $amount,
                 "currency" => Tools::getValue('currency'),
                 "payment_method_types" => array(Tools::getValue('payment_option')),
-                "capture_method" => $capture_method
+                "capture_method" => $capture_method,
+                "metadata" => array(
+                    'id_cart' => $this->context->cart->id
+                )
             );
 
             if (!Tools::getValue('id_payment_method')) {
@@ -102,8 +105,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             } elseif (Tools::getValue('payment_option') != 'card') {
                 $stripe_validation_return_url = $this->context->link->getModuleLink(
                     'stripe_official',
-                    'validation',
-                    array(),
+                    'orderConfirmationReturn',
+                    array(
+                        'id_cart' => $this->context->cart->id
+                    ),
                     true
                 );
                 $cardPayment['return_url'] = $stripe_validation_return_url;

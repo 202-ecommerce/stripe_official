@@ -142,6 +142,11 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
             ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
             $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
+        } elseif ($event->type == 'charge.succeeded'
+            && Stripe_official::$paymentMethods[$event->data->object->payment_method_details->type]['flow'] == 'redirect') {
+            ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
+            ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
+            $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
         } else {
             $handler->addActions('chargeWebhook');
         }
