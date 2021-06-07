@@ -51,14 +51,25 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
                 true
             );
         } else {
-            $paymentIntentDatas = Tools::getValue('paymentIntentDatas');
+            if (Tools::getValue('payment_intent')) {
+                // for redirect payment methods
+                $payment_intent = Tools::getValue('payment_intent');
+            } else {
+                $payment_intent = Tools::getValue('paymentIntent');
+            }
 
-            $datas = array(
-                'payment_method' => Tools::getValue('payment_option')
+            $intent = $intent = \Stripe\PaymentIntent::retrieve(
+                $payment_intent
             );
 
-            if (Tools::getValue('payment_option') == 'oxxo') {
-                $datas['voucher_url'] = $paymentIntentDatas['next_action']['oxxo_display_details']['hosted_voucher_url'];
+            $payment_method = $intent->payment_method_types[0];
+
+            $datas = array(
+                'payment_method' => $payment_method
+            );
+
+            if ($payment_method == 'oxxo') {
+                $datas['voucher_url'] = $intent->next_action->oxxo_display_details->hosted_voucher_url;
             }
 
             $url = Context::getContext()->link->getModuleLink(
@@ -70,7 +81,7 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
         }
 
         // for redirect payments
-        if (Stripe_official::$paymentMethods[Tools::getValue('payment_option')]['flow'] == 'redirect') {
+        if (Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect') {
             Tools::redirect($url);
             exit;
         }

@@ -94,7 +94,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             exit;
         }
 
-        http_response_code(200);
         if (!in_array($event->type, Stripe_official::$webhook_events)) {
             $msg = 'webhook "'.$event->type.'" call not yet supported';
             ProcessLoggerHandler::logInfo($msg, null, null, 'webhook');
@@ -102,12 +101,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             echo $msg;
             exit;
         }
-
-        // if (($event->type == 'charge.succeeded' && $event->data->object->captured === false)) {
-        //     ProcessLoggerHandler::logInfo('amount not captured yet', null, null, 'webhook');
-        //     ProcessLoggerHandler::closeLogger();
-        //     exit;
-        // }
 
         ProcessLoggerHandler::logInfo('starting webhook actions', null, null, 'webhook');
 
@@ -142,8 +135,10 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
             ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
             $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
-        } elseif ($event->type == 'charge.succeeded'
-            && Stripe_official::$paymentMethods[$event->data->object->payment_method_details->type]['flow'] == 'redirect') {
+        } elseif (($event->type == 'charge.succeeded'
+                    && Stripe_official::$paymentMethods[$event->data->object->payment_method_details->type]['flow'] == 'redirect' && $event->data->object->payment_method_details->type != 'sofort')
+                || ($event->type == 'charge.pending'
+                    && $event->data->object->payment_method_details->type == 'sofort')) {
             ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
             ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
             $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
