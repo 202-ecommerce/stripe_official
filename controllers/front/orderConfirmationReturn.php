@@ -43,6 +43,19 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
     {
         parent::initContent();
 
+        if (Tools::getValue('payment_intent')) {
+            // for redirect payment methods
+            $payment_intent = Tools::getValue('payment_intent');
+        } else {
+            $payment_intent = Tools::getValue('paymentIntent');
+        }
+
+        $intent = \Stripe\PaymentIntent::retrieve(
+            $payment_intent
+        );
+
+        $payment_method = $intent->payment_method_types[0];
+
         if (Tools::getValue('redirect_status') == 'failed') {
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',
@@ -51,19 +64,6 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
                 true
             );
         } else {
-            if (Tools::getValue('payment_intent')) {
-                // for redirect payment methods
-                $payment_intent = Tools::getValue('payment_intent');
-            } else {
-                $payment_intent = Tools::getValue('paymentIntent');
-            }
-
-            $intent = $intent = \Stripe\PaymentIntent::retrieve(
-                $payment_intent
-            );
-
-            $payment_method = $intent->payment_method_types[0];
-
             $datas = array(
                 'payment_method' => $payment_method
             );
