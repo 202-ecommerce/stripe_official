@@ -499,7 +499,7 @@ $(function(){
             case 'alipay':
               stripe.confirmAlipayPayment(
                 paymentIntentDatas.intent.client_secret,
-                {return_url: stripe_validation_return_url}
+                {return_url: stripe_order_confirmation_return_url}
               ).then(function(result) {
                 if (result.error) {
                   // Inform the customer that there was an error.
