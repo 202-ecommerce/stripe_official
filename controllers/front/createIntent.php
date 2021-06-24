@@ -115,24 +115,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $stripeIdempotencyKey->getByIdCart($this->context->cart->id);
-
-            if ($stripeIdempotencyKey->id != '') {
-                $intent = \Stripe\PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
-                if ($intent->payment_method_types[0] == Tools::getValue('payment_option')) {
-                    $intent = \Stripe\PaymentIntent::update(
-                        $stripeIdempotencyKey->id_payment_intent,
-                        [
-                            'amount' => $amount
-                        ]
-                    );
-                } else {
-                    $stripeIdempotencyKey->delete();
-                    $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
-                }
-            } else {
-                $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
-            }
+            $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
         } catch (Exception $e) {
             error_log($e->getMessage());
             ProcessLoggerHandler::logError(
