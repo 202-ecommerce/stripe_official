@@ -1337,7 +1337,13 @@ class Stripe_official extends PaymentModule
      */
     public function hookDisplayAdminOrderTabOrder($params)
     {
-        if ($params['order']->module != 'stripe_official') {
+        if (version_compare(_PS_VERSION_, '1.7.7.4', '>=')) {
+            $order = new Order($params['id_order']);
+        } else {
+            $order = $params['order'];
+        }
+
+        if ($order->module != 'stripe_official') {
             return;
         }
 
@@ -1355,8 +1361,14 @@ class Stripe_official extends PaymentModule
      */
     public function hookDisplayAdminOrderContentOrder($params)
     {
+        if (version_compare(_PS_VERSION_, '1.7.7.4', '>=')) {
+            $order = new Order($params['id_order']);
+        } else {
+            $order = $params['order'];
+        }
+
         $stripePayment = new StripePayment();
-        $stripePayment->getStripePaymentByCart($params['order']->id_cart);
+        $stripePayment->getStripePaymentByCart($order->id_cart);
 
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
@@ -1364,7 +1376,7 @@ class Stripe_official extends PaymentModule
         $dispute = false;
         if(!empty($stripePayment->getIdStripe())) {
             $stripeDispute = new StripeDispute();
-            $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe(), $params['order']->id_shop);
+            $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe(), $order->id_shop);
         }
 
         $this->context->smarty->assign(array(
