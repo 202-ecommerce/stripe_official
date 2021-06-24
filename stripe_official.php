@@ -1374,7 +1374,7 @@ class Stripe_official extends PaymentModule
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
         $dispute = false;
-        if(!empty($stripePayment->getIdStripe())) {
+        if (!empty($stripePayment->getIdStripe())) {
             $stripeDispute = new StripeDispute();
             $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe(), $order->id_shop);
         }
@@ -1896,7 +1896,7 @@ class Stripe_official extends PaymentModule
             'hookActionValidateOrder'
         );
 
-        if (($intent->payment_method_types[0] == 'card' && Configuration::get(self::CATCHANDAUTHORIZE) != NULL) || $intent->payment_method_types[0] != 'card') {
+        if (($intent->payment_method_types[0] == 'card' && Configuration::get(self::CATCHANDAUTHORIZE) != null) || $intent->payment_method_types[0] != 'card') {
             return;
         }
 

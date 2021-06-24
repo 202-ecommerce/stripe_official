@@ -47,7 +47,6 @@ function upgrade_module_2_3_1($module)
         'id_payment_intent'
     );
     $already_indexed = array();
-    $query = new DbQuery();
     $results = Db::getInstance()->executeS('SHOW INDEX FROM '._DB_PREFIX_.'stripe_idempotency_key');
 
     foreach ($results as $result) {

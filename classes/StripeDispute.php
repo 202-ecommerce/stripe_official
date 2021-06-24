@@ -40,7 +40,9 @@ class StripeDispute extends ObjectModel
         $module = Module::getInstanceByName('stripe_official');
         $key = $module->getSecretKey($id_shop);
 
-        if(empty($key)) return false;
+        if (empty($key)) {
+            return false;
+        }
 
         $stripe = new \Stripe\StripeClient($key);
 
@@ -49,7 +51,7 @@ class StripeDispute extends ObjectModel
 
     public function orderHasDispute($id_charge, $id_shop)
     {
-        if($disputes = $this->getAllDisputes($id_shop)) {
+        if ($disputes = $this->getAllDisputes($id_shop)) {
             foreach ($disputes->data as $dispute) {
                 if ($dispute->charge == $id_charge) {
                     return true;

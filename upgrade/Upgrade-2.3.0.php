@@ -30,7 +30,6 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_3_0($module)
 {
     $alter_stripe_payment_table = true;
-    $query = new DbQuery();
     $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_payment');
 
     if (!empty($result)) {
@@ -53,7 +52,6 @@ function upgrade_module_2_3_0($module)
 
 
     $alter_stripe_customer_table = true;
-    $query = new DbQuery();
     $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_customer');
 
     if (!empty($result)) {

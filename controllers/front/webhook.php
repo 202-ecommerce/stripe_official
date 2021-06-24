@@ -134,14 +134,28 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             || ($event->type == 'payment_intent.requires_action' && $event->data->object->payment_method_types[0] == 'oxxo')) {
             ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
             ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
-            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
+            $handler->addActions(
+                'prepareFlowNone',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'saveCard',
+                'addTentative'
+            );
         } elseif (($event->type == 'charge.succeeded'
                     && Stripe_official::$paymentMethods[$event->data->object->payment_method_details->type]['flow'] == 'redirect' && $event->data->object->payment_method_details->type != 'sofort')
                 || ($event->type == 'charge.pending'
                     && $event->data->object->payment_method_details->type == 'sofort')) {
             ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
             ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
-            $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
+            $handler->addActions(
+                'prepareFlowRedirectPaymentIntent',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'saveCard',
+                'addTentative'
+            );
         } else {
             $handler->addActions('chargeWebhook');
         }

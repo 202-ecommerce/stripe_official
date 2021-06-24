@@ -35,7 +35,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         parent::initContent();
 
         try {
-            if ($this->context->cart->id == NULL) {
+            if ($this->context->cart->id == null) {
                 throw new Exception("cart ID is empty", 1);
             }
 

@@ -90,7 +90,14 @@ class StripeWebhook extends ObjectModel
         }
 
         $webhooksList = self::getWebhookList();
-        $webhookUrl = $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+        $webhookUrl = $context->link->getModuleLink(
+            'stripe_official',
+            'webhook',
+            array(),
+            true,
+            Configuration::get('PS_LANG_DEFAULT'),
+            Configuration::get('PS_SHOP_DEFAULT')
+        );
         $webhookExists = false;
 
         foreach ($webhooksList->data as $webhook) {
