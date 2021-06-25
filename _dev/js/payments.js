@@ -28,7 +28,7 @@ $(function(){
     'use strict';
 
     // Create references to the submit button.
-    const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .ideal-submit-button[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-europe-payments[data-method="fpx"], .stripe-europe-payments[data-method="eps"], .stripe-europe-payments[data-method="p24"], .stripe-europe-payments[data-method="sepa_debit"], .stripe-submit-button');
+    const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .ideal-submit-button[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-europe-payments[data-method="fpx"], .stripe-europe-payments[data-method="eps"], .stripe-europe-payments[data-method="p24"], .stripe-europe-payments[data-method="sepa_debit"], .stripe-submit-button, .sepa_debit-submit-button');
     const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
     const submitInitialText = $submitButtons.text();
 
