@@ -42,12 +42,6 @@ class ValidationOrderActions extends DefaultActions
             $this->context = $this->conveyor['context'];
             $this->module = $this->conveyor['module'];
 
-            // if (isset($this->conveyor['response']['paymentIntent'])) {
-            //     $response = (object)$this->conveyor['response']['paymentIntent'];
-            // } else {
-            //     $response = (object)$this->conveyor['response'];
-            // }
-
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
 
             ProcessLoggerHandler::logInfo(
@@ -56,10 +50,8 @@ class ValidationOrderActions extends DefaultActions
                 null,
                 'ValidationOrderActions - prepareFlowNone'
             );
+            ProcessLoggerHandler::closeLogger();
 
-            // $charges = $intent->charges->data[0];
-
-            // if (!empty($charges)) {
             if (isset($intent->charges->data[0])) {
                 $charges = $intent->charges->data[0];
                 $this->conveyor['chargeId'] = $charges->id;
@@ -73,7 +65,6 @@ class ValidationOrderActions extends DefaultActions
             }
 
             $this->conveyor['currency'] = $intent->currency;
-            // $this->conveyor['id_payment_intent'] = $intent->id;
             $this->conveyor['saveCard'] = $intent->setup_future_usage;
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
@@ -251,8 +242,6 @@ class ValidationOrderActions extends DefaultActions
 
             $paymentIntent->update();
 
-            // $this->conveyor['paymentIntent'] = $paymentIntent;
-
             ProcessLoggerHandler::logInfo(
                 'updatePaymentIntent : OK',
                 null,
@@ -331,7 +320,6 @@ class ValidationOrderActions extends DefaultActions
             $orderStatus = Configuration::get('PS_OS_PAYMENT');
             $this->conveyor['result'] = 1;
         }
-        // $this->conveyor['cart'] = $this->context->cart;
 
         ProcessLoggerHandler::logInfo(
             'Beginning of validateOrder',
@@ -364,6 +352,46 @@ class ValidationOrderActions extends DefaultActions
 
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order($idOrder);
+
+            // capture payment for card if no catch and authorize enabled
+            $stripeIdempotencyKey = new StripeIdempotencyKey();
+            $stripeIdempotencyKey->getByIdCart($order->id_cart);
+
+            $intent = \Stripe\PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
+            ProcessLoggerHandler::logInfo(
+                'payment method => '.$intent->payment_method_types[0],
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+            ProcessLoggerHandler::closeLogger();
+
+            if ($intent->payment_method_types[0] == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
+                ProcessLoggerHandler::logInfo(
+                    'Capturing card',
+                    null,
+                    null,
+                    'ValidationOrderActions - createOrder'
+                );
+                ProcessLoggerHandler::closeLogger();
+                $currency = new Currency($order->id_currency, $this->context->language->id, $this->context->shop->id);
+
+                $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->total_paid : $order->total_paid * 100;
+
+                if (!$this->module->captureFunds($amount, $stripeIdempotencyKey->id_payment_intent)) {
+                    return false;
+                }
+
+                ProcessLoggerHandler::logInfo(
+                    'Payment captured',
+                    null,
+                    null,
+                    'ValidationOrderActions - createOrder'
+                );
+                ProcessLoggerHandler::closeLogger();
+            }
+            // END capture payment for card if no catch and authorize enabled
+
             if (empty($this->conveyor['source'])) {
                 \Stripe\PaymentIntent::update(
                     $this->conveyor['paymentIntent'],
