@@ -167,18 +167,25 @@ class ConfigurationActions extends DefaultActions
     {
         $this->context = $this->conveyor['context'];
 
-        if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE)
-            || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == ''
-            && StripeWebhook::countWebhooksList() < 16) {
+        if (StripeWebhook::countWebhooksList() < 16) {
             $webhooksList = StripeWebhook::getWebhookList();
 
+            $webhook_exists = false;
             foreach ($webhooksList as $webhookEndpoint) {
                 if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
-                    $webhookEndpoint->delete();
+                    $stripeWebhook = new StripeWebhook();
+                    $stripeWebhook->getByWebHookId($webhookEndpoint->id);
+                    if (!Validate::isLoadedObject($stripeWebhook)) {
+                        $webhookEndpoint->delete();
+                        StripeWebhook::create();
+                    }
+                    $webhook_exists = true;
                 }
             }
 
-            StripeWebhook::create();
+            if ($webhook_exists === false) {
+                StripeWebhook::create();
+            }
         }
 
         return true;

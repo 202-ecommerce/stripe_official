@@ -108,6 +108,7 @@ class Stripe_official extends PaymentModule
         'StripeCapture',
         'StripeCustomer',
         'StripeIdempotencyKey',
+        'StripeWebhook',
     );
 
     /**
