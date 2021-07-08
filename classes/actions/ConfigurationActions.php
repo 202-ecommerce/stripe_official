@@ -177,7 +177,14 @@ class ConfigurationActions extends DefaultActions
                     $stripeWebhook->getByWebHookId($webhookEndpoint->id);
                     if (!Validate::isLoadedObject($stripeWebhook)) {
                         $webhookEndpoint->delete();
-                        StripeWebhook::create();
+
+                        if (Configuration::get(Stripe_official::MODE, $context->language->id, $context->shop_group->id, $context->shop->id) == '1') {
+                            $secret_key = Configuration::get(Stripe_official::TEST_KEY, $context->language->id, $context->shop_group->id, $context->shop->id);
+                        } else {
+                            $secret_key = Configuration::get(Stripe_official::KEY, $context->language->id, $context->shop_group->id, $context->shop->id);
+                        }
+
+                        StripeWebhook::create($secret_key);
                     }
                     $webhook_exists = true;
                 }

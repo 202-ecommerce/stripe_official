@@ -96,7 +96,6 @@ class Stripe_official extends PaymentModule
     const CAPTURE_EXPIRE = 'STRIPE_CAPTURE_EXPIRE';
     const SAVE_CARD = 'STRIPE_SAVE_CARD';
     const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
-    const WEBHOOK_SIGNATURE = 'STRIPE_WEBHOOK_SIGNATURE';
 
     /**
      * List of objectModel used in this Module
