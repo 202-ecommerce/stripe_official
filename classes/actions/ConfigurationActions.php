@@ -170,6 +170,12 @@ class ConfigurationActions extends DefaultActions
         if (StripeWebhook::countWebhooksList() < 16) {
             $webhooksList = StripeWebhook::getWebhookList();
 
+            if (Configuration::get(Stripe_official::MODE, $this->context->language->id, $this->context->shop->id_shop_group, $this->context->shop->id) == '1') {
+                $secret_key = Configuration::get(Stripe_official::TEST_KEY, $this->context->language->id, $this->context->shop->id_shop_group, $this->context->shop->id);
+            } else {
+                $secret_key = Configuration::get(Stripe_official::KEY, $this->context->language->id, $this->context->shop->id_shop_group, $this->context->shop->id);
+            }
+
             $webhook_exists = false;
             foreach ($webhooksList as $webhookEndpoint) {
                 if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
@@ -177,13 +183,6 @@ class ConfigurationActions extends DefaultActions
                     $stripeWebhook->getByWebHookId($webhookEndpoint->id);
                     if (!Validate::isLoadedObject($stripeWebhook)) {
                         $webhookEndpoint->delete();
-
-                        if (Configuration::get(Stripe_official::MODE, $context->language->id, $context->shop_group->id, $context->shop->id) == '1') {
-                            $secret_key = Configuration::get(Stripe_official::TEST_KEY, $context->language->id, $context->shop_group->id, $context->shop->id);
-                        } else {
-                            $secret_key = Configuration::get(Stripe_official::KEY, $context->language->id, $context->shop_group->id, $context->shop->id);
-                        }
-
                         StripeWebhook::create($secret_key);
                     }
                     $webhook_exists = true;
@@ -191,7 +190,7 @@ class ConfigurationActions extends DefaultActions
             }
 
             if ($webhook_exists === false) {
-                StripeWebhook::create();
+                StripeWebhook::create($secret_key);
             }
         }
 
