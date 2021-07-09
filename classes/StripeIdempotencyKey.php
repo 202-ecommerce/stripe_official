@@ -133,6 +133,11 @@ class StripeIdempotencyKey extends ObjectModel
         );
 
         $stripeIdempotencyKey = new StripeIdempotencyKey();
+        $stripeIdempotencyKey->getByIdCart($id_cart);
+        if (Validate::isLoadedObject($stripeIdempotencyKey)) {
+            $stripeIdempotencyKey->delete();
+            $stripeIdempotencyKey = new StripeIdempotencyKey();
+        }
         $stripeIdempotencyKey->id_cart = $id_cart;
         $stripeIdempotencyKey->idempotency_key = $idempotency_key;
         $stripeIdempotencyKey->id_payment_intent = $intent->id;
