@@ -163,7 +163,7 @@ class Stripe_official extends PaymentModule
         'adminOrder',
         'actionOrderStatusUpdate',
         'displayMyAccountBlock',
-        'displayCustomerAccount',
+        'displayCustomerAccount'
     );
 
     // Read the Stripe guide: https://stripe.com/payments/payment-methods-guide
@@ -374,7 +374,8 @@ class Stripe_official extends PaymentModule
         'charge.pending',
         'charge.captured',
         'charge.refunded',
-        'charge.dispute.created'
+        'charge.dispute.created',
+        'payment_intent.requires_action'
     );
 
     /* refund */
@@ -1191,14 +1192,15 @@ class Stripe_official extends PaymentModule
     /**
      * get Secret Key according MODE staging or live
      *
+     * @param null $id_shop Optional, if set, get the secret key of the specified shop
      * @return string
      */
-    public function getSecretKey()
+    public function getSecretKey($id_shop = null)
     {
-        if (Configuration::get(self::MODE)) {
-            return Configuration::get(self::TEST_KEY);
+        if (Configuration::get(self::MODE, null, null, $id_shop)) {
+            return Configuration::get(self::TEST_KEY, null, null, $id_shop);
         } else {
-            return Configuration::get(self::KEY);
+            return Configuration::get(self::KEY, null, null, $id_shop);
         }
     }
 
@@ -1257,6 +1259,9 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
+        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') === 1) {
+            $query->where('id_shop = '.$this->context->shop->id);
+        }
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
         foreach ($results as &$result) {
@@ -1331,7 +1336,13 @@ class Stripe_official extends PaymentModule
      */
     public function hookDisplayAdminOrderTabOrder($params)
     {
-        if ($params['order']->module != 'stripe_official') {
+        if (version_compare(_PS_VERSION_, '1.7.7.4', '>=')) {
+            $order = new Order($params['id_order']);
+        } else {
+            $order = $params['order'];
+        }
+
+        if ($order->module != 'stripe_official') {
             return;
         }
 
@@ -1349,14 +1360,23 @@ class Stripe_official extends PaymentModule
      */
     public function hookDisplayAdminOrderContentOrder($params)
     {
+        if (version_compare(_PS_VERSION_, '1.7.7.4', '>=')) {
+            $order = new Order($params['id_order']);
+        } else {
+            $order = $params['order'];
+        }
+
         $stripePayment = new StripePayment();
-        $stripePayment->getStripePaymentByCart($params['order']->id_cart);
+        $stripePayment->getStripePaymentByCart($order->id_cart);
 
         $stripeCapture = new StripeCapture();
         $stripeCapture->getByIdPaymentIntent($stripePayment->getIdPaymentIntent());
 
-        $stripeDispute = new StripeDispute();
-        $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe());
+        $dispute = false;
+        if (!empty($stripePayment->getIdStripe())) {
+            $stripeDispute = new StripeDispute();
+            $dispute = $stripeDispute->orderHasDispute($stripePayment->getIdStripe(), $order->id_shop);
+        }
 
         $this->context->smarty->assign(array(
             'stripe_charge' => $stripePayment->getIdStripe(),
@@ -1502,6 +1522,13 @@ class Stripe_official extends PaymentModule
             'stripe_validation_return_url' => $this->context->link->getModuleLink(
                 $this->name,
                 'validation',
+                array(),
+                true
+            ),
+
+            'stripe_order_confirmation_return_url' => $this->context->link->getModuleLink(
+                $this->name,
+                'orderConfirmationReturn',
                 array(),
                 true
             ),

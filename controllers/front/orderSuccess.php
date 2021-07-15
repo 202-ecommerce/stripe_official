@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,21 +21,31 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-{extends file='page.tpl'}
+class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontController
+{
+    /**
+     * @see FrontController::initContent()
+     */
+    public function initContent()
+    {
+        parent::initContent();
 
-{block name='content'}
-    <section id="content-hook_order_confirmation" class="card">
-        <div class="card-block">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>
-                        {l s='An error occured during your payment.' mod='stripe_official'}<br />
-                        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-{/block}
+        $datas = array(
+            'payment_method' => Tools::getValue('payment_method')
+        );
+
+        if (Tools::getValue('payment_method') == 'oxxo') {
+            $datas['voucher_url'] = Tools::getValue('voucher_url');
+        }
+
+        $this->context->smarty->assign($datas);
+
+        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
+            $this->setTemplate('module:stripe_official/views/templates/front/order-confirmation-success-17.tpl');
+        } else {
+            $this->setTemplate('order-confirmation-success-16.tpl');
+        }
+    }
+}

@@ -35,11 +35,11 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         parent::initContent();
 
         try {
-            if ($this->context->cart->id == NULL) {
+            if ($this->context->cart->id == null) {
                 throw new Exception("cart ID is empty", 1);
             }
 
-            if (Configuration::get(Stripe_official::CATCHANDAUTHORIZE) && Tools::getValue('payment_option') == 'card') {
+            if (Tools::getValue('payment_option') == 'card') {
                 $capture_method = 'manual';
             } else {
                 $capture_method = 'automatic';
@@ -51,7 +51,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "amount" => $amount,
                 "currency" => Tools::getValue('currency'),
                 "payment_method_types" => array(Tools::getValue('payment_option')),
-                "capture_method" => $capture_method
+                "capture_method" => $capture_method,
+                "metadata" => array(
+                    'id_cart' => $this->context->cart->id
+                )
             );
 
             if (!Tools::getValue('id_payment_method')) {
@@ -102,42 +105,17 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             } elseif (Tools::getValue('payment_option') != 'card') {
                 $stripe_validation_return_url = $this->context->link->getModuleLink(
                     'stripe_official',
-                    'validation',
-                    array(),
+                    'orderConfirmationReturn',
+                    array(
+                        'id_cart' => $this->context->cart->id
+                    ),
                     true
                 );
                 $cardPayment['return_url'] = $stripe_validation_return_url;
             }
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $stripe_idempotency_key = $stripeIdempotencyKey->getByIdCart($this->context->cart->id);
-
-            if ($stripe_idempotency_key->id == '') {
-                $idempotency_key = $this->context->cart->id.'_'.uniqid();
-
-                $intent = \Stripe\PaymentIntent::create(
-                    $datasIntent,
-                    [
-                      'idempotency_key' => $idempotency_key
-                    ]
-                );
-
-                $stripeIdempotencyKey->id_cart = $this->context->cart->id;
-                $stripeIdempotencyKey->idempotency_key = $idempotency_key;
-                $stripeIdempotencyKey->id_payment_intent = $intent->id;
-                $stripeIdempotencyKey->save();
-
-                $paymentIntent = new StripePaymentIntent();
-                $paymentIntent->setIdPaymentIntent($intent->id);
-                $paymentIntent->setStatus($intent->status);
-                $paymentIntent->setAmount($intent->amount);
-                $paymentIntent->setCurrency($intent->currency);
-                $paymentIntent->setDateAdd(date("Y-m-d H:i:s", $intent->created));
-                $paymentIntent->setDateUpd(date("Y-m-d H:i:s", $intent->created));
-                $paymentIntent->save(false, false);
-            } else {
-                $intent = \Stripe\PaymentIntent::retrieve($stripe_idempotency_key->id_payment_intent);
-            }
+            $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
         } catch (Exception $e) {
             error_log($e->getMessage());
             ProcessLoggerHandler::logError(

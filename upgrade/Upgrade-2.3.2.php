@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2007-2019 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -20,21 +21,33 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ */
 
-{extends file='page.tpl'}
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-{block name='content'}
-    <section id="content-hook_order_confirmation" class="card">
-        <div class="card-block">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>
-                        {l s='An error occured during your payment.' mod='stripe_official'}<br />
-                        {{l s='Please [a @href1@]try again[/a] or contact the website owner.' mod='stripe_official'}|stripelreplace:['@href1@' => {{$stripe_order_url|escape:'htmlall'}}] nofilter}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-{/block}
+require_once dirname(__FILE__) . '/../classes/StripeWebhook.php';
+
+function upgrade_module_2_3_2($module)
+{
+    $context = Context::getContext();
+
+    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+    $installer->registerHooks();
+
+    $webhooksList = StripeWebhook::getWebhookList();
+
+    foreach ($webhooksList as $webhookEndpoint) {
+        if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
+            $webhookEndpoint->update(
+                $webhookEndpoint->id,
+                [
+                    'enabled_events' => $module::$webhook_events
+                ]
+            );
+        }
+    }
+
+    return true;
+}

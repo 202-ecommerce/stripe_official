@@ -72,11 +72,21 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
 
         // Set list of actions to execute
         if (Tools::getValue('source')) {
-            $handler->addActions('prepareFlowRedirect', 'updatePaymentIntent', 'createOrder', 'sendMail', 'addTentative');
+            $handler->addActions(
+                'prepareFlowRedirect',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'addTentative'
+            );
         } elseif (Tools::getValue('payment_intent')) {
-            $handler->addActions('prepareFlowRedirectPaymentIntent', 'updatePaymentIntent', 'createOrder', 'sendMail', 'addTentative');
-        } else {
-            $handler->addActions('prepareFlowNone', 'updatePaymentIntent', 'createOrder', 'sendMail', 'saveCard', 'addTentative');
+            $handler->addActions(
+                'prepareFlowRedirectPaymentIntent',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'addTentative'
+            );
         }
 
         // Process actions chain
@@ -94,6 +104,12 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
 
         $id_order = Order::getOrderByCartId($this->context->cart->id);
 
+        if (isset($this->context->customer->secure_key)) {
+            $secure_key = $this->context->customer->secure_key;
+        } else {
+            $secure_key = false;
+        }
+
         $url = Context::getContext()->link->getPageLink(
             'order-confirmation',
             true,
@@ -102,7 +118,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
                 'id_cart' => (int)$this->context->cart->id,
                 'id_module' => (int)$this->module->id,
                 'id_order' => (int)$id_order,
-                'key' => $returnValues['secure_key']
+                'key' => $secure_key
             )
         );
 
