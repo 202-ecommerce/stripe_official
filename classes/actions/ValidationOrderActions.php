@@ -354,10 +354,7 @@ class ValidationOrderActions extends DefaultActions
             $order = new Order($idOrder);
 
             // capture payment for card if no catch and authorize enabled
-            $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $stripeIdempotencyKey->getByIdCart($order->id_cart);
-
-            $intent = \Stripe\PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
+            $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
             ProcessLoggerHandler::logInfo(
                 'payment method => '.$intent->payment_method_types[0],
                 null,
@@ -378,7 +375,7 @@ class ValidationOrderActions extends DefaultActions
 
                 $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->total_paid : $order->total_paid * 100;
 
-                if (!$this->module->captureFunds($amount, $stripeIdempotencyKey->id_payment_intent)) {
+                if (!$this->module->captureFunds($amount, $this->conveyor['paymentIntent'])) {
                     return false;
                 }
 
