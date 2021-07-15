@@ -123,7 +123,7 @@ class StripeWebhook extends ObjectModel
         return $this;
     }
 
-    public static function create($secret_key)
+    public static function create()
     {
         try {
             $context = Context::getContext();
@@ -139,6 +139,12 @@ class StripeWebhook extends ObjectModel
                 ),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
+
+            if (Configuration::get(Stripe_official::MODE) == '1') {
+                $secret_key = Configuration::get(Stripe_official::TEST_KEY);
+            } else {
+                $secret_key = Configuration::get(Stripe_official::KEY);
+            }
 
             $stripeWebhook = new StripeWebhook();
             $stripeWebhook->stripe_webhook_id = $webhookEndpoint->id;
