@@ -27,102 +27,6 @@ use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class StripeWebhook extends ObjectModel
 {
-    /** @var string */
-    public $stripe_webhook_id;
-    /** @var string */
-    public $stripe_webhook_secret;
-    /** @var string */
-    public $stripe_secret_key;
-
-    /**
-     * @see ObjectModel::$definition
-     */
-    public static $definition = array(
-        'table'        => 'stripe_webhook',
-        'primary'      => 'id_stripe_webhook',
-        'fields'       => array(
-            'stripe_webhook_id' => array(
-                'type'     => ObjectModel::TYPE_STRING,
-                'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'stripe_webhook_secret' => array(
-                'type'     => ObjectModel::TYPE_STRING,
-                'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'stripe_secret_key' => array(
-                'type'     => ObjectModel::TYPE_STRING,
-                'validate' => 'isString',
-                'size'     => 255,
-            ),
-        ),
-    );
-
-    public function setStripeWebhookId($stripe_webhook_id)
-    {
-        $this->stripe_webhook_id = $stripe_webhook_id;
-    }
-
-    public function getStripeWebhookId()
-    {
-        return $this->stripe_webhook_id;
-    }
-
-    public function setStripeWebhookSecret($stripe_webhook_secret)
-    {
-        $this->stripe_webhook_secret = $stripe_webhook_secret;
-    }
-
-    public function getStripeWebhookSecret()
-    {
-        return $this->stripe_webhook_secret;
-    }
-
-    public function setStripeSecretKey($stripe_secret_key)
-    {
-        $this->stripe_secret_key = $stripe_secret_key;
-    }
-
-    public function getStripeSecretKey()
-    {
-        return $this->stripe_secret_key;
-    }
-
-    public function getByWebHookId($webhook_id)
-    {
-        $query = new DbQuery();
-        $query->select('*');
-        $query->from(static::$definition['table']);
-        $query->where('stripe_webhook_id = "'.pSQL($webhook_id).'"');
-
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
-        if ($result == false) {
-            return $this;
-        }
-
-        $this->hydrate($result);
-
-        return $this;
-    }
-
-    public function getBySecretKey($secret_key)
-    {
-        $query = new DbQuery();
-        $query->select('*');
-        $query->from(static::$definition['table']);
-        $query->where('stripe_secret_key = "'.pSQL($secret_key).'"');
-
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
-        if ($result == false) {
-            return $this;
-        }
-
-        $this->hydrate($result);
-
-        return $this;
-    }
-
     public static function create()
     {
         try {
@@ -140,17 +44,7 @@ class StripeWebhook extends ObjectModel
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
-            if (Configuration::get(Stripe_official::MODE) == '1') {
-                $secret_key = Configuration::get(Stripe_official::TEST_KEY);
-            } else {
-                $secret_key = Configuration::get(Stripe_official::KEY);
-            }
-
-            $stripeWebhook = new StripeWebhook();
-            $stripeWebhook->stripe_webhook_id = $webhookEndpoint->id;
-            $stripeWebhook->stripe_webhook_secret = $webhookEndpoint->secret;
-            $stripeWebhook->stripe_secret_key = $secret_key;
-            $stripeWebhook->save();
+            Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
                 'Create webhook endpoint - '.(string)$e->getMessage(),
@@ -158,7 +52,6 @@ class StripeWebhook extends ObjectModel
                 null,
                 'StripeWebhook'
             );
-            ProcessLoggerHandler::closeLogger();
             return false;
         }
     }
@@ -178,7 +71,6 @@ class StripeWebhook extends ObjectModel
                 null,
                 'StripeWebhook'
             );
-            ProcessLoggerHandler::closeLogger();
             return false;
         }
     }
