@@ -866,7 +866,7 @@ class Stripe_official extends PaymentModule
             }
 
             /* Check if webhook configuration is wrong */
-            if (!isset($webhookEndpoint->url) && !($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')))) {
+            if (isset($webhookEndpoint) && !($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')))) {
                 $this->warning[] = $this->l(
                     'Webhook configuration is wrong '.$webhookEndpoint->url.', click save credential to fix issue. Webhook configuration will be corrected.',
                     $this->name
