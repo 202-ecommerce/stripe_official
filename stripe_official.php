@@ -97,6 +97,8 @@ class Stripe_official extends PaymentModule
     const SAVE_CARD = 'STRIPE_SAVE_CARD';
     const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
     const WEBHOOK_SIGNATURE = 'STRIPE_WEBHOOK_SIGNATURE';
+    const WEBHOOK_ID = 'STRIPE_WEBHOOK_ID';
+    const ACCOUNT_ID = 'STRIPE_ACCOUNT_ID';
 
     /**
      * List of objectModel used in this Module
@@ -798,6 +800,7 @@ class Stripe_official extends PaymentModule
             );
         }
 
+        /* Check if webhook limit has been reached */
         if (StripeWebhook::webhookCanBeRegistered() === false && self::isWellConfigured() === true) {
             $this->warning[] = $this->l(
                 'You reached the limit of 16 webhook endpoints registered in your Dashboard Stripe for this account. Please remove one of them if you want to register this domain.',
@@ -843,6 +846,35 @@ class Stripe_official extends PaymentModule
             $handler->process('Configuration');
         }
 
+        /* Check if webhook_id has been defined */
+        if (!Configuration::get(self::WEBHOOK_ID)) {
+            $this->warning[] = $this->l(
+                'Webhook configuration cannot be found in PrestaShop, click save credential to fix issue. A new webhook will be created on Stripe, then saved in PrestaShop.',
+                $this->name
+            );
+        } else {
+            $webhookEndpoint = null;
+
+            /* Check if webhook access is write */
+            try {
+                $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve(Configuration::get(self::WEBHOOK_ID));
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                $this->warning[] = $this->l(
+                    'Webhook configuration cannot be accessed, click save credential to fix issue. A new webhook will be created on Stripe.',
+                    $this->name
+                );
+            }
+
+            /* Check if webhook configuration is wrong */
+            if (!isset($webhookEndpoint->url) && !($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')))) {
+                $this->warning[] = $this->l(
+                    'Webhook configuration is wrong '.$webhookEndpoint->url.', click save credential to fix issue. Webhook configuration will be corrected.',
+                    $this->name
+                );
+            }
+        }
+
+        /* Check if public and secret key have been defined */
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
             && !Configuration::get(self::TEST_KEY) && !Configuration::get(self::TEST_PUBLISHABLE)) {
             $this->errors[] = $this->l('Keys are empty.');

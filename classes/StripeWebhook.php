@@ -32,6 +32,7 @@ class StripeWebhook extends ObjectModel
         try {
             $context = Context::getContext();
 
+            $stripeAccount = \Stripe\Account::retrieve();
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
                 'url' => $context->link->getModuleLink(
                     'stripe_official',
@@ -45,6 +46,8 @@ class StripeWebhook extends ObjectModel
             ]);
 
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
+            Configuration::updateValue(Stripe_official::WEBHOOK_ID, $webhookEndpoint->id);
+            Configuration::updateValue(Stripe_official::ACCOUNT_ID, $stripeAccount->id);
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
                 'Create webhook endpoint - '.(string)$e->getMessage(),
