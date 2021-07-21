@@ -183,20 +183,37 @@ class ConfigurationActions extends DefaultActions
             || Configuration::get(Stripe_official::WEBHOOK_ID) == '') {
             $webhookConfError = true;
         } else {
-            $webhookEndpoint = null;
-
             /* Check if webhook access is write */
             try {
                 $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve(Configuration::get(Stripe_official::WEBHOOK_ID));
+                $webhookUrlExpected = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+                $webhookUpdateData = [];
+
+                /* Check if webhook configuration is wrong */
+                if ($webhookEndpoint->url != $webhookUrlExpected) {
+                    $webhookUpdateData['url'] = $webhookUrlExpected;
+                }
+                /* Check if webhook events are wrong */
+                $eventError = false;
+                if (count($webhookEndpoint->enabled_events) == count(Stripe_official::$webhook_events)) {
+                    foreach ($webhookEndpoint->enabled_events as $webhookEvent) {
+                        if (!in_array($webhookEvent, Stripe_official::$webhook_events)) {
+                            $eventError = true;
+                        }
+                    }
+                } else {
+                    $eventError = true;
+                }
+                if ($eventError)
+                    $webhookUpdateData['enabled_events'] = Stripe_official::$webhook_events;
+
+                if (!empty($webhookUpdateData)) {
+                    $key = Configuration::get(Stripe_official::MODE) ? Configuration::get(Stripe_official::TEST_KEY) : Configuration::get(Stripe_official::KEY);
+                    $stripeClient = new \Stripe\StripeClient($key);
+                    $stripeClient->webhookEndpoints->update(Configuration::get(Stripe_official::WEBHOOK_ID), $webhookUpdateData);
+                }
             } catch (\Stripe\Exception\ApiErrorException $e) {
                 $webhookConfError = true;
-            }
-
-            /* Check if webhook configuration is wrong */
-            if (isset($webhookEndpoint) && !($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT')))) {
-                $key = Configuration::get(Stripe_official::MODE) ? Configuration::get(Stripe_official::TEST_KEY) : Configuration::get(Stripe_official::KEY);
-                $stripeClient = new \Stripe\StripeClient($key);
-                $stripeClient->webhookEndpoints->update(Configuration::get(Stripe_official::WEBHOOK_ID), ['url' => $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))]);
             }
         }
 
