@@ -97,6 +97,8 @@ class Stripe_official extends PaymentModule
     const SAVE_CARD = 'STRIPE_SAVE_CARD';
     const ASK_CUSTOMER = 'STRIPE_ASK_CUSTOMER';
     const WEBHOOK_SIGNATURE = 'STRIPE_WEBHOOK_SIGNATURE';
+    const WEBHOOK_ID = 'STRIPE_WEBHOOK_ID';
+    const ACCOUNT_ID = 'STRIPE_ACCOUNT_ID';
 
     /**
      * List of objectModel used in this Module
@@ -798,6 +800,7 @@ class Stripe_official extends PaymentModule
             );
         }
 
+        /* Check if webhook limit has been reached */
         if (StripeWebhook::webhookCanBeRegistered() === false && self::isWellConfigured() === true) {
             $this->warning[] = $this->l(
                 'You reached the limit of 16 webhook endpoints registered in your Dashboard Stripe for this account. Please remove one of them if you want to register this domain.',
@@ -843,6 +846,52 @@ class Stripe_official extends PaymentModule
             $handler->process('Configuration');
         }
 
+        /* Check if webhook_id has been defined */
+        if (!Configuration::get(self::WEBHOOK_ID)) {
+            $this->errors[] = $this->l(
+                'Webhook configuration cannot be found in PrestaShop, click on save button to fix issue. A new webhook will be created on Stripe, then saved in PrestaShop.',
+                $this->name
+            );
+        } else {
+            /* Check if webhook access is write */
+            try {
+                $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve(Configuration::get(self::WEBHOOK_ID));
+
+                /* Check if webhook url is wrong */
+                $expectedWebhookUrl = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+                if ($webhookEndpoint->url != $expectedWebhookUrl) {
+                    $this->errors[] =
+                        $this->l('Webhook URL configuration is wrong, click on save button to fix issue. Webhook configuration will be corrected.', $this->name) .' | '.
+                        $this->l('Current webhook URL : ',$this->name).$webhookEndpoint->url .' | '.
+                        $this->l('Expected webhook URL : ',$this->name).$expectedWebhookUrl;
+                } else {
+                    /* Check if webhook events are wrong */
+                    $eventError = false;
+                    if (count($webhookEndpoint->enabled_events) == count(Stripe_official::$webhook_events)) {
+                        foreach ($webhookEndpoint->enabled_events as $webhookEvent) {
+                            if (!in_array($webhookEvent, Stripe_official::$webhook_events)) {
+                                $eventError = true;
+                            }
+                        }
+                    } else {
+                        $eventError = true;
+                    }
+                    if ($eventError) {
+                        $this->errors[] =
+                            $this->l('Webhook events configuration are wrong, click on save button to fix isssue. Webhook configuration will be corrected.',$this->name).' | '.
+                            $this->l('Current webhook events : ',$this->name).implode(' / ', $webhookEndpoint->enabled_events).' | '.
+                            $this->l('Expected webhook events : ',$this->name).implode(' / ', Stripe_official::$webhook_events);
+                    }
+                }
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                $this->errors[] = $this->l(
+                    'Webhook configuration cannot be accessed, click on save button to fix issue. A new webhook will be created on Stripe.',
+                    $this->name
+                );
+            }
+        }
+
+        /* Check if public and secret key have been defined */
         if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
             && !Configuration::get(self::TEST_KEY) && !Configuration::get(self::TEST_PUBLISHABLE)) {
             $this->errors[] = $this->l('Keys are empty.');

@@ -40,6 +40,14 @@ class ConfigurationActions extends DefaultActions
     {
         $this->module = $this->conveyor['module'];
 
+        /* If mode has changed delete webhook of previous mode */
+        if (Tools::getValue(Stripe_official::MODE) != Configuration::get(Stripe_official::MODE)) {
+            $key = Configuration::get(Stripe_official::MODE) ? Configuration::get(Stripe_official::TEST_KEY) : Configuration::get(Stripe_official::KEY);
+            $stripeClient = new \Stripe\StripeClient($key);
+            $stripeClient->webhookEndpoints->delete(Configuration::get('STRIPE_WEBHOOK_ID'));
+            Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, '');
+        }
+
         if (Tools::getValue(Stripe_official::MODE) == 1) {
             $secret_key = trim(Tools::getValue(Stripe_official::TEST_KEY));
             $publishable_key = trim(Tools::getValue(Stripe_official::TEST_PUBLISHABLE));
@@ -167,9 +175,49 @@ class ConfigurationActions extends DefaultActions
     {
         $this->context = $this->conveyor['context'];
 
+        $webhookConfError = false;
+        /* Check if webhook_id and webhook_signature have been defined */
         if (!Configuration::get(Stripe_official::WEBHOOK_SIGNATURE)
             || Configuration::get(Stripe_official::WEBHOOK_SIGNATURE) == ''
-            && StripeWebhook::countWebhooksList() < 16) {
+            || !Configuration::get(Stripe_official::WEBHOOK_ID)
+            || Configuration::get(Stripe_official::WEBHOOK_ID) == '') {
+            $webhookConfError = true;
+        } else {
+            /* Check if webhook access is write */
+            try {
+                $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve(Configuration::get(Stripe_official::WEBHOOK_ID));
+                $webhookUrlExpected = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+                $webhookUpdateData = [];
+
+                /* Check if webhook configuration is wrong */
+                if ($webhookEndpoint->url != $webhookUrlExpected) {
+                    $webhookUpdateData['url'] = $webhookUrlExpected;
+                }
+                /* Check if webhook events are wrong */
+                $eventError = false;
+                if (count($webhookEndpoint->enabled_events) == count(Stripe_official::$webhook_events)) {
+                    foreach ($webhookEndpoint->enabled_events as $webhookEvent) {
+                        if (!in_array($webhookEvent, Stripe_official::$webhook_events)) {
+                            $eventError = true;
+                        }
+                    }
+                } else {
+                    $eventError = true;
+                }
+                if ($eventError)
+                    $webhookUpdateData['enabled_events'] = Stripe_official::$webhook_events;
+
+                if (!empty($webhookUpdateData)) {
+                    $key = Configuration::get(Stripe_official::MODE) ? Configuration::get(Stripe_official::TEST_KEY) : Configuration::get(Stripe_official::KEY);
+                    $stripeClient = new \Stripe\StripeClient($key);
+                    $stripeClient->webhookEndpoints->update(Configuration::get(Stripe_official::WEBHOOK_ID), $webhookUpdateData);
+                }
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                $webhookConfError = true;
+            }
+        }
+
+        if ($webhookConfError && StripeWebhook::countWebhooksList() < 16) {
             $webhooksList = StripeWebhook::getWebhookList();
 
             foreach ($webhooksList as $webhookEndpoint) {
