@@ -460,9 +460,12 @@ class Stripe_official extends PaymentModule
      */
     public static function isWellConfigured()
     {
-        if (Configuration::get(self::MODE) == '1' && !empty(Configuration::get(self::TEST_PUBLISHABLE))) {
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+        $mode = Configuration::get(self::MODE, null, $shopGroupId, $shopId);
+        if ($mode == '1' && !empty(Configuration::get(self::TEST_PUBLISHABLE, null, $shopGroupId, $shopId))) {
             return true;
-        } elseif (Configuration::get(self::MODE) == '0' && !empty(Configuration::get(self::PUBLISHABLE))) {
+        } elseif ($mode == '0' && !empty(Configuration::get(self::PUBLISHABLE, null, $shopGroupId, $shopId))) {
             return true;
         }
 
@@ -481,20 +484,23 @@ class Stripe_official extends PaymentModule
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
         $installer->install();
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         // preset default values
-        if (!Configuration::updateValue(self::MODE, 1)
-            || !Configuration::updateValue(self::REFUND_MODE, 1)
-            || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50)
-            || !Configuration::updateValue(self::ENABLE_IDEAL, 0)
-            || !Configuration::updateValue(self::ENABLE_SOFORT, 0)
-            || !Configuration::updateValue(self::ENABLE_GIROPAY, 0)
-            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0)
-            || !Configuration::updateValue(self::ENABLE_FPX, 0)
-            || !Configuration::updateValue(self::ENABLE_EPS, 0)
-            || !Configuration::updateValue(self::ENABLE_P24, 0)
-            || !Configuration::updateValue(self::ENABLE_SEPA, 0)
-            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0)
-            || !Configuration::updateValue(self::ENABLE_OXXO, 0)) {
+        if (!Configuration::updateValue(self::MODE, 1, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::REFUND_MODE, 1, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_IDEAL, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_SOFORT, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_GIROPAY, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_FPX, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_EPS, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_P24, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_SEPA, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0, false, $shopGroupId, $shopId)
+            || !Configuration::updateValue(self::ENABLE_OXXO, 0, false, $shopGroupId, $shopId)) {
                  return false;
         }
 
@@ -538,8 +544,11 @@ class Stripe_official extends PaymentModule
      */
     public function installOrderState()
     {
-        if (!Configuration::get(self::OS_SOFORT_WAITING)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
+        if (!Configuration::get(self::OS_SOFORT_WAITING,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -576,12 +585,12 @@ class Stripe_official extends PaymentModule
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
-            Configuration::updateValue(self::OS_SOFORT_WAITING, (int) $order_state->id);
+            Configuration::updateValue(self::OS_SOFORT_WAITING, (int) $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::PARTIAL_REFUND_STATE)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE)))) {
+        if (!Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -613,12 +622,12 @@ class Stripe_official extends PaymentModule
             $order_state->color = '#FFDD99';
             $order_state->add();
 
-            Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id);
+            Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::CAPTURE_WAITING)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING)))) {
+        if (!Configuration::get(self::CAPTURE_WAITING,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -654,12 +663,12 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::SEPA_WAITING)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING)))) {
+        if (!Configuration::get(self::SEPA_WAITING,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -695,12 +704,12 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::SEPA_WAITING, $order_state->id);
+            Configuration::updateValue(self::SEPA_WAITING, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::SEPA_DISPUTE)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE)))) {
+        if (!Configuration::get(self::SEPA_DISPUTE,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -736,12 +745,12 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id);
+            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::OXXO_WAITING)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OXXO_WAITING)))) {
+        if (!Configuration::get(self::OXXO_WAITING,null, $shopGroupId, $shopId)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OXXO_WAITING,null, $shopGroupId, $shopId)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -777,7 +786,7 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::OXXO_WAITING, $order_state->id);
+            Configuration::updateValue(self::OXXO_WAITING, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         return true;
@@ -846,8 +855,12 @@ class Stripe_official extends PaymentModule
             $handler->process('Configuration');
         }
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         /* Check if webhook_id has been defined */
-        if (!Configuration::get(self::WEBHOOK_ID)) {
+        $webhookId = Configuration::get(self::WEBHOOK_ID,null, $shopGroupId, $shopId);
+        if (!$webhookId) {
             $this->errors[] = $this->l(
                 'Webhook configuration cannot be found in PrestaShop, click on save button to fix issue. A new webhook will be created on Stripe, then saved in PrestaShop.',
                 $this->name
@@ -855,10 +868,10 @@ class Stripe_official extends PaymentModule
         } else {
             /* Check if webhook access is write */
             try {
-                $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve(Configuration::get(self::WEBHOOK_ID));
+                $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve($webhookId);
 
                 /* Check if webhook url is wrong */
-                $expectedWebhookUrl = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'));
+                $expectedWebhookUrl = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT'));
                 if ($webhookEndpoint->url != $expectedWebhookUrl) {
                     $this->errors[] =
                         $this->l('Webhook URL configuration is wrong, click on save button to fix issue. Webhook configuration will be corrected.', $this->name) .' | '.
@@ -892,8 +905,8 @@ class Stripe_official extends PaymentModule
         }
 
         /* Check if public and secret key have been defined */
-        if (!Configuration::get(self::KEY) && !Configuration::get(self::PUBLISHABLE)
-            && !Configuration::get(self::TEST_KEY) && !Configuration::get(self::TEST_PUBLISHABLE)) {
+        if (!Configuration::get(self::KEY,null, $shopGroupId, $shopId) && !Configuration::get(self::PUBLISHABLE,null, $shopGroupId, $shopId)
+            && !Configuration::get(self::TEST_KEY,null, $shopGroupId, $shopId) && !Configuration::get(self::TEST_PUBLISHABLE,null, $shopGroupId, $shopId)) {
             $this->errors[] = $this->l('Keys are empty.');
         }
 
@@ -913,11 +926,11 @@ class Stripe_official extends PaymentModule
 
             if ($refund) {
                 $this->refund = 1;
-                Configuration::updateValue(self::REFUND_ID, Tools::getValue(self::REFUND_ID));
+                Configuration::updateValue(self::REFUND_ID, Tools::getValue(self::REFUND_ID), false, $shopGroupId, $shopId);
             } else {
                 $this->refund = 0;
                 $this->errors[] = $this->l('Unknown Stripe Payment ID.');
-                Configuration::updateValue(self::REFUND_ID, '');
+                Configuration::updateValue(self::REFUND_ID, '', false, $shopGroupId, $shopId);
             }
 
             $amount = null;
@@ -946,8 +959,8 @@ class Stripe_official extends PaymentModule
 
         $this->context->controller->addCSS($this->_path.'/views/css/admin.css');
 
-        if ((Configuration::get(self::TEST_KEY) != '' && Configuration::get(self::TEST_PUBLISHABLE) != '')
-            || (Configuration::get(self::KEY) != '' && Configuration::get(self::PUBLISHABLE) != '')) {
+        if ((Configuration::get(self::TEST_KEY,null, $shopGroupId, $shopId) != '' && Configuration::get(self::TEST_PUBLISHABLE,null, $shopGroupId, $shopId) != '')
+            || (Configuration::get(self::KEY,null, $shopGroupId, $shopId) != '' && Configuration::get(self::PUBLISHABLE,null, $shopGroupId, $shopId) != '')) {
             $keys_configured = true;
         } else {
             $keys_configured = false;
@@ -957,8 +970,8 @@ class Stripe_official extends PaymentModule
         $statusSelected = array();
         $statusUnselected = array();
 
-        if (Configuration::get(self::CAPTURE_STATUS) && Configuration::get(self::CAPTURE_STATUS) != '') {
-            $capture_status = explode(',', Configuration::get(self::CAPTURE_STATUS));
+        if (Configuration::get(self::CAPTURE_STATUS,null, $shopGroupId, $shopId) && Configuration::get(self::CAPTURE_STATUS,null, $shopGroupId, $shopId) != '') {
+            $capture_status = explode(',', Configuration::get(self::CAPTURE_STATUS,null, $shopGroupId, $shopId));
             foreach ($allOrderStatus as $status) {
                 if (in_array($status['id_order_state'], $capture_status)) {
                     $statusSelected[] = $status;
@@ -979,13 +992,13 @@ class Stripe_official extends PaymentModule
             'new_base_dir', $this->_path,
             'keys_configured' => $keys_configured,
             'link' => new Link(),
-            'catchandauthorize' => Configuration::get(self::CATCHANDAUTHORIZE),
+            'catchandauthorize' => Configuration::get(self::CATCHANDAUTHORIZE,null, $shopGroupId, $shopId),
             'orderStatus' => $orderStatus,
-            'orderStatusSelected' => Configuration::get(self::CAPTURE_STATUS),
+            'orderStatusSelected' => Configuration::get(self::CAPTURE_STATUS,null, $shopGroupId, $shopId),
             'allOrderStatus' => $allOrderStatus,
-            'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE),
-            'save_card' => Configuration::get(self::SAVE_CARD),
-            'ask_customer' => Configuration::get(self::ASK_CUSTOMER),
+            'captureExpire' => Configuration::get(self::CAPTURE_EXPIRE,null, $shopGroupId, $shopId),
+            'save_card' => Configuration::get(self::SAVE_CARD,null, $shopGroupId, $shopId),
+            'ask_customer' => Configuration::get(self::ASK_CUSTOMER,null, $shopGroupId, $shopId),
             'payment_methods' => Stripe_official::$paymentMethods,
             'language_iso_code' => $this->context->language->iso_code,
             'stripe_payments_url' => 'https://dashboard.stripe.com/settings/payments'
@@ -1014,34 +1027,36 @@ class Stripe_official extends PaymentModule
      */
     protected function assignSmartyVars()
     {
+        $shopGroupId = self::getShopGroupIdContext();
+        $shopId = self::getShopIdContext();
         $this->context->smarty->assign(array(
-            'stripe_mode' => Configuration::get(self::MODE),
-            'stripe_key' => Configuration::get(self::KEY),
-            'stripe_publishable' => Configuration::get(self::PUBLISHABLE),
-            'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE),
-            'stripe_test_key' => Configuration::get(self::TEST_KEY),
-            'postcode' => Configuration::get(self::POSTCODE),
-            'cardholdername' => Configuration::get(self::CARDHOLDERNAME),
-            'reinsurance' => Configuration::get(self::REINSURANCE),
-            'visa' => Configuration::get(self::VISA),
-            'mastercard' => Configuration::get(self::MASTERCARD),
-            'american_express' => Configuration::get(self::AMERICAN_EXPRESS),
-            'cb' => Configuration::get(self::CB),
-            'diners_club' => Configuration::get(self::DINERS_CLUB),
-            'union_pay' => Configuration::get(self::UNION_PAY),
-            'jcb' => Configuration::get(self::JCB),
-            'discovers' => Configuration::get(self::DISCOVERS),
-            'ideal' => Configuration::get(self::ENABLE_IDEAL),
-            'sofort' => Configuration::get(self::ENABLE_SOFORT),
-            'giropay' => Configuration::get(self::ENABLE_GIROPAY),
-            'bancontact' => Configuration::get(self::ENABLE_BANCONTACT),
-            'fpx' => Configuration::get(self::ENABLE_FPX),
-            'eps' => Configuration::get(self::ENABLE_EPS),
-            'p24' => Configuration::get(self::ENABLE_P24),
-            'sepa_debit' => Configuration::get(self::ENABLE_SEPA),
-            'alipay' => Configuration::get(self::ENABLE_ALIPAY),
-            'oxxo' => Configuration::get(self::ENABLE_OXXO),
-            'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
+            'stripe_mode' => Configuration::get(self::MODE,null, $shopGroupId, $shopId),
+            'stripe_key' => Configuration::get(self::KEY,null, $shopGroupId, $shopId),
+            'stripe_publishable' => Configuration::get(self::PUBLISHABLE,null, $shopGroupId, $shopId),
+            'stripe_test_publishable' => Configuration::get(self::TEST_PUBLISHABLE,null, $shopGroupId, $shopId),
+            'stripe_test_key' => Configuration::get(self::TEST_KEY,null, $shopGroupId, $shopId),
+            'postcode' => Configuration::get(self::POSTCODE,null, $shopGroupId, $shopId),
+            'cardholdername' => Configuration::get(self::CARDHOLDERNAME,null, $shopGroupId, $shopId),
+            'reinsurance' => Configuration::get(self::REINSURANCE,null, $shopGroupId, $shopId),
+            'visa' => Configuration::get(self::VISA,null, $shopGroupId, $shopId),
+            'mastercard' => Configuration::get(self::MASTERCARD,null, $shopGroupId, $shopId),
+            'american_express' => Configuration::get(self::AMERICAN_EXPRESS),null, $shopGroupId, $shopId,
+            'cb' => Configuration::get(self::CB,null, $shopGroupId, $shopId),
+            'diners_club' => Configuration::get(self::DINERS_CLUB,null, $shopGroupId, $shopId),
+            'union_pay' => Configuration::get(self::UNION_PAY,null, $shopGroupId, $shopId),
+            'jcb' => Configuration::get(self::JCB,null, $shopGroupId, $shopId),
+            'discovers' => Configuration::get(self::DISCOVERS,null, $shopGroupId, $shopId),
+            'ideal' => Configuration::get(self::ENABLE_IDEAL,null, $shopGroupId, $shopId),
+            'sofort' => Configuration::get(self::ENABLE_SOFORT,null, $shopGroupId, $shopId),
+            'giropay' => Configuration::get(self::ENABLE_GIROPAY,null, $shopGroupId, $shopId),
+            'bancontact' => Configuration::get(self::ENABLE_BANCONTACT,null, $shopGroupId, $shopId),
+            'fpx' => Configuration::get(self::ENABLE_FPX,null, $shopGroupId, $shopId),
+            'eps' => Configuration::get(self::ENABLE_EPS,null, $shopGroupId, $shopId),
+            'p24' => Configuration::get(self::ENABLE_P24,null, $shopGroupId, $shopId),
+            'sepa_debit' => Configuration::get(self::ENABLE_SEPA),null, $shopGroupId, $shopId,
+            'alipay' => Configuration::get(self::ENABLE_ALIPAY,null, $shopGroupId, $shopId),
+            'oxxo' => Configuration::get(self::ENABLE_OXXO,null, $shopGroupId, $shopId),
+            'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY,null, $shopGroupId, $shopId),
             'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
         ));
     }
@@ -1239,17 +1254,47 @@ class Stripe_official extends PaymentModule
     }
 
     /**
+     * get current ShopId according to activate multishop feature
+     *
+     * @return int|null
+     */
+    public static function getShopIdContext()
+    {
+
+        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
+            return Context::getContext()->shop->id;
+        }
+        return null;
+    }
+
+    /**
+     * get current ShopGroupId according to activate multishop feature
+     *
+     * @return int|null
+     */
+    public static function getShopGroupIdContext()
+    {
+
+        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
+            return Context::getContext()->shop->id_shop_group;
+        }
+        return null;
+    }
+
+    /**
      * get Secret Key according MODE staging or live
      *
      * @param null $id_shop Optional, if set, get the secret key of the specified shop
      * @return string
      */
-    public function getSecretKey($id_shop = null)
+    public function getSecretKey($id_shop_group = null, $id_shop = null)
     {
-        if (Configuration::get(self::MODE, null, null, $id_shop)) {
-            return Configuration::get(self::TEST_KEY, null, null, $id_shop);
+        $shopGroupId = $id_shop_group ?: Stripe_official::getShopGroupIdContext();
+        $shopId = $id_shop ?: Stripe_official::getShopIdContext();
+        if (Configuration::get(self::MODE, null, $shopGroupId, $shopId)) {
+            return Configuration::get(self::TEST_KEY, null, $shopGroupId, $shopId);
         } else {
-            return Configuration::get(self::KEY, null, null, $id_shop);
+            return Configuration::get(self::KEY, null, $shopGroupId, $shopId);
         }
     }
 
@@ -1258,12 +1303,14 @@ class Stripe_official extends PaymentModule
      *
      * @return string
      */
-    public function getPublishableKey()
+    public function getPublishableKey($id_shop_group = null, $id_shop = null)
     {
-        if (Configuration::get(self::MODE)) {
-            return Configuration::get(self::TEST_PUBLISHABLE);
+        $shopGroupId = $id_shop_group ?: Stripe_official::getShopGroupIdContext();
+        $shopId = $id_shop ?: Stripe_official::getShopIdContext();
+        if (Configuration::get(self::MODE, null, $shopGroupId, $shopId)) {
+            return Configuration::get(self::TEST_PUBLISHABLE, null, $shopGroupId, $shopId);
         } else {
-            return Configuration::get(self::PUBLISHABLE);
+            return Configuration::get(self::PUBLISHABLE, null, $shopGroupId, $shopId);
         }
     }
 

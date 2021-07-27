@@ -52,7 +52,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'webhook'
         );
 
-        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE);
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE,null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
 
