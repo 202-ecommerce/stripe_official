@@ -60,7 +60,7 @@ class ProcessLoggerObjectModel extends ObjectModel
                 'size'     => 100,
             ),
             'msg'     => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'type'     => ObjectModel::TYPE_HTML,
                 'validate' => 'isGenericName',
                 'size'     => 255,
             ),
