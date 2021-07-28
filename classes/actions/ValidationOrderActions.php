@@ -291,7 +291,7 @@ class ValidationOrderActions extends DefaultActions
 
         $this->conveyor['cart'] = new Cart((int)$this->conveyor['id_cart']);
 
-        $customer = new Customer($this->conveyor['cart']->id);
+        $customer = new Customer($this->conveyor['cart']->id_customer);
 
         if (isset($customer->secure_key)) {
             $this->conveyor['secure_key'] = $customer->secure_key;
