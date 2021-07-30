@@ -699,6 +699,17 @@ class ValidationOrderActions extends DefaultActions
         );
 
         $order = new Order($id_order);
+        if ($order->module != 'stripe_official') {
+            ProcessLoggerHandler::logInfo(
+                'This order #'.$id_order.' was not made with stripe',
+                null,
+                null,
+                'webhook'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            return true;
+        }
 
         if ($this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
             ProcessLoggerHandler::logInfo(
