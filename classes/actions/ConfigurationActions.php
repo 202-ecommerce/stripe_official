@@ -44,13 +44,14 @@ class ConfigurationActions extends DefaultActions
         $mode = Configuration::get(Stripe_official::MODE,null, $shopGroupId, $shopId);
         $secretKeyLive = Configuration::get(Stripe_official::KEY,null, $shopGroupId, $shopId);
         $secretKeyTest = Configuration::get(Stripe_official::TEST_KEY,null, $shopGroupId, $shopId);
+        $webhookId = Configuration::get(Stripe_official::WEBHOOK_ID,null, $shopGroupId, $shopId);
 
         /* If mode has changed delete webhook of previous mode */
-        if (Tools::getValue(Stripe_official::MODE) != $mode
+        if (Tools::getValue(Stripe_official::MODE) != $mode && $webhookId
             && (($secretKeyTest && $mode) || ($secretKeyLive && !$mode))) {
             $secretKey = $mode ? $secretKeyTest : $secretKeyLive;
             $stripeClient = new \Stripe\StripeClient($secretKey);
-            $stripeClient->webhookEndpoints->delete(Configuration::get(Stripe_official::WEBHOOK_ID,null, $shopGroupId, $shopId));
+            $stripeClient->webhookEndpoints->delete($webhookId);
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, '', false, $shopGroupId, $shopId);
         }
 
