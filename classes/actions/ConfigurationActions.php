@@ -41,13 +41,13 @@ class ConfigurationActions extends DefaultActions
         $this->module = $this->conveyor['module'];
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
-        $mode = ConfigurationCore::get(Stripe_official::MODE,null, $shopGroupId, $shopId);
+        $mode = Configuration::get(Stripe_official::MODE,null, $shopGroupId, $shopId);
         $secretKeyLive = Configuration::get(Stripe_official::KEY,null, $shopGroupId, $shopId);
         $secretKeyTest = Configuration::get(Stripe_official::TEST_KEY,null, $shopGroupId, $shopId);
 
         /* If mode has changed delete webhook of previous mode */
         if (Tools::getValue(Stripe_official::MODE) != $mode
-            && ($secretKeyTest && $mode) || ($secretKeyLive && !$mode)) {
+            && (($secretKeyTest && $mode) || ($secretKeyLive && !$mode))) {
             $secretKey = $mode ? $secretKeyTest : $secretKeyLive;
             $stripeClient = new \Stripe\StripeClient($secretKey);
             $stripeClient->webhookEndpoints->delete(Configuration::get(Stripe_official::WEBHOOK_ID,null, $shopGroupId, $shopId));
