@@ -330,6 +330,11 @@ class ValidationOrderActions extends DefaultActions
         ProcessLoggerHandler::closeLogger();
 
         try {
+            if (Configuration::get('PS_GEOLOCATION_ENABLED')) {
+                $addressInvoice = new Address($this->conveyor['cart']->id_address_invoice);
+                $this->context->country = new Country($addressInvoice->id_country);
+            }
+
             $this->module->validateOrder(
                 (int)$this->conveyor['id_cart'],
                 (int)$orderStatus,
