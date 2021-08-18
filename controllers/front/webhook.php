@@ -28,6 +28,61 @@ use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 {
+    /**
+     * Override displayMaintenancePage to prevent the maintenance page to be displayed
+     *
+     * @see FrontController::displayMaintenancePage()
+     */
+    protected function displayMaintenancePage()
+    {
+        return;
+    }
+
+    /**
+     * Override displayRestrictedCountryPage to prevent page country is not allowed
+     *
+     * @see FrontController::displayRestrictedCountryPage()
+     */
+    protected function displayRestrictedCountryPage()
+    {
+        return;
+    }
+
+    /**
+     * Override geolocationManagement to prevent country GEOIP blocking
+     *
+     * @see FrontController::geolocationManagement()
+     *
+     * @param Country $defaultCountry
+     *
+     * @return false
+     */
+    protected function geolocationManagement($defaultCountry)
+    {
+        return false;
+    }
+
+    /**
+     * Override sslRedirection to prevent redirection
+     *
+     * @see FrontController::sslRedirection()
+     */
+    protected function sslRedirection()
+    {
+        return;
+    }
+
+    /**
+     * Override canonicalRedirection to prevent redirection
+     *
+     * @see FrontController::canonicalRedirection()
+     *
+     * @param string $canonical_url
+     */
+    protected function canonicalRedirection($canonical_url = '')
+    {
+        return;
+    }
 
     public function postProcess()
     {
@@ -52,11 +107,27 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'webhook'
         );
 
-        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE);
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE,null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
+
+        ProcessLoggerHandler::logInfo(
+            'set endpoint secret => '.$endpoint_secret,
+            null,
+            null,
+            'webhook'
+        );
+
         $input = @Tools::file_get_contents("php://input");
         ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
 
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+
+        ProcessLoggerHandler::logInfo(
+            'set http stripe signature => '.$sig_header,
+            null,
+            null,
+            'webhook'
+        );
+
         $event = null;
 
         try {

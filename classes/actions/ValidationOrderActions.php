@@ -291,7 +291,7 @@ class ValidationOrderActions extends DefaultActions
 
         $this->conveyor['cart'] = new Cart((int)$this->conveyor['id_cart']);
 
-        $customer = new Customer($this->conveyor['cart']->id);
+        $customer = new Customer($this->conveyor['cart']->id_customer);
 
         if (isset($customer->secure_key)) {
             $this->conveyor['secure_key'] = $customer->secure_key;
@@ -330,6 +330,11 @@ class ValidationOrderActions extends DefaultActions
         ProcessLoggerHandler::closeLogger();
 
         try {
+            if (Configuration::get('PS_GEOLOCATION_ENABLED')) {
+                $addressInvoice = new Address($this->conveyor['cart']->id_address_invoice);
+                $this->context->country = new Country($addressInvoice->id_country);
+            }
+
             $this->module->validateOrder(
                 (int)$this->conveyor['id_cart'],
                 (int)$orderStatus,
@@ -699,6 +704,17 @@ class ValidationOrderActions extends DefaultActions
         );
 
         $order = new Order($id_order);
+        if ($order->module != 'stripe_official') {
+            ProcessLoggerHandler::logInfo(
+                'This order #'.$id_order.' was not made with stripe',
+                null,
+                null,
+                'webhook'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            return true;
+        }
 
         if ($this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
             ProcessLoggerHandler::logInfo(

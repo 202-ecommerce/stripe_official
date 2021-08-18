@@ -31,6 +31,8 @@ class StripeWebhook extends ObjectModel
     {
         try {
             $context = Context::getContext();
+            $shopGroupId = Stripe_official::getShopGroupIdContext();
+            $shopId = Stripe_official::getShopIdContext();
 
             $stripeAccount = \Stripe\Account::retrieve();
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
@@ -40,14 +42,16 @@ class StripeWebhook extends ObjectModel
                     array(),
                     true,
                     Configuration::get('PS_LANG_DEFAULT'),
-                    Configuration::get('PS_SHOP_DEFAULT')
+                    $shopId ?: Configuration::get('PS_SHOP_DEFAULT')
                 ),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
-            Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret);
-            Configuration::updateValue(Stripe_official::WEBHOOK_ID, $webhookEndpoint->id);
-            Configuration::updateValue(Stripe_official::ACCOUNT_ID, $stripeAccount->id);
+            Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, $webhookEndpoint->secret, false, $shopGroupId, $shopId);
+            Configuration::updateValue(Stripe_official::WEBHOOK_ID, $webhookEndpoint->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(Stripe_official::ACCOUNT_ID, $stripeAccount->id, false, $shopGroupId, $shopId);
+
+            return true;
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
                 'Create webhook endpoint - '.(string)$e->getMessage(),
@@ -99,7 +103,7 @@ class StripeWebhook extends ObjectModel
             array(),
             true,
             Configuration::get('PS_LANG_DEFAULT'),
-            Configuration::get('PS_SHOP_DEFAULT')
+            Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')
         );
         $webhookExists = false;
 
