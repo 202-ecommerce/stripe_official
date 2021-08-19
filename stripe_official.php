@@ -1057,7 +1057,7 @@ class Stripe_official extends PaymentModule
             'alipay' => Configuration::get(self::ENABLE_ALIPAY,null, $shopGroupId, $shopId),
             'oxxo' => Configuration::get(self::ENABLE_OXXO,null, $shopGroupId, $shopId),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY,null, $shopGroupId, $shopId),
-            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
+            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')),
         ));
     }
 
