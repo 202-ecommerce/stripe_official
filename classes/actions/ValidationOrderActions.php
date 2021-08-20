@@ -774,7 +774,8 @@ class ValidationOrderActions extends DefaultActions
                     'webhook'
                 );
             }
-        } elseif ($this->conveyor['event_json']->type == 'charge.failed') {
+        } elseif ($this->conveyor['event_json']->type == 'charge.failed'
+            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         }
 
