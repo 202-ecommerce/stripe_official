@@ -716,7 +716,8 @@ class ValidationOrderActions extends DefaultActions
             return true;
         }
 
-        if ($this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
+        if ($this->conveyor['event_json']->type != 'payment_intent.requires_action'
+            && $this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
             ProcessLoggerHandler::logInfo(
                 'Order status is already the good one',
                 null,
@@ -755,9 +756,26 @@ class ValidationOrderActions extends DefaultActions
             $order->update();
 
             $history->addWithemail();
-        } elseif ($this->conveyor['event_json']->type == 'charge.expired'
-            || $this->conveyor['event_json']->type == 'charge.refunded') {
+        } elseif ($this->conveyor['event_json']->type == 'charge.expired') {
             $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
+        } elseif ($this->conveyor['event_json']->type == 'charge.refunded') {
+            if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured) {
+                $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+                ProcessLoggerHandler::logInfo(
+                    'Partial refund of payment => '.$this->conveyor['event_json']->data->object->id,
+                    null,
+                    null,
+                    'webhook'
+                );
+            } else {
+                $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
+                ProcessLoggerHandler::logInfo(
+                    'Full refund of payment => '.$this->conveyor['event_json']->data->object->id,
+                    null,
+                    null,
+                    'webhook'
+                );
+            }
         } elseif ($this->conveyor['event_json']->type == 'charge.succeeded') {
             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
             if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {

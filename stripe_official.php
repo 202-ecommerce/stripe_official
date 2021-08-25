@@ -1216,13 +1216,6 @@ class Stripe_official extends PaymentModule
             $query->where('id_stripe = "'.pSQL($refund_id).'"');
             $state = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
 
-            if ($state == 2) {
-                /* Refund State */
-                $order->setCurrentState(7);
-            } elseif ($state == 3) {
-                /* Partial Refund State */
-                $order->setCurrentState(Configuration::get(self::PARTIAL_REFUND_STATE));
-            }
             $this->success = $this->l('Refunds processed successfully');
         } else {
             $this->errors[] = $this->l('Invalid Stripe credentials, please check your configuration.');
