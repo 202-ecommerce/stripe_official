@@ -262,7 +262,7 @@ $(function(){
     * with Elements.
     *
     * Please note this form is not submitted when the user chooses the "Pay" button
-    * or Apple Pay, Google Pay, and Microsoft Pay since they provide name and
+    * or Apple Pay, and Google Pay since they provide name and
     * shipping information directly.
     */
     $submit.click(async event => {
