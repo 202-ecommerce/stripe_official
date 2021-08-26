@@ -50,7 +50,6 @@ class ValidationOrderActions extends DefaultActions
                 null,
                 'ValidationOrderActions - prepareFlowNone'
             );
-            ProcessLoggerHandler::closeLogger();
 
             if (isset($intent->charges->data[0])) {
                 $charges = $intent->charges->data[0];
@@ -269,6 +268,16 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
+        if (Order::getOrderByCartId((int)$this->conveyor['id_cart'])) {
+            ProcessLoggerHandler::logInfo(
+                'Prestashop order has been already created for this cart',
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+            return false;
+        }
+
         if ($this->conveyor['status'] != 'succeeded'
             && $this->conveyor['status'] != 'pending'
             && $this->conveyor['status'] != 'requires_capture'
@@ -327,7 +336,6 @@ class ValidationOrderActions extends DefaultActions
             null,
             'ValidationOrderActions - createOrder'
         );
-        ProcessLoggerHandler::closeLogger();
 
         try {
             if (Configuration::get('PS_GEOLOCATION_ENABLED')) {
@@ -353,7 +361,6 @@ class ValidationOrderActions extends DefaultActions
                 null,
                 'ValidationOrderActions - createOrder'
             );
-            ProcessLoggerHandler::closeLogger();
 
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order($idOrder);
@@ -366,7 +373,6 @@ class ValidationOrderActions extends DefaultActions
                 null,
                 'ValidationOrderActions - createOrder'
             );
-            ProcessLoggerHandler::closeLogger();
 
             if ($intent->payment_method_types[0] == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
                 ProcessLoggerHandler::logInfo(
@@ -375,12 +381,13 @@ class ValidationOrderActions extends DefaultActions
                     null,
                     'ValidationOrderActions - createOrder'
                 );
-                ProcessLoggerHandler::closeLogger();
+
                 $currency = new Currency($order->id_currency, $this->context->language->id, $this->context->shop->id);
 
                 $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->total_paid : $order->total_paid * 100;
 
                 if (!$this->module->captureFunds($amount, $this->conveyor['paymentIntent'])) {
+                    ProcessLoggerHandler::closeLogger();
                     return false;
                 }
 
@@ -390,7 +397,6 @@ class ValidationOrderActions extends DefaultActions
                     null,
                     'ValidationOrderActions - createOrder'
                 );
-                ProcessLoggerHandler::closeLogger();
             }
             // END capture payment for card if no catch and authorize enabled
 
@@ -623,7 +629,6 @@ class ValidationOrderActions extends DefaultActions
                             $orderId,
                             'validation'
                         );
-                        ProcessLoggerHandler::closeLogger();
                         PrestaShopLogger::addLog(
                             'PaymentModule::validateOrder - Cannot save Order Payment',
                             3,
@@ -668,76 +673,109 @@ class ValidationOrderActions extends DefaultActions
     {
         $this->context = $this->conveyor['context'];
 
-        if (isset($this->conveyor['event_json']->data->object->payment_intent)) {
-            $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->payment_intent;
-        } else {
-            $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->id;
-        }
-
-        $id_cart = $this->conveyor['event_json']->data->object->metadata->id_cart;
-
+        $this->conveyor['IdPaymentIntent'] =
+            (isset($this->conveyor['event_json']->data->object->payment_intent))
+                ? $this->conveyor['event_json']->data->object->payment_intent
+                : $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->id;;
         ProcessLoggerHandler::logInfo(
             'chargeWebhook with IdPaymentIntent => ' . $this->conveyor['IdPaymentIntent'],
             null,
             null,
-            'webhook'
+            'ValidationOrderActions - chargeWebhook'
         );
 
+        $id_cart = $this->conveyor['event_json']->data->object->metadata->id_cart;
         $id_order = Order::getOrderByCartId($id_cart);
+        $event_type = $this->conveyor['event_json']->type;
+
         if ($id_order == false) {
-            ProcessLoggerHandler::logError(
-                '$id_order = false',
-                null,
-                null,
-                'webhook'
-            );
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(400);
-            return false;
+            if (in_array($event_type, Stripe_official::$webhook_events)) {
+                ProcessLoggerHandler::logInfo(
+                    'Unknown order => '.$event_type,
+                    null,
+                    null,
+                    'ValidationOrderActions - chargeWebhook'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(200);
+                return true;
+            } else {
+                ProcessLoggerHandler::logError(
+                    'Unknown order => $id_order = false',
+                    null,
+                    null,
+                    'ValidationOrderActions - chargeWebhook'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                return false;
+            }
         }
 
+        $order = new Order($id_order);
         ProcessLoggerHandler::logInfo(
             '$id_order = OK',
             'Order',
             $id_order,
-            'webhook'
+            'ValidationOrderActions - chargeWebhook'
         );
 
-        $order = new Order($id_order);
         if ($order->module != 'stripe_official') {
             ProcessLoggerHandler::logInfo(
                 'This order #'.$id_order.' was not made with stripe',
                 null,
                 null,
-                'webhook'
+                'ValidationOrderActions - chargeWebhook'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(200);
             return true;
         }
 
-        if ($this->conveyor['event_json']->type != 'payment_intent.requires_action'
-            && $this->conveyor['events_states'][$this->conveyor['event_json']->type] == $order->getCurrentState()) {
+        if ($event_type != 'payment_intent.requires_action'
+            && $this->conveyor['events_states'][$event_type] == $order->getCurrentState()) {
             ProcessLoggerHandler::logInfo(
                 'Order status is already the good one',
                 null,
                 null,
-                'webhook'
+                'ValidationOrderActions - chargeWebhook'
             );
             ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
             return true;
         }
 
         ProcessLoggerHandler::logInfo(
-            'current charge => '.$this->conveyor['event_json']->type,
+            'current charge => '.$event_type,
             null,
             null,
-            'webhook'
+            'ValidationOrderActions - chargeWebhook'
         );
 
-        if ($this->conveyor['event_json']->type == 'charge.dispute.created') {
+        if ($event_type == 'charge.dispute.created') {
             $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
-        } elseif ($this->conveyor['event_json']->type == 'charge.captured') {
+        } elseif ($event_type == 'charge.expired') {
+            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
+        } elseif ($event_type == 'charge.failed'
+            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+            $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+        } elseif ($event_type == 'charge.succeeded') {
+            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+            if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {
+                $stripePayment = new StripePayment();
+                $stripePayment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
+                $stripePayment->setIdStripe($this->conveyor['event_json']->data->object->id);
+                $stripePayment->setVoucherValidate(date("Y-m-d H:i:s"));
+                $stripePayment->save();
+
+                ProcessLoggerHandler::logInfo(
+                    'oxxo charge ID => '.$this->conveyor['event_json']->data->object->id,
+                    null,
+                    null,
+                    'ValidationOrderActions - chargeWebhook'
+                );
+            }
+        } elseif ($event_type == 'charge.captured') {
             $history = new OrderHistory();
             $history->id_order = (int) $order->id;
             $history->id_employee = 0;
@@ -756,16 +794,14 @@ class ValidationOrderActions extends DefaultActions
             $order->update();
 
             $history->addWithemail();
-        } elseif ($this->conveyor['event_json']->type == 'charge.expired') {
-            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-        } elseif ($this->conveyor['event_json']->type == 'charge.refunded') {
+        } elseif ($event_type == 'charge.refunded') {
             if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured) {
                 $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
                 ProcessLoggerHandler::logInfo(
                     'Partial refund of payment => '.$this->conveyor['event_json']->data->object->id,
                     null,
                     null,
-                    'webhook'
+                    'ValidationOrderActions - chargeWebhook'
                 );
             } else {
                 $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
@@ -773,35 +809,16 @@ class ValidationOrderActions extends DefaultActions
                     'Full refund of payment => '.$this->conveyor['event_json']->data->object->id,
                     null,
                     null,
-                    'webhook'
+                    'ValidationOrderActions - chargeWebhook'
                 );
             }
-        } elseif ($this->conveyor['event_json']->type == 'charge.succeeded') {
-            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
-            if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {
-                $stripePayment = new StripePayment();
-                $stripePayment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
-                $stripePayment->setIdStripe($this->conveyor['event_json']->data->object->id);
-                $stripePayment->setVoucherValidate(date("Y-m-d H:i:s"));
-                $stripePayment->save();
-
-                ProcessLoggerHandler::logInfo(
-                    'oxxo charge ID => '.$this->conveyor['event_json']->data->object->id,
-                    null,
-                    null,
-                    'webhook'
-                );
-            }
-        } elseif ($this->conveyor['event_json']->type == 'charge.failed'
-            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
-            $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         }
 
         ProcessLoggerHandler::logInfo(
-            'setCurrentState for '.$this->conveyor['event_json']->type,
+            'setCurrentState for '.$event_type,
             'Order',
             $id_order,
-            'webhook'
+            'ValidationOrderActions - chargeWebhook'
         );
         ProcessLoggerHandler::closeLogger();
         return true;
