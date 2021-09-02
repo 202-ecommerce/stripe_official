@@ -759,7 +759,8 @@ class ValidationOrderActions extends DefaultActions
         } elseif ($event_type == 'charge.failed'
             && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
-        } elseif ($event_type == 'charge.succeeded') {
+        } elseif ($event_type == 'charge.succeeded'
+            && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
             $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
             if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {
                 $stripePayment = new StripePayment();
@@ -775,7 +776,8 @@ class ValidationOrderActions extends DefaultActions
                     'ValidationOrderActions - chargeWebhook'
                 );
             }
-        } elseif ($event_type == 'charge.captured') {
+        } elseif ($event_type == 'charge.captured'
+            && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
             $history = new OrderHistory();
             $history->id_order = (int) $order->id;
             $history->id_employee = 0;
