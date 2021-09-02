@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * @throws \Stripe\Exception\ApiErrorException
  */
-function upgrade_module_2_3_6()
+function upgrade_module_2_3_6($module)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_official_processlogger` MODIFY msg TEXT';
     if (!Db::getInstance()->execute($sql)) {
@@ -153,6 +153,8 @@ function upgrade_module_2_3_6()
             Configuration::updateValue(Stripe_official::ASK_CUSTOMER, $askCustomer, false, $shopGroupId, $shopId);
         }
     }
+
+    $module->cleanModuleCache();
 
     return true;
 }

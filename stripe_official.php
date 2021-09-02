@@ -1209,6 +1209,46 @@ class Stripe_official extends PaymentModule
     }
 
     /**
+     * Get a list of files contained in directory
+     *
+     * @param string $dir Target directory path
+     * @param string $regex Apply regex
+     * @param false $onlyFilename Get only filename
+     * @param array $results Results search
+     * @return array
+     */
+    private static function getDirContentFiles($dir, $regex = '/.*/', $onlyFilename = false, &$results = array()) {
+        $files = scandir($dir);
+
+        foreach ($files as $value) {
+            $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+            if (!is_dir($path) && preg_match($regex, $value)) {
+                $results[] = $onlyFilename ? $value : $path;
+            } else if ($value != "." && $value != "..") {
+                self::getDirContentFiles($path, $regex, $onlyFilename, $results);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * clean cache for upgrader to prevent issue during module upgrade
+     *
+     * @return void
+     */
+    public function cleanModuleCache()
+    {
+        $path =_PS_MODULE_DIR_.'stripe_official/views/templates';
+        $regPattern = '/.*\.tpl/';
+        $templates = self::getDirContentFiles($path, $regPattern, true);
+
+        foreach ($templates as $tpl) {
+            $this->_clearCache($tpl);
+        }
+    }
+
+    /**
      * get current ShopId according to activate multishop feature
      *
      * @return int|null

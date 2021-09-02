@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * @throws \Stripe\Exception\ApiErrorException
  */
-function upgrade_module_2_3_7()
+function upgrade_module_2_3_7($module)
 {
     $shopGroupId = Stripe_official::getShopGroupIdContext();
     $shopId = Stripe_official::getShopIdContext();
@@ -42,6 +42,8 @@ function upgrade_module_2_3_7()
             return false;
         }
     }
+
+    $module->cleanModuleCache();
 
     return true;
 }
