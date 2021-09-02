@@ -58,7 +58,6 @@ class Stripe_official extends PaymentModule
     const TEST_KEY = 'STRIPE_TEST_KEY';
     const PUBLISHABLE = 'STRIPE_PUBLISHABLE';
     const TEST_PUBLISHABLE = 'STRIPE_TEST_PUBLISHABLE';
-    const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
     const SEPA_WAITING = 'STRIPE_SEPA_WAITING';
@@ -586,43 +585,6 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
             Configuration::updateValue(self::OS_SOFORT_WAITING, (int) $order_state->id, false, $shopGroupId, $shopId);
-        }
-
-        /* Create Order State for Stripe */
-        if (!Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)))) {
-            $order_state = new OrderState();
-            $order_state->name = array();
-            foreach (Language::getLanguages() as $language) {
-                switch (Tools::strtolower($language['iso_code'])) {
-                    case 'fr':
-                        $order_state->name[$language['id_lang']] = pSQL('Remboursement partiel Stripe');
-                        break;
-                    case 'es':
-                        $order_state->name[$language['id_lang']] = pSQL('Reembolso parcial Stripe');
-                        break;
-                    case 'de':
-                        $order_state->name[$language['id_lang']] = pSQL('Teilweise Rückerstattung Stripe');
-                        break;
-                    case 'nl':
-                        $order_state->name[$language['id_lang']] = pSQL('Gedeeltelijke terugbetaling Stripe');
-                        break;
-                    case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('Rimborso parziale Stripe');
-                        break;
-
-                    default:
-                        $order_state->name[$language['id_lang']] = pSQL('Stripe Partial Refund');
-                        break;
-                }
-            }
-            $order_state->invoice = false;
-            $order_state->send_email = false;
-            $order_state->logable = true;
-            $order_state->color = '#FFDD99';
-            $order_state->add();
-
-            Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id, false, $shopGroupId, $shopId);
         }
 
         /* Create Order State for Stripe */
