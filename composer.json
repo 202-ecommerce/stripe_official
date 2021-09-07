@@ -1,10 +1,20 @@
 {
+    "name": "202-ecommerce/stripe_official",
+    "description": "Official Stripe PrestaShop module",
+    "homepage": "https://github.com/202-ecommerce/stripe_official",
+    "authors": [
+        {
+            "name": "202-ecommerce",
+            "email": "contact@202-ecommerce.com"
+        }
+    ],
+    "type": "prestashop-module",
     "config": {
         "prepend-autoloader": false
     },
-	"require": {
-		"stripe/stripe-php": "^7.33"
-	},
+    "require": {
+        "stripe/stripe-php": "^7.33"
+    },
     "autoload": {
         "psr-4": {
           "Stripe_officialClasslib\\": "vendor/totpsclasslib/src/"
