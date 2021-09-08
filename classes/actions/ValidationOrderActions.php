@@ -338,10 +338,8 @@ class ValidationOrderActions extends DefaultActions
         );
 
         try {
-            if (Configuration::get('PS_GEOLOCATION_ENABLED')) {
-                $addressInvoice = new Address($this->conveyor['cart']->id_address_invoice);
-                $this->context->country = new Country($addressInvoice->id_country);
-            }
+            $addressDelivery = new Address($this->conveyor['cart']->id_address_delivery);
+            $this->context->country = new Country($addressDelivery->id_country);
 
             $this->module->validateOrder(
                 (int)$this->conveyor['id_cart'],
