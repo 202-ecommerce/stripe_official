@@ -1973,8 +1973,12 @@ class Stripe_official extends PaymentModule
             $prestashop_version = '1.6';
         }
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         $this->context->smarty->assign(array(
-            'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version,
+            'isSaveCard' => Configuration::get(self::SAVE_CARD, null, $shopGroupId, $shopId),
         ));
 
         return $this->display(__FILE__, 'my-account-stripe-cards.tpl');
