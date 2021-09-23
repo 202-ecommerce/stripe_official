@@ -607,8 +607,9 @@ class ValidationOrderActions extends DefaultActions
             $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
             $stripePayment->save();
 
-            // Payent with Sofort is not accepted yet so we can't get his orderPayment
-            if (Tools::strtolower($cardType) != 'sofort') {
+            // Payment with Sofort is not accepted yet, so we can't get his orderPayment
+            if (Tools::strtolower($cardType) != 'sofort'
+                && Tools::strtolower($cardType) != 'sepa_debit') {
                 $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
                 $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
@@ -795,7 +796,8 @@ class ValidationOrderActions extends DefaultActions
 
             $history->addWithemail();
         } elseif ($event_type == 'charge.refunded') {
-            if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured) {
+            if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
+                || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
                 $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
                 ProcessLoggerHandler::logInfo(
                     'Partial refund of payment => '.$this->conveyor['event_json']->data->object->id,
