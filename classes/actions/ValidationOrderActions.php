@@ -363,6 +363,16 @@ class ValidationOrderActions extends DefaultActions
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order($idOrder);
 
+            // Check if order is split
+            $splitOrder = Order::getByReference($order->reference);
+            if ($splitOrder->count() > 1) {
+                $total_paid_real = 0;
+                foreach ($splitOrder->getResults() as $result) {
+                    $total_paid_real += $result->total_paid;
+                }
+                $order->total_paid = $total_paid_real;
+            }
+
             // capture payment for card if no catch and authorize enabled
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
             ProcessLoggerHandler::logInfo(
