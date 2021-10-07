@@ -24,29 +24,53 @@
  * @version   develop
  */
 
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+namespace Stripe_officialClasslib\Hook;
 
 use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
+use Stripe_officialClasslib\Module;
+use Stripe_officialClasslib\Utils\Translate\TranslateTrait;
 
-class ProcessLoggerExtension extends AbstractModuleExtension
+abstract class AbstractHook
 {
-    public $name = 'process_logger';
+    use TranslateTrait;
 
-    public $extensionAdminControllers = [
-        [
-            'name' => [
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ],
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ],
-    ];
+    const AVAILABLE_HOOKS = [];
 
-    public $objectModels = [
-        ProcessLoggerObjectModel::class,
-    ];
+    /**
+     * @var Module
+     */
+    protected $module;
+
+    /**
+     * AbstractExtensionHook constructor.
+     *
+     * @param Module $module
+     */
+    public function __construct($module)
+    {
+        $this->module = $module;
+    }
+
+    /**
+     * Get all available hooks for current object
+     *
+     * @return array
+     */
+    public function getAvailableHooks()
+    {
+        return static::AVAILABLE_HOOKS;
+    }
+
+    /**
+     * Remove first 4 letters of hook function and replace the first letter by lower case
+     * TODO maybe we should delete this function, because it isn't used
+     *
+     * @param string $functionName
+     *
+     * @return string
+     */
+    protected function getHookNameFromFunction($functionName)
+    {
+        return lcfirst(substr($functionName, 4, strlen($functionName)));
+    }
 }

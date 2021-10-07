@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * NOTICE OF LICENSE
  *
  * This source file is subject to a commercial license from SARL 202 ecommerce
@@ -20,33 +20,19 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
  * @version   develop
  */
 
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+namespace Stripe_officialClasslib\Database\Action\Table;
 
-use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
+use Stripe_officialClasslib\Database\Definition\Table\TableDefinition;
 
-class ProcessLoggerExtension extends AbstractModuleExtension
+abstract class AbstractTableAction
 {
-    public $name = 'process_logger';
-
-    public $extensionAdminControllers = [
-        [
-            'name' => [
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ],
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ],
-    ];
-
-    public $objectModels = [
-        ProcessLoggerObjectModel::class,
-    ];
+    /**
+     * @param TableDefinition $tableDefinition
+     *
+     * @return bool
+     */
+    abstract public function handle(TableDefinition $tableDefinition);
 }

@@ -20,20 +20,21 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ *
+ * @version   develop
  */
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin;
 
 use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-
-use \Db;
-use \Tools;
-use \Configuration;
+use Configuration;
+use Db;
+use Shop;
+use Tools;
 
 class AdminProcessLoggerController extends \ModuleAdminController
 {
-    /** @var bool $bootstrap Active bootstrap for Prestashop 1.6 */
+    /** @var bool Active bootstrap for Prestashop 1.6 */
     public $bootstrap = true;
 
     /** @var \Module Instance of your module automatically set by ModuleAdminController */
@@ -48,10 +49,10 @@ class AdminProcessLoggerController extends \ModuleAdminController
     /** @var string|false Object identifier inside the associated table */
     public $identifier = 'id_stripe_official_processlogger';
 
-    /** @var string Default ORDER BY clause when $_orderBy is not defined */
+    /** @var string Default ORDER BY clause when is not defined */
     protected $_defaultOrderBy = 'id_stripe_official_processlogger';
 
-    /** @var string Default ORDER WAY clause when $_orderWay is not defined */
+    /** @var string Default ORDER WAY clause when is not defined */
     protected $_defaultOrderWay = 'DESC';
 
     /** @var bool List content lines are clickable if true */
@@ -68,103 +69,110 @@ class AdminProcessLoggerController extends \ModuleAdminController
 
         $this->addRowAction('delete');
 
-        $this->bulk_actions = array(
-            'delete' => array(
+        $this->bulk_actions = [
+            'delete' => [
                 'text' => $this->module->l('Delete selected', 'AdminProcessLoggerController'),
                 'confirm' => $this->module->l(
                     'Would you like to delete the selected items?',
                     'AdminProcessLoggerController'
                 ),
-            )
-        );
+            ],
+        ];
 
-        $this->fields_list = array(
-            'id_stripe_official_processlogger' => array(
-                'title'  => $this->module->l('ID', 'AdminProcessLoggerController'),
-                'align'  => 'center',
-                'class'  => 'fixed-width-xs',
+        $this->fields_list = [
+            'id_stripe_official_processlogger' => [
+                'title' => $this->module->l('ID', 'AdminProcessLoggerController'),
+                'align' => 'center',
+                'class' => 'fixed-width-xs',
                 'search' => true,
-            ),
-            'name'                      => array(
+            ],
+            'name' => [
                 'title' => $this->module->l('Name', 'AdminProcessLoggerController'),
-            ),
-            'msg'                       => array(
+            ],
+            'msg' => [
                 'title' => $this->module->l('Message', 'AdminProcessLoggerController'),
-            ),
-            'level'                     => array(
-                'title'    => $this->module->l('Level', 'AdminProcessLoggerController'),
+            ],
+            'level' => [
+                'title' => $this->module->l('Level', 'AdminProcessLoggerController'),
                 'callback' => 'getLevel',
-            ),
-            'object_name'               => array(
+            ],
+            'object_name' => [
                 'title' => $this->module->l('Object Name', 'AdminProcessLoggerController'),
-            ),
-            'object_id'                 => array(
-                'title'    => $this->module->l('Object ID', 'AdminProcessLoggerController'),
+            ],
+            'object_id' => [
+                'title' => $this->module->l('Object ID', 'AdminProcessLoggerController'),
                 'callback' => 'getObjectId',
-            ),
-            'date_add'                  => array(
+            ],
+            'id_session' => [
+                'title' => $this->module->l('Session ID', 'AdminProcessLoggerController'),
+            ],
+            'date_add' => [
                 'title' => $this->module->l('Date', 'AdminProcessLoggerController'),
-            ),
-        );
+            ],
+        ];
 
-        $this->fields_options = array(
-            'processLogger' => array(
-                'image'       => '../img/admin/cog.gif',
-                'title'       => $this->module->l('Process Logger Settings', 'AdminProcessLoggerController'),
+        $this->fields_options = [
+            'processLogger' => [
+                'image' => '../img/admin/cog.gif',
+                'title' => $this->module->l('Process Logger Settings', 'AdminProcessLoggerController'),
                 'description' => $this->module->l(
                     'Here you can change the default configuration for this Process Logger',
                     'AdminProcessLoggerController'
                 ),
-                'fields'      => array(
-                    'STRIPE_OFFICIAL_EXTLOGS_ERASING_DISABLED' => array(
-                        'title'        => $this->module->l(
+                'fields' => [
+                    'STRIPE_OFFICIAL_EXTLOGS_ERASING_DISABLED' => [
+                        'title' => $this->module->l(
                             'Disable auto erasing',
                             'AdminProcessLoggerController'
                         ),
-                        'hint'         => $this->module->l(
+                        'hint' => $this->module->l(
                             'If disabled, logs will be automatically erased after the delay',
                             'AdminProcessLoggerController'
                         ),
-                        'validation'   => 'isBool',
-                        'cast'         => 'intval',
-                        'type'         => 'bool',
-                    ),
-                    'STRIPE_OFFICIAL_EXTLOGS_ERASING_DAYSMAX' => array(
-                        'title'        => $this->module->l(
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                    ],
+                    'STRIPE_OFFICIAL_EXTLOGS_ERASING_DAYSMAX' => [
+                        'title' => $this->module->l(
                             'Auto erasing delay (in days)',
                             'AdminProcessLoggerController'
                         ),
-                        'hint'         => $this->module->l(
+                        'hint' => $this->module->l(
                             'Choose the number of days you want to keep logs in database',
                             'AdminProcessLoggerController'
                         ),
-                        'validation'   => 'isInt',
-                        'cast'         => 'intval',
-                        'type'         => 'text',
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
                         'defaultValue' => 5,
-                    ),
-                ),
-                'submit'      => array(
+                    ],
+                ],
+                'submit' => [
                     'title' => $this->module->l('Save', 'AdminProcessLoggerController'),
-                    'name' => 'submitSaveConf'),
-            ),
-        );
+                    'name' => 'submitSaveConf',
+                ],
+            ],
+        ];
     }
 
     /**
-     * @param $echo string Value of field
-     * @param $tr array All data of the row
+     * @param string $echo Value of field
+     * @param array $tr All data of the row
+     *
      * @return string
      */
     public function getObjectId($echo, $tr)
     {
         unset($tr);
+
         return empty($echo) ? '' : $echo;
     }
 
     /**
-     * @param $echo string Value of field
-     * @param $tr array All data of the row
+     * @param string $echo Value of field
+     * @param array $tr All data of the row
+     *
      * @return string
      */
     public function getLevel($echo, $tr)
@@ -172,15 +180,19 @@ class AdminProcessLoggerController extends \ModuleAdminController
         unset($tr);
         switch ($echo) {
             case 'info':
-                $echo = '<span class="badge badge-info">'.$echo.'</span>';
+                $echo = '<span class="badge badge-info">' . $echo . '</span>';
                 break;
             case 'success':
-                $echo = '<span class="badge badge-success">'.$echo.'</span>';
+                $echo = '<span class="badge badge-success">' . $echo . '</span>';
                 break;
             case 'error':
-                $echo = '<span class="badge badge-danger">'.$echo.'</span>';
+                $echo = '<span class="badge badge-danger">' . $echo . '</span>';
+                break;
+            case 'deprecated':
+                $echo = '<span class="badge badge-warning">' . $echo . '</span>';
                 break;
         }
+
         return $echo;
     }
 
@@ -202,13 +214,13 @@ class AdminProcessLoggerController extends \ModuleAdminController
         parent::initToolbar();
         // Remove the add new item button
         unset($this->toolbar_btn['new']);
-        $this->toolbar_btn['delete'] = array(
+        $this->toolbar_btn['delete'] = [
             'short' => 'Erase',
             'desc' => $this->module->l('Erase all'),
-            'js' => 'if (confirm(\''.
-                $this->module->l('Are you sure?', 'AdminProcessLoggerController').
-                '\')) document.location = \''.self::$currentIndex.'&amp;token='.$this->token.'&amp;action=erase\';'
-        );
+            'js' => 'if (confirm(\'' .
+                $this->module->l('Are you sure?', 'AdminProcessLoggerController') .
+                '\')) document.location = \'' . self::$currentIndex . '&amp;token=' . $this->token . '&amp;action=erase\';',
+        ];
     }
 
     /**
@@ -238,11 +250,11 @@ class AdminProcessLoggerController extends \ModuleAdminController
 
     public function saveConfiguration()
     {
-        $shops = Shop::getShops();
+        $shops = \Shop::getShops();
         foreach ($shops as $shop) {
             $extlogs_erasing_daysmax = Tools::getValue('STRIPE_OFFICIAL_EXTLOGS_ERASING_DAYSMAX');
             $extlogs_erasing_disabled = Tools::getValue('STRIPE_OFFICIAL_EXTLOGS_ERASING_DISABLED');
-            
+
             Configuration::updateValue(
                 'STRIPE_OFFICIAL_EXTLOGS_ERASING_DISABLED',
                 ($extlogs_erasing_disabled ? true : false),

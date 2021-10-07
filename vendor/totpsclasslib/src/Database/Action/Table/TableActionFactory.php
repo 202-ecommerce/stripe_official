@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * NOTICE OF LICENSE
  *
  * This source file is subject to a commercial license from SARL 202 ecommerce
@@ -20,33 +20,38 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
  * @version   develop
  */
 
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+namespace Stripe_officialClasslib\Database\Action\Table;
 
-use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
+use Stripe_officialClasslib\Database\Action\Table\AbstractTableAction;
+use Stripe_officialClasslib\Database\Action\Table\CreateTableAction;
+use Stripe_officialClasslib\Database\Action\Table\DeleteTableAction;
+use Stripe_officialClasslib\Database\Action\Table\TableActionType;
+use Stripe_officialClasslib\Database\Action\Table\UpdateTableAction;
+use PrestaShopException;
 
-class ProcessLoggerExtension extends AbstractModuleExtension
+class TableActionFactory
 {
-    public $name = 'process_logger';
-
-    public $extensionAdminControllers = [
-        [
-            'name' => [
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ],
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ],
-    ];
-
-    public $objectModels = [
-        ProcessLoggerObjectModel::class,
-    ];
+    /**
+     * @param $tableAction
+     *
+     * @return AbstractTableAction
+     *
+     * @throws PrestaShopException
+     */
+    public function getTableAction($tableAction)
+    {
+        switch ($tableAction) {
+            case TableActionType::CREATE:
+                return new CreateTableAction();
+            case TableActionType::UPDATE:
+                return new UpdateTableAction();
+            case TableActionType::DELETE:
+                return new DeleteTableAction();
+            default:
+                throw new PrestaShopException("Unknown table action $tableAction");
+        }
+    }
 }

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * NOTICE OF LICENSE
  *
  * This source file is subject to a commercial license from SARL 202 ecommerce
@@ -20,33 +20,20 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
  * @version   develop
  */
 
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+namespace Stripe_officialClasslib\Database\ForeignKey;
 
-use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
-
-class ProcessLoggerExtension extends AbstractModuleExtension
+class ReferenceOption
 {
-    public $name = 'process_logger';
+    const RESTRICT = 'RESTRICT';
 
-    public $extensionAdminControllers = [
-        [
-            'name' => [
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ],
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ],
-    ];
+    const CASCADE = 'CASCADE';
 
-    public $objectModels = [
-        ProcessLoggerObjectModel::class,
-    ];
+    const SET_NULL = 'SET NULL';
+
+    const NO_ACTION = 'NO ACTION';
+
+    const SET_DEFAULT = 'SET DEFAULT';
 }

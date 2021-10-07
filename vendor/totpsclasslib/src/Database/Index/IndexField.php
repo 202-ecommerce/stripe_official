@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * NOTICE OF LICENSE
  *
  * This source file is subject to a commercial license from SARL 202 ecommerce
@@ -20,33 +20,32 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
  * @version   develop
  */
 
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+namespace Stripe_officialClasslib\Database\Index;
 
-use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
-
-class ProcessLoggerExtension extends AbstractModuleExtension
+class IndexField
 {
-    public $name = 'process_logger';
+    private $column;
 
-    public $extensionAdminControllers = [
-        [
-            'name' => [
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ],
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ],
-    ];
+    /**
+     * @return mixed
+     */
+    public function getColumn()
+    {
+        return $this->column;
+    }
 
-    public $objectModels = [
-        ProcessLoggerObjectModel::class,
-    ];
+    /**
+     * @param mixed $column
+     *
+     * @return IndexField
+     */
+    public function setColumn($column)
+    {
+        $this->column = $column;
+
+        return $this;
+    }
 }

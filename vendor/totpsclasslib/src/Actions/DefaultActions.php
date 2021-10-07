@@ -20,12 +20,13 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ *
+ * @version   develop
  */
 
 namespace Stripe_officialClasslib\Actions;
 
-use \Translate;
+use Translate;
 
 /**
  * DefaultActions
@@ -33,21 +34,22 @@ use \Translate;
 class DefaultActions
 {
     /**
-     * @var \ObjectModel $modelObject
+     * @var \ObjectModel
      */
     protected $modelObject;
 
     /**
      * Values conveyored by the classes
      *
-     * @var array $conveyor
+     * @var array
      */
-    protected $conveyor = array();
+    protected $conveyor = [];
 
     /**
      * Set the modelObject
      *
      * @param \ObjectModel $modelObject
+     *
      * @return $this
      */
     public function setModelObject($modelObject)
@@ -61,6 +63,7 @@ class DefaultActions
      * Set the conveyor
      *
      * @param array $conveyorData
+     *
      * @return $this
      */
     public function setConveyor($conveyorData)
@@ -84,24 +87,28 @@ class DefaultActions
      * Call next action call back of cross modules
      *
      * @param mixed $action Name of the actions chain
+     *
      * @return bool
      */
     protected function forward($action)
     {
-        if (!is_callable(array($this, $action), false)) {
-            echo $action.' not defined';
+        if (!is_callable([$this, $action], false)) {
+            echo $action . ' not defined';
             exit;
         }
-        if (!call_user_func_array(array($this, $action), array())) {
+        if (!call_user_func_array([$this, $action], [])) {
             return false;
         }
+
         return true;
     }
 
     /**
      * Translation function; needed so PS will properly parse the file
+     *
      * @param string $string the string to translate
      * @param string $source the file with the translation; should always be the current file
+     *
      * @return mixed|string
      */
     protected function l($string, $source)

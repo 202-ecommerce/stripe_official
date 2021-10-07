@@ -1,22 +1,46 @@
 <?php
+/*
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to a commercial license from SARL 202 ecommerce
+ * Use, copy, modification or distribution of this source file without written
+ * license agreement from the SARL 202 ecommerce is strictly forbidden.
+ * In order to obtain a license, please contact us: tech@202-ecommerce.com
+ * ...........................................................................
+ * INFORMATION SUR LA LICENCE D'UTILISATION
+ *
+ * L'utilisation de ce fichier source est soumise a une licence commerciale
+ * concedee par la societe 202 ecommerce
+ * Toute utilisation, reproduction, modification ou distribution du present
+ * fichier source sans contrat de licence ecrit de la part de la SARL 202 ecommerce est
+ * expressement interdite.
+ * Pour obtenir une licence, veuillez contacter 202-ecommerce <tech@202-ecommerce.com>
+ * ...........................................................................
+ *
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) 202-ecommerce
+ * @license   Commercial license
+ *
+ * @version   develop
+ */
 
 namespace Stripe_officialClasslib\Install;
 
-
-use \Configuration;
-use \Db;
-use \DbQuery;
-use \Language;
-use \Tab;
-use \Tools;
-use Stripe_officialClasslib\Db\ObjectModelExtension;
+use Stripe_officialClasslib\Database\ForeignKey\ForeignKeyHandler;
+use Stripe_officialClasslib\Database\ObjectModelExtension;
+use Stripe_officialClasslib\Module;
+use Stripe_officialClasslib\Registry;
+use Db;
+use DbQuery;
+use Language;
+use Tab;
 
 abstract class AbstractInstaller
 {
     //region Fields
 
     /**
-     * @var \Stripe_official
+     * @var Module
      */
     protected $module;
 
@@ -44,24 +68,28 @@ abstract class AbstractInstaller
 
     /**
      * Get hooks used in module/extension
+     *
      * @return array
      */
     abstract public function getHooks();
 
     /**
      * Get admin controllers used in module/extension
+     *
      * @return array
      */
     abstract public function getAdminControllers();
 
     /**
      * Get object models used in module/extension
+     *
      * @return array
      */
     abstract public function getObjectModels();
 
     /**
-     * @param \Stripe_official $module
+     * @param Module $module
+     *
      * @return $this
      */
     public function setModule($module)
@@ -73,6 +101,7 @@ abstract class AbstractInstaller
 
     /**
      * @return bool
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -87,6 +116,7 @@ abstract class AbstractInstaller
 
     /**
      * @return bool
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -99,11 +129,14 @@ abstract class AbstractInstaller
     }
 
     //TODO
+
     /**
      * Used only if merchant choose to keep data on modal in Prestashop 1.6
      *
-     * @param Stripe_official $module
+     * @param Module $module
+     *
      * @return bool
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -120,6 +153,7 @@ abstract class AbstractInstaller
 
     /**
      * Register hooks used by our module
+     *
      * @return bool
      */
     public function registerHooks()
@@ -128,14 +162,16 @@ abstract class AbstractInstaller
             return true;
         }
 
-        return array_product(array_map(array($this->module, 'registerHook'), $this->getHooks()));
+        return array_product(array_map([$this->module, 'registerHook'], $this->getHooks()));
     }
 
     //TODO
+
     /**
      * Clear hooks used by our module
      *
      * @return bool
+     *
      * @throws \PrestaShopException
      */
     public function clearHookUsed()
@@ -150,7 +186,7 @@ abstract class AbstractInstaller
 
         if (false === is_array($this->getHooks())) {
             // If $module->hooks is not defined or is not an array
-            $this->hooks = array();
+            $this->hooks = [];
         }
 
         foreach ($this->getHooks() as $hook) {
@@ -175,6 +211,7 @@ abstract class AbstractInstaller
      * Retrieve hooks used by our module
      *
      * @return array
+     *
      * @throws \PrestaShopDatabaseException
      */
     public function getHooksUsed()
@@ -189,7 +226,7 @@ abstract class AbstractInstaller
         $results = Db::getInstance()->executeS($query);
 
         if (empty($results)) {
-            return array();
+            return [];
         }
 
         return array_column($results, 'name');
@@ -199,6 +236,7 @@ abstract class AbstractInstaller
      * Add Tabs for our ModuleAdminController
      *
      * @return bool
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -211,8 +249,16 @@ abstract class AbstractInstaller
             return $result;
         }
 
+        Tab::disableCache();
+        (new Tab())->cleanPositions(0); // fix parent tab positions
+
         foreach ($this->getAdminControllers() as $tabData) {
-            if (Tab::getIdFromClassName($tabData['class_name'])) {
+            if ($tabId = Tab::getIdFromClassName($tabData['class_name'])) {
+                $tabObj = new Tab($tabId);
+                if (isset($tabData['position'])) {
+                    $tabObj->updatePosition('- 1', $tabData['position']);
+                    $tabObj->cleanPositions($tabObj->id_parent);
+                }
                 $result &= true;
                 continue;
             }
@@ -222,7 +268,7 @@ abstract class AbstractInstaller
                 $parentClassName = 'AdminPreferences';
             }
             /** 3 levels available on 1.7+ */
-            $defaultTabLevel1 = array('SELL', 'IMPROVE', 'CONFIGURE', 'DEFAULT');
+            $defaultTabLevel1 = ['SELL', 'IMPROVE', 'CONFIGURE', 'DEFAULT'];
             if (in_array($parentClassName, $defaultTabLevel1) && version_compare(_PS_VERSION_, '1.7', '<')) {
                 continue;
             }
@@ -257,6 +303,10 @@ abstract class AbstractInstaller
                 $tab->icon = $tabData['icon']; // For Prestashop 1.7
             }
             $result &= (bool)$tab->add();
+            if (isset($tabData['position'])) {
+                $tab->updatePosition('- 1', $tabData['position']);
+                $tab->cleanPositions($tab->id_parent);
+            }
         }
 
         return $result;
@@ -266,6 +316,7 @@ abstract class AbstractInstaller
      * Delete Tabs of our ModuleAdminController
      *
      * @return bool
+     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -274,7 +325,7 @@ abstract class AbstractInstaller
         $query = new DbQuery();
         $query->select('*');
         $query->from('tab');
-        $query->where('module = \''.pSQL($this->module->name).'\'');
+        $query->where('module = \'' . pSQL($this->module->name) . '\'');
 
         $tabs = Db::getInstance()->executeS($query);
 
@@ -287,6 +338,7 @@ abstract class AbstractInstaller
             $tab = new Tab((int)$tabData['id_tab']);
             $result &= (bool)$tab->delete();
         }
+
         return $result;
     }
 
@@ -301,14 +353,30 @@ abstract class AbstractInstaller
             return true;
         }
 
-        return array_product(array_map(array($this, 'installObjectModel'), $this->getObjectModels()));
+        $installResult = array_product(array_map([$this, 'installObjectModel'], $this->getObjectModels()));
+
+        $installResult &= $this->setCheckForeignKey(false);
+
+        if (!empty(Registry::get('tables'))) {
+            $tables = Registry::get('tables');
+            foreach ($tables as $tableDefinition) {
+                $foreignKeyHandler = new ForeignKeyHandler($tableDefinition);
+                $installResult &= $foreignKeyHandler->handle();
+            }
+        }
+
+        $installResult &= $this->setCheckForeignKey(true);
+
+        return $installResult;
     }
 
     /**
      * Install model
      *
      * @param string $objectModelClassName
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function installObjectModel($objectModelClassName)
@@ -317,13 +385,7 @@ abstract class AbstractInstaller
             throw new \Exception('Installer error : ModelObject "' . $objectModelClassName . '" not found');
         }
 
-        /** @var \ObjectModel $objectModel */
-        $objectModel = new $objectModelClassName();
-
-        $objectModelExtended = new ObjectModelExtension(
-            $objectModel,
-            Db::getInstance()
-        );
+        $objectModelExtended = new ObjectModelExtension($objectModelClassName);
 
         return $objectModelExtended->install();
     }
@@ -339,14 +401,18 @@ abstract class AbstractInstaller
             return true;
         }
 
-        return array_product(array_map(array($this, 'uninstallObjectModel'), $this->getObjectModels()));
+        return $this->setCheckForeignKey(false)
+            && array_product(array_map([$this, 'uninstallObjectModel'], $this->getObjectModels()))
+            && $this->setCheckForeignKey(true);
     }
 
     /**
      * Uninstall model
      *
      * @param string $objectModelClassName
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function uninstallObjectModel($objectModelClassName)
@@ -355,14 +421,13 @@ abstract class AbstractInstaller
             throw new \Exception('Installer error : ModelObject "' . $objectModelClassName . '" not found');
         }
 
-        /** @var \ObjectModel $objectModel */
-        $objectModel = new $objectModelClassName();
-
-        $objectModelExtended = new ObjectModelExtension(
-            $objectModel,
-            Db::getInstance()
-        );
+        $objectModelExtended = new ObjectModelExtension($objectModelClassName);
 
         return $objectModelExtended->uninstall();
+    }
+
+    private function setCheckForeignKey(bool $check)
+    {
+        return Db::getInstance()->Execute('SET FOREIGN_KEY_CHECKS = ' . (int)$check);
     }
 }
