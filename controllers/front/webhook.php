@@ -23,6 +23,9 @@
  * @license   Commercial license
  */
 
+use Stripe\Exception\SignatureVerificationException;
+use Stripe\Stripe;
+use Stripe\Webhook;
 use Stripe_officialClasslib\Actions\ActionsHandler;
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
@@ -86,94 +89,188 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        // Retrieve secret API key
         $secret_key = $this->module->getSecretKey();
 
-        ProcessLoggerHandler::logInfo($secret_key, null, null, 'webhook');
+        // Check API key validity
+        $this->checkApiKey($secret_key);
 
-        try {
-            \Stripe\Stripe::setApiKey($secret_key);
-        } catch (Exception $e) {
-            print_r($e->getMessage());
-            ProcessLoggerHandler::logError('setApiKey not ok: ' . $e->getMessage(), null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(500);
-            exit;
-        }
-        // Retrieve the request's body and parse it as JSON
-        ProcessLoggerHandler::logInfo(
-            'setApiKey ok. Retrieve the request\'s body and parse it as JSON',
-            null,
-            null,
-            'webhook'
-        );
-
-        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE,null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
-
-        ProcessLoggerHandler::logInfo(
-            'set endpoint secret => '.$endpoint_secret,
-            null,
-            null,
-            'webhook'
-        );
-
+        // Retrieve payload
         $input = @Tools::file_get_contents("php://input");
-        ProcessLoggerHandler::logInfo('$input => ' . $input, null, null, 'webhook');
+        ProcessLoggerHandler::logInfo(
+            '$input => ' . $input,
+            null,
+            null,
+            'webhook - postProcess'
+        );
 
+        // Retrieve http signature
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
-
         ProcessLoggerHandler::logInfo(
             'set http stripe signature => '.$sig_header,
             null,
             null,
-            'webhook'
+            'webhook - postProcess'
         );
 
-        $event = null;
+        // Retrieve secret endpoint
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE,null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
+        ProcessLoggerHandler::logInfo(
+            'set endpoint secret => '.$endpoint_secret,
+            null,
+            null,
+            'webhook - postProcess'
+        );
 
-        try {
-            $event = \Stripe\Webhook::constructEvent(
-                $input,
-                $sig_header,
-                $endpoint_secret
-            );
-        } catch (\UnexpectedValueException $e) {
-            // Invalid payload
-            ProcessLoggerHandler::logError('Invalid payload : '.$e->getMessage(), null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(400);
-            echo $e->getMessage();
-            exit();
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            // Invalid signature
-            ProcessLoggerHandler::logError('Invalid signature : '.$e->getMessage(), null, null, 'webhook');
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(400);
-            echo $e->getMessage();
-            exit();
+        // Construct event charge
+        $event = $this->constructEvent($input, $sig_header, $endpoint_secret);
+
+        // Retrieve payment intent
+        if ($event->type == 'payment_intent.requires_action') {
+            $paymentIntent = $event->data->object->id;
+        } else {
+            $paymentIntent = $event->data->object->payment_intent;
         }
+        ProcessLoggerHandler::logInfo(
+            'payment_intent : '.$paymentIntent,
+            null,
+            null,
+            'webhook - postProcess'
+        );
 
-        ProcessLoggerHandler::logInfo('$event => ' . $event, null, null, 'webhook');
-        ProcessLoggerHandler::logInfo('event ' . $event->id . ' retrieved', null, null, 'webhook');
-        ProcessLoggerHandler::logInfo('event type : ' . $event->type, null, null, 'webhook');
+        // Create the handler
+        $handler = $this->createWebhookHandler($event, $paymentIntent);
 
-        if (!$event) {
-            $msg = 'JSON not valid';
-            ProcessLoggerHandler::logError($msg, null, null, 'webhook');
+        // Handle actions
+        $this->handleWebhookActions($handler, $event);
+
+        ProcessLoggerHandler::closeLogger();
+        exit;
+    }
+
+    private function checkApiKey($secretKey)
+    {
+        try {
+            ProcessLoggerHandler::logInfo(
+                $secretKey,
+                null,
+                null,
+                'webhook - checkApiKey'
+            );
+
+            Stripe::setApiKey($secretKey);
+
+            // Retrieve the request's body and parse it as JSON
+            ProcessLoggerHandler::logInfo(
+                'setApiKey ok. Retrieve the request\'s body and parse it as JSON',
+                null,
+                null,
+                'webhook - checkApiKey'
+            );
+        } catch (Exception $e) {
+            print_r($e->getMessage());
+            ProcessLoggerHandler::logError(
+                'setApiKey not ok: ' . $e->getMessage(),
+                null,
+                null,
+                'webhook - checkApiKey'
+            );
             ProcessLoggerHandler::closeLogger();
             http_response_code(500);
-            echo $msg;
             exit;
         }
+    }
 
-        if (!in_array($event->type, Stripe_official::$webhook_events)) {
-            $msg = 'webhook "'.$event->type.'" call not yet supported';
-            ProcessLoggerHandler::logInfo($msg, null, null, 'webhook');
+    private function constructEvent($payload, $sigHeader, $secret)
+    {
+        try {
+            $event = Webhook::constructEvent(
+                $payload,
+                $sigHeader,
+                $secret
+            );
+
+            if (!$event) {
+                $msg = 'JSON not valid';
+                ProcessLoggerHandler::logError(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - constructEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(500);
+                echo $msg;
+                exit;
+            }
+
+            if (!in_array($event->type, Stripe_official::$webhook_events)) {
+                $msg = 'webhook "'.$event->type.'" call not yet supported';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - constructEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                echo $msg;
+                exit;
+            }
+
+            ProcessLoggerHandler::logInfo(
+                '$event => ' . $event,
+                null,
+                null,
+                'webhook - constructEvent'
+            );
+            ProcessLoggerHandler::logInfo(
+                'event ' . $event->id . ' retrieved',
+                null,
+                null,
+                'webhook - constructEvent'
+            );
+            ProcessLoggerHandler::logInfo(
+                'event type : ' . $event->type,
+                null,
+                null,
+                'webhook - constructEvent'
+            );
+            return $event;
+        } catch (UnexpectedValueException $e) {
+            // Invalid payload
+            ProcessLoggerHandler::logError(
+                'Invalid payload : '.$e->getMessage(),
+                null,
+                null,
+                'webhook - constructEvent'
+            );
             ProcessLoggerHandler::closeLogger();
-            echo $msg;
-            exit;
+            http_response_code(400);
+            echo $e->getMessage();
+            exit();
+        } catch (SignatureVerificationException $e) {
+            // Invalid signature
+            ProcessLoggerHandler::logError(
+                'Invalid signature : '.$e->getMessage(),
+                null,
+                null,
+                'webhook - constructEvent'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(400);
+            echo $e->getMessage();
+            exit();
         }
+    }
 
-        ProcessLoggerHandler::logInfo('starting webhook actions', null, null, 'webhook');
+    private function createWebhookHandler($event, $paymentIntent)
+    {
+        ProcessLoggerHandler::logInfo(
+            'creating webhook handler',
+            null,
+            null,
+            'webhook - createWebhookHandler'
+        );
 
         $events_states = array(
             'charge.expired' => Configuration::get('PS_OS_CANCELED'),
@@ -184,13 +281,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'charge.dispute.created' => Configuration::get(Stripe_official::SEPA_DISPUTE)
         );
 
-        if ($event->type == 'payment_intent.requires_action') {
-            $paymentIntent = $event->data->object->id;
-        } else {
-            $paymentIntent = $event->data->object->payment_intent;
-        }
-
-        // Create the handler
         $handler = new ActionsHandler();
         $handler->setConveyor(array(
             'event_json' => $event,
@@ -200,11 +290,33 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'paymentIntent' => $paymentIntent,
         ));
 
-        if (($event->type == 'charge.succeeded' && $event->data->object->payment_method_details->type == 'card')
-            || ($event->type == 'charge.pending' && $event->data->object->payment_method_details->type == 'sepa_debit')
-            || ($event->type == 'payment_intent.requires_action' && $event->data->object->payment_method_types[0] == 'oxxo')) {
-            ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
-            ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
+        return $handler;
+    }
+
+    private function handleWebhookActions($handler, $event)
+    {
+        ProcessLoggerHandler::logInfo(
+            'Starting webhook actions',
+            null,
+            null,
+            'webhook - handleWebhookActions'
+        );
+
+        $eventType = $event->type;
+        $paymentMethodType = $event->data->object->payment_method_details->type;
+
+        if (($eventType == 'charge.succeeded'
+                && $paymentMethodType == 'card')
+            || ($eventType == 'charge.pending'
+                && $paymentMethodType == 'sepa_debit')
+            || ($eventType == 'payment_intent.requires_action'
+                && $event->data->object->payment_method_types[0] == 'oxxo')) {
+            ProcessLoggerHandler::logInfo(
+                'Payment method flow without redirection',
+                null,
+                null,
+                'webhook - handleWebhookActions'
+            );
             $handler->addActions(
                 'prepareFlowNone',
                 'updatePaymentIntent',
@@ -213,12 +325,17 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'saveCard',
                 'addTentative'
             );
-        } elseif (($event->type == 'charge.succeeded'
-                    && Stripe_official::$paymentMethods[$event->data->object->payment_method_details->type]['flow'] == 'redirect' && $event->data->object->payment_method_details->type != 'sofort')
-                || ($event->type == 'charge.pending'
-                    && $event->data->object->payment_method_details->type == 'sofort')) {
-            ProcessLoggerHandler::logInfo('payment_intent : '.$paymentIntent, null, null, 'webhook');
-            ProcessLoggerHandler::logInfo('$event->type : '.$event->type, null, null, 'webhook');
+        } elseif (($eventType == 'charge.succeeded'
+                && $paymentMethodType != 'sofort'
+                && Stripe_official::$paymentMethods[$paymentMethodType]['flow'] == 'redirect')
+            || ($eventType == 'charge.pending'
+                && $paymentMethodType == 'sofort')) {
+            ProcessLoggerHandler::logInfo(
+                'Payment method flow with redirection',
+                null,
+                null,
+                'webhook - handleWebhookActions'
+            );
             $handler->addActions(
                 'prepareFlowRedirectPaymentIntent',
                 'updatePaymentIntent',
@@ -230,13 +347,17 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         } else {
             $handler->addActions('chargeWebhook');
         }
+
         // Process actions chain
         if (!$handler->process('ValidationOrder')) {
             // Handle error
-            ProcessLoggerHandler::logError('Order webhook process failed.', null, null, 'webhook');
+            ProcessLoggerHandler::logError(
+                'Webhook actions process failed.',
+                null,
+                null,
+                'webhook - handleWebhookActions'
+            );
             ProcessLoggerHandler::closeLogger();
         }
-
-        exit;
     }
 }
