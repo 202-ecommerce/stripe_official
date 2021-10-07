@@ -1228,7 +1228,7 @@ class Stripe_official extends PaymentModule
             $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
             if (!is_dir($path) && preg_match($regex, $value)) {
                 $results[] = $onlyFilename ? $value : $path;
-            } else if ($value != "." && $value != "..") {
+            } else if (is_dir($path) && $value != "." && $value != "..") {
                 self::getDirContentFiles($path, $regex, $onlyFilename, $results);
             }
         }

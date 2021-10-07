@@ -28,9 +28,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-/**
- * @throws \Stripe\Exception\ApiErrorException
- */
 function upgrade_module_2_3_7($module)
 {
     $shopGroupId = Stripe_official::getShopGroupIdContext();
@@ -43,36 +40,36 @@ function upgrade_module_2_3_7($module)
         }
     }
 
-    $os_sofort_waiting = Configuration::get(self::OS_SOFORT_WAITING) ?: Configuration::get(self::OS_SOFORT_WAITING, null, $shopGroupId, $shopId);
+    $os_sofort_waiting = Configuration::get(Stripe_official::OS_SOFORT_WAITING) ?: Configuration::get(Stripe_official::OS_SOFORT_WAITING, null, $shopGroupId, $shopId);
     if ($os_sofort_waiting) {
-        Configuration::deleteByName(self::OS_SOFORT_WAITING);
-        Configuration::updateValue(self::CAPTURE_WAITING, $os_sofort_waiting);
+        Configuration::deleteByName(Stripe_official::OS_SOFORT_WAITING);
+        Configuration::updateValue(Stripe_official::CAPTURE_WAITING, $os_sofort_waiting);
     }
-    $capture_waiting = Configuration::get(self::CAPTURE_WAITING) ?: Configuration::get(self::CAPTURE_WAITING, null, $shopGroupId, $shopId);
+    $capture_waiting = Configuration::get(Stripe_official::CAPTURE_WAITING) ?: Configuration::get(Stripe_official::CAPTURE_WAITING, null, $shopGroupId, $shopId);
     if ($capture_waiting) {
-        Configuration::deleteByName(self::CAPTURE_WAITING);
-        Configuration::updateValue(self::CAPTURE_WAITING, $capture_waiting);
+        Configuration::deleteByName(Stripe_official::CAPTURE_WAITING);
+        Configuration::updateValue(Stripe_official::CAPTURE_WAITING, $capture_waiting);
     }
-    $sepa_waiting = Configuration::get(self::SEPA_WAITING) ?: Configuration::get(self::SEPA_WAITING, null, $shopGroupId, $shopId);
+    $sepa_waiting = Configuration::get(Stripe_official::SEPA_WAITING) ?: Configuration::get(Stripe_official::SEPA_WAITING, null, $shopGroupId, $shopId);
     if ($sepa_waiting) {
-        Configuration::deleteByName(self::SEPA_WAITING);
+        Configuration::deleteByName(Stripe_official::SEPA_WAITING);
         $orderState = new OrderState($sepa_waiting);
         $orderState->logable = false;
         $orderState->save();
-        Configuration::updateValue(self::SEPA_WAITING, $orderState->id);
+        Configuration::updateValue(Stripe_official::SEPA_WAITING, $orderState->id);
     }
-    $sepa_dispute = Configuration::get(self::SEPA_DISPUTE) ?: Configuration::get(self::SEPA_DISPUTE, null, $shopGroupId, $shopId);
+    $sepa_dispute = Configuration::get(Stripe_official::SEPA_DISPUTE) ?: Configuration::get(Stripe_official::SEPA_DISPUTE, null, $shopGroupId, $shopId);
     if ($sepa_dispute) {
-        Configuration::deleteByName(self::SEPA_DISPUTE);
-        Configuration::updateValue(self::SEPA_DISPUTE, $sepa_dispute);
+        Configuration::deleteByName(Stripe_official::SEPA_DISPUTE);
+        Configuration::updateValue(Stripe_official::SEPA_DISPUTE, $sepa_dispute);
     }
-    $oxxo_waiting = Configuration::get(self::OXXO_WAITING) ?: Configuration::get(self::OXXO_WAITING, null, $shopGroupId, $shopId);
+    $oxxo_waiting = Configuration::get(Stripe_official::OXXO_WAITING) ?: Configuration::get(Stripe_official::OXXO_WAITING, null, $shopGroupId, $shopId);
     if ($oxxo_waiting) {
-        Configuration::deleteByName(self::OXXO_WAITING);
+        Configuration::deleteByName(Stripe_official::OXXO_WAITING);
         $orderState = new OrderState($sepa_dispute);
         $orderState->logable = false;
         $orderState->save();
-        Configuration::updateValue(self::OXXO_WAITING, $orderState->id);
+        Configuration::updateValue(Stripe_official::OXXO_WAITING, $orderState->id);
     }
 
     $module->cleanModuleCache();
