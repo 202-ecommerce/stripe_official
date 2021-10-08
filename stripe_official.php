@@ -37,15 +37,15 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 /**
 * Stripe official PrestaShop module main class extends payment class
-* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developped by "202 ecommerce"
-* This library provide utils common features as DB installer, internal logger, chain of resposability design pattern
+* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
+* This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
 *
 * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
 * // use Stripe_officialClasslib\Install\ModuleInstaller;
 * // use Stripe_officialClasslib\Actions\ActionsHandler;
 * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
 *
-* Developpers use declarative method to define objects, parameters, controllers... needed in this module
+* Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
 class Stripe_official extends PaymentModule
@@ -109,6 +109,7 @@ class Stripe_official extends PaymentModule
         'StripeCapture',
         'StripeCustomer',
         'StripeIdempotencyKey',
+        'StripeEvent',
     );
 
     /**
@@ -369,14 +370,15 @@ class Stripe_official extends PaymentModule
     );
 
     public static $webhook_events = array(
-        'charge.expired',
-        'charge.failed',
-        'charge.succeeded',
-        'charge.pending',
-        'charge.captured',
-        'charge.refunded',
-        'charge.dispute.created',
-        'payment_intent.requires_action'
+        \Stripe\Event::CHARGE_UPDATED,
+        \Stripe\Event::CHARGE_EXPIRED,
+        \Stripe\Event::CHARGE_FAILED,
+        \Stripe\Event::CHARGE_SUCCEEDED,
+        \Stripe\Event::CHARGE_PENDING,
+        \Stripe\Event::CHARGE_CAPTURED,
+        \Stripe\Event::CHARGE_REFUNDED,
+        \Stripe\Event::CHARGE_DISPUTE_CREATED,
+        \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION,
     );
 
     /* refund */
