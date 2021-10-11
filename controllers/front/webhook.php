@@ -89,6 +89,13 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        ProcessLoggerHandler::logInfo(
+            '[ Webhook Process Beginning ]',
+            null,
+            null,
+            'webhook - postProcess'
+        );
+
         // Retrieve secret API key
         $secret_key = $this->module->getSecretKey();
 
@@ -138,12 +145,24 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'webhook - postProcess'
         );
 
+        // Registry Stripe event in database
+        $registeredEvent = $this->registerEvent($event, $paymentIntent);
+
         // Create the handler
         $handler = $this->createWebhookHandler($event, $paymentIntent);
 
         // Handle actions
         $this->handleWebhookActions($handler, $event);
 
+        // Valid Stripe event process
+        $this->validProcessEvent($registeredEvent);
+
+        ProcessLoggerHandler::logInfo(
+            '[ Webhook Process Ending ]',
+            null,
+            null,
+            'webhook - postProcess'
+        );
         ProcessLoggerHandler::closeLogger();
         exit;
     }
@@ -263,6 +282,145 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
     }
 
+    private function registerEvent($event, $paymentIntent)
+    {
+        try {
+            $stripeEventStatus = $this->checkEventStatus($event, $paymentIntent);
+            $stripeEventDate = new DateTime();
+            $stripeEventDate = $stripeEventDate->setTimestamp($event->created);
+
+            $stripeEvent = new StripeEvent();
+            $stripeEvent->setIdPaymentIntent($paymentIntent);
+            $stripeEvent->setStatus($stripeEventStatus);
+            $stripeEvent->setDateAdd($stripeEventDate);
+            $stripeEvent->setIsProcessed(false);
+            $stripeEvent->save();
+
+            return $stripeEvent;
+        } catch (PrestaShopException $e) {
+            $msg = 'A problem appears while recording the Stripe event => ' . $e->getMessage();
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                null,
+                null,
+                'webhook - registerEvent'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            echo $msg;
+            exit;
+        }
+    }
+
+    private function validProcessEvent($registeredEvent)
+    {
+        try {
+            $registeredEvent->setIsProcessed(true);
+            $registeredEvent->save();
+        } catch (PrestaShopException $e) {
+            $msg = 'A problem appears while completing the Stripe event process => ' . $e->getMessage();
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                null,
+                null,
+                'webhook - registerEvent'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            echo $msg;
+            exit;
+        }
+    }
+
+    private function checkEventStatus($event, $paymentIntent)
+    {
+        $transitionStatus = [
+            StripeEvent::FAILED_STATUS => null,
+            StripeEvent::PENDING_STATUS => null,
+            StripeEvent::AUTHORIZED_STATUS => StripeEvent::PENDING_STATUS,
+            StripeEvent::CAPTURED_STATUS => StripeEvent::AUTHORIZED_STATUS,
+            StripeEvent::REFUNDED_STATUS => StripeEvent::CAPTURED_STATUS,
+            StripeEvent::EXPIRED_STATUS => StripeEvent::PENDING_STATUS,
+        ];
+
+        $lastRegisteredEvent = new StripeEvent();
+        $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
+
+        $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
+        $currentEventDate = new DateTime();
+        $currentEventDate = $currentEventDate->setTimestamp($event->created);
+        if ($lastRegisteredEventDate > $currentEventDate) {
+            $msg = 'This charge event come too late to be processed.';
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                null,
+                null,
+                'webhook - checkEventStatus'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            echo $msg;
+            exit;
+        }
+
+        switch ($event->type) {
+            case 'charge.succeeded':
+                $eventStatus = StripeEvent::AUTHORIZED_STATUS;
+                break;
+            case 'charge.captured':
+                $eventStatus = StripeEvent::CAPTURED_STATUS;
+                break;
+            case 'charge.refunded':
+                $eventStatus = StripeEvent::REFUNDED_STATUS;
+                break;
+            case 'charge.failed':
+                $eventStatus = StripeEvent::FAILED_STATUS;
+                break;
+            case 'charge.expired':
+                $eventStatus = StripeEvent::EXPIRED_STATUS;
+                break;
+            default:
+                $eventStatus = StripeEvent::PENDING_STATUS;
+                break;
+        }
+
+        if ($lastRegisteredEvent->status == $eventStatus) {
+            if ($lastRegisteredEvent->isProcessed) {
+                $msg = 'This Stripe module event "' .$eventStatus.'" has already been processed.';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    'StripeEvent',
+                    $lastRegisteredEvent->id,
+                    'webhook - checkEventStatus'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(200);
+                echo $msg;
+                exit;
+            }
+            ProcessLoggerHandler::logInfo(
+                $eventStatus . ' event restarted because the previous one did not complete processing',
+                'StripeEvent',
+                $lastRegisteredEvent->id,
+                'webhook - checkEventStatus'
+            );
+        } elseif ($lastRegisteredEvent->status != $transitionStatus[$eventStatus] || !$lastRegisteredEvent->isProcessed) {
+            $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed ? 'Yes' : 'No') . '].';
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                'StripeEvent',
+                $lastRegisteredEvent->id,
+                'webhook - checkEventStatus'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            echo $msg;
+            exit;
+        }
+
+        return $eventStatus;
+    }
+
     private function createWebhookHandler($event, $paymentIntent)
     {
         ProcessLoggerHandler::logInfo(
@@ -303,7 +461,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         );
 
         $eventType = $event->type;
-        $paymentMethodType = $event->data->object->payment_method_details->type;
+        $paymentMethodType = $event->data->object->payment_method_details->type ?: null;
 
         if (($eventType == 'charge.succeeded'
                 && $paymentMethodType == 'card')
@@ -349,7 +507,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         // Process actions chain
-        if (!$handler->process('ValidationOrder')) {
+        $handler->process('ValidationOrderActions');
+        if (!$handler->isSuccess()) {
+            $conveyor = $handler->getConveyor();
             // Handle error
             ProcessLoggerHandler::logError(
                 'Webhook actions process failed.',
@@ -358,6 +518,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - handleWebhookActions'
             );
             ProcessLoggerHandler::closeLogger();
+            http_response_code(400);
+            echo $conveyor['error'];
+            exit();
         }
     }
 }

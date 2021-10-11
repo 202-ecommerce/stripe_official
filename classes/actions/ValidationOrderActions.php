@@ -763,10 +763,9 @@ class ValidationOrderActions extends DefaultActions
 
         if ($event_type == 'charge.dispute.created') {
             $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
-        } elseif ($event_type == 'charge.expired') {
-            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-        } elseif ($event_type == 'charge.failed'
-            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+        } elseif (($event_type == 'charge.failed'
+            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT'))
+            || $event_type == 'charge.expired') {
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         } elseif ($event_type == 'charge.succeeded'
             && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {

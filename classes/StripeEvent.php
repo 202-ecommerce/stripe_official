@@ -28,14 +28,32 @@ use Stripe_officialClasslib\Database\Index\IndexType;
 
 class StripeEvent extends ObjectModel
 {
-    /** @var string */
-    public $id_payment_intent;
-    /** @var string */
-    public $status;
-    /** @var date */
-    public $date_add;
+    const PENDING_STATUS = 'PENDING';
+    const AUTHORIZED_STATUS = 'AUTHORIZED';
+    const CAPTURED_STATUS = 'CAPTURED';
+    const REFUNDED_STATUS = 'REFUNDED';
+    const FAILED_STATUS = 'FAILED';
+    const EXPIRED_STATUS = 'EXPIRED';
 
     /**
+     * @var string $id_payment_intent
+     */
+    public $id_payment_intent;
+    /**
+     * @var string $status
+     */
+    public $status;
+    /**
+     * @var DateTime $date_add
+     */
+    public $date_add;
+    /**
+     * @var bool $isProcess
+     */
+    public $isProcessed;
+
+    /**
+     * @var array $definition
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -56,6 +74,10 @@ class StripeEvent extends ObjectModel
                 'type'     => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
             ),
+            'is_process' => array(
+                'type'      => ObjectModel::TYPE_BOOL,
+                'validate' => 'isBool',
+            )
         ),
         'indexes'      => [
             [
@@ -100,5 +122,51 @@ class StripeEvent extends ObjectModel
     public function getDateAdd()
     {
         return $this->date_add;
+    }
+
+    public function isProcess()
+    {
+        return $this->isProcessed;
+    }
+
+    public function setIsProcessed($isProcessed)
+    {
+        $this->isProcessed = $isProcessed;
+    }
+
+    public function getLastRegisteredEventByPaymentIntent($paymentIntent)
+    {
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from(static::$definition['table']);
+        $query->where('payment_intent = "' . pSQL($paymentIntent) . '"');
+        $query->orderBy('date_add ASC');
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+        if ($result == false) {
+            return $this;
+        }
+
+        $this->hydrate($result);
+
+        return $this;
+    }
+
+    public function getEventByPaymentIntentNStatus($paymentIntent, $status)
+    {
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from(static::$definition['table']);
+        $query->where('payment_intent = "' . pSQL($paymentIntent) . '" AND status = "' . pSQL($status) . '"');
+        $query->orderBy('date_add ASC');
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+        if ($result == false) {
+            return $this;
+        }
+
+        $this->hydrate($result);
+
+        return $this;
     }
 }
