@@ -28,6 +28,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
+
 function upgrade_module_2_4_0($module)
 {
     $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);

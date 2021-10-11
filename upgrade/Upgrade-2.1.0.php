@@ -44,7 +44,7 @@ function upgrade_module_2_1_0($module)
                 'context' => Context::getContext()
             ));
     $handler->addActions('registerWebhookSignature');
-    $handler->process('Configuration');
+    $handler->process('ConfigurationActions');
 
     return true;
 }
