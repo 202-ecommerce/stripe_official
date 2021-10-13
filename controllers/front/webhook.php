@@ -290,10 +290,15 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             $stripeEventDate = $stripeEventDate->setTimestamp($event->created);
 
             $stripeEvent = new StripeEvent();
-            $stripeEvent->setIdPaymentIntent($paymentIntent);
-            $stripeEvent->setStatus($stripeEventStatus);
-            $stripeEvent->setDateAdd($stripeEventDate);
-            $stripeEvent->setIsProcessed(false);
+            $stripeEvent = $stripeEvent->getEventByPaymentIntentNStatus($paymentIntent, $stripeEventStatus);
+            if ($stripeEvent->id != null) {
+                $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
+            } else {
+                $stripeEvent->setIdPaymentIntent($paymentIntent);
+                $stripeEvent->setStatus($stripeEventStatus);
+                $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
+                $stripeEvent->setIsProcessed(false);
+            }
 
             if (!$stripeEvent->save()) {
                 $msg = 'An issue appears during saving Stripe module event in database (the event probably already exists).';
@@ -367,24 +372,6 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
 
-        if ($lastRegisteredEvent->date_add != null) {
-            $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
-            $currentEventDate = new DateTime();
-            $currentEventDate = $currentEventDate->setTimestamp($event->created);
-            if ($lastRegisteredEventDate > $currentEventDate) {
-                $msg = 'This charge event come too late to be processed.';
-                ProcessLoggerHandler::logInfo(
-                    $msg,
-                    null,
-                    null,
-                    'webhook - checkEventStatus'
-                );
-                ProcessLoggerHandler::closeLogger();
-                http_response_code(400);
-                die($msg);
-            }
-        }
-
         switch ($event->type) {
             case 'charge.succeeded':
                 $eventStatus = StripeEvent::AUTHORIZED_STATUS;
@@ -404,6 +391,24 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             default:
                 $eventStatus = StripeEvent::PENDING_STATUS;
                 break;
+        }
+
+        if ($lastRegisteredEvent->status != $eventStatus && $lastRegisteredEvent->date_add != null) {
+            $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
+            $currentEventDate = new DateTime();
+            $currentEventDate = $currentEventDate->setTimestamp($event->created);
+            if ($lastRegisteredEventDate > $currentEventDate) {
+                $msg = 'This charge event come too late to be processed.';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - checkEventStatus'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                die($msg);
+            }
         }
 
         if ($lastRegisteredEvent->status == $eventStatus) {

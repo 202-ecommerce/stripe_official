@@ -268,14 +268,16 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
-        if (Order::getOrderByCartId((int)$this->conveyor['id_cart'])) {
+        $this->conveyor['isAlreadyOrdered'] = (bool)Order::getOrderByCartId((int)$this->conveyor['id_cart']);
+
+        if ($this->conveyor['isAlreadyOrdered']) {
             ProcessLoggerHandler::logInfo(
                 'Prestashop order has been already created for this cart',
                 null,
                 null,
                 'ValidationOrderActions - createOrder'
             );
-            return false;
+            return true;
         }
 
         if ($this->conveyor['status'] != 'succeeded'
@@ -587,6 +589,10 @@ class ValidationOrderActions extends DefaultActions
     */
     public function addTentative()
     {
+        if ($this->conveyor['isAlreadyOrdered']) {
+            return true;
+        }
+
         try {
             if ($this->conveyor['datas']['type'] == 'American Express') {
                 $this->conveyor['datas']['type'] = 'amex';
@@ -685,7 +691,7 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['IdPaymentIntent'] =
             (isset($this->conveyor['event_json']->data->object->payment_intent))
                 ? $this->conveyor['event_json']->data->object->payment_intent
-                : $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->id;;
+                : $this->conveyor['event_json']->data->object->id;;
         ProcessLoggerHandler::logInfo(
             'chargeWebhook with IdPaymentIntent => ' . $this->conveyor['IdPaymentIntent'],
             null,

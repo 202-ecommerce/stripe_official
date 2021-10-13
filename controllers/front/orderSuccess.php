@@ -1,4 +1,8 @@
 <?php
+
+use Stripe_officialClasslib\Actions\ActionsHandler;
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 /**
  * 2007-2019 PrestaShop
  *
@@ -32,20 +36,198 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
     {
         parent::initContent();
 
-        $datas = array(
-            'payment_method' => Tools::getValue('payment_method')
-        );
+        $payment_intent = Tools::getValue('payment_intent');
+        $payment_method = Tools::getValue('payment_method');
 
-        if (Tools::getValue('payment_method') == 'oxxo') {
-            $datas['voucher_url'] = Tools::getValue('voucher_url');
-        }
+        if ($this->registerStripeEvent($payment_intent)) {
+            $handler = new ActionsHandler();
+            $handler->setConveyor(array(
+                //'event_json' => $event,
+                'module' => $this->module,
+                'context' => $this->context,
+                //'events_states' => $events_states,
+                'paymentIntent' => $payment_intent,
+            ));
 
-        $this->context->smarty->assign($datas);
+            if ($payment_method == 'card'
+                || $payment_method == 'sepa_debit'
+                || $payment_method == 'oxxo') {
+                ProcessLoggerHandler::logInfo(
+                    'Payment method flow without redirection',
+                    null,
+                    null,
+                    'orderSuccess - initContent'
+                );
+                $handler->addActions(
+                    'prepareFlowNone',
+                    'updatePaymentIntent',
+                    'createOrder',
+                    'sendMail',
+                    'saveCard',
+                    'addTentative'
+                );
+            } elseif ($payment_method == 'sofort') {
+                ProcessLoggerHandler::logInfo(
+                    'Payment method flow with redirection',
+                    null,
+                    null,
+                    'orderSuccess - initContent'
+                );
+                $handler->addActions(
+                    'prepareFlowRedirectPaymentIntent',
+                    'updatePaymentIntent',
+                    'createOrder',
+                    'sendMail',
+                    'saveCard',
+                    'addTentative'
+                );
+            }
 
-        if (version_compare(_PS_VERSION_, '1.7', '>=')) {
-            $this->setTemplate('module:stripe_official/views/templates/front/order-confirmation-success-17.tpl');
+            if (!$handler->process('ValidationOrderActions')) {
+                // Handle error
+                ProcessLoggerHandler::logError(
+                    'Order creation process failed.',
+                    null,
+                    null,
+                    'orderSuccess - initContent'
+                );
+                ProcessLoggerHandler::closeLogger();
+
+                $url = Context::getContext()->link->getModuleLink(
+                    'stripe_official',
+                    'orderFailure',
+                    array(),
+                    true
+                );
+            } else {
+                $url = $this->createOrder();
+            }
         } else {
-            $this->setTemplate('order-confirmation-success-16.tpl');
+            $url = $this->createOrder();
         }
+
+        Tools::redirect($url);
+        exit;
+    }
+
+    private function registerStripeEvent($paymentIntent)
+    {
+        $intent = \Stripe\PaymentIntent::retrieve($paymentIntent);
+
+        $eventCharge = isset($intent->charges->data[0]) ? $intent->charges->data[0] : $intent;
+
+        $transitionStatus = [
+            StripeEvent::FAILED_STATUS => null,
+            StripeEvent::PENDING_STATUS => null,
+            StripeEvent::AUTHORIZED_STATUS => StripeEvent::PENDING_STATUS,
+            StripeEvent::CAPTURED_STATUS => StripeEvent::AUTHORIZED_STATUS,
+            StripeEvent::REFUNDED_STATUS => StripeEvent::CAPTURED_STATUS,
+            StripeEvent::EXPIRED_STATUS => StripeEvent::PENDING_STATUS,
+        ];
+
+        $lastRegisteredEvent = new StripeEvent();
+        $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
+
+        if ($lastRegisteredEvent->date_add != null) {
+            $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
+            $currentEventDate = new DateTime();
+            $currentEventDate = $currentEventDate->setTimestamp($eventCharge->created);
+            if ($lastRegisteredEventDate > $currentEventDate) {
+                ProcessLoggerHandler::logInfo(
+                    'This charge event come too late to be processed [Last event : ' . $lastRegisteredEventDate->format('Y-m-d H:m:s') . ' | Current event : ' . $currentEventDate->format('Y-m-d H:m:s') . '].',
+                    null,
+                    null,
+                    'orderSuccess - registerStripeEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                return false;
+            }
+        }
+
+        switch ($eventCharge ->type) {
+            case 'charge.succeeded':
+                $stripeEventStatus = StripeEvent::AUTHORIZED_STATUS;
+                break;
+            case 'charge.captured':
+                $stripeEventStatus = StripeEvent::CAPTURED_STATUS;
+                break;
+            case 'charge.refunded':
+                $stripeEventStatus = StripeEvent::REFUNDED_STATUS;
+                break;
+            case 'charge.failed':
+                $stripeEventStatus = StripeEvent::FAILED_STATUS;
+                break;
+            case 'charge.expired':
+                $stripeEventStatus = StripeEvent::EXPIRED_STATUS;
+                break;
+            default:
+                $stripeEventStatus = StripeEvent::PENDING_STATUS;
+                break;
+        }
+
+        if ($lastRegisteredEvent->status != $transitionStatus[$stripeEventStatus]) {
+            ProcessLoggerHandler::logInfo(
+                'This Stripe module event "' .$stripeEventStatus.'" has already been processed.',
+                'StripeEvent',
+                $lastRegisteredEvent->id,
+                'webhook - checkEventStatus'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
+        }
+
+        $stripeEventDate = new DateTime();
+        $stripeEventDate = $stripeEventDate->setTimestamp($eventCharge->created);
+
+        $stripeEvent = new StripeEvent();
+        $stripeEvent = $stripeEvent->getEventByPaymentIntentNStatus($paymentIntent, $stripeEventStatus);
+        $stripeEvent->setIdPaymentIntent($paymentIntent);
+        $stripeEvent->setStatus($stripeEventStatus);
+        $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
+        $stripeEvent->setIsProcessed(true);
+
+        try {
+            return $stripeEvent->save();
+        } catch (PrestaShopException $e) {
+            ProcessLoggerHandler::logInfo(
+                'Cannot process event',
+                null,
+                null,
+                'orderSuccess - registerStripeEvent'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
+        }
+    }
+
+    private function createOrder()
+    {
+        ProcessLoggerHandler::logInfo(
+            'Create order',
+            null,
+            null,
+            'orderSuccess - createOrder'
+        );
+        ProcessLoggerHandler::closeLogger();
+
+        $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+        if (isset($this->context->customer->secure_key)) {
+            $secure_key = $this->context->customer->secure_key;
+        } else {
+            $secure_key = false;
+        }
+
+        return Context::getContext()->link->getPageLink(
+            'order-confirmation',
+            true,
+            null,
+            array(
+                'id_cart' => (int)$this->context->cart->id,
+                'id_module' => (int)$this->module->id,
+                'id_order' => (int)$id_order,
+                'key' => $secure_key
+            )
+        );
     }
 }

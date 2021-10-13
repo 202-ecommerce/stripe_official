@@ -65,6 +65,7 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
             );
         } else {
             $datas = array(
+                'payment_intent' => $payment_intent,
                 'payment_method' => $payment_method
             );
 
