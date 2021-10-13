@@ -294,11 +294,23 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             $stripeEvent->setStatus($stripeEventStatus);
             $stripeEvent->setDateAdd($stripeEventDate);
             $stripeEvent->setIsProcessed(false);
-            $stripeEvent->save();
+
+            if (!$stripeEvent->save()) {
+                $msg = 'An issue appears during saving Stripe module event in database (the event probably already exists).';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - registerEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                die($msg);
+            }
 
             return $stripeEvent;
         } catch (PrestaShopException $e) {
-            $msg = 'A problem appears while recording the Stripe event => ' . $e->getMessage();
+            $msg = 'A problem appears while recording the Stripe module event => ' . $e->getMessage();
             ProcessLoggerHandler::logInfo(
                 $msg,
                 null,
@@ -306,9 +318,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - registerEvent'
             );
             ProcessLoggerHandler::closeLogger();
-            http_response_code(200);
-            echo $msg;
-            exit;
+            http_response_code(400);
+            die($msg);
         }
     }
 
@@ -316,7 +327,18 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
     {
         try {
             $registeredEvent->setIsProcessed(true);
-            $registeredEvent->save();
+            if (!$registeredEvent->save()) {
+                $msg = 'An issue appears while updating the Stripe module event';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - registerEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                die($msg);
+            }
         } catch (PrestaShopException $e) {
             $msg = 'A problem appears while completing the Stripe event process => ' . $e->getMessage();
             ProcessLoggerHandler::logInfo(
@@ -326,9 +348,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - registerEvent'
             );
             ProcessLoggerHandler::closeLogger();
-            http_response_code(200);
-            echo $msg;
-            exit;
+            http_response_code(400);
+            die($msg);
         }
     }
 
@@ -346,21 +367,22 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
 
-        $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
-        $currentEventDate = new DateTime();
-        $currentEventDate = $currentEventDate->setTimestamp($event->created);
-        if ($lastRegisteredEventDate > $currentEventDate) {
-            $msg = 'This charge event come too late to be processed.';
-            ProcessLoggerHandler::logInfo(
-                $msg,
-                null,
-                null,
-                'webhook - checkEventStatus'
-            );
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(200);
-            echo $msg;
-            exit;
+        if ($lastRegisteredEvent->date_add != null) {
+            $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
+            $currentEventDate = new DateTime();
+            $currentEventDate = $currentEventDate->setTimestamp($event->created);
+            if ($lastRegisteredEventDate > $currentEventDate) {
+                $msg = 'This charge event come too late to be processed.';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - checkEventStatus'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                die($msg);
+            }
         }
 
         switch ($event->type) {
@@ -385,7 +407,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         if ($lastRegisteredEvent->status == $eventStatus) {
-            if ($lastRegisteredEvent->isProcessed) {
+            if ($lastRegisteredEvent->isProcessed()) {
                 $msg = 'This Stripe module event "' .$eventStatus.'" has already been processed.';
                 ProcessLoggerHandler::logInfo(
                     $msg,
@@ -404,7 +426,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $lastRegisteredEvent->id,
                 'webhook - checkEventStatus'
             );
-        } elseif ($lastRegisteredEvent->status != $transitionStatus[$eventStatus] || !$lastRegisteredEvent->isProcessed) {
+        } elseif ($lastRegisteredEvent->status != $transitionStatus[$eventStatus] || !$lastRegisteredEvent->isProcessed()) {
             $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed ? 'Yes' : 'No') . '].';
             ProcessLoggerHandler::logInfo(
                 $msg,
@@ -413,9 +435,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
-            http_response_code(200);
-            echo $msg;
-            exit;
+            http_response_code(400);
+            die($msg);
         }
 
         return $eventStatus;
@@ -507,9 +528,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         // Process actions chain
-        $handler->process('ValidationOrderActions');
-        if (!$handler->isSuccess()) {
-            $conveyor = $handler->getConveyor();
+        if (!$handler->process('ValidationOrderActions')) {
             // Handle error
             ProcessLoggerHandler::logError(
                 'Webhook actions process failed.',
@@ -519,8 +538,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            echo $conveyor['error'];
-            exit();
+            die('Webhook actions process failed.');
         }
     }
 }

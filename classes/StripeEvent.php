@@ -48,9 +48,9 @@ class StripeEvent extends ObjectModel
      */
     public $date_add;
     /**
-     * @var bool $isProcess
+     * @var bool $is_processed
      */
-    public $isProcessed;
+    public $is_processed;
 
     /**
      * @var array $definition
@@ -74,7 +74,7 @@ class StripeEvent extends ObjectModel
                 'type'     => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
             ),
-            'is_process' => array(
+            'is_processed' => array(
                 'type'      => ObjectModel::TYPE_BOOL,
                 'validate' => 'isBool',
             )
@@ -124,14 +124,14 @@ class StripeEvent extends ObjectModel
         return $this->date_add;
     }
 
-    public function isProcess()
+    public function isProcessed()
     {
-        return $this->isProcessed;
+        return $this->is_processed;
     }
 
-    public function setIsProcessed($isProcessed)
+    public function setIsProcessed($is_processed)
     {
-        $this->isProcessed = $isProcessed;
+        $this->is_processed = $is_processed;
     }
 
     public function getLastRegisteredEventByPaymentIntent($paymentIntent)
@@ -139,8 +139,8 @@ class StripeEvent extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('payment_intent = "' . pSQL($paymentIntent) . '"');
-        $query->orderBy('date_add ASC');
+        $query->where('id_payment_intent = "' . pSQL($paymentIntent) . '"');
+        $query->orderBy('date_add DESC');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
@@ -157,8 +157,7 @@ class StripeEvent extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('payment_intent = "' . pSQL($paymentIntent) . '" AND status = "' . pSQL($status) . '"');
-        $query->orderBy('date_add ASC');
+        $query->where('id_payment_intent = "' . pSQL($paymentIntent) . '" AND status = "' . pSQL($status) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {

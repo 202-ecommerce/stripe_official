@@ -116,6 +116,24 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
+
+            $stripeEvent = new StripeEvent();
+            $stripeEvent->setIdPaymentIntent($intent->id);
+            $stripeEvent->setStatus(StripeEvent::PENDING_STATUS);
+            $stripeEvent->setDateAdd($intent->created);
+            $stripeEvent->setIsProcessed(1);
+            if (!$stripeEvent->save()) {
+                $msg = 'An issue appears during saving Stripe module event in database (the event probably already exists).';
+                ProcessLoggerHandler::logInfo(
+                    $msg,
+                    null,
+                    null,
+                    'webhook - registerEvent'
+                );
+                ProcessLoggerHandler::closeLogger();
+                http_response_code(400);
+                die($msg);
+            }
         } catch (Exception $e) {
             error_log($e->getMessage());
             ProcessLoggerHandler::logError(
