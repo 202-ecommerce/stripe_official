@@ -133,7 +133,7 @@ class ObjectModelDefinition
     /**
      * @return string
      */
-    public function getTable(): string
+    public function getTable()
     {
         return $this->table;
     }
@@ -143,7 +143,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setTable(string $table): ObjectModelDefinition
+    public function setTable(string $table)
     {
         $this->table = $table;
 
@@ -153,7 +153,7 @@ class ObjectModelDefinition
     /**
      * @return array
      */
-    public function getPrimary(): array
+    public function getPrimary()
     {
         return $this->primary;
     }
@@ -163,7 +163,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setPrimary(string $primary): ObjectModelDefinition
+    public function setPrimary(string $primary)
     {
         $this->primary = array_map(function ($primaryKey) {
             return trim($primaryKey);
@@ -175,7 +175,7 @@ class ObjectModelDefinition
     /**
      * @return bool
      */
-    public function isMultilang(): bool
+    public function isMultilang()
     {
         return $this->multilang;
     }
@@ -185,7 +185,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setMultilang(bool $multilang): ObjectModelDefinition
+    public function setMultilang(bool $multilang)
     {
         $this->multilang = $multilang;
 
@@ -195,7 +195,7 @@ class ObjectModelDefinition
     /**
      * @return bool
      */
-    public function isMultilangShop(): bool
+    public function isMultilangShop()
     {
         return $this->multilangShop;
     }
@@ -205,7 +205,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setMultilangShop(bool $multilangShop): ObjectModelDefinition
+    public function setMultilangShop(bool $multilangShop)
     {
         $this->multilangShop = $multilangShop;
 
@@ -215,7 +215,7 @@ class ObjectModelDefinition
     /**
      * @return bool
      */
-    public function isMultishop(): bool
+    public function isMultishop()
     {
         return $this->multishop;
     }
@@ -225,7 +225,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setMultishop(bool $multishop): ObjectModelDefinition
+    public function setMultishop(bool $multishop)
     {
         $this->multishop = $multishop;
 
@@ -235,7 +235,7 @@ class ObjectModelDefinition
     /**
      * @return array
      */
-    public function getFields(): array
+    public function getFields()
     {
         return $this->fields;
     }
@@ -245,7 +245,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setFields(array $fields): ObjectModelDefinition
+    public function setFields(array $fields)
     {
         $this->fields = $fields;
 
@@ -255,7 +255,7 @@ class ObjectModelDefinition
     /**
      * @return array
      */
-    public function getAssociations(): array
+    public function getAssociations()
     {
         return $this->associations;
     }
@@ -265,7 +265,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setAssociations(array $associations): ObjectModelDefinition
+    public function setAssociations(array $associations)
     {
         $this->associations = $associations;
 
@@ -275,7 +275,7 @@ class ObjectModelDefinition
     /**
      * @return Index[]
      */
-    public function getIndexes(): array
+    public function getIndexes()
     {
         return $this->indexes;
     }
@@ -285,7 +285,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setIndexes(array $indexes): ObjectModelDefinition
+    public function setIndexes(array $indexes)
     {
         $this->indexes = $indexes;
 
@@ -295,7 +295,7 @@ class ObjectModelDefinition
     /**
      * @return string
      */
-    public function getCharset(): string
+    public function getCharset()
     {
         return $this->charset;
     }
@@ -305,7 +305,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setCharset(string $charset): ObjectModelDefinition
+    public function setCharset(string $charset)
     {
         $this->charset = $charset;
 
@@ -315,7 +315,7 @@ class ObjectModelDefinition
     /**
      * @return string
      */
-    public function getCollation(): string
+    public function getCollation()
     {
         return $this->collation;
     }
@@ -325,7 +325,7 @@ class ObjectModelDefinition
      *
      * @return ObjectModelDefinition
      */
-    public function setCollation(string $collation): ObjectModelDefinition
+    public function setCollation(string $collation)
     {
         $this->collation = $collation;
 

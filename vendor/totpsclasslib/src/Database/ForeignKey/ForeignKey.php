@@ -74,7 +74,7 @@ class ForeignKey
     /**
      * @return int
      */
-    public function getType(): int
+    public function getType()
     {
         return $this->type;
     }
@@ -84,7 +84,7 @@ class ForeignKey
      *
      * @return ForeignKey
      */
-    public function setType(int $type): ForeignKey
+    public function setType(int $type)
     {
         $this->type = $type;
 
@@ -154,7 +154,7 @@ class ForeignKey
     /**
      * @return string
      */
-    public function getOnUpdate(): string
+    public function getOnUpdate()
     {
         return $this->onUpdate;
     }
@@ -164,7 +164,7 @@ class ForeignKey
      *
      * @return ForeignKey
      */
-    public function setOnUpdate(string $onUpdate): ForeignKey
+    public function setOnUpdate(string $onUpdate)
     {
         $this->onUpdate = $onUpdate;
 
@@ -174,7 +174,7 @@ class ForeignKey
     /**
      * @return string
      */
-    public function getOnDelete(): string
+    public function getOnDelete()
     {
         return $this->onDelete;
     }
@@ -184,7 +184,7 @@ class ForeignKey
      *
      * @return ForeignKey
      */
-    public function setOnDelete(string $onDelete): ForeignKey
+    public function setOnDelete(string $onDelete)
     {
         $this->onDelete = $onDelete;
 

@@ -46,7 +46,7 @@ class Index
     /**
      * @return array
      */
-    public function getFields(): array
+    public function getFields()
     {
         return $this->fields;
     }
@@ -56,7 +56,7 @@ class Index
      *
      * @return Index
      */
-    public function setFields(array $fields): Index
+    public function setFields(array $fields)
     {
         $this->fields = $fields;
 
@@ -66,7 +66,7 @@ class Index
     /**
      * @return string
      */
-    public function getType(): string
+    public function getType()
     {
         return $this->type;
     }
@@ -76,7 +76,7 @@ class Index
      *
      * @return Index
      */
-    public function setType(string $type): Index
+    public function setType(string $type)
     {
         $this->type = $type;
 
@@ -106,7 +106,7 @@ class Index
     /**
      * @return string
      */
-    public function getOptions(): string
+    public function getOptions()
     {
         return $this->options;
     }
@@ -116,7 +116,7 @@ class Index
      *
      * @return Index
      */
-    public function setOptions(string $options): Index
+    public function setOptions(string $options)
     {
         $this->options = $options;
 

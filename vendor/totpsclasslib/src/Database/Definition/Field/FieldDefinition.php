@@ -57,7 +57,7 @@ class FieldDefinition
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -67,7 +67,7 @@ class FieldDefinition
      *
      * @return FieldDefinition
      */
-    public function setName(string $name): FieldDefinition
+    public function setName(string $name)
     {
         $this->name = $name;
 
@@ -77,7 +77,7 @@ class FieldDefinition
     /**
      * @return array
      */
-    public function getDefinition(): array
+    public function getDefinition()
     {
         return $this->definition;
     }
@@ -87,7 +87,7 @@ class FieldDefinition
      *
      * @return FieldDefinition
      */
-    public function setDefinition(array $definition): FieldDefinition
+    public function setDefinition(array $definition)
     {
         $this->definition = $definition;
 
@@ -99,7 +99,7 @@ class FieldDefinition
      *
      * @throws \PrestaShopException
      */
-    public function getColumn(): string
+    public function getColumn()
     {
         if (!empty($this->column)) {
             return $this->column;

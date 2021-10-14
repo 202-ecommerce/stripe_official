@@ -85,7 +85,7 @@ class TableDefinition
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -95,7 +95,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setName(string $name): TableDefinition
+    public function setName(string $name)
     {
         $this->name = $name;
 
@@ -105,7 +105,7 @@ class TableDefinition
     /**
      * @return FieldDefinition[]
      */
-    public function getFields(): array
+    public function getFields()
     {
         return $this->fields;
     }
@@ -115,7 +115,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setFields(array $fields): TableDefinition
+    public function setFields(array $fields)
     {
         $this->fields = $fields;
 
@@ -125,7 +125,7 @@ class TableDefinition
     /**
      * @return string
      */
-    public function getEngine(): string
+    public function getEngine()
     {
         return $this->engine;
     }
@@ -135,7 +135,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setEngine(string $engine): TableDefinition
+    public function setEngine(string $engine)
     {
         $this->engine = $engine;
 
@@ -145,7 +145,7 @@ class TableDefinition
     /**
      * @return string
      */
-    public function getCharset(): string
+    public function getCharset()
     {
         return $this->charset;
     }
@@ -155,7 +155,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setCharset(string $charset): TableDefinition
+    public function setCharset(string $charset)
     {
         $this->charset = $charset;
 
@@ -165,7 +165,7 @@ class TableDefinition
     /**
      * @return string
      */
-    public function getCollation(): string
+    public function getCollation()
     {
         return $this->collation;
     }
@@ -175,7 +175,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setCollation(string $collation): TableDefinition
+    public function setCollation(string $collation)
     {
         $this->collation = $collation;
 
@@ -185,7 +185,7 @@ class TableDefinition
     /**
      * @return ForeignKey[]
      */
-    public function getForeignKeys(): array
+    public function getForeignKeys()
     {
         return $this->foreignKeys;
     }
@@ -195,7 +195,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setForeignKeys(array $foreignKeys): TableDefinition
+    public function setForeignKeys(array $foreignKeys)
     {
         $this->foreignKeys = $foreignKeys;
 
@@ -205,7 +205,7 @@ class TableDefinition
     /**
      * @return Index[]
      */
-    public function getIndexes(): array
+    public function getIndexes()
     {
         return $this->indexes;
     }
@@ -215,7 +215,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setIndexes(array $indexes): TableDefinition
+    public function setIndexes(array $indexes)
     {
         $this->indexes = $indexes;
 
@@ -225,7 +225,7 @@ class TableDefinition
     /**
      * @return string
      */
-    public function getAlias(): string
+    public function getAlias()
     {
         return $this->alias;
     }
@@ -235,7 +235,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setAlias(string $alias): TableDefinition
+    public function setAlias(string $alias)
     {
         $this->alias = $alias;
 
@@ -245,7 +245,7 @@ class TableDefinition
     /**
      * @return string[]
      */
-    public function getPrimaryKey(): array
+    public function getPrimaryKey()
     {
         return $this->primaryKey;
     }
@@ -255,7 +255,7 @@ class TableDefinition
      *
      * @return TableDefinition
      */
-    public function setPrimaryKey(array $primaryKey): TableDefinition
+    public function setPrimaryKey(array $primaryKey)
     {
         $this->primaryKey = $primaryKey;
 

@@ -80,7 +80,7 @@ class IndexHandler implements DbObjectHandler
     protected function getKeys()
     {
         return Db::getInstance()->executeS("
-                SHOW KEYS FROM `{$this->tableDefinition->getName()}` 
+                SHOW KEYS FROM `{$this->tableDefinition->getName()}`
                 WHERE Key_name <> 'PRIMARY'"
         );
     }
@@ -104,7 +104,7 @@ class IndexHandler implements DbObjectHandler
     /**
      * @return TableDefinition
      */
-    public function getTableDefinition(): TableDefinition
+    public function getTableDefinition()
     {
         return $this->tableDefinition;
     }
