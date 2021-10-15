@@ -45,7 +45,8 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $capture_method = 'automatic';
             }
 
-            $amount = Tools::ps_round(Tools::getValue('amount'));
+            $cart =  new Cart($this->context->cart->id, $this->context->language->id); //-> JUST INSERT LANG_ID for multistore
+            $amount = str_replace(".", "",sprintf('%0.2f', $cart->getOrderTotal(true, Cart::BOTH)));
 
             $datasIntent = array(
                 "amount" => $amount,
@@ -115,7 +116,21 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
+            $stripe_idempotency_key = $stripeIdempotencyKey->getByIdCart($this->context->cart->id);
+
+          if ($stripe_idempotency_key->id == '') {
             $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $datasIntent);
+          }else{
+            $intent = \Stripe\PaymentIntent::retrieve($stripe_idempotency_key->id_payment_intent);
+            if ($intent['amount'] != $amount){
+                $intent = \Stripe\PaymentIntent::update($stripe_idempotency_key->id_payment_intent,  [
+                        'amount' => $amount
+                    ]);
+            }
+            $intent = \Stripe\PaymentIntent::retrieve($stripe_idempotency_key->id_payment_intent);
+          }
+
+
         } catch (Exception $e) {
             error_log($e->getMessage());
             ProcessLoggerHandler::logError(
