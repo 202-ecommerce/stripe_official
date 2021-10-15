@@ -126,8 +126,9 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $intent = \Stripe\PaymentIntent::update($stripe_idempotency_key->id_payment_intent,  [
                         'amount' => $amount
                     ]);
+                $intent = \Stripe\PaymentIntent::retrieve($stripe_idempotency_key->id_payment_intent);
+
             }
-            $intent = \Stripe\PaymentIntent::retrieve($stripe_idempotency_key->id_payment_intent);
           }
 
 
