@@ -432,7 +432,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - checkEventStatus'
             );
         } elseif ($lastRegisteredEvent->status != $transitionStatus[$eventStatus] || !$lastRegisteredEvent->isProcessed()) {
-            $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed ? 'Yes' : 'No') . '].';
+            $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].';
             ProcessLoggerHandler::logInfo(
                 $msg,
                 'StripeEvent',
