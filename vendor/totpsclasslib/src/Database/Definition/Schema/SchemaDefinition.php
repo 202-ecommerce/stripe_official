@@ -54,14 +54,18 @@ class SchemaDefinition
     public function buildTableDefinitions()
     {
         $tableDefinitionFactory = new TableDefinitionFactory($this->objectModelDefinition);
-        $this->tableDefinitions[] = ($tableDefinitionFactory->getTableDefinitionBuilder(TableType::MAIN))->build();
+
+        $tableDefinitionFactoryMain = $tableDefinitionFactory->getTableDefinitionBuilder(TableType::MAIN);
+        $this->tableDefinitions[] = $tableDefinitionFactoryMain->build();
 
         if ($this->objectModelDefinition->isMultilang() || $this->objectModelDefinition->isMultilangShop()) {
-            $this->tableDefinitions[] = ($tableDefinitionFactory->getTableDefinitionBuilder(TableType::LANG))->build();
+            $tableDefinitionFactoryLang = $tableDefinitionFactory->getTableDefinitionBuilder(TableType::LANG);
+            $this->tableDefinitions[] = $tableDefinitionFactoryLang->build();
         }
 
         if ($this->objectModelDefinition->isMultishop()) {
-            $this->tableDefinitions[] = ($tableDefinitionFactory->getTableDefinitionBuilder(TableType::SHOP))->build();
+            $tableDefinitionFactoryShop = $tableDefinitionFactory->getTableDefinitionBuilder(TableType::SHOP);
+            $this->tableDefinitions[] = $tableDefinitionFactoryShop->build();
         }
 
         return $this;
