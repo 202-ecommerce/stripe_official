@@ -130,7 +130,16 @@ class Stripe_official extends PaymentModule
                 'fr' => 'Logs',
             ),
             'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'AdminAdvancedParameters',
+            'parent_class_name' => 'stripe_official',
+            'visible' => false,
+        ),
+        array(
+            'name' => array(
+                'en' => 'Paiment Intent List',
+                'fr' => 'Liste des intentions de paiement',
+            ),
+            'class_name' => 'AdminStripe_officialPaymentIntent',
+            'parent_class_name' => 'stripe_official',
             'visible' => false,
         ),
     );
