@@ -89,24 +89,17 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             if (!$handler->process('ValidationOrderActions')) {
                 // Handle error
                 ProcessLoggerHandler::logError(
-                    'Order creation process failed.',
+                    'Order creation process disrupted.',
                     null,
                     null,
                     'orderSuccess - initContent'
                 );
                 ProcessLoggerHandler::closeLogger();
-
-                $url = Context::getContext()->link->getModuleLink(
-                    'stripe_official',
-                    'orderFailure',
-                    array(),
-                    true
-                );
             } else {
-                $url = $this->createOrder();
+                $url = $this->displayOrderConfirmation();
             }
         } else {
-            $url = $this->createOrder();
+            $url = $this->displayOrderConfirmation();
         }
 
         Tools::redirect($url);
@@ -175,7 +168,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'This Stripe module event "' .$stripeEventStatus.'" has already been processed.',
                 'StripeEvent',
                 $lastRegisteredEvent->id,
-                'webhook - checkEventStatus'
+                'orderSuccess - registerStripeEvent'
             );
             ProcessLoggerHandler::closeLogger();
             return false;
@@ -205,17 +198,28 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
     }
 
-    private function createOrder()
+    private function displayOrderConfirmation()
     {
         ProcessLoggerHandler::logInfo(
-            'Create order',
+            'Display order confirmation',
             null,
             null,
             'orderSuccess - createOrder'
         );
         ProcessLoggerHandler::closeLogger();
 
-        $id_order = Order::getOrderByCartId($this->context->cart->id);
+        $waiting_count = 0;
+        while(!$id_order = Order::getOrderByCartId($this->context->cart->id) && $waiting_count < 4) {
+            sleep(2);
+            $waiting_count++;
+            ProcessLoggerHandler::logInfo(
+                'Waiting proccess time => '.$waiting_count,
+                null,
+                null,
+                'orderSuccess - displayOrderConfirmation'
+            );
+            ProcessLoggerHandler::closeLogger();
+        }
 
         if (isset($this->context->customer->secure_key)) {
             $secure_key = $this->context->customer->secure_key;
