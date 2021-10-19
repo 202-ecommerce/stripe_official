@@ -119,7 +119,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
             $stripeEvent = new StripeEvent();
             $stripeEvent->setIdPaymentIntent($intent->id);
-            $stripeEvent->setStatus(StripeEvent::PENDING_STATUS);
+            $stripeEvent->setStatus(StripeEvent::CREATED_STATUS);
             $stripeEvent->setDateAdd($intent->created);
             $stripeEvent->setIsProcessed(1);
             if (!$stripeEvent->save()) {

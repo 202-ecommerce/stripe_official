@@ -28,6 +28,7 @@ use Stripe_officialClasslib\Database\Index\IndexType;
 
 class StripeEvent extends ObjectModel
 {
+    const CREATED_STATUS = 'CREATED';
     const PENDING_STATUS = 'PENDING';
     const AUTHORIZED_STATUS = 'AUTHORIZED';
     const CAPTURED_STATUS = 'CAPTURED';

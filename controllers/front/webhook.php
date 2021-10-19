@@ -361,12 +361,13 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
     private function checkEventStatus($event, $paymentIntent)
     {
         $transitionStatus = [
-            StripeEvent::FAILED_STATUS => null,
-            StripeEvent::PENDING_STATUS => null,
-            StripeEvent::AUTHORIZED_STATUS => StripeEvent::PENDING_STATUS,
-            StripeEvent::CAPTURED_STATUS => StripeEvent::AUTHORIZED_STATUS,
-            StripeEvent::REFUNDED_STATUS => StripeEvent::CAPTURED_STATUS,
-            StripeEvent::EXPIRED_STATUS => StripeEvent::PENDING_STATUS,
+            StripeEvent::CREATED_STATUS => [null],
+            StripeEvent::FAILED_STATUS => [null],
+            StripeEvent::PENDING_STATUS => [StripeEvent::CREATED_STATUS],
+            StripeEvent::AUTHORIZED_STATUS => [StripeEvent::CREATED_STATUS, StripeEvent::PENDING_STATUS],
+            StripeEvent::CAPTURED_STATUS => [StripeEvent::AUTHORIZED_STATUS],
+            StripeEvent::REFUNDED_STATUS => [StripeEvent::CAPTURED_STATUS],
+            StripeEvent::EXPIRED_STATUS => [StripeEvent::PENDING_STATUS],
         ];
 
         $lastRegisteredEvent = new StripeEvent();
@@ -388,6 +389,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             case 'charge.expired':
                 $eventStatus = StripeEvent::EXPIRED_STATUS;
                 break;
+            case 'charge.pending':
             default:
                 $eventStatus = StripeEvent::PENDING_STATUS;
                 break;
@@ -431,7 +433,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $lastRegisteredEvent->id,
                 'webhook - checkEventStatus'
             );
-        } elseif ($lastRegisteredEvent->status != $transitionStatus[$eventStatus] || !$lastRegisteredEvent->isProcessed()) {
+        } elseif (in_array($lastRegisteredEvent->status, $transitionStatus[$eventStatus]) || !$lastRegisteredEvent->isProcessed()) {
             $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].';
             ProcessLoggerHandler::logInfo(
                 $msg,
@@ -487,14 +489,20 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         );
 
         $eventType = $event->type;
-        $paymentMethodType = $event->data->object->payment_method_details->type ?: null;
+
+        if (isset($event->data->object->payment_method_details->type))
+            $paymentMethodType =  $event->data->object->payment_method_details->type;
+        elseif (isset($event->data->object->payment_method_types[0]))
+            $paymentMethodType = $event->data->object->payment_method_types[0];
+        else
+            $paymentMethodType = null;
 
         if (($eventType == 'charge.succeeded'
                 && $paymentMethodType == 'card')
             || ($eventType == 'charge.pending'
                 && $paymentMethodType == 'sepa_debit')
             || ($eventType == 'payment_intent.requires_action'
-                && $event->data->object->payment_method_types[0] == 'oxxo')) {
+                && $paymentMethodType == 'oxxo')) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow without redirection',
                 null,

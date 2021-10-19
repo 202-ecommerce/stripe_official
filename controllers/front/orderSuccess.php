@@ -120,12 +120,13 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         $eventCharge = isset($intent->charges->data[0]) ? $intent->charges->data[0] : $intent;
 
         $transitionStatus = [
-            StripeEvent::FAILED_STATUS => null,
-            StripeEvent::PENDING_STATUS => null,
-            StripeEvent::AUTHORIZED_STATUS => StripeEvent::PENDING_STATUS,
-            StripeEvent::CAPTURED_STATUS => StripeEvent::AUTHORIZED_STATUS,
-            StripeEvent::REFUNDED_STATUS => StripeEvent::CAPTURED_STATUS,
-            StripeEvent::EXPIRED_STATUS => StripeEvent::PENDING_STATUS,
+            StripeEvent::CREATED_STATUS => [null],
+            StripeEvent::FAILED_STATUS => [null],
+            StripeEvent::PENDING_STATUS => [StripeEvent::CREATED_STATUS],
+            StripeEvent::AUTHORIZED_STATUS => [StripeEvent::CREATED_STATUS, StripeEvent::PENDING_STATUS],
+            StripeEvent::CAPTURED_STATUS => [StripeEvent::AUTHORIZED_STATUS],
+            StripeEvent::REFUNDED_STATUS => [StripeEvent::CAPTURED_STATUS],
+            StripeEvent::EXPIRED_STATUS => [StripeEvent::PENDING_STATUS],
         ];
 
         $lastRegisteredEvent = new StripeEvent();
@@ -163,12 +164,13 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             case 'charge.expired':
                 $stripeEventStatus = StripeEvent::EXPIRED_STATUS;
                 break;
+            case 'charge.pending':
             default:
                 $stripeEventStatus = StripeEvent::PENDING_STATUS;
                 break;
         }
 
-        if ($lastRegisteredEvent->status != $transitionStatus[$stripeEventStatus]) {
+        if (!in_array($lastRegisteredEvent->status, $transitionStatus[$stripeEventStatus]) ) {
             ProcessLoggerHandler::logInfo(
                 'This Stripe module event "' .$stripeEventStatus.'" has already been processed.',
                 'StripeEvent',
