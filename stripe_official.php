@@ -379,7 +379,6 @@ class Stripe_official extends PaymentModule
     );
 
     public static $webhook_events = array(
-        \Stripe\Event::CHARGE_UPDATED,
         \Stripe\Event::CHARGE_EXPIRED,
         \Stripe\Event::CHARGE_FAILED,
         \Stripe\Event::CHARGE_SUCCEEDED,
