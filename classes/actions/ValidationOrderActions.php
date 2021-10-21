@@ -472,17 +472,19 @@ class ValidationOrderActions extends DefaultActions
             $orderId = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order((int)$orderId);
 
+            if (!isset($this->conveyor['voucher_url']))
+                $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
+            if (!isset($this->conveyor['voucher_expire']))
+                $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
+
             $template_vars = array(
                 '{name}' => $this->conveyor['payment_method']->billing_details->name,
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{order_id}' => $order->id,
-                '{voucher_url}' => $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url,
+                '{voucher_url}' => $this->conveyor['voucher_url'],
                 '{order_ref}' => $order->reference,
                 '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
             );
-
-            $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
-            $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
 
             if ($dir_mail) {
                 Mail::Send(
@@ -691,7 +693,7 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['IdPaymentIntent'] =
             (isset($this->conveyor['event_json']->data->object->payment_intent))
                 ? $this->conveyor['event_json']->data->object->payment_intent
-                : $this->conveyor['event_json']->data->object->id;;
+                : $this->conveyor['event_json']->data->object->id;
         ProcessLoggerHandler::logInfo(
             'chargeWebhook with IdPaymentIntent => ' . $this->conveyor['IdPaymentIntent'],
             null,

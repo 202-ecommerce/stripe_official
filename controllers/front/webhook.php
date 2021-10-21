@@ -360,40 +360,10 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     private function checkEventStatus($event, $paymentIntent)
     {
-        $transitionStatus = [
-            StripeEvent::CREATED_STATUS => [null],
-            StripeEvent::FAILED_STATUS => [null],
-            StripeEvent::PENDING_STATUS => [StripeEvent::CREATED_STATUS],
-            StripeEvent::AUTHORIZED_STATUS => [StripeEvent::CREATED_STATUS, StripeEvent::PENDING_STATUS],
-            StripeEvent::CAPTURED_STATUS => [StripeEvent::AUTHORIZED_STATUS],
-            StripeEvent::REFUNDED_STATUS => [StripeEvent::CAPTURED_STATUS],
-            StripeEvent::EXPIRED_STATUS => [StripeEvent::PENDING_STATUS],
-        ];
+        $eventStatus = StripeEvent::getStatusAssociatedToChargeType($event->type);
 
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
-
-        switch ($event->type) {
-            case 'charge.succeeded':
-                $eventStatus = StripeEvent::AUTHORIZED_STATUS;
-                break;
-            case 'charge.captured':
-                $eventStatus = StripeEvent::CAPTURED_STATUS;
-                break;
-            case 'charge.refunded':
-                $eventStatus = StripeEvent::REFUNDED_STATUS;
-                break;
-            case 'charge.failed':
-                $eventStatus = StripeEvent::FAILED_STATUS;
-                break;
-            case 'charge.expired':
-                $eventStatus = StripeEvent::EXPIRED_STATUS;
-                break;
-            case 'charge.pending':
-            default:
-                $eventStatus = StripeEvent::PENDING_STATUS;
-                break;
-        }
 
         if ($lastRegisteredEvent->status != $eventStatus && $lastRegisteredEvent->date_add != null) {
             $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
@@ -433,7 +403,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $lastRegisteredEvent->id,
                 'webhook - checkEventStatus'
             );
-        } elseif (in_array($lastRegisteredEvent->status, $transitionStatus[$eventStatus]) || !$lastRegisteredEvent->isProcessed()) {
+        } elseif (!StripeEvent::validateTransitionStatus($lastRegisteredEvent->status, $eventStatus) || !$lastRegisteredEvent->isProcessed()) {
             $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].';
             ProcessLoggerHandler::logInfo(
                 $msg,

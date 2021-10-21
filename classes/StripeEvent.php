@@ -169,4 +169,69 @@ class StripeEvent extends ObjectModel
 
         return $this;
     }
+
+    public static function getStatusAssociatedToChargeType($chargeType)
+    {
+        switch ($chargeType)
+        {
+            case 'charge.succeeded':
+                return StripeEvent::AUTHORIZED_STATUS;
+
+            case 'charge.captured':
+                return StripeEvent::CAPTURED_STATUS;
+
+            case 'charge.refunded':
+                return StripeEvent::REFUNDED_STATUS;
+
+            case 'charge.failed':
+                return StripeEvent::FAILED_STATUS;
+
+            case 'charge.expired':
+                return StripeEvent::EXPIRED_STATUS;
+
+            case 'charge.pending':
+            default:
+                return  StripeEvent::PENDING_STATUS;
+        }
+    }
+
+    public static function getTransitionStatusByNewStatus($newStatus)
+    {
+        switch ($newStatus)
+        {
+            case StripeEvent::PENDING_STATUS:
+                return [
+                    StripeEvent::CREATED_STATUS,
+                ];
+
+            case StripeEvent::AUTHORIZED_STATUS:
+            case StripeEvent::EXPIRED_STATUS:
+                return [
+                    StripeEvent::CREATED_STATUS,
+                    StripeEvent::PENDING_STATUS,
+                ];
+
+            case StripeEvent::CAPTURED_STATUS:
+                return [
+                    StripeEvent::AUTHORIZED_STATUS,
+                ];
+
+            case StripeEvent::REFUNDED_STATUS:
+                return [
+                    StripeEvent::CAPTURED_STATUS,
+                ];
+
+            case StripeEvent::CREATED_STATUS:
+            case StripeEvent::FAILED_STATUS:
+            default:
+                return [];
+        }
+    }
+
+    public static function validateTransitionStatus($currentStatus, $newStatus)
+    {
+        $transitionStatus = self::getTransitionStatusByNewStatus($newStatus);
+
+        return in_array($currentStatus, $transitionStatus);
+    }
 }

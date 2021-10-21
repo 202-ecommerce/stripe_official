@@ -42,15 +42,23 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         $payment_intent = Tools::getValue('payment_intent');
         $payment_method = Tools::getValue('payment_method');
 
-        if ($this->registerStripeEvent($payment_intent)) {
-            $handler = new ActionsHandler();
-            $handler->setConveyor(array(
-                //'event_json' => $event,
+        $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
+
+        if ($this->registerStripeEvent($intent)) {
+
+            $conveyorData = [
                 'module' => $this->module,
                 'context' => $this->context,
-                //'events_states' => $events_states,
                 'paymentIntent' => $payment_intent,
-            ));
+            ];
+
+            if ($payment_method == 'oxxo') {
+                $conveyorData['voucher_url'] = $intent->next_action->oxxo_display_details->hosted_voucher_url;
+                $conveyorData['voucher_expire'] = $intent->next_action->oxxo_display_details->expires_after;
+            }
+
+            $handler = new ActionsHandler();
+            $handler->setConveyor($conveyorData);
 
             if ($payment_method == 'card'
                 || $payment_method == 'sepa_debit'
@@ -95,32 +103,17 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'orderSuccess - initContent'
                 );
                 ProcessLoggerHandler::closeLogger();
-            } else {
-                $url = $this->displayOrderConfirmation();
             }
-        } else {
-            $url = $this->displayOrderConfirmation();
         }
 
-        Tools::redirect($url);
-        exit;
+        $this->displayOrderConfirmation();
     }
 
     private function registerStripeEvent($paymentIntent)
     {
-        $intent = \Stripe\PaymentIntent::retrieve($paymentIntent);
+        $eventCharge = isset($paymentIntent->charges->data[0]) ? $paymentIntent->charges->data[0] : $paymentIntent;
 
-        $eventCharge = isset($intent->charges->data[0]) ? $intent->charges->data[0] : $intent;
-
-        $transitionStatus = [
-            StripeEvent::CREATED_STATUS => [null],
-            StripeEvent::FAILED_STATUS => [null],
-            StripeEvent::PENDING_STATUS => [StripeEvent::CREATED_STATUS],
-            StripeEvent::AUTHORIZED_STATUS => [StripeEvent::CREATED_STATUS, StripeEvent::PENDING_STATUS],
-            StripeEvent::CAPTURED_STATUS => [StripeEvent::AUTHORIZED_STATUS],
-            StripeEvent::REFUNDED_STATUS => [StripeEvent::CAPTURED_STATUS],
-            StripeEvent::EXPIRED_STATUS => [StripeEvent::PENDING_STATUS],
-        ];
+        $stripeEventStatus = StripeEvent::getStatusAssociatedToChargeType($eventCharge->type);
 
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
@@ -141,29 +134,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             }
         }
 
-        switch ($eventCharge ->type) {
-            case 'charge.succeeded':
-                $stripeEventStatus = StripeEvent::AUTHORIZED_STATUS;
-                break;
-            case 'charge.captured':
-                $stripeEventStatus = StripeEvent::CAPTURED_STATUS;
-                break;
-            case 'charge.refunded':
-                $stripeEventStatus = StripeEvent::REFUNDED_STATUS;
-                break;
-            case 'charge.failed':
-                $stripeEventStatus = StripeEvent::FAILED_STATUS;
-                break;
-            case 'charge.expired':
-                $stripeEventStatus = StripeEvent::EXPIRED_STATUS;
-                break;
-            case 'charge.pending':
-            default:
-                $stripeEventStatus = StripeEvent::PENDING_STATUS;
-                break;
-        }
-
-        if (!in_array($lastRegisteredEvent->status, $transitionStatus[$stripeEventStatus]) ) {
+        if (!StripeEvent::validateTransitionStatus($lastRegisteredEvent->status, $stripeEventStatus)) {
             ProcessLoggerHandler::logInfo(
                 'This Stripe module event "' .$stripeEventStatus.'" has already been processed.',
                 'StripeEvent',
@@ -227,7 +198,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             $secure_key = false;
         }
 
-        return Context::getContext()->link->getPageLink(
+        $url = Context::getContext()->link->getPageLink(
             'order-confirmation',
             true,
             null,
@@ -238,5 +209,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'key' => $secure_key
             )
         );
+
+        Tools::redirect($url);
+        exit;
     }
 }
