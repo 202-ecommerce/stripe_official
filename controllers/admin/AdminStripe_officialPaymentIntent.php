@@ -114,6 +114,9 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
                 'align' => 'right',
                 'class' => 'fixed-width-xs',
             ],
+            'flow_type' => [
+                'title' => $this->module->l('Flow Type', 'AdminStripe_officialPaymentIntentController'),
+            ],
         ];
 
         return $this->renderList();

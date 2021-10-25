@@ -154,6 +154,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         $stripeEvent->setStatus($stripeEventStatus);
         $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
         $stripeEvent->setIsProcessed(true);
+        $stripeEvent->setFlowType('direct');
 
         try {
             return $stripeEvent->save();
@@ -179,12 +180,15 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         );
         ProcessLoggerHandler::closeLogger();
 
-        $waiting_count = 0;
-        while(!$id_order = Order::getOrderByCartId($this->context->cart->id) && $waiting_count < 4) {
+        for($i = 0; $i < 4; $i++) {
+            $id_order = Order::getOrderByCartId($this->context->cart->id);
+
+            if ($id_order)
+                break;
+
             sleep(2);
-            $waiting_count++;
             ProcessLoggerHandler::logInfo(
-                'Waiting proccess time => '.$waiting_count,
+                'Waiting proccess time => '.$i,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'

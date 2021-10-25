@@ -52,6 +52,10 @@ class StripeEvent extends ObjectModel
      * @var bool $is_processed
      */
     public $is_processed;
+    /**
+     * @var $flow_type
+     */
+    public $flow_type = 'webhook';
 
     /**
      * @var array $definition
@@ -76,9 +80,14 @@ class StripeEvent extends ObjectModel
                 'validate' => 'isDate',
             ),
             'is_processed' => array(
-                'type'      => ObjectModel::TYPE_BOOL,
+                'type'     => ObjectModel::TYPE_BOOL,
                 'validate' => 'isBool',
-            )
+            ),
+            'flow_type'  => array(
+                'type'     => ObjectModel::TYPE_STRING,
+                'validate' => 'isString',
+                'size'     => 30,
+            ),
         ),
         'indexes'      => [
             [
@@ -133,6 +142,16 @@ class StripeEvent extends ObjectModel
     public function setIsProcessed($is_processed)
     {
         $this->is_processed = $is_processed;
+    }
+
+    public function setFlowType($flow_type)
+    {
+        $this->flow_type = $flow_type;
+    }
+
+    public function getFlowType()
+    {
+        return $this->flow_type;
     }
 
     public function getLastRegisteredEventByPaymentIntent($paymentIntent)
@@ -205,6 +224,7 @@ class StripeEvent extends ObjectModel
                 ];
 
             case StripeEvent::AUTHORIZED_STATUS:
+            case StripeEvent::FAILED_STATUS:
             case StripeEvent::EXPIRED_STATUS:
                 return [
                     StripeEvent::CREATED_STATUS,
@@ -222,7 +242,6 @@ class StripeEvent extends ObjectModel
                 ];
 
             case StripeEvent::CREATED_STATUS:
-            case StripeEvent::FAILED_STATUS:
             default:
                 return [];
         }

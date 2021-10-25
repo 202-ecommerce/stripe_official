@@ -365,6 +365,19 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
 
+        if ($lastRegisteredEvent->id == null) {
+            $msg = 'This payment intent doesn\'t exist. This charge event is perhaps intended for another webhook.';
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                null,
+                null,
+                'webhook - checkEventStatus'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(500);
+            die($msg);
+        }
+
         if ($lastRegisteredEvent->status != $eventStatus && $lastRegisteredEvent->date_add != null) {
             $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
             $currentEventDate = new DateTime();
