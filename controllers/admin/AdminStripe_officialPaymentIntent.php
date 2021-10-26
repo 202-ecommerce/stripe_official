@@ -36,7 +36,7 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
 
         $this->_select = 'sp.id_cart, sp.id_payment_intent, sp.type, spi.status, o.reference';
         $this->_join =
-            'INNER JOIN `'._DB_PREFIX_.'stripe_payment` sp ON (a.id_payment_intent = sp.id_payment_intent AND sp.result = 1)
+            'INNER JOIN `'._DB_PREFIX_.'stripe_payment` sp ON (a.id_payment_intent = sp.id_payment_intent AND sp.result > 0)
             INNER JOIN `'._DB_PREFIX_.'stripe_payment_intent` spi ON (sp.id_payment_intent = spi.id_payment_intent)
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (sp.id_cart = o.id_cart)';
         $this->_group = 'GROUP BY id_payment_intent';

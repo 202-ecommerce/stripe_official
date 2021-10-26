@@ -42,7 +42,24 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         $payment_intent = Tools::getValue('payment_intent');
         $payment_method = Tools::getValue('payment_method');
 
-        $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
+        try {
+            $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            $intent = null;
+            ProcessLoggerHandler::logInfo(
+                'Retrieve payment intent : ' . $e->getMessage(),
+                null,
+                null,
+                'orderSuccess - registerStripeEvent'
+            );
+        }
+
+        ProcessLoggerHandler::logInfo(
+            'Retrieve payment intent : '.$intent,
+            null,
+            null,
+            'orderSuccess - registerStripeEvent'
+        );
 
         if ($this->registerStripeEvent($intent)) {
 
@@ -77,7 +94,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'saveCard',
                     'addTentative'
                 );
-            } elseif ($payment_method == 'sofort') {
+            } elseif ($payment_method == 'sofort'
+                || $payment_method == 'fpx') {
                 ProcessLoggerHandler::logInfo(
                     'Payment method flow with redirection',
                     null,
@@ -102,7 +120,6 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     null,
                     'orderSuccess - initContent'
                 );
-                ProcessLoggerHandler::closeLogger();
             }
         }
 
@@ -113,10 +130,17 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
     {
         $eventCharge = isset($paymentIntent->charges->data[0]) ? $paymentIntent->charges->data[0] : $paymentIntent;
 
-        $stripeEventStatus = StripeEvent::getStatusAssociatedToChargeType($eventCharge->type);
+        $stripeEventStatus = StripeEvent::getStatusAssociatedToChargeType($eventCharge->status);
 
         $lastRegisteredEvent = new StripeEvent();
-        $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
+        $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent->id);
+
+        ProcessLoggerHandler::logInfo(
+            'Last registered event => ID : ' . $lastRegisteredEvent->id,
+            null,
+            null,
+            'orderSuccess - registerStripeEvent'
+        );
 
         if ($lastRegisteredEvent->date_add != null) {
             $lastRegisteredEventDate = new DateTime($lastRegisteredEvent->date_add);
@@ -136,7 +160,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         if (!StripeEvent::validateTransitionStatus($lastRegisteredEvent->status, $stripeEventStatus)) {
             ProcessLoggerHandler::logInfo(
-                'This Stripe module event "' .$stripeEventStatus.'" has already been processed.',
+                'This Stripe module event "' . $stripeEventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].',
                 'StripeEvent',
                 $lastRegisteredEvent->id,
                 'orderSuccess - registerStripeEvent'
@@ -149,8 +173,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         $stripeEventDate = $stripeEventDate->setTimestamp($eventCharge->created);
 
         $stripeEvent = new StripeEvent();
-        $stripeEvent = $stripeEvent->getEventByPaymentIntentNStatus($paymentIntent, $stripeEventStatus);
-        $stripeEvent->setIdPaymentIntent($paymentIntent);
+        $stripeEvent->setIdPaymentIntent($paymentIntent->id);
         $stripeEvent->setStatus($stripeEventStatus);
         $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
         $stripeEvent->setIsProcessed(true);
@@ -160,7 +183,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             return $stripeEvent->save();
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logInfo(
-                'Cannot process event',
+                'An issue appears during saving Stripe module event in database : ' . $e->getMessage(),
                 null,
                 null,
                 'orderSuccess - registerStripeEvent'
@@ -176,15 +199,21 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             'Display order confirmation',
             null,
             null,
-            'orderSuccess - createOrder'
+            'orderSuccess - displayOrderConfirmation'
         );
-        ProcessLoggerHandler::closeLogger();
 
-        for($i = 0; $i < 4; $i++) {
+        for($i = 1; $i < 5; $i++) {
             $id_order = Order::getOrderByCartId($this->context->cart->id);
 
-            if ($id_order)
+            if ($id_order) {
+                ProcessLoggerHandler::logInfo(
+                    'Waiting proccess order OK',
+                    null,
+                    null,
+                    'orderSuccess - displayOrderConfirmation'
+                );
                 break;
+            }
 
             sleep(2);
             ProcessLoggerHandler::logInfo(
@@ -193,7 +222,6 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 null,
                 'orderSuccess - displayOrderConfirmation'
             );
-            ProcessLoggerHandler::closeLogger();
         }
 
         if (isset($this->context->customer->secure_key)) {
@@ -213,6 +241,14 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'key' => $secure_key
             )
         );
+
+        ProcessLoggerHandler::logInfo(
+            'Confirmation order url => '.$url,
+            null,
+            null,
+            'orderSuccess - displayOrderConfirmation'
+        );
+        ProcessLoggerHandler::closeLogger();
 
         Tools::redirect($url);
         exit;

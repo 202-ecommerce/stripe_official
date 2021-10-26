@@ -194,21 +194,27 @@ class StripeEvent extends ObjectModel
         switch ($chargeType)
         {
             case 'charge.succeeded':
+            case 'succeeded':
                 return StripeEvent::AUTHORIZED_STATUS;
 
             case 'charge.captured':
+            case 'captured':
                 return StripeEvent::CAPTURED_STATUS;
 
             case 'charge.refunded':
+            case 'refunded':
                 return StripeEvent::REFUNDED_STATUS;
 
             case 'charge.failed':
+            case 'failed':
                 return StripeEvent::FAILED_STATUS;
 
             case 'charge.expired':
+            case 'expired':
                 return StripeEvent::EXPIRED_STATUS;
 
             case 'charge.pending':
+            case 'pending':
             default:
                 return  StripeEvent::PENDING_STATUS;
         }
