@@ -244,6 +244,7 @@ class StripeEvent extends ObjectModel
 
             case StripeEvent::REFUNDED_STATUS:
                 return [
+                    StripeEvent::AUTHORIZED_STATUS,
                     StripeEvent::CAPTURED_STATUS,
                 ];
 

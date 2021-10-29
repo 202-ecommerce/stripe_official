@@ -123,7 +123,10 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             }
         }
 
-        $this->displayOrderConfirmation();
+        $stripePayment = new StripePayment();
+        $stripePayment->getStripePaymentByPaymentIntent($intent->id);
+
+        $this->displayOrderConfirmation($stripePayment->id_cart);
     }
 
     private function registerStripeEvent($paymentIntent)
@@ -193,7 +196,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
     }
 
-    private function displayOrderConfirmation()
+    private function displayOrderConfirmation($cartId)
     {
         ProcessLoggerHandler::logInfo(
             'Display order confirmation',
@@ -202,8 +205,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             'orderSuccess - displayOrderConfirmation'
         );
 
-        for($i = 1; $i < 5; $i++) {
-            $id_order = Order::getOrderByCartId($this->context->cart->id);
+        for($i = 1; $i <= 15; $i++) {
+            $id_order = (int) Order::getOrderByCartId($cartId);
 
             if ($id_order) {
                 ProcessLoggerHandler::logInfo(
@@ -235,9 +238,9 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             true,
             null,
             array(
-                'id_cart' => (int)$this->context->cart->id,
+                'id_cart' => $cartId,
                 'id_module' => (int)$this->module->id,
-                'id_order' => (int)$id_order,
+                'id_order' => $id_order,
                 'key' => $secure_key
             )
         );
