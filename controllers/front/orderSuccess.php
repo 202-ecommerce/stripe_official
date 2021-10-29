@@ -36,9 +36,6 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
     {
         parent::initContent();
 
-        if (Configuration::get("STRIPE_RECIPE_MODE"))
-            sleep(3);
-
         $payment_intent = Tools::getValue('payment_intent');
         $payment_method = Tools::getValue('payment_method');
 

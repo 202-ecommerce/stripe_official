@@ -138,16 +138,15 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeEvent->setDateAdd($intent->created);
             $stripeEvent->setIsProcessed(1);
             if (!$stripeEvent->save()) {
-                $msg = 'An issue appears during saving Stripe module event in database (the event probably already exists).';
                 ProcessLoggerHandler::logInfo(
-                    $msg,
+                    'An issue appears during saving Stripe module event in database (the event probably already exists).',
                     null,
                     null,
                     'webhook - registerEvent'
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(400);
-                die($msg);
+                die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
             }
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -158,7 +157,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 'createIntent'
             );
             ProcessLoggerHandler::closeLogger();
-            die($e->getMessage());
+            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
         }
 
         echo Tools::jsonEncode(array(
