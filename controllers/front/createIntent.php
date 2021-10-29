@@ -54,7 +54,8 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "capture_method" => $capture_method,
                 "metadata" => array(
                     'id_cart' => $this->context->cart->id
-                )
+                ),
+                "description" => 'Product Purchase',
             );
 
             if (!Tools::getValue('id_payment_method')) {
@@ -67,6 +68,20 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                     $lastname = str_replace('\'', '\\\'', $this->context->customer->lastname);
                     $stripe_fullname = $firstname . ' ' . $lastname;
                 }
+
+                $shippingAddress = new Address($this->context->cart->id_address_delivery);
+                $shippingAddressState = new State($shippingAddress->id_state);
+
+                $datasIntent['shipping'] = [
+                    'name' => $stripe_fullname,
+                    'address' => [
+                        'line1' => $shippingAddress->address1,
+                        'postal_code' => $shippingAddress->postcode,
+                        'city' => $shippingAddress->city,
+                        'state' => $shippingAddressState->iso_code,
+                        'country' => Country::getIsoById($shippingAddress->id_country),
+                    ],
+                ];
 
                 $address = new Address($this->context->cart->id_address_invoice);
 
