@@ -1562,7 +1562,8 @@ class Stripe_official extends PaymentModule
                 $this->name.'-stripe-v3',
                 'https://js.stripe.com/v3/',
                 array(
-                    'server'=>'remote'
+                    'server'=>'remote',
+                    'position' => 'head',
                 )
             );
             $this->context->controller->registerJavascript(
