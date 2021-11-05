@@ -120,10 +120,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             }
         }
 
-        $stripePayment = new StripePayment();
-        $stripePayment->getStripePaymentByPaymentIntent($intent->id);
-
-        $this->displayOrderConfirmation($stripePayment->id_cart);
+        $this->displayOrderConfirmation($intent->id);
     }
 
     private function registerStripeEvent($paymentIntent)
@@ -193,7 +190,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
     }
 
-    private function displayOrderConfirmation($cartId)
+    private function displayOrderConfirmation($id_intent)
     {
         ProcessLoggerHandler::logInfo(
             'Display order confirmation',
@@ -203,18 +200,21 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         );
 
         for($i = 1; $i <= 15; $i++) {
-            $id_order = (int) Order::getOrderByCartId($cartId);
+            $stripePayment = new StripePayment();
+            $stripePayment->getStripePaymentByPaymentIntent($id_intent);
+            if ($stripePayment->id_cart !== null) {
+                $id_order = (int) Order::getOrderByCartId($stripePayment->id_cart);
 
-            if ($id_order) {
-                ProcessLoggerHandler::logInfo(
-                    'Waiting proccess order OK',
-                    null,
-                    null,
-                    'orderSuccess - displayOrderConfirmation'
-                );
-                break;
+                if ($id_order) {
+                    ProcessLoggerHandler::logInfo(
+                        'Waiting proccess order OK',
+                        null,
+                        null,
+                        'orderSuccess - displayOrderConfirmation'
+                    );
+                    break;
+                }
             }
-
             sleep(2);
             ProcessLoggerHandler::logInfo(
                 'Waiting proccess time => '.$i,
@@ -235,7 +235,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             true,
             null,
             array(
-                'id_cart' => $cartId,
+                'id_cart' => $stripePayment->id_cart,
                 'id_module' => (int)$this->module->id,
                 'id_order' => $id_order,
                 'key' => $secure_key
