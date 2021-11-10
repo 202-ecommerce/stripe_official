@@ -1,7 +1,4 @@
 <?php
-
-use Stripe_officialClasslib\Database\Index\IndexType;
-
 /**
  * 2007-2019 PrestaShop
  *
@@ -74,6 +71,7 @@ class StripeEvent extends ObjectModel
                 'type'     => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
                 'size'     => 30,
+                'unique' => true,
             ),
             'date_add'  => array(
                 'type'     => ObjectModel::TYPE_DATE,
@@ -89,19 +87,6 @@ class StripeEvent extends ObjectModel
                 'size'     => 30,
             ),
         ),
-        'indexes'      => [
-            [
-                'fields'    => [
-                    [
-                        'column' => 'id_payment_intent',
-                    ],
-                    [
-                        'column' => 'status',
-                    ]
-                ],
-                'type' => IndexType::UNIQUE,
-            ],
-        ],
     );
 
     public function setIdPaymentIntent($id_payment_intent)

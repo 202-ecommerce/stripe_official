@@ -20,8 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
- * @version   develop
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib;
@@ -31,36 +30,35 @@ namespace Stripe_officialClasslib;
  */
 class Registry
 {
+
     /**
-     * @var Registry Instance of this class
+     * @var Stripe_officialClasslib\Registry $_registry Instance of this class
      */
     private static $_registry = null;
 
     /**
-     * @var array
+     * @var array $values
      */
-    private $values = [];
-
+    private $values = array();
+    
     /**
      * Get instance of this class
      *
-     * @return Registry
+     * @return Stripe_officialClasslib\Registry
      */
     public static function getInstance()
     {
         if (self::$_registry === null) {
-            self::$_registry = new Registry();
+            self::$_registry = new Registry;
         }
-
         return self::$_registry;
     }
-
+    
     /**
      * Get a variable in the Registry
      *
      * @param string $index
-     *
-     * @return mixed
+     * @return bool
      */
     public static function get($index)
     {
@@ -68,27 +66,25 @@ class Registry
         if (!$instance->offsetExists($index)) {
             return false;
         }
-
         return $instance->values[$index];
     }
-
+    
     /**
      * Set a variable in the Registry
      *
      * @param string $index
-     * @param string|array $value
+     * @param string $value
      */
     public static function set($index, $value)
     {
         $instance = self::getInstance();
-        $instance->values[$index] = $value;
+        $instance->values[$index]= $value;
     }
 
     /**
      * Check if var exist in the registry
      *
      * @param string $index
-     *
      * @return bool
      */
     public static function isRegistered($index)
@@ -96,7 +92,6 @@ class Registry
         if (self::$_registry === null) {
             return false;
         }
-
         return self::$_registry->offsetExists($index);
     }
 
@@ -104,7 +99,6 @@ class Registry
      * Check if offsetExists
      *
      * @param string $index
-     *
      * @return bool
      */
     public function offsetExists($index)
@@ -112,10 +106,9 @@ class Registry
         if (false === isset($this->values)) {
             return false;
         }
-
         return array_key_exists($index, $this->values);
     }
-
+    
     /**
      * Increment a counter in the Registry
      *
@@ -131,7 +124,7 @@ class Registry
             $instance->values[$index] = $value;
         }
     }
-
+    
     /**
      * Decrement a counter in the Registry
      *

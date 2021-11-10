@@ -1,40 +1,18 @@
 <?php
-/*
- * NOTICE OF LICENSE
- *
- * This source file is subject to a commercial license from SARL 202 ecommerce
- * Use, copy, modification or distribution of this source file without written
- * license agreement from the SARL 202 ecommerce is strictly forbidden.
- * In order to obtain a license, please contact us: tech@202-ecommerce.com
- * ...........................................................................
- * INFORMATION SUR LA LICENCE D'UTILISATION
- *
- * L'utilisation de ce fichier source est soumise a une licence commerciale
- * concedee par la societe 202 ecommerce
- * Toute utilisation, reproduction, modification ou distribution du present
- * fichier source sans contrat de licence ecrit de la part de la SARL 202 ecommerce est
- * expressement interdite.
- * Pour obtenir une licence, veuillez contacter 202-ecommerce <tech@202-ecommerce.com>
- * ...........................................................................
- *
- * @author    202-ecommerce <tech@202-ecommerce.com>
- * @copyright Copyright (c) 202-ecommerce
- * @license   Commercial license
- *
- * @version   develop
- */
 
 namespace Stripe_officialClasslib\Install;
 
-use Stripe_officialClasslib\Database\ObjectModelExtension;
+
+use \Module;
+use \Db;
+use \DbQuery;
+use \PrestaShopDatabaseException;
+use \PrestaShopException;
+use \Tab;
+use \Language;
+use Stripe_officialClasslib\Db\ObjectModelExtension;
 use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
-use Db;
-use DbQuery;
-use Language;
-use Module;
-use PrestaShopDatabaseException;
-use PrestaShopException;
-use Tab;
+
 
 class ExtensionInstaller extends AbstractInstaller
 {
@@ -53,21 +31,11 @@ class ExtensionInstaller extends AbstractInstaller
         $this->extension = $extension;
     }
 
-    public function install()
-    {
-        return parent::install() && $this->extension->install();
-    }
-
-    public function uninstall()
-    {
-        return parent::uninstall() && $this->extension->uninstall();
-    }
 
     //region Get-Set
 
     /**
      * @return array
-     *
      * @throws PrestaShopException
      */
     public function getHooks()
@@ -81,7 +49,6 @@ class ExtensionInstaller extends AbstractInstaller
 
     /**
      * @return array
-     *
      * @throws PrestaShopException
      */
     public function getAdminControllers()
@@ -90,12 +57,11 @@ class ExtensionInstaller extends AbstractInstaller
             throw new PrestaShopException('Extension is null, can\'t get extension\'s admin controllers');
         }
 
-        return $this->extension->getExtensionAdminControllers();
+        return $this->extension->extensionAdminControllers;
     }
 
     /**
      * @return array
-     *
      * @throws PrestaShopException
      */
     public function getObjectModels()
@@ -117,7 +83,6 @@ class ExtensionInstaller extends AbstractInstaller
 
     /**
      * @param AbstractModuleExtension $extension
-     *
      * @return ExtensionInstaller
      */
     public function setExtension($extension)

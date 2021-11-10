@@ -20,35 +20,32 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- *
- * @version   develop
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger;
 
-use Stripe_officialClasslib\Extensions\ProcessMonitor\ProcessMonitorHandler;
-use Configuration;
-use Db;
-use Hook;
-use Tools;
+use \Db;
+use \Configuration;
+use \Hook;
 
 class ProcessLoggerHandler
 {
     /**
-     * @var ProcessMonitorHandler
-     *                            Instance of ProcessMonitorHandler
+     * @var Stripe_officialClasslib\Extensions\ProcessMonitor\ProcessMonitorHandler
+     * Instance of ProcessMonitorHandler
      */
     private static $process;
 
     /**
      * @var array logs
      */
-    private static $logs = [];
+    private static $logs = array();
 
     /**
      * Set process name and remove oldest logs
      *
-     * @param ProcessMonitorHandler|null $process
+     * @param Stripe_officialClasslib\Extensions\ProcessMonitor\ProcessMonitorHandler|null $process
      */
     public static function openLogger($process = null)
     {
@@ -58,9 +55,6 @@ class ProcessLoggerHandler
 
     /**
      * @param string|null $msg
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public static function closeLogger($msg = null)
     {
@@ -79,15 +73,15 @@ class ProcessLoggerHandler
      */
     public static function addLog($msg, $objectModel = null, $objectId = null, $name = null, $level = 'info')
     {
-        self::$logs[] = [
+        self::$logs[] = array(
             'name' => pSQL($name),
             'msg' => pSQL($msg),
             'level' => pSQL($level),
             'object_name' => pSQL($objectModel),
             'object_id' => (int)$objectId,
-            'date_add' => date('Y-m-d H:i:s'),
+            'date_add' => date("Y-m-d H:i:s"),
             'id_session' => self::getSessionId(),
-        ];
+        );
 
         if (100 === count(self::$logs)) {
             self::saveLogsInDb();
@@ -137,53 +131,37 @@ class ProcessLoggerHandler
     }
 
     /**
-     * @param string $msg
-     * @param string|null $objectModel
-     * @param int|null $objectId
-     * @param string $name
-     */
-    public static function logDeprecated($msg, $objectModel = null, $objectId = null, $name = 'default')
-    {
-        if (self::$process != null) {
-            $name = self::$process->getProcessName();
-        }
-        self::addLog($msg, $objectModel, $objectId, $name, 'deprecated');
-    }
-
-    /**
      * @return bool
-     *
-     * @throws \PrestaShopDatabaseException
-     * @throws \PrestaShopException
      */
     public static function saveLogsInDb()
     {
         $result = true;
         if (false === empty(self::$logs) && self::getSkippingHooksResult()) {
+            
             Hook::exec(
-                'actionProcessLoggerSave',
-                [
-                    'logs' => &self::$logs,
-                ],
-                null,
-                true
+                    'actionProcessLoggerSave',
+                    array(
+                        'logs' => &self::$logs,
+                    ),
+                    null,
+                    true
             );
             Hook::exec(
-                'actionStripe_officialProcessLoggerSave',
-                [
-                    'logs' => &self::$logs,
-                ],
-                null,
-                true
+                    'actionStripe_officialProcessLoggerSave',
+                    array(
+                        'logs' => &self::$logs,
+                    ),
+                    null,
+                    true
             );
-
+            
             $result = Db::getInstance()->insert(
                 'stripe_official_processlogger',
                 self::$logs
             );
 
             if ($result) {
-                self::$logs = [];
+                self::$logs = array();
             }
         }
 
@@ -229,34 +207,32 @@ class ProcessLoggerHandler
 
         return (int)$numberOfDays;
     }
-
+    
     /**
      * Executes the hooks used to skip a ProcessLogger save. This will return
      * false if any module hooked to either 'actionSkipProcessLoggerSave' or
      * 'actionSkipStripe_officialProcessLoggerSave' returns false (weak comparison)
-     *
+     * 
      * @return bool
-     *
-     * @throws \PrestaShopException
      */
-    protected static function getSkippingHooksResult()
-    {
+    protected static function getSkippingHooksResult() {
+        
         if (Hook::getIdByName('actionSkipProcessLoggerSave')) {
             $hookProcessLoggerReturnArray = Hook::exec(
-                'actionSkipProcessLoggerSave',
-                [
-                    'logs' => self::$logs,
-                ],
-                null,
-                true
+                    'actionSkipProcessLoggerSave',
+                    array(
+                        'logs' => self::$logs,
+                    ),
+                    null,
+                    true
             );
 
             if (!is_array($hookProcessLoggerReturnArray)) {
                 return false;
             }
-
+            
             if (!empty($hookProcessLoggerReturnArray)) {
-                $hookReturn = array_reduce($hookProcessLoggerReturnArray, function ($and, $hookReturn) {
+                $hookReturn = array_reduce($hookProcessLoggerReturnArray, function($and, $hookReturn) {
                     return $and && (bool)$hookReturn;
                 });
                 if (!$hookReturn) {
@@ -264,23 +240,23 @@ class ProcessLoggerHandler
                 }
             }
         }
-
+        
         if (Hook::getIdByName('actionSkipStripe_officialProcessLoggerSave')) {
             $hookModuleProcessLoggerReturnArray = Hook::exec(
-                'actionSkipStripe_officialProcessLoggerSave',
-                [
-                    'logs' => self::$logs,
-                ],
-                null,
-                true
+                    'actionSkipStripe_officialProcessLoggerSave',
+                    array(
+                        'logs' => self::$logs,
+                    ),
+                    null,
+                    true
             );
 
             if (!is_array($hookModuleProcessLoggerReturnArray)) {
                 return false;
             }
-
+            
             if (!empty($hookModuleProcessLoggerReturnArray)) {
-                $hookReturn = array_reduce($hookModuleProcessLoggerReturnArray, function ($and, $hookReturn) {
+                $hookReturn = array_reduce($hookModuleProcessLoggerReturnArray, function($and, $hookReturn) {
                     return $and && (bool)$hookReturn;
                 });
                 if (!$hookReturn) {
@@ -288,13 +264,13 @@ class ProcessLoggerHandler
                 }
             }
         }
-
+        
         return true;
     }
 
     protected static function getSessionId()
     {
-        $values = [];
+        $values = array();
         $remoteAddr = Tools::getRemoteAddr();
         $values[] = $remoteAddr;
         if (!empty($_SERVER['REQUEST_TIME'])) {

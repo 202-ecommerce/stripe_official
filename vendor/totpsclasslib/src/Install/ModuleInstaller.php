@@ -1,45 +1,20 @@
 <?php
-/*
- * NOTICE OF LICENSE
- *
- * This source file is subject to a commercial license from SARL 202 ecommerce
- * Use, copy, modification or distribution of this source file without written
- * license agreement from the SARL 202 ecommerce is strictly forbidden.
- * In order to obtain a license, please contact us: tech@202-ecommerce.com
- * ...........................................................................
- * INFORMATION SUR LA LICENCE D'UTILISATION
- *
- * L'utilisation de ce fichier source est soumise a une licence commerciale
- * concedee par la societe 202 ecommerce
- * Toute utilisation, reproduction, modification ou distribution du present
- * fichier source sans contrat de licence ecrit de la part de la SARL 202 ecommerce est
- * expressement interdite.
- * Pour obtenir une licence, veuillez contacter 202-ecommerce <tech@202-ecommerce.com>
- * ...........................................................................
- *
- * @author    202-ecommerce <tech@202-ecommerce.com>
- * @copyright Copyright (c) 202-ecommerce
- * @license   Commercial license
- *
- * @version   develop
- */
 
 namespace Stripe_officialClasslib\Install;
 
+use \Configuration;
+use \Db;
+use \DbQuery;
+use \Language;
+use \OrderState;
+use \Tools;
 use Stripe_officialClasslib\Install\AbstractInstaller;
 use Stripe_officialClasslib\Install\ExtensionInstaller;
-use Configuration;
-use Db;
-use DbQuery;
-use Language;
-use OrderState;
-use Tools;
 
 class ModuleInstaller extends AbstractInstaller
 {
     /**
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -54,7 +29,6 @@ class ModuleInstaller extends AbstractInstaller
 
     /**
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -70,7 +44,6 @@ class ModuleInstaller extends AbstractInstaller
 
     /**
      * @return bool
-     *
      * @throws \Exception
      */
     public function checkPhpVersion()
@@ -82,7 +55,11 @@ class ModuleInstaller extends AbstractInstaller
         $phpVersion = Tools::checkPhpVersion();
 
         if (Tools::version_compare($phpVersion, $this->module->php_version_required, '<')) {
-            throw new \Exception(sprintf('[%s] This module requires at least PHP %s or newer versions.', $this->module->name, $this->module->php_version_required));
+            throw new \Exception(sprintf(
+                '[%s] This module requires at least PHP %s or newer versions.',
+                $this->module->name,
+                $this->module->php_version_required
+            ));
         }
 
         return true;
@@ -92,7 +69,6 @@ class ModuleInstaller extends AbstractInstaller
      * Uninstall Configuration (with or without language management)
      *
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      */
     public function uninstallConfiguration()
@@ -122,7 +98,6 @@ class ModuleInstaller extends AbstractInstaller
      * Register Order State : create new order state for this module
      *
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -161,7 +136,6 @@ class ModuleInstaller extends AbstractInstaller
      * Unregister Order State : mark them as deleted
      *
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -209,14 +183,12 @@ class ModuleInstaller extends AbstractInstaller
             return true;
         }
 
-        return array_product(array_map([$this, 'installExtension'], $this->module->extensions));
+        return array_product(array_map(array($this, 'installExtension'), $this->module->extensions));
     }
 
     /**
-     * @param string $extensionName
-     *
+     * @param $extensionName
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
@@ -234,14 +206,12 @@ class ModuleInstaller extends AbstractInstaller
             return true;
         }
 
-        return array_product(array_map([$this, 'uninstallExtension'], $this->module->extensions));
+        return array_product(array_map(array($this, 'uninstallExtension'), $this->module->extensions));
     }
 
     /**
-     * @param string $extensionName
-     *
+     * @param $extensionName
      * @return bool
-     *
      * @throws \PrestaShopDatabaseException
      * @throws \PrestaShopException
      */
