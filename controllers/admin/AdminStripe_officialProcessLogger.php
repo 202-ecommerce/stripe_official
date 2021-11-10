@@ -23,6 +23,7 @@
  *
  * @version   develop
  */
+require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
 use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
 
