@@ -25,9 +25,10 @@
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger;
 
-use \Db;
-use \Configuration;
-use \Hook;
+use Db;
+use Configuration;
+use Hook;
+use Tools;
 
 class ProcessLoggerHandler
 {
