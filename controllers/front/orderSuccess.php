@@ -109,7 +109,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 );
             }
 
-            if (!$handler->process('ValidationOrderActions')) {
+            if (!$handler->process('ValidationOrder')) {
                 // Handle error
                 ProcessLoggerHandler::logError(
                     'Order creation process disrupted.',

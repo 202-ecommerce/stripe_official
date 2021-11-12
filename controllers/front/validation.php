@@ -90,7 +90,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         }
 
         // Process actions chain
-        if ($handler->process('ValidationOrderActions')) {
+        if ($handler->process('ValidationOrder')) {
             // Retrieve and use resulting data
             $returnValues = $handler->getConveyor();
         } else {
