@@ -76,7 +76,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
             if ($payment_method == 'card'
                 || $payment_method == 'sepa_debit'
-                || $payment_method == 'oxxo') {
+                || $payment_method == 'oxxo'
+                || $payment_method == 'giropay') {
                 ProcessLoggerHandler::logInfo(
                     'Payment method flow without redirection',
                     null,
