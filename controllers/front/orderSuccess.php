@@ -76,8 +76,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
             if ($payment_method == 'card'
                 || $payment_method == 'sepa_debit'
-                || $payment_method == 'oxxo'
-                || $payment_method == 'giropay') {
+                || $payment_method == 'oxxo') {
                 ProcessLoggerHandler::logInfo(
                     'Payment method flow without redirection',
                     null,
@@ -93,7 +92,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'addTentative'
                 );
             } elseif ($payment_method == 'sofort'
-                || $payment_method == 'fpx') {
+                || $payment_method == 'fpx'
+                || $payment_method == 'giropay') {
                 ProcessLoggerHandler::logInfo(
                     'Payment method flow with redirection',
                     null,
