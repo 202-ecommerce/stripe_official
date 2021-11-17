@@ -803,28 +803,38 @@ class ValidationOrderActions extends DefaultActions
 
             $history->addWithemail();
         } elseif ($event_type == 'charge.refunded') {
-            if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
-                || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
-                $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+            if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+                $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
                 ProcessLoggerHandler::logInfo(
-                    'Partial refund of payment => '.$this->conveyor['event_json']->data->object->id,
+                    'Order canceled',
                     null,
                     null,
                     'ValidationOrderActions - chargeWebhook'
                 );
             } else {
-                $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
-                ProcessLoggerHandler::logInfo(
-                    'Full refund of payment => '.$this->conveyor['event_json']->data->object->id,
-                    null,
-                    null,
-                    'ValidationOrderActions - chargeWebhook'
-                );
+                if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
+                    || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
+                    $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+                    ProcessLoggerHandler::logInfo(
+                        'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                        null,
+                        null,
+                        'ValidationOrderActions - chargeWebhook'
+                    );
+                } else {
+                    $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
+                    ProcessLoggerHandler::logInfo(
+                        'Full refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                        null,
+                        null,
+                        'ValidationOrderActions - chargeWebhook'
+                    );
+                }
             }
         }
 
         ProcessLoggerHandler::logInfo(
-            'setCurrentState for '.$event_type,
+            'Set Order State to ' . $order->getCurrentOrderState()->name . 'for ' . $event_type,
             'Order',
             $id_order,
             'ValidationOrderActions - chargeWebhook'
