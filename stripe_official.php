@@ -491,7 +491,12 @@ class Stripe_official extends PaymentModule
         }
 
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
-        $installer->install();
+
+        if ($installer->install()
+            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
+            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+            Db::getInstance()->execute($sql);
+        }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();

@@ -132,6 +132,21 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         // Construct event charge
         $event = $this->constructEvent($input, $sig_header, $endpoint_secret);
 
+        // Check if shop is the good one
+        $cart = new Cart($event->data->object->metadata->id_cart);
+        if ($cart->id_shop_group != Stripe_official::getShopGroupIdContext()
+            || $cart->id_shop != Stripe_official::getShopIdContext()) {
+            ProcessLoggerHandler::logInfo(
+                $msg = 'This cart does not come from this shop',
+                'Cart',
+                $cart->id,
+                'ValidationOrderActions - createOrder'
+            );
+            http_response_code(400);
+            echo $msg;
+            exit;
+        }
+
         // Retrieve payment intent
         if ($event->type == 'payment_intent.requires_action') {
             $paymentIntent = $event->data->object->id;

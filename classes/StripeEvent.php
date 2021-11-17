@@ -71,7 +71,6 @@ class StripeEvent extends ObjectModel
                 'type'     => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
                 'size'     => 30,
-                'unique' => true,
             ),
             'date_add'  => array(
                 'type'     => ObjectModel::TYPE_DATE,

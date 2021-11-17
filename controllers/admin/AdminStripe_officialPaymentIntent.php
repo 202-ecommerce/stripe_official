@@ -34,16 +34,20 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
     {
         parent::__construct();
 
-        $this->_select = 'sp.id_cart, sp.id_payment_intent, sp.type, spi.status, o.reference';
+        $this->_select = 'o.id_order, sp.id_cart, sp.id_payment_intent, sp.type, spi.status, o.reference';
         $this->_join =
             'INNER JOIN `'._DB_PREFIX_.'stripe_payment` sp ON (a.id_payment_intent = sp.id_payment_intent AND sp.result > 0)
             INNER JOIN `'._DB_PREFIX_.'stripe_payment_intent` spi ON (sp.id_payment_intent = spi.id_payment_intent)
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (sp.id_cart = o.id_cart)';
-        $this->_group = 'GROUP BY id_payment_intent';
 
         $this->explicitSelect = true;
 
         $this->fields_list = [
+            'id_order' => [
+                'title' => $this->module->l('Order ID', 'AdminStripe_officialPaymentIntentController'),
+                'filter_key' => 'o!id_order',
+                'orderby' => false,
+            ],
             'id_cart' => [
                 'title' => $this->module->l('Cart ID', 'AdminStripe_officialPaymentIntentController'),
                 'filter_key' => 'sp!id_cart',
