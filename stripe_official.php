@@ -1274,11 +1274,10 @@ class Stripe_official extends PaymentModule
      */
     public static function getShopIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
@@ -1288,11 +1287,10 @@ class Stripe_official extends PaymentModule
      */
     public static function getShopGroupIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id_shop_group;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
