@@ -121,6 +121,10 @@ class StripeIdempotencyKey extends ObjectModel
         return $this;
     }
 
+    /**
+     * @throws PrestaShopException
+     * @throws \Stripe\Exception\ApiErrorException
+     */
     public function createNewOne($id_cart, $datasIntent)
     {
         $idempotency_key = $id_cart.'_'.uniqid();

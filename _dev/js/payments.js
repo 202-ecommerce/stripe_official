@@ -303,7 +303,7 @@ $(function(){
       disableSubmit(disableText, stripe_message.processing);
       createPaymentIntent(payment, id_payment_method, false);
 
-      if (paymentIntentDatas.intent.status != 'succeeded') {
+      if (paymentIntentDatas && paymentIntentDatas.intent.status != 'succeeded') {
         if (payment === 'card') {
           if (typeof id_payment_method == 'undefined') {
             // card payment via stripe form
@@ -542,7 +542,8 @@ $(function(){
               saveCard = datas.saveCard;
           },
           error: function(err) {
-              console.log(err.responseText);
+            paymentIntentDatas = false;
+            console.log(err.responseText);
               var error = {
                 'message': err.responseText
               }
