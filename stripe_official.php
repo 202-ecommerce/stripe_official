@@ -1671,7 +1671,7 @@ class Stripe_official extends PaymentModule
      */
     public function hookPayment($params)
     {
-        if (!$this->active) {
+        if (!self::isWellConfigured() || !$this->active) {
             return;
         }
 
