@@ -714,7 +714,7 @@ class ValidationOrderActions extends DefaultActions
                     'ValidationOrderActions - chargeWebhook'
                 );
                 ProcessLoggerHandler::closeLogger();
-                http_response_code(400);
+                http_response_code(200);
                 return false;
             }
         }

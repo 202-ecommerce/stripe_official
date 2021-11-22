@@ -142,7 +142,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $cart->id,
                 'ValidationOrderActions - createOrder'
             );
-            http_response_code(400);
+            http_response_code(200);
             echo $msg;
             exit;
         }
@@ -353,7 +353,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                     $msg,
                     null,
                     null,
-                    'webhook - registerEvent'
+                    'webhook - validProcessEvent'
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(400);
@@ -365,7 +365,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $msg,
                 null,
                 null,
-                'webhook - registerEvent'
+                'webhook - validProcessEvent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
@@ -402,7 +402,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
-            http_response_code(500);
+            http_response_code(200);
             die($msg);
         }
 
@@ -419,7 +419,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                     'webhook - checkEventStatus'
                 );
                 ProcessLoggerHandler::closeLogger();
-                http_response_code(400);
+                http_response_code(200);
                 die($msg);
             }
         }
