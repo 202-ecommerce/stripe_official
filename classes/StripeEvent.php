@@ -199,8 +199,10 @@ class StripeEvent extends ObjectModel
 
             case 'charge.pending':
             case 'pending':
-            default:
                 return  StripeEvent::PENDING_STATUS;
+
+            default:
+                return false;
         }
     }
 

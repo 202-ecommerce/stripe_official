@@ -377,6 +377,19 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
     {
         $eventStatus = StripeEvent::getStatusAssociatedToChargeType($event->type);
 
+        if (!$eventStatus) {
+            $msg = 'Charge event does not need to be processed : '.$event->type;
+            ProcessLoggerHandler::logInfo(
+                $msg,
+                null,
+                null,
+                'webhook - checkEventStatus'
+            );
+            ProcessLoggerHandler::closeLogger();
+            http_response_code(200);
+            die($msg);
+        }
+
         $lastRegisteredEvent = new StripeEvent();
         $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($paymentIntent);
 
