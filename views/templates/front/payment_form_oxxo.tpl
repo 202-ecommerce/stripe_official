@@ -37,4 +37,8 @@
     <div id="error-message" role="alert"></div>
 
     <div class="stripe-error-message alert alert-danger"></div>
+
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+      <button class="stripe-submit-button" data-method="oxxo">{l s='Buy now' mod='stripe_official'}</button>
+    {/if}
 </form>
