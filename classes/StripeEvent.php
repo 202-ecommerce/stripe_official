@@ -32,6 +32,7 @@ class StripeEvent extends ObjectModel
     const REFUNDED_STATUS = 'REFUNDED';
     const FAILED_STATUS = 'FAILED';
     const EXPIRED_STATUS = 'EXPIRED';
+    const REQUIRES_ACTION_STATUS = 'REQUIRES_ACTION';
 
     /**
      * @var string $id_payment_intent
@@ -199,7 +200,11 @@ class StripeEvent extends ObjectModel
 
             case 'charge.pending':
             case 'pending':
-                return  StripeEvent::PENDING_STATUS;
+                return StripeEvent::PENDING_STATUS;
+
+            case 'payment_intent.requires_action':
+            case 'requires_action':
+                return StripeEvent::REQUIRES_ACTION_STATUS;
 
             default:
                 return false;
@@ -210,9 +215,15 @@ class StripeEvent extends ObjectModel
     {
         switch ($newStatus)
         {
+            case StripeEvent::REQUIRES_ACTION_STATUS:
+                return [
+                    StripeEvent::CREATED_STATUS,
+                ];
+
             case StripeEvent::PENDING_STATUS:
                 return [
                     StripeEvent::CREATED_STATUS,
+                    StripeEvent::REQUIRES_ACTION_STATUS,
                 ];
 
             case StripeEvent::AUTHORIZED_STATUS:
@@ -220,6 +231,7 @@ class StripeEvent extends ObjectModel
             case StripeEvent::EXPIRED_STATUS:
                 return [
                     StripeEvent::CREATED_STATUS,
+                    StripeEvent::REQUIRES_ACTION_STATUS,
                     StripeEvent::PENDING_STATUS,
                 ];
 
