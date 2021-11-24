@@ -292,11 +292,11 @@ $(function(){
           cardFormPayment = false;
         }
 
-        if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
+        /*if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
           var error = { "message" : stripe_message.accept_cgv };
           updateError($submitButtons, error);
           return false;
-        }
+        }*/
       }
 
       // Disable the Pay button to prevent multiple click events.
@@ -547,7 +547,7 @@ $(function(){
               var error = {
                 'message': err.responseText
               }
-              updateError($('#stripe-'+payment+'element'), error);
+              updateError($('#stripe-'+payment+'-element'), error);
           }
       });
     }
@@ -647,7 +647,7 @@ $(function(){
     // Update error message
     function updateError(element, error) {
       const $error = $(".stripe-payment-form:visible .stripe-error-message");
-      var elementError = $(element).siblings('.stripe-error-message');
+      var elementError = $(element).find('.stripe-error-message');
       var disableElement = $(element).siblings('.stripe-submit-button');
       if (error) {
         if (stripe_ps_version == '1.6') {

@@ -22,7 +22,7 @@
  * @license   Commercial license
 *}
 
-<form class="stripe-payment-form" action="">
+<form class="stripe-payment-form" id="stripe-alipay-element" action="">
     <input type="hidden" name="stripe-payment-method" value="alipay">
     <div class="stripe-error-message alert alert-danger">
         {if isset($stripeError)}<p>{$stripeError|escape:'htmlall':'UTF-8'}</p>{/if}
@@ -32,7 +32,7 @@
         <div class="payment_module stripe-europe-payments" data-method="alipay">
             <p title="{l s='Pay by Alipay' mod='stripe_official'}">
                 <img id="alipay" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/alipay.png" alt="{l s='Pay by Alipay' mod='stripe_official'}" />
-                {l s='Pay by Alipay' mod='stripe_official'}
+                <button class="stripe-submit-button" data-method="alipay">{l s='Pay by Alipay' mod='stripe_official'}</button>
             </p>
         </div>
     {/if}
