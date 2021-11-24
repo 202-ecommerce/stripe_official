@@ -142,6 +142,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $cart->id,
                 'ValidationOrderActions - createOrder'
             );
+            ProcessLoggerHandler::closeLogger();
             http_response_code(200);
             echo $msg;
             exit;

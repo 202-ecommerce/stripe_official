@@ -211,6 +211,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             'orderSuccess - displayOrderConfirmation'
         );
 
+        $id_order = 0;
         for($i = 1; $i <= 15; $i++) {
             $stripePayment = new StripePayment();
             $stripePayment->getStripePaymentByPaymentIntent($id_intent);

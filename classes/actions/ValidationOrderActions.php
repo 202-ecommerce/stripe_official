@@ -833,8 +833,10 @@ class ValidationOrderActions extends DefaultActions
             }
         }
 
+        $currentOrderState = $order->getCurrentOrderState()->name[(int)Configuration::get('PS_LANG_DEFAULT')];
+
         ProcessLoggerHandler::logInfo(
-            'Set Order State to ' . $order->getCurrentOrderState()->name . 'for ' . $event_type,
+            'Set Order State to ' . $currentOrderState . 'for ' . $event_type,
             'Order',
             $id_order,
             'ValidationOrderActions - chargeWebhook'
