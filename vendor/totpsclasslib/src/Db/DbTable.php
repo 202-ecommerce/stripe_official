@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Db;
@@ -94,7 +94,7 @@ class DbTable
             }
             $result = $this->db->execute("CREATE TABLE IF NOT EXISTS `$this->name` (".
                             implode(', ', array_merge($this->columns, $keys)).
-                        ") ENGINE=$this->engine CHARSET=$this->charset;");
+                        ") ENGINE=$this->engine CHARSET=$this->charset COLLATE=$this->collation;");
             if ($result == true) {
                 $this->alterKeys();
             }
@@ -368,8 +368,8 @@ class DbTable
                 break;
             case static::FOREIGN:
                 list($table, $columns) = explode('.', $name);
-                $this->keys[] = "FOREIGN KEY (`$columns`) REFERENCES $table (`$columns`)
-                ON UPDATE CASCADE ON DELETE CASCADE";
+                $this->keys[] = "FOREIGN KEY (`$columns`) REFERENCES $table (`$columns`) 
+                                 ON UPDATE CASCADE ON DELETE CASCADE";
                 break;
             case static::UNIQUE:
                 $this->keys[] = "UNIQUE KEY (`$columns`)";

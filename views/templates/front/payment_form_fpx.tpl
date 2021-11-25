@@ -24,20 +24,27 @@
 
 <form class="stripe-payment-form" action="">
     <input type="hidden" name="stripe-payment-method" value="fpx">
+    <div class="stripe-error-message alert alert-danger">
+        {if isset($stripeError)}<p>{$stripeError|escape:'htmlall':'UTF-8'}</p>{/if}
+    </div>
 
     {if isset($prestashop_version) && $prestashop_version == '1.7'}
         <div id="stripe-fpx-bank-element" class="field"></div>
     {/if}
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
-        <div class="payment_module stripe-europe-payments" data-method="fpx">
-            <p title="{l s='Pay by FPX' mod='stripe_official'}">
-                <img id="fpx" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/fpx.png" alt="{l s='Pay by FPX' mod='stripe_official'}" />
-                {l s='Pay by FPX' mod='stripe_official'}
-            </p>
-        </div>
-        <span id="stripe-fpx-bank-element" class="field"></span>
-        <button class="fpx-submit-button" data-method="fpx">{l s='Buy now' mod='stripe_official'}</button>
+      <img id="fpx" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/fpx.png" alt="{l s='Pay by FPX' mod='stripe_official'}" />
+      <span id="stripe-fpx-bank-element" class="field"></span>
+      <div class="payment_module stripe-europe-payments" data-method="fpx">
+        <p title="{l s='Pay by FPX' mod='stripe_official'}">
+          <button class="stripe-submit-button" data-method="fpx">{l s='Pay by FPX' mod='stripe_official'}</button>
+        </p>
+      </div>
     {/if}
 
+    {if $stripe_reinsurance_enabled == 'on'}
+      <div id="powered_by_stripe">
+        <img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/powered_by_stripe.png" />
+      </div>
+    {/if}
 </form>

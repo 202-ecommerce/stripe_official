@@ -31,7 +31,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * @throws \Stripe\Exception\ApiErrorException
  */
-function upgrade_module_2_3_6()
+function upgrade_module_2_3_6($module)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_official_processlogger` MODIFY msg TEXT';
     if (!Db::getInstance()->execute($sql)) {
@@ -54,7 +54,7 @@ function upgrade_module_2_3_6()
         $refundId = Configuration::get(Stripe_official::REFUND_ID);
         $refundMode = Configuration::get(Stripe_official::REFUND_MODE);
         $minimumAmount3ds = Configuration::get(Stripe_official::MINIMUM_AMOUNT_3DS);
-        $partialRefundState = Configuration::get(Stripe_official::PARTIAL_REFUND_STATE);
+        $partialRefundState = Configuration::get('STRIPE_PARTIAL_REFUND_STATE');
         $refundAmount = Configuration::get(Stripe_official::REFUND_AMOUNT);
 
         $enableIdeal = Configuration::get(Stripe_official::ENABLE_IDEAL);
@@ -105,7 +105,7 @@ function upgrade_module_2_3_6()
         Configuration::updateValue(Stripe_official::REFUND_ID, $refundId, false, $shopGroupId, $shopId);
         Configuration::updateValue(Stripe_official::REFUND_MODE, $refundMode, false, $shopGroupId, $shopId);
         Configuration::updateValue(Stripe_official::MINIMUM_AMOUNT_3DS, $minimumAmount3ds, false, $shopGroupId, $shopId);
-        Configuration::updateValue(Stripe_official::PARTIAL_REFUND_STATE, $partialRefundState, false, $shopGroupId, $shopId);
+        Configuration::updateValue('STRIPE_PARTIAL_REFUND_STATE', $partialRefundState, false, $shopGroupId, $shopId);
         Configuration::updateValue(Stripe_official::REFUND_AMOUNT, $refundAmount, false, $shopGroupId, $shopId);
 
         Configuration::updateValue(Stripe_official::ENABLE_IDEAL, $enableIdeal, false, $shopGroupId, $shopId);
@@ -153,6 +153,8 @@ function upgrade_module_2_3_6()
             Configuration::updateValue(Stripe_official::ASK_CUSTOMER, $askCustomer, false, $shopGroupId, $shopId);
         }
     }
+
+    $module->cleanModuleCache();
 
     return true;
 }

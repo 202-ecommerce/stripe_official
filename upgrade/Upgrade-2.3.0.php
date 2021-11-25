@@ -57,11 +57,11 @@ function upgrade_module_2_3_0($module)
     if (!empty($result)) {
         foreach ($result as $res) {
             if ($res['Field'] == 'id_account') {
-                $alter_stripe_payment_table = false;
+                $alter_stripe_customer_table = false;
             }
         }
 
-        if ($alter_stripe_payment_table === true) {
+        if ($alter_stripe_customer_table === true) {
             $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_customer
                     ADD id_account varchar(255) AFTER stripe_customer_key';
             if (!Db::getInstance()->execute($sql)) {

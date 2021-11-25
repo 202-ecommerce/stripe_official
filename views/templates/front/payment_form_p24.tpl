@@ -24,6 +24,9 @@
 
 <form class="stripe-payment-form" action="">
     <input type="hidden" name="stripe-payment-method" value="p24">
+    <div class="stripe-error-message alert alert-danger">
+        {if isset($stripeError)}<p>{$stripeError|escape:'htmlall':'UTF-8'}</p>{/if}
+    </div>
 
     {if isset($prestashop_version) && $prestashop_version == '1.6'}
         <div class="payment_module stripe-europe-payments" data-method="p24">

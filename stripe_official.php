@@ -37,15 +37,15 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 /**
 * Stripe official PrestaShop module main class extends payment class
-* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developped by "202 ecommerce"
-* This library provide utils common features as DB installer, internal logger, chain of resposability design pattern
+* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
+* This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
 *
 * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
 * // use Stripe_officialClasslib\Install\ModuleInstaller;
 * // use Stripe_officialClasslib\Actions\ActionsHandler;
 * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
 *
-* Developpers use declarative method to define objects, parameters, controllers... needed in this module
+* Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
 class Stripe_official extends PaymentModule
@@ -58,7 +58,6 @@ class Stripe_official extends PaymentModule
     const TEST_KEY = 'STRIPE_TEST_KEY';
     const PUBLISHABLE = 'STRIPE_PUBLISHABLE';
     const TEST_PUBLISHABLE = 'STRIPE_TEST_PUBLISHABLE';
-    const PARTIAL_REFUND_STATE = 'STRIPE_PARTIAL_REFUND_STATE';
     const OS_SOFORT_WAITING = 'STRIPE_OS_SOFORT_WAITING';
     const CAPTURE_WAITING = 'STRIPE_CAPTURE_WAITING';
     const SEPA_WAITING = 'STRIPE_SEPA_WAITING';
@@ -110,6 +109,7 @@ class Stripe_official extends PaymentModule
         'StripeCapture',
         'StripeCustomer',
         'StripeIdempotencyKey',
+        'StripeEvent',
     );
 
     /**
@@ -130,7 +130,16 @@ class Stripe_official extends PaymentModule
                 'fr' => 'Logs',
             ),
             'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'AdminAdvancedParameters',
+            'parent_class_name' => 'stripe_official',
+            'visible' => false,
+        ),
+        array(
+            'name' => array(
+                'en' => 'Paiment Intent List',
+                'fr' => 'Liste des intentions de paiement',
+            ),
+            'class_name' => 'AdminStripe_officialPaymentIntent',
+            'parent_class_name' => 'stripe_official',
             'visible' => false,
         ),
     );
@@ -370,14 +379,14 @@ class Stripe_official extends PaymentModule
     );
 
     public static $webhook_events = array(
-        'charge.expired',
-        'charge.failed',
-        'charge.succeeded',
-        'charge.pending',
-        'charge.captured',
-        'charge.refunded',
-        'charge.dispute.created',
-        'payment_intent.requires_action'
+        \Stripe\Event::CHARGE_EXPIRED,
+        \Stripe\Event::CHARGE_FAILED,
+        \Stripe\Event::CHARGE_SUCCEEDED,
+        \Stripe\Event::CHARGE_PENDING,
+        \Stripe\Event::CHARGE_CAPTURED,
+        \Stripe\Event::CHARGE_REFUNDED,
+        \Stripe\Event::CHARGE_DISPUTE_CREATED,
+        \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION,
     );
 
     /* refund */
@@ -482,7 +491,12 @@ class Stripe_official extends PaymentModule
         }
 
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
-        $installer->install();
+
+        if ($installer->install()
+            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
+            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+            Db::getInstance()->execute($sql);
+        }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
@@ -547,8 +561,8 @@ class Stripe_official extends PaymentModule
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
 
-        if (!Configuration::get(self::OS_SOFORT_WAITING,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING,null, $shopGroupId, $shopId)))) {
+        if (!Configuration::get(self::OS_SOFORT_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -585,49 +599,12 @@ class Stripe_official extends PaymentModule
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
-            Configuration::updateValue(self::OS_SOFORT_WAITING, (int) $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::OS_SOFORT_WAITING, (int) $order_state->id);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::PARTIAL_REFUND_STATE,null, $shopGroupId, $shopId)))) {
-            $order_state = new OrderState();
-            $order_state->name = array();
-            foreach (Language::getLanguages() as $language) {
-                switch (Tools::strtolower($language['iso_code'])) {
-                    case 'fr':
-                        $order_state->name[$language['id_lang']] = pSQL('Remboursement partiel Stripe');
-                        break;
-                    case 'es':
-                        $order_state->name[$language['id_lang']] = pSQL('Reembolso parcial Stripe');
-                        break;
-                    case 'de':
-                        $order_state->name[$language['id_lang']] = pSQL('Teilweise Rückerstattung Stripe');
-                        break;
-                    case 'nl':
-                        $order_state->name[$language['id_lang']] = pSQL('Gedeeltelijke terugbetaling Stripe');
-                        break;
-                    case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('Rimborso parziale Stripe');
-                        break;
-
-                    default:
-                        $order_state->name[$language['id_lang']] = pSQL('Stripe Partial Refund');
-                        break;
-                }
-            }
-            $order_state->invoice = false;
-            $order_state->send_email = false;
-            $order_state->logable = true;
-            $order_state->color = '#FFDD99';
-            $order_state->add();
-
-            Configuration::updateValue(self::PARTIAL_REFUND_STATE, $order_state->id, false, $shopGroupId, $shopId);
-        }
-
-        /* Create Order State for Stripe */
-        if (!Configuration::get(self::CAPTURE_WAITING,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING,null, $shopGroupId, $shopId)))) {
+        if (!Configuration::get(self::CAPTURE_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::CAPTURE_WAITING)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
@@ -667,26 +644,26 @@ class Stripe_official extends PaymentModule
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::SEPA_WAITING,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING,null, $shopGroupId, $shopId)))) {
+        if (!Configuration::get(self::SEPA_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_WAITING)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'fr':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        $order_state->name[$language['id_lang']] = pSQL('En attente de paiement SEPA');
                         break;
                     case 'es':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        $order_state->name[$language['id_lang']] = pSQL('Esperando pago SEPA');
                         break;
                     case 'de':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        $order_state->name[$language['id_lang']] = pSQL('Warten auf SEPA-Zahlung');
                         break;
                     case 'nl':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        $order_state->name[$language['id_lang']] = pSQL('Wachten op SEPA-betaling');
                         break;
                     case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for SEPA payment');
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa del pagamento SEPA');
                         break;
 
                     default:
@@ -694,9 +671,11 @@ class Stripe_official extends PaymentModule
                         break;
                 }
             }
-            $order_state->invoice = false;
             $order_state->send_email = false;
-            $order_state->logable = true;
+            $order_state->hidden = false;
+            $order_state->delivery = false;
+            $order_state->logable = false;
+            $order_state->invoice = false;
             $order_state->color = '#fcba03';
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
@@ -704,30 +683,30 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::SEPA_WAITING, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::SEPA_WAITING, $order_state->id);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::SEPA_DISPUTE,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE,null, $shopGroupId, $shopId)))) {
+        if (!Configuration::get(self::SEPA_DISPUTE)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SEPA_DISPUTE)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'fr':
-                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        $order_state->name[$language['id_lang']] = pSQL('Litige SEPA');
                         break;
                     case 'es':
-                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        $order_state->name[$language['id_lang']] = pSQL('Disputa SEPA');
                         break;
                     case 'de':
-                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA-Streit');
                         break;
                     case 'nl':
-                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        $order_state->name[$language['id_lang']] = pSQL('SEPA-geschil');
                         break;
                     case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('SEPA dispute');
+                        $order_state->name[$language['id_lang']] = pSQL('Controversia SEPA');
                         break;
 
                     default:
@@ -745,30 +724,30 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::SEPA_DISPUTE, $order_state->id);
         }
 
         /* Create Order State for Stripe */
-        if (!Configuration::get(self::OXXO_WAITING,null, $shopGroupId, $shopId)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OXXO_WAITING,null, $shopGroupId, $shopId)))) {
+        if (!Configuration::get(self::OXXO_WAITING)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OXXO_WAITING)))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'fr':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        $order_state->name[$language['id_lang']] = pSQL('En attente de la confirmation de paiement OXXO');
                         break;
                     case 'es':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        $order_state->name[$language['id_lang']] = pSQL('Esperando la confirmación del pago de OXXO');
                         break;
                     case 'de':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        $order_state->name[$language['id_lang']] = pSQL('Warten auf OXXO-Zahlungsbestätigung');
                         break;
                     case 'nl':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        $order_state->name[$language['id_lang']] = pSQL('Wachten op OXXO betalingsbevestiging');
                         break;
                     case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for OXXO payment confirmation');
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa della conferma del pagamento OXXO');
                         break;
 
                     default:
@@ -778,7 +757,9 @@ class Stripe_official extends PaymentModule
             }
             $order_state->invoice = false;
             $order_state->send_email = false;
-            $order_state->logable = true;
+            $order_state->hidden = false;
+            $order_state->delivery = false;
+            $order_state->logable = false;
             $order_state->color = '#C23416';
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
@@ -786,7 +767,7 @@ class Stripe_official extends PaymentModule
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::OXXO_WAITING, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::OXXO_WAITING, $order_state->id);
         }
 
         return true;
@@ -1057,7 +1038,7 @@ class Stripe_official extends PaymentModule
             'alipay' => Configuration::get(self::ENABLE_ALIPAY,null, $shopGroupId, $shopId),
             'oxxo' => Configuration::get(self::ENABLE_OXXO,null, $shopGroupId, $shopId),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY,null, $shopGroupId, $shopId),
-            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true),
+            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')),
         ));
     }
 
@@ -1216,13 +1197,6 @@ class Stripe_official extends PaymentModule
             $query->where('id_stripe = "'.pSQL($refund_id).'"');
             $state = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
 
-            if ($state == 2) {
-                /* Refund State */
-                $order->setCurrentState(7);
-            } elseif ($state == 3) {
-                /* Partial Refund State */
-                $order->setCurrentState(Configuration::get(self::PARTIAL_REFUND_STATE));
-            }
             $this->success = $this->l('Refunds processed successfully');
         } else {
             $this->errors[] = $this->l('Invalid Stripe credentials, please check your configuration.');
@@ -1254,17 +1228,56 @@ class Stripe_official extends PaymentModule
     }
 
     /**
+     * Get a list of files contained in directory
+     *
+     * @param string $dir Target directory path
+     * @param string $regex Apply regex
+     * @param false $onlyFilename Get only filename
+     * @param array $results Results search
+     * @return array
+     */
+    private static function getDirContentFiles($dir, $regex = '/.*/', $onlyFilename = false, &$results = array()) {
+        $files = scandir($dir);
+
+        foreach ($files as $value) {
+            $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+            if (!is_dir($path) && preg_match($regex, $value)) {
+                $results[] = $onlyFilename ? $value : $path;
+            } else if (is_dir($path) && $value != "." && $value != "..") {
+                self::getDirContentFiles($path, $regex, $onlyFilename, $results);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * clean cache for upgrader to prevent issue during module upgrade
+     *
+     * @return void
+     */
+    public function cleanModuleCache()
+    {
+        $path =_PS_MODULE_DIR_.'stripe_official/views/templates';
+        $regPattern = '/.*\.tpl/';
+        $templates = self::getDirContentFiles($path, $regPattern, true);
+
+        foreach ($templates as $tpl) {
+            $this->_clearCache($tpl);
+        }
+    }
+
+    /**
      * get current ShopId according to activate multishop feature
      *
      * @return int|null
      */
     public static function getShopIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
@@ -1274,11 +1287,10 @@ class Stripe_official extends PaymentModule
      */
     public static function getShopGroupIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id_shop_group;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
@@ -1553,7 +1565,8 @@ class Stripe_official extends PaymentModule
                 $this->name.'-stripe-v3',
                 'https://js.stripe.com/v3/',
                 array(
-                    'server'=>'remote'
+                    'server'=>'remote',
+                    'position' => 'head',
                 )
             );
             $this->context->controller->registerJavascript(
@@ -1658,7 +1671,7 @@ class Stripe_official extends PaymentModule
      */
     public function hookPayment($params)
     {
-        if (!$this->active) {
+        if (!self::isWellConfigured() || !$this->active) {
             return;
         }
 
@@ -1974,8 +1987,12 @@ class Stripe_official extends PaymentModule
             $prestashop_version = '1.6';
         }
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         $this->context->smarty->assign(array(
-            'prestashop_version' => $prestashop_version
+            'prestashop_version' => $prestashop_version,
+            'isSaveCard' => Configuration::get(self::SAVE_CARD, null, $shopGroupId, $shopId),
         ));
 
         return $this->display(__FILE__, 'my-account-stripe-cards.tpl');

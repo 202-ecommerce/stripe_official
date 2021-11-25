@@ -29,9 +29,23 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_3_0()
 {
-    $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment ADD state tinyint(4) NOT NULL';
-    if (!Db::getInstance()->execute($sql)) {
-        return false;
+    $alter_stripe_payment_table = true;
+    $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_payment');
+
+    if (!empty($result)) {
+        foreach ($result as $res) {
+            if ($res['Field'] == 'id_account') {
+                $alter_stripe_payment_table = false;
+            }
+        }
+
+        if ($alter_stripe_payment_table === true) {
+            $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment ADD state tinyint(4) NOT NULL';
+            if (!Db::getInstance()->execute($sql)) {
+                return false;
+            }
+        }
     }
+
     return true;
 }

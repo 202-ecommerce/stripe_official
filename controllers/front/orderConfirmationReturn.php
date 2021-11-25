@@ -54,7 +54,12 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
             $payment_intent
         );
 
-        $payment_method = $intent->payment_method_types[0];
+        if (isset($intent->payment_method_details->type))
+            $payment_method =  $intent->payment_method_details->type;
+        elseif (isset($intent->payment_method_types[0]))
+            $payment_method = $intent->payment_method_types[0];
+        else
+            $payment_method = null;
 
         if (Tools::getValue('redirect_status') == 'failed') {
             $url = Context::getContext()->link->getModuleLink(
@@ -64,18 +69,15 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
                 true
             );
         } else {
-            $datas = array(
+            $data = array(
+                'payment_intent' => $payment_intent,
                 'payment_method' => $payment_method
             );
-
-            if ($payment_method == 'oxxo') {
-                $datas['voucher_url'] = $intent->next_action->oxxo_display_details->hosted_voucher_url;
-            }
 
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',
                 'orderSuccess',
-                $datas,
+                $data,
                 true
             );
         }
