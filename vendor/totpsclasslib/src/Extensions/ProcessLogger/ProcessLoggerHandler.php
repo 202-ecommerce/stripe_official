@@ -20,14 +20,15 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger;
 
-use \Db;
-use \Configuration;
-use \Hook;
+use Db;
+use Configuration;
+use Hook;
+use Tools;
 
 class ProcessLoggerHandler
 {
@@ -80,6 +81,7 @@ class ProcessLoggerHandler
             'object_name' => pSQL($objectModel),
             'object_id' => (int)$objectId,
             'date_add' => date("Y-m-d H:i:s"),
+            'id_session' => self::getSessionId(),
         );
 
         if (100 === count(self::$logs)) {
@@ -265,5 +267,23 @@ class ProcessLoggerHandler
         }
         
         return true;
+    }
+
+    protected static function getSessionId()
+    {
+        $values = array();
+        $remoteAddr = Tools::getRemoteAddr();
+        $values[] = $remoteAddr;
+        if (!empty($_SERVER['REQUEST_TIME'])) {
+            $values[] = $_SERVER['REQUEST_TIME'];
+        } elseif (!empty($_SERVER['REQUEST_TIME_FLOAT'])) {
+            $values[] = $_SERVER['REQUEST_TIME_FLOAT'];
+        }
+
+        if (!empty($_SERVER['REMOTE_PORT'])) {
+            $values[] = $_SERVER['REMOTE_PORT'];
+        }
+
+        return sprintf('%08x', abs(crc32(implode('', $values))));
     }
 }

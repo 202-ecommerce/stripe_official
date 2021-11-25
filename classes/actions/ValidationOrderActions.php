@@ -268,14 +268,16 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
-        if (Order::getOrderByCartId((int)$this->conveyor['id_cart'])) {
+        $this->conveyor['isAlreadyOrdered'] = (bool)Order::getOrderByCartId((int)$this->conveyor['id_cart']);
+
+        if ($this->conveyor['isAlreadyOrdered']) {
             ProcessLoggerHandler::logInfo(
                 'Prestashop order has been already created for this cart',
                 null,
                 null,
                 'ValidationOrderActions - createOrder'
             );
-            return false;
+            return true;
         }
 
         if ($this->conveyor['status'] != 'succeeded'
@@ -363,16 +365,6 @@ class ValidationOrderActions extends DefaultActions
             $idOrder = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order($idOrder);
 
-            // Check if order is split
-            $splitOrder = Order::getByReference($order->reference);
-            if ($splitOrder->count() > 1) {
-                $total_paid_real = 0;
-                foreach ($splitOrder->getResults() as $result) {
-                    $total_paid_real += $result->total_paid;
-                }
-                $order->total_paid = $total_paid_real;
-            }
-
             // capture payment for card if no catch and authorize enabled
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
             ProcessLoggerHandler::logInfo(
@@ -392,7 +384,7 @@ class ValidationOrderActions extends DefaultActions
 
                 $currency = new Currency($order->id_currency, $this->context->language->id, $this->context->shop->id);
 
-                $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->total_paid : $order->total_paid * 100;
+                $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->getTotalPaid() : $order->getTotalPaid() * 100;
 
                 if (!$this->module->captureFunds($amount, $this->conveyor['paymentIntent'])) {
                     ProcessLoggerHandler::closeLogger();
@@ -470,17 +462,19 @@ class ValidationOrderActions extends DefaultActions
             $orderId = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
             $order = new Order((int)$orderId);
 
+            if (!isset($this->conveyor['voucher_url']))
+                $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
+            if (!isset($this->conveyor['voucher_expire']))
+                $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
+
             $template_vars = array(
                 '{name}' => $this->conveyor['payment_method']->billing_details->name,
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{order_id}' => $order->id,
-                '{voucher_url}' => $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url,
+                '{voucher_url}' => $this->conveyor['voucher_url'],
                 '{order_ref}' => $order->reference,
                 '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
             );
-
-            $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
-            $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
 
             if ($dir_mail) {
                 Mail::Send(
@@ -587,6 +581,10 @@ class ValidationOrderActions extends DefaultActions
     */
     public function addTentative()
     {
+        if ($this->conveyor['isAlreadyOrdered']) {
+            return true;
+        }
+
         try {
             if ($this->conveyor['datas']['type'] == 'American Express') {
                 $this->conveyor['datas']['type'] = 'amex';
@@ -685,7 +683,7 @@ class ValidationOrderActions extends DefaultActions
         $this->conveyor['IdPaymentIntent'] =
             (isset($this->conveyor['event_json']->data->object->payment_intent))
                 ? $this->conveyor['event_json']->data->object->payment_intent
-                : $this->conveyor['IdPaymentIntent'] = $this->conveyor['event_json']->data->object->id;;
+                : $this->conveyor['event_json']->data->object->id;
         ProcessLoggerHandler::logInfo(
             'chargeWebhook with IdPaymentIntent => ' . $this->conveyor['IdPaymentIntent'],
             null,
@@ -716,7 +714,7 @@ class ValidationOrderActions extends DefaultActions
                     'ValidationOrderActions - chargeWebhook'
                 );
                 ProcessLoggerHandler::closeLogger();
-                http_response_code(400);
+                http_response_code(200);
                 return false;
             }
         }
@@ -763,10 +761,9 @@ class ValidationOrderActions extends DefaultActions
 
         if ($event_type == 'charge.dispute.created') {
             $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
-        } elseif ($event_type == 'charge.expired') {
-            $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-        } elseif ($event_type == 'charge.failed'
-            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+        } elseif (($event_type == 'charge.failed'
+            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT'))
+            || $event_type == 'charge.expired') {
             $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
         } elseif ($event_type == 'charge.succeeded'
             && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
@@ -806,28 +803,40 @@ class ValidationOrderActions extends DefaultActions
 
             $history->addWithemail();
         } elseif ($event_type == 'charge.refunded') {
-            if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
-                || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
-                $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+            if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+                $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
                 ProcessLoggerHandler::logInfo(
-                    'Partial refund of payment => '.$this->conveyor['event_json']->data->object->id,
+                    'Order canceled',
                     null,
                     null,
                     'ValidationOrderActions - chargeWebhook'
                 );
             } else {
-                $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
-                ProcessLoggerHandler::logInfo(
-                    'Full refund of payment => '.$this->conveyor['event_json']->data->object->id,
-                    null,
-                    null,
-                    'ValidationOrderActions - chargeWebhook'
-                );
+                if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
+                    || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
+                    $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+                    ProcessLoggerHandler::logInfo(
+                        'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                        null,
+                        null,
+                        'ValidationOrderActions - chargeWebhook'
+                    );
+                } else {
+                    $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
+                    ProcessLoggerHandler::logInfo(
+                        'Full refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                        null,
+                        null,
+                        'ValidationOrderActions - chargeWebhook'
+                    );
+                }
             }
         }
 
+        $currentOrderState = $order->getCurrentOrderState()->name[(int)Configuration::get('PS_LANG_DEFAULT')];
+
         ProcessLoggerHandler::logInfo(
-            'setCurrentState for '.$event_type,
+            'Set Order State to ' . $currentOrderState . 'for ' . $event_type,
             'Order',
             $id_order,
             'ValidationOrderActions - chargeWebhook'

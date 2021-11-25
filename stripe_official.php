@@ -37,15 +37,15 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 /**
 * Stripe official PrestaShop module main class extends payment class
-* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developped by "202 ecommerce"
-* This library provide utils common features as DB installer, internal logger, chain of resposability design pattern
+* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
+* This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
 *
 * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
 * // use Stripe_officialClasslib\Install\ModuleInstaller;
 * // use Stripe_officialClasslib\Actions\ActionsHandler;
 * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
 *
-* Developpers use declarative method to define objects, parameters, controllers... needed in this module
+* Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
 class Stripe_official extends PaymentModule
@@ -109,6 +109,7 @@ class Stripe_official extends PaymentModule
         'StripeCapture',
         'StripeCustomer',
         'StripeIdempotencyKey',
+        'StripeEvent',
     );
 
     /**
@@ -129,7 +130,16 @@ class Stripe_official extends PaymentModule
                 'fr' => 'Logs',
             ),
             'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'AdminAdvancedParameters',
+            'parent_class_name' => 'stripe_official',
+            'visible' => false,
+        ),
+        array(
+            'name' => array(
+                'en' => 'Paiment Intent List',
+                'fr' => 'Liste des intentions de paiement',
+            ),
+            'class_name' => 'AdminStripe_officialPaymentIntent',
+            'parent_class_name' => 'stripe_official',
             'visible' => false,
         ),
     );
@@ -369,14 +379,14 @@ class Stripe_official extends PaymentModule
     );
 
     public static $webhook_events = array(
-        'charge.expired',
-        'charge.failed',
-        'charge.succeeded',
-        'charge.pending',
-        'charge.captured',
-        'charge.refunded',
-        'charge.dispute.created',
-        'payment_intent.requires_action'
+        \Stripe\Event::CHARGE_EXPIRED,
+        \Stripe\Event::CHARGE_FAILED,
+        \Stripe\Event::CHARGE_SUCCEEDED,
+        \Stripe\Event::CHARGE_PENDING,
+        \Stripe\Event::CHARGE_CAPTURED,
+        \Stripe\Event::CHARGE_REFUNDED,
+        \Stripe\Event::CHARGE_DISPUTE_CREATED,
+        \Stripe\Event::PAYMENT_INTENT_REQUIRES_ACTION,
     );
 
     /* refund */
@@ -481,7 +491,12 @@ class Stripe_official extends PaymentModule
         }
 
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
-        $installer->install();
+
+        if ($installer->install()
+            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
+            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+            Db::getInstance()->execute($sql);
+        }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
@@ -1259,11 +1274,10 @@ class Stripe_official extends PaymentModule
      */
     public static function getShopIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
@@ -1273,11 +1287,10 @@ class Stripe_official extends PaymentModule
      */
     public static function getShopGroupIdContext()
     {
-
         if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
             return Context::getContext()->shop->id_shop_group;
         }
-        return null;
+        return Configuration::get('PS_SHOP_DEFAULT');
     }
 
     /**
@@ -1552,7 +1565,8 @@ class Stripe_official extends PaymentModule
                 $this->name.'-stripe-v3',
                 'https://js.stripe.com/v3/',
                 array(
-                    'server'=>'remote'
+                    'server'=>'remote',
+                    'position' => 'head',
                 )
             );
             $this->context->controller->registerJavascript(
@@ -1657,7 +1671,7 @@ class Stripe_official extends PaymentModule
      */
     public function hookPayment($params)
     {
-        if (!$this->active) {
+        if (!self::isWellConfigured() || !$this->active) {
             return;
         }
 

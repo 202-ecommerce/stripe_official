@@ -292,18 +292,18 @@ $(function(){
           cardFormPayment = false;
         }
 
-        if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
+        /*if (typeof stripe_compliance != 'undefined' && $('#uniform-cgv').find('input#cgv').prop("checked") !== true) {
           var error = { "message" : stripe_message.accept_cgv };
           updateError($submitButtons, error);
           return false;
-        }
+        }*/
       }
 
       // Disable the Pay button to prevent multiple click events.
       disableSubmit(disableText, stripe_message.processing);
       createPaymentIntent(payment, id_payment_method, false);
 
-      if (paymentIntentDatas.intent.status != 'succeeded') {
+      if (paymentIntentDatas && paymentIntentDatas.intent.status != 'succeeded') {
         if (payment === 'card') {
           if (typeof id_payment_method == 'undefined') {
             // card payment via stripe form
@@ -542,11 +542,12 @@ $(function(){
               saveCard = datas.saveCard;
           },
           error: function(err) {
-              console.log(err.responseText);
+            paymentIntentDatas = false;
+            console.log(err.responseText);
               var error = {
                 'message': err.responseText
               }
-              updateError($('#stripe-'+payment+'element'), error);
+              updateError($('#stripe-'+payment+'-element'), error);
           }
       });
     }
@@ -646,7 +647,7 @@ $(function(){
     // Update error message
     function updateError(element, error) {
       const $error = $(".stripe-payment-form:visible .stripe-error-message");
-      var elementError = $(element).siblings('.stripe-error-message');
+      var elementError = $(element).find('.stripe-error-message');
       var disableElement = $(element).siblings('.stripe-submit-button');
       if (error) {
         if (stripe_ps_version == '1.6') {

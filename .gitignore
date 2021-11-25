@@ -1,4 +1,4 @@
-/vendor
+/vendor/*
 !/vendor/totpsclasslib
 /node_modules
 /views/css

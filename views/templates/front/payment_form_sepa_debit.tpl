@@ -24,6 +24,9 @@
 
 <form class="stripe-payment-form" id="stripe-sepa-element" action="">
     <input type="hidden" name="stripe-payment-method" value="sepa_debit">
+    <div class="stripe-error-message alert alert-danger">
+        {if isset($stripeError)}<p>{$stripeError|escape:'htmlall':'UTF-8'}</p>{/if}
+    </div>
 
     {if isset($prestashop_version) && $prestashop_version == '1.7'}
         <div id="stripe-iban-element" class="field"></div>

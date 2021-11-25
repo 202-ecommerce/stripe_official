@@ -51,7 +51,11 @@ class ConfigurationActions extends DefaultActions
             && (($secretKeyTest && $mode) || ($secretKeyLive && !$mode))) {
             $secretKey = $mode ? $secretKeyTest : $secretKeyLive;
             $stripeClient = new \Stripe\StripeClient($secretKey);
-            $stripeClient->webhookEndpoints->delete($webhookId);
+            try {
+                $stripeClient->webhookEndpoints->delete($webhookId);
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                $this->module->errors[] = $e->getMessage();
+            }
             Configuration::updateValue(Stripe_official::WEBHOOK_SIGNATURE, '', false, $shopGroupId, $shopId);
         }
 

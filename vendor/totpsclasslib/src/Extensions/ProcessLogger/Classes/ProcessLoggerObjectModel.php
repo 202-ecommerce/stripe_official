@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger\Classes;
@@ -43,6 +43,11 @@ class ProcessLoggerObjectModel extends ObjectModel
 
     /** @var int|null Identifier of resource announced with ObjectModel if needed */
     public $object_id;
+
+    /**
+     * @var int|null
+     */
+    public $id_session;
 
     /** @var string Date */
     public $date_add;
@@ -77,6 +82,11 @@ class ProcessLoggerObjectModel extends ObjectModel
             'object_id' => array(
                 'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isUnsigned',
+                'allow_null' => true,
+            ),
+            'id_session' => array(
+                'type' => ObjectModel::TYPE_STRING,
+                'validate' => 'isString',
                 'allow_null' => true,
             ),
             'date_add' => array(

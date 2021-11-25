@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin;
@@ -101,6 +101,9 @@ class AdminProcessLoggerController extends \ModuleAdminController
             'object_id'                 => array(
                 'title'    => $this->module->l('Object ID', 'AdminProcessLoggerController'),
                 'callback' => 'getObjectId',
+            ),
+            'id_session' => array(
+                'title' => $this->module->l('Session ID', 'AdminProcessLoggerController'),
             ),
             'date_add'                  => array(
                 'title' => $this->module->l('Date', 'AdminProcessLoggerController'),
@@ -238,7 +241,7 @@ class AdminProcessLoggerController extends \ModuleAdminController
 
     public function saveConfiguration()
     {
-        $shops = Shop::getShops();
+        $shops = \Shop::getShops();
         foreach ($shops as $shop) {
             $extlogs_erasing_daysmax = Tools::getValue('STRIPE_OFFICIAL_EXTLOGS_ERASING_DAYSMAX');
             $extlogs_erasing_disabled = Tools::getValue('STRIPE_OFFICIAL_EXTLOGS_ERASING_DISABLED');

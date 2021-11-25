@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.0
+ * @version   release/2.1.1
  */
 
 namespace Stripe_officialClasslib\Db;
@@ -38,7 +38,7 @@ class ObjectModelDefinition
      * Defaults.
      */
     const CHARSET   = 'utf8';
-    const COLLATION = 'DEFAULT';
+    const COLLATION = 'utf8_general_ci';
     const ENGINE    = _MYSQL_ENGINE_;
     const DB_PREFIX = _DB_PREFIX_;
     /**
@@ -367,11 +367,16 @@ class ObjectModelDefinition
                     );
                     break;
                 case ObjectModel::TYPE_HTML:
-                // TYPE_SQL not supported in PS 1.6.0
-                //case ObjectModel::TYPE_SQL:
+                /* Not compatible with PS 1.6; not very useful anyway...
+                case ObjectModel::TYPE_SQL:
+                 */
                     $length = isset($constraints['size']) ? $constraints['size'] : null;
                     $length = isset($length['max']) ? $length['max'] : $length;
-                    $description .= $length ? "TEXT($length)" : 'TEXT';
+                    if ($length >= 65535) {
+                        $description .= $length ? "TEXT($length)" : 'TEXT';
+                    } else {
+                        $description .= 'MEDIUMTEXT';
+                    }
                     break;
                 case ObjectModel::TYPE_INT:
                     $description .= 'INT(10)'.(

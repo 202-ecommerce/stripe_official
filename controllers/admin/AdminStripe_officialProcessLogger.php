@@ -20,31 +20,13 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.1
+ *
+ * @version   develop
  */
-namespace Stripe_officialClasslib\Extensions\ProcessLogger;
+require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 
-use Stripe_officialClasslib\Extensions\AbstractModuleExtension;
 use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
-use Stripe_officialClasslib\Extensions\ProcessLogger\Classes\ProcessLoggerObjectModel;
 
-class ProcessLoggerExtension extends AbstractModuleExtension
+class AdminStripe_officialProcessLoggerController extends AdminProcessLoggerController
 {
-    public $name = 'process_logger';
-
-    public $extensionAdminControllers = array(
-        array(
-            'name' => array(
-                'en' => 'Logger Stripe_official',
-                'fr' => 'Logger Stripe_official',
-            ),
-            'class_name' => 'AdminStripe_officialProcessLogger',
-            'parent_class_name' => 'stripe_official',
-            'visible' => true,
-        ),
-    );
-
-    public $objectModels = array(
-        ProcessLoggerObjectModel::class
-    );
 }

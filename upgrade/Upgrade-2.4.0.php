@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 2007-2019 PrestaShop
+ * 2007-2021 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -23,10 +24,19 @@
  * @license   Commercial license
  */
 
-require_once dirname(__FILE__) . '/../../vendor/autoload.php';
-use Stripe_officialClasslib\Extensions\ProcessLogger\Controllers\Admin\AdminProcessLoggerController;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
-class AdminStripe_officialProcessLoggerController extends AdminProcessLoggerController
+require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
+
+function upgrade_module_2_4_0($module)
 {
+    $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
 
+    if (!$installer->installObjectModels()) {
+        return false;
+    }
+
+    return true;
 }
