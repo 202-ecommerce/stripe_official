@@ -490,12 +490,32 @@ class Stripe_official extends PaymentModule
             return false;
         }
 
-        $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
+        try {
+            $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
+            $sql = "SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'";
 
-        if ($installer->install()
-            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
-            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
-            Db::getInstance()->execute($sql);
+            if ($installer->install()
+                && !Db::getInstance()->executeS($sql)) {
+                $sql = "SELECT MAX(id_stripe_event) AS id_stripe_event FROM `" . _DB_PREFIX_ . "stripe_event` GROUP BY `id_payment_intent`, `status`";
+                $duplicateRows = Db::getInstance()->executeS($sql);
+
+                $idList = [];
+                foreach ($duplicateRows as $duplicateRow) {
+                    $idList[] = $duplicateRow['id_stripe_event'];
+                }
+
+                if (!empty($idList)) {
+                    $sql = "DELETE FROM `" . _DB_PREFIX_ . "stripe_event` WHERE id_stripe_event NOT IN (" . implode(',', $idList) . ");";
+                    Db::getInstance()->execute($sql);
+                }
+
+                $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+                Db::getInstance()->execute($sql);
+            }
+        } catch (PrestaShopDatabaseException $e) {
+            return false;
+        } catch (PrestaShopException $e) {
+            return false;
         }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
