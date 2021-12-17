@@ -140,7 +140,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 $msg = 'This cart does not come from this shop',
                 'Cart',
                 $cart->id,
-                'ValidationOrderActions - createOrder'
+                'webhook - postProcess'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(200);
@@ -379,7 +379,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $eventStatus = StripeEvent::getStatusAssociatedToChargeType($event->type);
 
         if (!$eventStatus) {
-            $msg = 'Charge event does not need to be processed : '.$event->type;
+            $msg = 'Charge event does not need to be processed : ' . $event->type;
             ProcessLoggerHandler::logInfo(
                 $msg,
                 null,
@@ -412,7 +412,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             $currentEventDate = new DateTime();
             $currentEventDate = $currentEventDate->setTimestamp($event->created);
             if ($lastRegisteredEventDate > $currentEventDate) {
-                $msg = 'This charge event come too late to be processed.';
+                $msg = 'This charge event come too late to be processed [Last event : ' . $lastRegisteredEventDate->format('Y-m-d H:m:s') . ' | Current event : ' . $currentEventDate->format('Y-m-d H:m:s') . '].';
                 ProcessLoggerHandler::logInfo(
                     $msg,
                     null,
@@ -427,7 +427,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
         if ($lastRegisteredEvent->status == $eventStatus) {
             if ($lastRegisteredEvent->isProcessed()) {
-                $msg = 'This Stripe module event "' .$eventStatus.'" has already been processed.';
+                $msg = 'This Stripe module event "' . $eventStatus . '" has already been processed.';
                 ProcessLoggerHandler::logInfo(
                     $msg,
                     'StripeEvent',
@@ -446,6 +446,27 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'webhook - checkEventStatus'
             );
         } elseif (!StripeEvent::validateTransitionStatus($lastRegisteredEvent->status, $eventStatus) || !$lastRegisteredEvent->isProcessed()) {
+            if ($eventStatus === StripeEvent::CAPTURED_STATUS) {
+                if (isset($event->data->object->payment_method_details->type))
+                    $paymentMethodType =  $event->data->object->payment_method_details->type;
+                elseif (isset($event->data->object->payment_method_types[0]))
+                    $paymentMethodType = $event->data->object->payment_method_types[0];
+                else
+                    $paymentMethodType = null;
+
+                if ($paymentMethodType == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) != 'on') {
+                    $msg = 'The card payment amount has already been captured.';
+                    ProcessLoggerHandler::logInfo(
+                        $msg,
+                        null,
+                        null,
+                        'webhook - checkEventStatus'
+                    );
+                    ProcessLoggerHandler::closeLogger();
+                    http_response_code(200);
+                    die($msg);
+                }
+            }
             $msg = 'This Stripe module event "' . $eventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].';
             ProcessLoggerHandler::logInfo(
                 $msg,
