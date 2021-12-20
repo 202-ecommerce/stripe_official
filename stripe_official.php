@@ -578,9 +578,6 @@ class Stripe_official extends PaymentModule
      */
     public function installOrderState()
     {
-        $shopGroupId = Stripe_official::getShopGroupIdContext();
-        $shopId = Stripe_official::getShopIdContext();
-
         if (!Configuration::get(self::OS_SOFORT_WAITING)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
             $order_state = new OrderState();
@@ -614,6 +611,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/cc-sofort.png';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -654,13 +652,14 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#03befc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
         }
 
         /* Create Order State for Stripe */
@@ -697,6 +696,7 @@ class Stripe_official extends PaymentModule
             $order_state->logable = false;
             $order_state->invoice = false;
             $order_state->color = '#fcba03';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -738,6 +738,7 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#e3e1dc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -781,6 +782,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->color = '#C23416';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
