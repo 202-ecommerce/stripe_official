@@ -617,7 +617,8 @@ class ValidationOrderActions extends DefaultActions
 
             // Payment with Sofort is not accepted yet, so we can't get his orderPayment
             if (Tools::strtolower($cardType) != 'sofort'
-                && Tools::strtolower($cardType) != 'sepa_debit') {
+                && Tools::strtolower($cardType) != 'sepa_debit'
+                && Tools::strtolower($cardType) != 'oxxo') {
                 $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
                 $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
