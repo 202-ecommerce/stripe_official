@@ -35,9 +35,11 @@ function upgrade_module_2_4_0($module)
     try {
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
 
-        if ($installer->install()) {
+        if (!$installer->install()) {
             return false;
         }
+
+        return true;
     } catch (PrestaShopDatabaseException $e) {
         return false;
     } catch (PrestaShopException $e) {

@@ -486,16 +486,16 @@ class Stripe_official extends PaymentModule
      */
     public function install()
     {
-        if (!parent::install()) {
-            return false;
-        }
-
         try {
             $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
+
+            if (!$installer->install()) {
+                return false;
+            }
+
             $sql = "SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'";
 
-            if ($installer->install()
-                && !Db::getInstance()->executeS($sql)) {
+            if (!Db::getInstance()->executeS($sql)) {
                 $sql = "SELECT MAX(id_stripe_event) AS id_stripe_event FROM `" . _DB_PREFIX_ . "stripe_event` GROUP BY `id_payment_intent`, `status`";
                 $duplicateRows = Db::getInstance()->executeS($sql);
 
