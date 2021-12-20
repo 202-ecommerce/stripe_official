@@ -1538,17 +1538,24 @@ class Stripe_official extends PaymentModule
             && !empty($order->getHistory($this->context->language->id, Configuration::get(self::CAPTURE_WAITING)))
             && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
             $stripePayment = new StripePayment();
-            $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
-            $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
 
-            if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+            try {
+                $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
+                $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
+
+                if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+                    return false;
+                }
+
+                $stripeCapture = new StripeCapture();
+                $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
+                $stripeCapture->date_authorize = date('Y-m-d H:i:s');
+                $stripeCapture->save();
+            } catch (\Stripe\Exception\UnexpectedValueException $e) {
+                return false;
+            } catch (PrestaShopException $e) {
                 return false;
             }
-
-            $stripeCapture = new StripeCapture();
-            $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
-            $stripeCapture->date_authorize = date('Y-m-d H:i:s');
-            $stripeCapture->save();
         }
 
         return true;
