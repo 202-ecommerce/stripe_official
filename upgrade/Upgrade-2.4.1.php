@@ -43,8 +43,8 @@ function upgrade_module_2_4_1($module)
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
             SELECT *
             FROM `' . _DB_PREFIX_ . 'order_state` os
-            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . (int) Language::getIdByIso('en') . ')
-            WHERE name LIKE "%Sofort%" ORDER BY `name` ASC');
+            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . (int) Configuration::get('PS_LANG_DEFAULT') . ')
+            WHERE name LIKE "%Sofort%"');
 
             if (empty($result[0])) {
                 return false;
