@@ -24,6 +24,8 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -41,15 +43,34 @@ function upgrade_module_2_4_1($module)
             $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
             SELECT *
             FROM `' . _DB_PREFIX_ . 'order_state` os
-            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . Language::getIdByIso('en') . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . (int) Language::getIdByIso('en') . ')
             WHERE name LIKE "%Sofort%" ORDER BY `name` ASC');
+
+            if (empty($result[0])) {
+                return false;
+            }
+
             Configuration::updateValue(stripe_official::OS_SOFORT_WAITING, $result[0]['id_order_state']);
         }
 
         return true;
     } catch (PrestaShopDatabaseException $e) {
+        ProcessLoggerHandler::logError(
+            $e->getMessage(),
+            null,
+            null,
+            'Upgrade 2.4.1'
+        );
+        ProcessLoggerHandler::closeLogger();
         return false;
     } catch (PrestaShopException $e) {
+        ProcessLoggerHandler::logError(
+            $e->getMessage(),
+            null,
+            null,
+            'Upgrade 2.4.1'
+        );
+        ProcessLoggerHandler::closeLogger();
         return false;
     }
 }

@@ -48,6 +48,8 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 * Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class Stripe_official extends PaymentModule
 {
     /**
@@ -499,10 +501,7 @@ class Stripe_official extends PaymentModule
                 $sql = "SELECT MAX(id_stripe_event) AS id_stripe_event FROM `" . _DB_PREFIX_ . "stripe_event` GROUP BY `id_payment_intent`, `status`";
                 $duplicateRows = Db::getInstance()->executeS($sql);
 
-                $idList = [];
-                foreach ($duplicateRows as $duplicateRow) {
-                    $idList[] = $duplicateRow['id_stripe_event'];
-                }
+                $idList = array_column($duplicateRows, 'id_stripe_event');
 
                 if (!empty($idList)) {
                     $sql = "DELETE FROM `" . _DB_PREFIX_ . "stripe_event` WHERE id_stripe_event NOT IN (" . implode(',', $idList) . ");";
@@ -513,8 +512,22 @@ class Stripe_official extends PaymentModule
                 Db::getInstance()->execute($sql);
             }
         } catch (PrestaShopDatabaseException $e) {
+            ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
         } catch (PrestaShopException $e) {
+            ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
         }
 
@@ -1552,8 +1565,22 @@ class Stripe_official extends PaymentModule
                 $stripeCapture->date_authorize = date('Y-m-d H:i:s');
                 $stripeCapture->save();
             } catch (\Stripe\Exception\UnexpectedValueException $e) {
+                ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                ProcessLoggerHandler::closeLogger();
                 return false;
             } catch (PrestaShopException $e) {
+                ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                ProcessLoggerHandler::closeLogger();
                 return false;
             }
         }
