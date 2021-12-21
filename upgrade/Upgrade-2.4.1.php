@@ -24,21 +24,33 @@
  * @license   Commercial license
  */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
-
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
-function upgrade_module_2_4_0($module)
+function upgrade_module_2_4_1($module)
 {
     try {
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
 
         if (!$installer->install()) {
             return false;
+        }
+
+        if (!Validate::isLoadedObject(new OrderState((int) Configuration::get(stripe_official::OS_SOFORT_WAITING)))) {
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            SELECT *
+            FROM `' . _DB_PREFIX_ . 'order_state` os
+            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . (int) Configuration::get('PS_LANG_DEFAULT') . ')
+            WHERE name LIKE "%Sofort%"');
+
+            if (empty($result[0])) {
+                return false;
+            }
+
+            Configuration::updateValue(stripe_official::OS_SOFORT_WAITING, $result[0]['id_order_state']);
         }
 
         return true;

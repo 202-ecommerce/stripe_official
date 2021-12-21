@@ -617,7 +617,8 @@ class ValidationOrderActions extends DefaultActions
 
             // Payment with Sofort is not accepted yet, so we can't get his orderPayment
             if (Tools::strtolower($cardType) != 'sofort'
-                && Tools::strtolower($cardType) != 'sepa_debit') {
+                && Tools::strtolower($cardType) != 'sepa_debit'
+                && Tools::strtolower($cardType) != 'oxxo') {
                 $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
                 $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
@@ -626,7 +627,7 @@ class ValidationOrderActions extends DefaultActions
                         'OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' .$this->conveyor['chargeId'] . ' on payment.',
                         'Order',
                         $orderId,
-                        'validation'
+                        'ValidationOrderActions - addTentative'
                     );
                     $order = new Order($orderId);
                     if (!$order->addOrderPayment($this->conveyor['amount'], null, $this->conveyor['chargeId'])) {
@@ -634,7 +635,7 @@ class ValidationOrderActions extends DefaultActions
                             'PaymentModule::validateOrder - Cannot save Order Payment',
                             'Order',
                             $orderId,
-                            'validation'
+                            'ValidationOrderActions - addTentative'
                         );
                         PrestaShopLogger::addLog(
                             'PaymentModule::validateOrder - Cannot save Order Payment',
@@ -759,84 +760,86 @@ class ValidationOrderActions extends DefaultActions
             'ValidationOrderActions - chargeWebhook'
         );
 
-        if ($event_type == 'charge.dispute.created') {
-            $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
-        } elseif (($event_type == 'charge.failed'
-            && $order->getCurrentState() != Configuration::get('PS_OS_PAYMENT'))
-            || $event_type == 'charge.expired') {
-            $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
-        } elseif ($event_type == 'charge.succeeded'
-            && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
-            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
-            if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {
-                $stripePayment = new StripePayment();
-                $stripePayment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
-                $stripePayment->setIdStripe($this->conveyor['event_json']->data->object->id);
-                $stripePayment->setVoucherValidate(date("Y-m-d H:i:s"));
-                $stripePayment->save();
 
-                ProcessLoggerHandler::logInfo(
-                    'oxxo charge ID => '.$this->conveyor['event_json']->data->object->id,
-                    null,
-                    null,
-                    'ValidationOrderActions - chargeWebhook'
-                );
-            }
-        } elseif ($event_type == 'charge.captured'
-            && $order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
-            $history = new OrderHistory();
-            $history->id_order = (int) $order->id;
-            $history->id_employee = 0;
-            $history->changeIdOrderState((int)Configuration::get('PS_OS_PAYMENT'), (int) $order->id, true);
+        switch($event_type)
+        {
+            case 'charge.succeeded':
+                if ($order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
+                    $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
 
-            $query = new DbQuery();
-            $query->select('invoice_number, invoice_date, delivery_number, delivery_date');
-            $query->from('orders');
-            $query->where('id_order = ' . pSQL($order->id));
-            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
+                    if ($this->conveyor['event_json']->data->object->payment_method_details->type == 'oxxo') {
+                        $stripePayment = new StripePayment();
+                        $stripePayment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
+                        $stripePayment->setIdStripe($this->conveyor['event_json']->data->object->id);
+                        $stripePayment->setVoucherValidate(date("Y-m-d H:i:s"));
+                        $stripePayment->save();
 
-            $order->invoice_date = $res['invoice_date'];
-            $order->invoice_number = $res['invoice_number'];
-            $order->delivery_date = $res['delivery_date'];
-            $order->delivery_number = $res['delivery_number'];
-            $order->update();
+                        ProcessLoggerHandler::logInfo(
+                            'oxxo charge ID => ' . $this->conveyor['event_json']->data->object->id,
+                            null,
+                            null,
+                            'ValidationOrderActions - chargeWebhook'
+                        );
+                    }
+                }
+                break;
 
-            $history->addWithemail();
-        } elseif ($event_type == 'charge.refunded') {
-            if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
-                $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-                ProcessLoggerHandler::logInfo(
-                    'Order canceled',
-                    null,
-                    null,
-                    'ValidationOrderActions - chargeWebhook'
-                );
-            } else {
-                if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
-                    || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
-                    $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+            case 'charge.captured':
+                if ($order->getCurrentState() == Configuration::get('STRIPE_CAPTURE_WAITING')) {
+                    $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                }
+                break;
+
+            case 'charge.refunded':
+                if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+                    $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
                     ProcessLoggerHandler::logInfo(
-                        'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                        'Order canceled',
                         null,
                         null,
                         'ValidationOrderActions - chargeWebhook'
                     );
                 } else {
-                    $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
-                    ProcessLoggerHandler::logInfo(
-                        'Full refund of payment => ' . $this->conveyor['event_json']->data->object->id,
-                        null,
-                        null,
-                        'ValidationOrderActions - chargeWebhook'
-                    );
+                    if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
+                        || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
+                        $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+                        ProcessLoggerHandler::logInfo(
+                            'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                            null,
+                            null,
+                            'ValidationOrderActions - chargeWebhook'
+                        );
+                    } else {
+                        $order->setCurrentState(Configuration::get('PS_OS_REFUND'));
+                        ProcessLoggerHandler::logInfo(
+                            'Full refund of payment => ' . $this->conveyor['event_json']->data->object->id,
+                            null,
+                            null,
+                            'ValidationOrderActions - chargeWebhook'
+                        );
+                    }
                 }
-            }
+                break;
+
+            case 'charge.failed':
+            case 'charge.expired':
+                if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
+                    $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+                }
+                break;
+
+            case 'charge.dispute.created':
+                $order->setCurrentState(Configuration::get(Stripe_official::SEPA_DISPUTE));
+                break;
+
+            default:
+                return true;
         }
 
         $currentOrderState = $order->getCurrentOrderState()->name[(int)Configuration::get('PS_LANG_DEFAULT')];
 
         ProcessLoggerHandler::logInfo(
-            'Set Order State to ' . $currentOrderState . 'for ' . $event_type,
+            'Set Order State to ' . $currentOrderState . ' for ' . $event_type,
             'Order',
             $id_order,
             'ValidationOrderActions - chargeWebhook'

@@ -43,7 +43,7 @@ function upgrade_module_2_3_7($module)
     $os_sofort_waiting = Configuration::get(Stripe_official::OS_SOFORT_WAITING) ?: Configuration::get(Stripe_official::OS_SOFORT_WAITING, null, $shopGroupId, $shopId);
     if ($os_sofort_waiting) {
         Configuration::deleteByName(Stripe_official::OS_SOFORT_WAITING);
-        Configuration::updateValue(Stripe_official::CAPTURE_WAITING, $os_sofort_waiting);
+        Configuration::updateValue(Stripe_official::OS_SOFORT_WAITING, $os_sofort_waiting);
     }
     $capture_waiting = Configuration::get(Stripe_official::CAPTURE_WAITING) ?: Configuration::get(Stripe_official::CAPTURE_WAITING, null, $shopGroupId, $shopId);
     if ($capture_waiting) {

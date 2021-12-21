@@ -48,6 +48,8 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 * Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class Stripe_official extends PaymentModule
 {
     /**
@@ -486,16 +488,47 @@ class Stripe_official extends PaymentModule
      */
     public function install()
     {
-        if (!parent::install()) {
+        try {
+            $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
+
+            if (!$installer->install()) {
+                return false;
+            }
+
+            $sql = "SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'";
+
+            if (!Db::getInstance()->executeS($sql)) {
+                $sql = "SELECT MAX(id_stripe_event) AS id_stripe_event FROM `" . _DB_PREFIX_ . "stripe_event` GROUP BY `id_payment_intent`, `status`";
+                $duplicateRows = Db::getInstance()->executeS($sql);
+
+                $idList = array_column($duplicateRows, 'id_stripe_event');
+
+                if (!empty($idList)) {
+                    $sql = "DELETE FROM `" . _DB_PREFIX_ . "stripe_event` WHERE id_stripe_event NOT IN (" . implode(',', $idList) . ");";
+                    Db::getInstance()->execute($sql);
+                }
+
+                $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+                Db::getInstance()->execute($sql);
+            }
+        } catch (PrestaShopDatabaseException $e) {
+            ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            ProcessLoggerHandler::closeLogger();
             return false;
-        }
-
-        $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
-
-        if ($installer->install()
-            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
-            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
-            Db::getInstance()->execute($sql);
+        } catch (PrestaShopException $e) {
+            ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            ProcessLoggerHandler::closeLogger();
+            return false;
         }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
@@ -558,9 +591,6 @@ class Stripe_official extends PaymentModule
      */
     public function installOrderState()
     {
-        $shopGroupId = Stripe_official::getShopGroupIdContext();
-        $shopId = Stripe_official::getShopIdContext();
-
         if (!Configuration::get(self::OS_SOFORT_WAITING)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
             $order_state = new OrderState();
@@ -594,6 +624,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/cc-sofort.png';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -634,13 +665,14 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#03befc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
         }
 
         /* Create Order State for Stripe */
@@ -677,6 +709,7 @@ class Stripe_official extends PaymentModule
             $order_state->logable = false;
             $order_state->invoice = false;
             $order_state->color = '#fcba03';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -718,6 +751,7 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#e3e1dc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -761,6 +795,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->color = '#C23416';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -1516,17 +1551,38 @@ class Stripe_official extends PaymentModule
             && !empty($order->getHistory($this->context->language->id, Configuration::get(self::CAPTURE_WAITING)))
             && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
             $stripePayment = new StripePayment();
-            $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
-            $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
 
-            if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+            try {
+                $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
+                $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
+
+                if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+                    return false;
+                }
+
+                $stripeCapture = new StripeCapture();
+                $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
+                $stripeCapture->date_authorize = date('Y-m-d H:i:s');
+                $stripeCapture->save();
+            } catch (\Stripe\Exception\UnexpectedValueException $e) {
+                ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                ProcessLoggerHandler::closeLogger();
+                return false;
+            } catch (PrestaShopException $e) {
+                ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                ProcessLoggerHandler::closeLogger();
                 return false;
             }
-
-            $stripeCapture = new StripeCapture();
-            $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
-            $stripeCapture->date_authorize = date('Y-m-d H:i:s');
-            $stripeCapture->save();
         }
 
         return true;
