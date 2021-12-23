@@ -66,7 +66,7 @@ function upgrade_module_2_3_7($module)
     $oxxo_waiting = Configuration::get(Stripe_official::OXXO_WAITING) ?: Configuration::get(Stripe_official::OXXO_WAITING, null, $shopGroupId, $shopId);
     if ($oxxo_waiting) {
         Configuration::deleteByName(Stripe_official::OXXO_WAITING);
-        $orderState = new OrderState($sepa_dispute);
+        $orderState = new OrderState($oxxo_waiting);
         $orderState->logable = false;
         $orderState->save();
         Configuration::updateValue(Stripe_official::OXXO_WAITING, $orderState->id);

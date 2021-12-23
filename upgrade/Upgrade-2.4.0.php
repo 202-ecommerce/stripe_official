@@ -30,8 +30,6 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
 
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 function upgrade_module_2_4_0($module)
 {
     try {
@@ -43,22 +41,22 @@ function upgrade_module_2_4_0($module)
 
         return true;
     } catch (PrestaShopDatabaseException $e) {
-        ProcessLoggerHandler::logError(
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
             $e->getMessage(),
             null,
             null,
-            'Upgrade 2.4.1'
+            'Upgrade 2.4.0'
         );
-        ProcessLoggerHandler::closeLogger();
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
         return false;
     } catch (PrestaShopException $e) {
-        ProcessLoggerHandler::logError(
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
             $e->getMessage(),
             null,
             null,
-            'Upgrade 2.4.1'
+            'Upgrade 2.4.0'
         );
-        ProcessLoggerHandler::closeLogger();
+        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
         return false;
     }
 }
