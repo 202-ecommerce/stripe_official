@@ -47,37 +47,46 @@ function upgrade_module_2_4_1($module)
         if (!empty($result)) {
             $order_state_to_delete = array_column($result, 'id_order_state');
 
-            if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('DELETE FROM `' . _DB_PREFIX_ . 'order_state` WHERE id_order_state IN (' . implode(',', $order_state_to_delete) . ');')) {
-                return false;
+            foreach ($order_state_to_delete as $id) {
+                $order_state = new OrderState((int) $id);
+                $order_state->delete();
             }
         }
 
         if (Configuration::get(Stripe_official::OXXO_WAITING) == Configuration::get(Stripe_official::SEPA_DISPUTE)) {
             $stripe_order_states = [
-                ['name' => 'sofort', 'color' => '#4169E1', 'config' => stripe_official::OS_SOFORT_WAITING],
-                ['name' => 'stripe', 'color' => '#03befc', 'config' => stripe_official::CAPTURE_WAITING],
-                ['name' => 'sepa', 'color' => '#fcba03', 'config' => stripe_official::SEPA_WAITING],
-                ['name' => 'sepa', 'color' => '#e3e1dc', 'config' => stripe_official::SEPA_DISPUTE],
-                ['name' => 'oxxo', 'color' => '#C23416', 'config' => stripe_official::OXXO_WAITING],
+                ['sofort', '#4169E1', stripe_official::OS_SOFORT_WAITING],
+                ['stripe', '#03befc', stripe_official::CAPTURE_WAITING],
+                ['sepa', '#fcba03', stripe_official::SEPA_WAITING],
+                ['sepa', '#e3e1dc', stripe_official::SEPA_DISPUTE],
+                ['oxxo', '#C23416', stripe_official::OXXO_WAITING],
             ];
 
-            $order_state_to_affect = array_map(
-                'cleanStripeOrderState',
-                array_column($stripe_order_states, 'name'),
-                array_column($stripe_order_states, 'color')
-            );
+            foreach ($stripe_order_states as list($name, $color, $config)) {
+                $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+                    'SELECT os.id_order_state FROM `' . _DB_PREFIX_ . 'order_state` os
+                    INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.id_order_state = osl.id_order_state)
+                    WHERE osl.name LIKE "%' . pSQL($name) . '%" AND os.color = "' . pSQL($color) . '" GROUP BY os.id_order_state ORDER BY os.id_order_state DESC;');
 
-            for ($i = 0; $i < 5; $i++) {
-                if (!$order_state_to_affect[$i]) {
-                    return false;
+                if (empty($result)) {
+                    break;
                 }
 
-                $order_state = new OrderState($order_state_to_affect[$i]);
-                $order_state->unremovable = true;
-                $order_state->module_name = $module->name;
-                $order_state->save();
+                $order_state_ids = array_column($result, 'id_order_state');
 
-                Configuration::updateValue($stripe_order_states[$i]['config'], $order_state->id);
+                foreach ($order_state_ids as $key => $order_state_id) {
+                    $order_state = new OrderState((int) $order_state_id);
+
+                    if ($key > 0) {
+                        $order_state->delete();
+                    } else {
+                        $order_state->unremovable = true;
+                        $order_state->module_name = 'stripe_official';
+                        $order_state->save();
+
+                        Configuration::updateValue($config, $order_state->id);
+                    }
+                }
             }
         }
 
@@ -101,32 +110,4 @@ function upgrade_module_2_4_1($module)
         Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
         return false;
     }
-}
-
-/**
- * @throws PrestaShopDatabaseException
- */
-function cleanStripeOrderState($name, $color)
-{
-    $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-        'SELECT os.id_order_state FROM `' . _DB_PREFIX_ . 'order_state` os
-            INNER JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.id_order_state = osl.id_order_state)
-            WHERE osl.name LIKE "%' . $name . '%" AND os.color = "' . $color . '" GROUP BY os.id_order_state ORDER BY os.id_order_state DESC;');
-
-    $order_state_ids = array_column($result, 'id_order_state');
-
-    $order_state_id = $order_state_ids[0];
-
-    if (count($order_state_ids) > 1) {
-        unset($order_state_ids[0]);
-
-        $order_state_to_clean = implode(',', $order_state_ids);
-
-        if (!Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('UPDATE `' . _DB_PREFIX_ . 'order_history` SET id_order_state = ' . $order_state_id . ' WHERE id_order_state IN (' . $order_state_to_clean . ');')
-            || !Db::getInstance(_PS_USE_SQL_SLAVE_)->execute('DELETE FROM `' . _DB_PREFIX_ . 'order_state` WHERE id_order_state IN (' . $order_state_to_clean . ');')) {
-            return false;
-        }
-    }
-
-    return $order_state_id;
 }
