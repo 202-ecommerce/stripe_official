@@ -41,22 +41,8 @@ function upgrade_module_2_4_0($module)
 
         return true;
     } catch (PrestaShopDatabaseException $e) {
-        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
-            $e->getMessage(),
-            null,
-            null,
-            'Upgrade 2.4.0'
-        );
-        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
         return false;
     } catch (PrestaShopException $e) {
-        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
-            $e->getMessage(),
-            null,
-            null,
-            'Upgrade 2.4.0'
-        );
-        Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
         return false;
     }
 }
