@@ -48,8 +48,6 @@ require_once dirname(__FILE__) . '/vendor/autoload.php';
 * Developers use declarative method to define objects, parameters, controllers... needed in this module
 */
 
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 class Stripe_official extends PaymentModule
 {
     /**
@@ -489,6 +487,10 @@ class Stripe_official extends PaymentModule
     public function install()
     {
         try {
+            if (!parent::install()) {
+                return false;
+            }
+
             $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
 
             if (!$installer->install()) {
@@ -511,51 +513,51 @@ class Stripe_official extends PaymentModule
                 $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
                 Db::getInstance()->execute($sql);
             }
+
+            $shopGroupId = Stripe_official::getShopGroupIdContext();
+            $shopId = Stripe_official::getShopIdContext();
+
+            // preset default values
+            if (!Configuration::updateValue(self::MODE, 1, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::REFUND_MODE, 1, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_IDEAL, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_SOFORT, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_GIROPAY, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_FPX, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_EPS, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_P24, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_SEPA, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_ALIPAY, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_OXXO, 0, false, $shopGroupId, $shopId)) {
+                return false;
+            }
+
+            if (!$this->installOrderState()) {
+                return false;
+            }
+
+            return true;
         } catch (PrestaShopDatabaseException $e) {
-            ProcessLoggerHandler::logError(
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                 $e->getMessage(),
                 null,
                 null,
                 'Stripe_official - install'
             );
-            ProcessLoggerHandler::closeLogger();
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return false;
         } catch (PrestaShopException $e) {
-            ProcessLoggerHandler::logError(
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                 $e->getMessage(),
                 null,
                 null,
                 'Stripe_official - install'
             );
-            ProcessLoggerHandler::closeLogger();
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return false;
         }
-
-        $shopGroupId = Stripe_official::getShopGroupIdContext();
-        $shopId = Stripe_official::getShopIdContext();
-
-        // preset default values
-        if (!Configuration::updateValue(self::MODE, 1, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::REFUND_MODE, 1, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_IDEAL, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_SOFORT, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_GIROPAY, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_FPX, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_EPS, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_P24, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_SEPA, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_OXXO, 0, false, $shopGroupId, $shopId)) {
-                 return false;
-        }
-
-        if (!$this->installOrderState()) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -1565,22 +1567,22 @@ class Stripe_official extends PaymentModule
                 $stripeCapture->date_authorize = date('Y-m-d H:i:s');
                 $stripeCapture->save();
             } catch (\Stripe\Exception\UnexpectedValueException $e) {
-                ProcessLoggerHandler::logError(
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                     $e->getMessage(),
                     null,
                     null,
                     'Stripe_official - hookActionOrderStatusUpdate'
                 );
-                ProcessLoggerHandler::closeLogger();
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 return false;
             } catch (PrestaShopException $e) {
-                ProcessLoggerHandler::logError(
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                     $e->getMessage(),
                     null,
                     null,
                     'Stripe_official - hookActionOrderStatusUpdate'
                 );
-                ProcessLoggerHandler::closeLogger();
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 return false;
             }
         }

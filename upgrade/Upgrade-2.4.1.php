@@ -35,42 +35,14 @@ function upgrade_module_2_4_1($module)
     try {
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
 
-        if (!$installer->install()) {
+        if (!$installer->installExtension(Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension::class)) {
             return false;
-        }
-
-        if (!Validate::isLoadedObject(new OrderState((int) Configuration::get(stripe_official::OS_SOFORT_WAITING)))) {
-            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-            SELECT *
-            FROM `' . _DB_PREFIX_ . 'order_state` os
-            LEFT JOIN `' . _DB_PREFIX_ . 'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = ' . (int) Configuration::get('PS_LANG_DEFAULT') . ')
-            WHERE name LIKE "%Sofort%"');
-
-            if (empty($result[0])) {
-                return false;
-            }
-
-            Configuration::updateValue(stripe_official::OS_SOFORT_WAITING, $result[0]['id_order_state']);
         }
 
         return true;
     } catch (PrestaShopDatabaseException $e) {
-        ProcessLoggerHandler::logError(
-            $e->getMessage(),
-            null,
-            null,
-            'Upgrade 2.4.1'
-        );
-        ProcessLoggerHandler::closeLogger();
         return false;
     } catch (PrestaShopException $e) {
-        ProcessLoggerHandler::logError(
-            $e->getMessage(),
-            null,
-            null,
-            'Upgrade 2.4.1'
-        );
-        ProcessLoggerHandler::closeLogger();
         return false;
     }
 }
