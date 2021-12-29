@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.1
+ * @version   release/2.3.1
  */
 
 namespace Stripe_officialClasslib\Db;
@@ -67,8 +67,7 @@ class DbSchema
             ->setKeysSimple($this->def->getKeysSimple($this->id))
             ->setKeysUnique($this->def->getKeysUnique($this->id))
             ->setKeysFulltext($this->def->getKeysFulltext($this->id))
-            // @todo: fix foreign key with lang table not InnoDb
-            //->setKeysForeign($this->def->getKeysForeign($this->id))
+            ->setKeysForeign($this->def->getKeysForeign($this->id))
             ;
     }
 }

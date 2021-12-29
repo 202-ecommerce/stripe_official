@@ -31,6 +31,18 @@ class ExtensionInstaller extends AbstractInstaller
         $this->extension = $extension;
     }
 
+    public function install()
+    {
+        return parent::install() && $this->extension->install();
+    }
+
+    public function uninstall()
+    {
+        return parent::uninstall() && $this->extension->uninstall();
+    }
+
+
+
 
     //region Get-Set
 
