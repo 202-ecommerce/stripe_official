@@ -514,29 +514,30 @@ class ValidationOrderActions extends DefaultActions
                 return true;
             }
 
+            $cartCustomer = new Customer($this->conveyor['cart']->id_customer);
+
             $stripeAccount = \Stripe\Account::retrieve();
 
             $stripeCustomer = new StripeCustomer();
-            $stripeCustomer = $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
+            $stripeCustomer = $stripeCustomer->getCustomerById($cartCustomer->id, $stripeAccount->id);
 
-            if ($stripeCustomer->id == null) {
+            if (empty($stripeCustomer->id)) {
                 $customer = \Stripe\Customer::create([
                     'description' => 'Customer created from Prestashop Stripe module',
-                    'email' => $this->context->customer->email,
-                    'name' => $this->context->customer->firstname.' '.$this->context->customer->lastname,
+                    'email' => $cartCustomer->email,
+                    'name' => $cartCustomer->firstname.' '.$cartCustomer->lastname,
                 ]);
 
-                $stripeCustomer->id_customer = $this->context->customer->id;
+                $stripeCustomer->id_customer = $cartCustomer->id;
                 $stripeCustomer->stripe_customer_key = $customer->id;
                 $stripeCustomer->id_account = $stripeAccount->id;
                 $stripeCustomer->save();
             }
 
-            $customer = \Stripe\Customer::retrieve($stripeCustomer->stripe_customer_key);
-
             $stripeCard = new StripeCard();
-            $stripeCard->stripe_customer_key = $customer->id;
+            $stripeCard->stripe_customer_key = $stripeCustomer->stripe_customer_key;
             $stripeCard->payment_method = $this->conveyor['token'];
+
             if (!$stripeCard->save()) {
                 ProcessLoggerHandler::logError(
                     'Error during save card, card has not been registered',
