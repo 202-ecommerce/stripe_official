@@ -30,30 +30,30 @@ if (!defined('_PS_VERSION_')) {
 require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 /**
-* Stripe object model
-*/
+ * Stripe object model
+ */
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 /**
-* Stripe official PrestaShop module main class extends payment class
-* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
-* This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
-*
-* To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
-* // use Stripe_officialClasslib\Install\ModuleInstaller;
-* // use Stripe_officialClasslib\Actions\ActionsHandler;
-* // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
-*
-* Developers use declarative method to define objects, parameters, controllers... needed in this module
-*/
+ * Stripe official PrestaShop module main class extends payment class
+ * Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
+ * This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
+ *
+ * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
+ * // use Stripe_officialClasslib\Install\ModuleInstaller;
+ * // use Stripe_officialClasslib\Actions\ActionsHandler;
+ * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
+ *
+ * Developers use declarative method to define objects, parameters, controllers... needed in this module
+ */
 
 class Stripe_official extends PaymentModule
 {
     /**
-    * Stripe Prestashop configuration
-    * use Configuration::get(Stripe_official::CONST_NAME) to return a value
-    */
+     * Stripe Prestashop configuration
+     * use Configuration::get(Stripe_official::CONST_NAME) to return a value
+     */
     const KEY = 'STRIPE_KEY';
     const TEST_KEY = 'STRIPE_TEST_KEY';
     const PUBLISHABLE = 'STRIPE_PUBLISHABLE';
@@ -113,16 +113,16 @@ class Stripe_official extends PaymentModule
     );
 
     /**
-    * List of _202 classlib_ extentions
-    * @var array
-    */
+     * List of _202 classlib_ extentions
+     * @var array
+     */
     public $extensions = array(
         Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension::class,
     );
 
     /**
-    * To be retrocompatible with PS 1.7, admin tab (controllers) are defined in moduleAdminControllers
-    */
+     * To be retrocompatible with PS 1.7, admin tab (controllers) are defined in moduleAdminControllers
+     */
     public $moduleAdminControllers = array(
         array(
             'name' => array(
@@ -148,17 +148,17 @@ class Stripe_official extends PaymentModule
      * List of ModuleFrontController used in this Module
      * Module::install() register it, after that you can edit it in BO (for rewrite if needed)
      * @var array
-      */
+     */
     public $controllers = array(
         'orderFailure',
         'stripeCards',
     );
 
     /**
-    * List of hooks needed in this module
-    * _202 classlib_ extentions will plugged automatically hooks
-    * @var array
-    */
+     * List of hooks needed in this module
+     * _202 classlib_ extentions will plugged automatically hooks
+     * @var array
+     */
     public $hooks = array(
         'header',
         'orderConfirmation',
@@ -857,9 +857,9 @@ class Stripe_official extends PaymentModule
         if (Tools::isSubmit('submit_login')) {
             $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
             $handler->setConveyor(array(
-                        'context' => $this->context,
-                        'module' => $this
-                    ));
+                'context' => $this->context,
+                'module' => $this
+            ));
 
             $handler->addActions(
                 'registerKeys',
@@ -1118,7 +1118,7 @@ class Stripe_official extends PaymentModule
             } else {
                 \Stripe\Stripe::setApiKey($secret_key);
                 \Stripe\ApplePayDomain::create(array(
-                  'domain_name' => $this->context->shop->domain
+                    'domain_name' => $this->context->shop->domain
                 ));
 
                 $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
@@ -1605,11 +1605,14 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        $currency = $this->context->currency->iso_code;
-        $address = new Address($this->context->cart->id_address_invoice);
-        $amount = $this->context->cart->getOrderTotal();
+        $cart = $this->context->cart;
+
+        $address = new Address($cart->id_address_invoice);
+        $currency = new Currency($cart->id_currency);
+        $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+        $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
+        $amount = Tools::ps_round($amount);
 
         if ($amount == 0) {
             return;
@@ -1744,12 +1747,13 @@ class Stripe_official extends PaymentModule
 
         // The hookHeader isn't triggered when updating the cart or the carrier
         // on PS1.6 with OPC; so we need to update the PaymentIntent here
-        $currency = new Currency($params['cart']->id_currency);
-        $currency_iso_code = Tools::strtolower($currency->iso_code);
-        $address = new Address($params['cart']->id_address_invoice);
-        $amount = $this->context->cart->getOrderTotal();
+        $cart = $params['cart'];
+        $address = new Address($cart->id_address_invoice);
+        $currency = new Currency($cart->id_currency);
+        $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
-        $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
+        $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
+        $amount = Tools::ps_round($amount);
 
         if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
@@ -1794,6 +1798,7 @@ class Stripe_official extends PaymentModule
             }
 
             // Check for currency support
+            $currency_iso_code = Tools::strtolower($currency->iso_code);
             if (isset($paymentMethod['currencies']) && !in_array($currency_iso_code, $paymentMethod['currencies'])) {
                 continue;
             }
@@ -1867,7 +1872,7 @@ class Stripe_official extends PaymentModule
 
     /**
      * Hook Stripe Payment for PS 1.7
-    */
+     */
     public function hookPaymentOptions($params)
     {
         if (!self::isWellConfigured() || !$this->active) {
@@ -1936,9 +1941,9 @@ class Stripe_official extends PaymentModule
             // The customer can potientially use this payment method
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
-            ->setModuleName($this->name)
-            //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
-            ->setCallToActionText($this->button_label[$name]);
+                ->setModuleName($this->name)
+                //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
+                ->setCallToActionText($this->button_label[$name]);
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], array('redirect', 'receiver'))) {
@@ -1989,8 +1994,8 @@ class Stripe_official extends PaymentModule
 
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
-            ->setModuleName($this->name)
-            ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+                ->setModuleName($this->name)
+                ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
 
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id
