@@ -530,12 +530,10 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         else
             $paymentMethodType = null;
 
-        if (($eventType == 'charge.succeeded'
-                && $paymentMethodType == 'card')
-            || ($eventType == 'charge.pending'
-                && $paymentMethodType == 'sepa_debit')
-            || ($eventType == 'payment_intent.requires_action'
-                && $paymentMethodType == 'oxxo')) {
+        if (($eventType == 'charge.succeeded' && $paymentMethodType == 'card')
+            || ($eventType == 'charge.pending' && $paymentMethodType == 'sepa_debit')
+            || ($eventType == 'payment_intent.requires_action' && $paymentMethodType == 'oxxo')
+        ) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow without redirection',
                 null,
@@ -550,11 +548,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'saveCard',
                 'addTentative'
             );
-        } elseif (($eventType == 'charge.succeeded'
-                && $paymentMethodType != 'sofort'
-                && Stripe_official::$paymentMethods[$paymentMethodType]['flow'] == 'redirect')
-            || ($eventType == 'charge.pending'
-                && $paymentMethodType == 'sofort')) {
+        } elseif (($eventType == 'charge.pending' && $paymentMethodType == 'sofort')
+            || (($eventType == 'charge.succeeded' || $eventType == 'payment_intent.requires_action') && $paymentMethodType != 'sofort')
+        ) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow with redirection',
                 null,
