@@ -1116,23 +1116,27 @@ class Stripe_official extends PaymentModule
             if (!$this->copyAppleDomainFile()) {
                 $this->warning[] = $this->l('Your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
             } else {
-                \Stripe\Stripe::setApiKey($secret_key);
-                \Stripe\ApplePayDomain::create(array(
-                    'domain_name' => $this->context->shop->domain
-                ));
+                try {
+                    \Stripe\Stripe::setApiKey($secret_key);
+                    \Stripe\ApplePayDomain::create(array(
+                        'domain_name' => $this->context->shop->domain
+                    ));
 
-                $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
-                curl_setopt($curl, CURLOPT_FAILONERROR, true);
-                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                $result = curl_exec($curl);
-                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                curl_close($curl);
+                    $curl = curl_init(Tools::getShopDomainSsl(true, true) . '/.well-known/apple-developer-merchantid-domain-association');
+                    curl_setopt($curl, CURLOPT_FAILONERROR, true);
+                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                    $result = curl_exec($curl);
+                    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    curl_close($curl);
 
-                if ($httpcode != 200 || !$result) {
-                    $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                    if ($httpcode != 200 || !$result) {
+                        $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                    }
+                } catch (\Stripe\Exception\ApiErrorException $e) {
+                    $this->warning[] = $e->getMessage();
                 }
             }
         }
