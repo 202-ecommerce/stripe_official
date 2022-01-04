@@ -510,7 +510,7 @@ class ValidationOrderActions extends DefaultActions
     public function saveCard()
     {
         try {
-            if ($this->conveyor['saveCard'] == null) {
+            if (empty($this->conveyor['saveCard']) === true || empty($this->conveyor['cart']->id_customer) === true) {
                 return true;
             }
 
@@ -521,7 +521,7 @@ class ValidationOrderActions extends DefaultActions
             $stripeCustomer = new StripeCustomer();
             $stripeCustomer = $stripeCustomer->getCustomerById($cartCustomer->id, $stripeAccount->id);
 
-            if (empty($stripeCustomer->id)) {
+            if (empty($stripeCustomer->id) === true) {
                 $customer = \Stripe\Customer::create([
                     'description' => 'Customer created from Prestashop Stripe module',
                     'email' => $cartCustomer->email,
