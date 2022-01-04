@@ -1616,7 +1616,6 @@ class Stripe_official extends PaymentModule
         $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
-        $amount = Tools::ps_round($amount);
 
         if ($amount == 0) {
             return;
@@ -1757,7 +1756,6 @@ class Stripe_official extends PaymentModule
         $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
-        $amount = Tools::ps_round($amount);
 
         if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
