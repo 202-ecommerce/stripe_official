@@ -125,23 +125,21 @@ class StripeIdempotencyKey extends ObjectModel
      * @throws PrestaShopException
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function createNewOne($id_cart, $datasIntent)
+    public function createNewOne($id_cart, $intentData)
     {
         $idempotency_key = $id_cart.'_'.uniqid();
 
         $intent = \Stripe\PaymentIntent::create(
-            $datasIntent,
+            $intentData,
             [
               'idempotency_key' => $idempotency_key
             ]
         );
 
-        $stripeIdempotencyKey = new StripeIdempotencyKey();
-        $stripeIdempotencyKey->getByIdCart($id_cart);
-        $stripeIdempotencyKey->id_cart = $id_cart;
-        $stripeIdempotencyKey->idempotency_key = $idempotency_key;
-        $stripeIdempotencyKey->id_payment_intent = $intent->id;
-        $stripeIdempotencyKey->save();
+        $this->id_cart = $id_cart;
+        $this->idempotency_key = $idempotency_key;
+        $this->id_payment_intent = $intent->id;
+        $this->save();
 
         $paymentIntent = new StripePaymentIntent();
         $paymentIntent->setIdPaymentIntent($intent->id);
@@ -150,6 +148,25 @@ class StripeIdempotencyKey extends ObjectModel
         $paymentIntent->setCurrency($intent->currency);
         $paymentIntent->setDateAdd(date("Y-m-d H:i:s", $intent->created));
         $paymentIntent->setDateUpd(date("Y-m-d H:i:s", $intent->created));
+        $paymentIntent->save(false, false);
+
+        return $intent;
+    }
+
+    /**
+     * @throws \Stripe\Exception\ApiErrorException
+     * @throws PrestaShopException
+     */
+    public function updateIntentData($intentData)
+    {
+        $intent = \Stripe\PaymentIntent::update($this->id_payment_intent, $intentData);
+
+        $paymentIntent = new StripePaymentIntent();
+        $paymentIntent->findByIdPaymentIntent($this->id_payment_intent);
+        $paymentIntent->setStatus($intent->status);
+        $paymentIntent->setAmount($intent->amount);
+        $paymentIntent->setCurrency($intent->currency);
+        $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
         $paymentIntent->save(false, false);
 
         return $intent;
