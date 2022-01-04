@@ -125,12 +125,12 @@ class StripeIdempotencyKey extends ObjectModel
      * @throws PrestaShopException
      * @throws \Stripe\Exception\ApiErrorException
      */
-    public function createNewOne($id_cart, $intentData)
+    public function createNewOne($id_cart, $datasIntent)
     {
         $idempotency_key = $id_cart.'_'.uniqid();
 
         $intent = \Stripe\PaymentIntent::create(
-            $intentData,
+            $datasIntent,
             [
               'idempotency_key' => $idempotency_key
             ]

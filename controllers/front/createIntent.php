@@ -221,8 +221,15 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
     private function createIdempotencyKey($intentData)
     {
         try {
+            $cart = $this->context->cart;
             $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $intent = $stripeIdempotencyKey->createNewOne($this->context->cart->id, $intentData);
+            $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
+
+            if (empty($stripeIdempotencyKey->id) === true) {
+                $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
+            } else {
+                $intent = $stripeIdempotencyKey->updateIntentData($intentData);
+            }
 
             ProcessLoggerHandler::logInfo(
                 'Intent => '.$intent,
