@@ -25,17 +25,18 @@
 
 namespace Stripe_officialClasslib\Utils\Translate;
 
-use \Translate;
+use Translate;
 
 trait TranslateTrait
 {
-
     /**
      * Translation method for classes that use this trait
-     * @param $textToTranslate
+     *
+     * @param string $textToTranslate
      * @param string $class
      * @param bool $addslashes
      * @param bool $htmlentities
+     *
      * @return mixed
      */
     protected function l($textToTranslate, $class = '', $addslashes = false, $htmlentities = true)
@@ -43,11 +44,13 @@ trait TranslateTrait
         if (empty($class) === true) {
             $class = $this->getClassShortName();
         }
-        return Translate::getModuleTranslation('tomrewardseditor', $textToTranslate, $class);
+
+        return Translate::getModuleTranslation('stripe_official', $textToTranslate, $class);
     }
 
     /**
      * @return string
+     *
      * @throws \ReflectionException
      */
     protected function getClassShortName()
