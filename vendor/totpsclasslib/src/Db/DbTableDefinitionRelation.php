@@ -20,13 +20,12 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.1
+ * @version   release/2.3.1
  */
 
 namespace Stripe_officialClasslib\Db;
 
 use Stripe_officialClasslib\Db\ObjectModelDefinition;
-use Stripe_officialClasslib\Db\DbTableDefinitionRelation;
 
 use \ObjectModel;
 
@@ -196,8 +195,8 @@ class DbTableDefinitionRelation
     public function getKeysSimple()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_LANG:
+            case self::ID_SHOP:
                 return array();
             default:
                 return array_filter(
@@ -216,8 +215,8 @@ class DbTableDefinitionRelation
     public function getKeysUnique()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_LANG:
+            case self::ID_SHOP:
                 return array();
             default:
                 return array_filter(
@@ -236,8 +235,8 @@ class DbTableDefinitionRelation
     public function getKeysFulltext()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_LANG:
+            case self::ID_SHOP:
                 return array();
             default:
                 return array_filter(
@@ -256,8 +255,8 @@ class DbTableDefinitionRelation
     public function getType()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_LANG:
+            case self::ID_SHOP:
                 return ObjectModel::HAS_MANY;
             default:
                 return (int)$this->get('type');
@@ -305,8 +304,8 @@ class DbTableDefinitionRelation
     protected function getFieldsCommon()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_LANG:
+            case self::ID_SHOP:
                 return array_filter(
                     $this->def->get('fields'),
                     array(
@@ -327,9 +326,9 @@ class DbTableDefinitionRelation
     protected function getForeignTable()
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
+            case self::ID_LANG:
                 return _DB_PREFIX_ . 'lang';
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_SHOP:
                 return _DB_PREFIX_ . 'shop';
             default:
                 return _DB_PREFIX_ . $this->getForeignModelTableName();
@@ -358,7 +357,7 @@ class DbTableDefinitionRelation
     protected function hasMany($relation)
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
+            case self::ID_LANG:
                 return !empty($this->def->get("multilang_$relation"));
             default:
                 return !empty($this->get("multi$relation"));
@@ -374,9 +373,9 @@ class DbTableDefinitionRelation
     protected function hasField($field, $name)
     {
         switch ($this->id) {
-            case DbTableDefinitionRelation::ID_LANG:
+            case self::ID_LANG:
                 return !empty($field['lang']);
-            case DbTableDefinitionRelation::ID_SHOP:
+            case self::ID_SHOP:
                 return !empty($field['shop']);
             default:
                 return isset($this->get('fields')[$name]);

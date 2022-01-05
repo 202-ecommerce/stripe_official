@@ -36,10 +36,18 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
     {
         parent::initContent();
 
-        $payment_intent = Tools::getValue('payment_intent');
-        $payment_method = Tools::getValue('payment_method');
+        $intent = $this->retrievePaymentIntent();
 
+        if ($this->registerStripeEvent($intent))
+            $this->handleWebhookActions($intent);
+
+        $this->displayOrderConfirmation($intent->id);
+    }
+
+    private function retrievePaymentIntent()
+    {
         try {
+            $payment_intent = Tools::getValue('payment_intent');
             $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
         } catch (\Stripe\Exception\ApiErrorException $e) {
             $intent = null;
@@ -47,7 +55,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'Retrieve payment intent : ' . $e->getMessage(),
                 null,
                 null,
-                'orderSuccess - registerStripeEvent'
+                'orderSuccess - retrievePaymentIntent'
             );
         }
 
@@ -55,76 +63,13 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             'Retrieve payment intent : '.$intent,
             null,
             null,
-            'orderSuccess - registerStripeEvent'
+            'orderSuccess - retrievePaymentIntent'
         );
 
-        if ($this->registerStripeEvent($intent)) {
-
-            $conveyorData = [
-                'module' => $this->module,
-                'context' => $this->context,
-                'paymentIntent' => $payment_intent,
-            ];
-
-            if ($payment_method == 'oxxo') {
-                $conveyorData['voucher_url'] = $intent->next_action->oxxo_display_details->hosted_voucher_url;
-                $conveyorData['voucher_expire'] = $intent->next_action->oxxo_display_details->expires_after;
-            }
-
-            $handler = new ActionsHandler();
-            $handler->setConveyor($conveyorData);
-
-            if ($payment_method == 'card'
-                || $payment_method == 'sepa_debit'
-                || $payment_method == 'oxxo') {
-                ProcessLoggerHandler::logInfo(
-                    'Payment method flow without redirection',
-                    null,
-                    null,
-                    'orderSuccess - initContent'
-                );
-                $handler->addActions(
-                    'prepareFlowNone',
-                    'updatePaymentIntent',
-                    'createOrder',
-                    'sendMail',
-                    'saveCard',
-                    'addTentative'
-                );
-            } elseif ($payment_method == 'sofort'
-                || $payment_method == 'fpx'
-                || $payment_method == 'giropay') {
-                ProcessLoggerHandler::logInfo(
-                    'Payment method flow with redirection',
-                    null,
-                    null,
-                    'orderSuccess - initContent'
-                );
-                $handler->addActions(
-                    'prepareFlowRedirectPaymentIntent',
-                    'updatePaymentIntent',
-                    'createOrder',
-                    'sendMail',
-                    'saveCard',
-                    'addTentative'
-                );
-            }
-
-            if (!$handler->process('ValidationOrder')) {
-                // Handle error
-                ProcessLoggerHandler::logError(
-                    'Order creation process disrupted.',
-                    null,
-                    null,
-                    'orderSuccess - initContent'
-                );
-            }
-        }
-
-        $this->displayOrderConfirmation($intent->id);
+        return $intent;
     }
 
-    private function registerStripeEvent($paymentIntent)
+    private function checkEventStatus($paymentIntent)
     {
         $eventCharge = isset($paymentIntent->charges->data[0]) ? $paymentIntent->charges->data[0] : $paymentIntent;
 
@@ -135,7 +80,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'Charge event does not need to be processed : '.$eventCharge->status,
                 null,
                 null,
-                'webhook - checkEventStatus'
+                'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
             return false;
@@ -148,7 +93,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             'Last registered event => ID : ' . $lastRegisteredEvent->id,
             null,
             null,
-            'orderSuccess - registerStripeEvent'
+            'orderSuccess - checkEventStatus'
         );
 
         if ($lastRegisteredEvent->date_add != null) {
@@ -160,7 +105,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'This charge event come too late to be processed [Last event : ' . $lastRegisteredEventDate->format('Y-m-d H:m:s') . ' | Current event : ' . $currentEventDate->format('Y-m-d H:m:s') . '].',
                     null,
                     null,
-                    'orderSuccess - registerStripeEvent'
+                    'orderSuccess - checkEventStatus'
                 );
                 ProcessLoggerHandler::closeLogger();
                 return false;
@@ -172,11 +117,20 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'This Stripe module event "' . $stripeEventStatus . '" cannot be processed because [Last event status: ' . $lastRegisteredEvent->status . ' | Processed : ' . ($lastRegisteredEvent->isProcessed() ? 'Yes' : 'No') . '].',
                 'StripeEvent',
                 $lastRegisteredEvent->id,
-                'orderSuccess - registerStripeEvent'
+                'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
             return false;
         }
+
+        return $stripeEventStatus;
+    }
+
+    private function registerStripeEvent($paymentIntent)
+    {
+        $eventCharge = isset($paymentIntent->charges->data[0]) ? $paymentIntent->charges->data[0] : $paymentIntent;
+
+        $stripeEventStatus = $this->checkEventStatus($paymentIntent);
 
         $stripeEventDate = new DateTime();
         $stripeEventDate = $stripeEventDate->setTimestamp($eventCharge->created);
@@ -199,6 +153,75 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             return false;
+        }
+    }
+
+    private function handleWebhookActions($intent)
+    {
+        $eventCharge = isset($intent->charges->data[0]) ? $intent->charges->data[0] : $intent;
+        $eventType = $eventCharge->status;
+
+        $payment_method = Tools::getValue('payment_method');
+
+        $conveyorData = [
+            'module' => $this->module,
+            'context' => $this->context,
+            'paymentIntent' => $intent->id,
+        ];
+
+        if ($payment_method == 'oxxo') {
+            $conveyorData['voucher_url'] = $intent->next_action->oxxo_display_details->hosted_voucher_url;
+            $conveyorData['voucher_expire'] = $intent->next_action->oxxo_display_details->expires_after;
+        }
+
+        $handler = new ActionsHandler();
+        $handler->setConveyor($conveyorData);
+
+        if (($eventType == 'succeeded' && $payment_method == 'card')
+            || ($eventType == 'pending' && $payment_method == 'sepa_debit')
+            || ($eventType == 'requires_action' && $payment_method == 'oxxo')
+        ) {
+            ProcessLoggerHandler::logInfo(
+                'Payment method flow without redirection',
+                null,
+                null,
+                'orderSuccess - handleWebhookActions'
+            );
+            $handler->addActions(
+                'prepareFlowNone',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'saveCard',
+                'addTentative'
+            );
+        } elseif (($eventType == 'pending' && $payment_method == 'sofort')
+            || (($eventType == 'succeeded' || $eventType == 'requires_action') && $payment_method != 'sofort')
+        ) {
+            ProcessLoggerHandler::logInfo(
+                'Payment method flow with redirection',
+                null,
+                null,
+                'orderSuccess - handleWebhookActions'
+            );
+            $handler->addActions(
+                'prepareFlowRedirectPaymentIntent',
+                'updatePaymentIntent',
+                'createOrder',
+                'sendMail',
+                'saveCard',
+                'addTentative'
+            );
+        }
+
+        if (!$handler->process('ValidationOrder')) {
+            // Handle error
+            ProcessLoggerHandler::logError(
+                'Order creation process disrupted.',
+                null,
+                null,
+                'orderSuccess - handleWebhookActions'
+            );
         }
     }
 
