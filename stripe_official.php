@@ -1678,7 +1678,7 @@ class Stripe_official extends PaymentModule
             'stripe_pk' => $this->getPublishableKey(),
             'stripe_merchant_country_code' => $merchantCountry->iso_code,
 
-            'stripe_currency' => Tools::strtolower($currency),
+            'stripe_currency' => Tools::strtolower($currency->iso_code),
             'stripe_amount' => Tools::ps_round($amount, 2),
 
             'stripe_fullname' => $stripe_fullname,

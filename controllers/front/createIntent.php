@@ -52,7 +52,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $paymentOption = Tools::getValue('payment_option');
             $paymentMethodId = Tools::getValue('id_payment_method');
 
-            $intentData = $this->constructIntentData($amount, $currency, $paymentOption, $paymentMethodId);
+            $intentData = $this->constructIntentData($amount, $currency->iso_code, $paymentOption, $paymentMethodId);
 
             $cardData = $this->constructCardData($paymentMethodId);
 
