@@ -57,8 +57,6 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $cardData = $this->constructCardData($paymentMethodId);
 
             $intent = $this->createIdempotencyKey($intentData);
-
-            $this->registerStripeEvent($intent);
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
                 "Retrieve Stripe Account Error => ".$e->getMessage(),
@@ -229,7 +227,9 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
             if (empty($stripeIdempotencyKey->id) === true) {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
+                $this->registerStripeEvent($intent);
             } else {
+                unset($intentData['capture_method']);
                 $intent = $stripeIdempotencyKey->updateIntentData($intentData);
             }
 
