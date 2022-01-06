@@ -870,7 +870,7 @@ class Stripe_official extends PaymentModule
                 'registerWebhookSignature'
             );
 
-            $handler->process('Configuration');
+            $handler->process('ConfigurationActions');
         }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();

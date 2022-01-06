@@ -570,7 +570,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         }
 
         // Process actions chain
-        if (!$handler->process('ValidationOrder')) {
+        if (!$handler->process('ValidationOrderActions')) {
             // Handle error
             ProcessLoggerHandler::logError(
                 'Webhook actions process failed.',
