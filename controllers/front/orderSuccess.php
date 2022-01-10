@@ -132,6 +132,10 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         $stripeEventStatus = $this->checkEventStatus($paymentIntent);
 
+        if (empty($stripeEventStatus) === true) {
+            return false;
+        }
+
         $stripeEventDate = new DateTime();
         $stripeEventDate = $stripeEventDate->setTimestamp($eventCharge->created);
 
@@ -196,7 +200,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'addTentative'
             );
         } elseif (($eventType == 'pending' && $payment_method == 'sofort')
-            || (($eventType == 'succeeded' || $eventType == 'requires_action') && $payment_method != 'sofort')
+            || (($eventType == 'succeeded' || $eventType == 'requires_action')
+                && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect')
         ) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow with redirection',
@@ -266,24 +271,40 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             $secure_key = false;
         }
 
-        $url = Context::getContext()->link->getPageLink(
-            'order-confirmation',
-            true,
-            null,
-            array(
-                'id_cart' => $stripePayment->id_cart,
-                'id_module' => (int)$this->module->id,
-                'id_order' => $id_order,
-                'key' => $secure_key
-            )
-        );
+        if ($id_order === 0) {
+            $url = Context::getContext()->link->getModuleLink(
+                'stripe_official',
+                'orderFailure',
+                array(),
+                true
+            );
 
-        ProcessLoggerHandler::logInfo(
-            'Confirmation order url => '.$url,
-            null,
-            null,
-            'orderSuccess - displayOrderConfirmation'
-        );
+            ProcessLoggerHandler::logInfo(
+                'Failed order url => '.$url,
+                null,
+                null,
+                'orderSuccess - displayOrderConfirmation'
+            );
+        } else {
+            $url = Context::getContext()->link->getPageLink(
+                'order-confirmation',
+                true,
+                null,
+                array(
+                    'id_cart' => $stripePayment->id_cart,
+                    'id_module' => (int)$this->module->id,
+                    'id_order' => $id_order,
+                    'key' => $secure_key
+                )
+            );
+
+            ProcessLoggerHandler::logInfo(
+                'Confirmation order url => '.$url,
+                null,
+                null,
+                'orderSuccess - displayOrderConfirmation'
+            );
+        }
         ProcessLoggerHandler::closeLogger();
 
         Tools::redirect($url);

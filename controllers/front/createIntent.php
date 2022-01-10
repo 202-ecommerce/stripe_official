@@ -225,7 +225,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            if (empty($stripeIdempotencyKey->id) === true) {
+            $lastRegisteredEvent = new StripeEvent();
+            $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($stripeIdempotencyKey->id);
+
+            if (empty($stripeIdempotencyKey->id) === true || $lastRegisteredEvent->status === 'FAILED') {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
                 $this->registerStripeEvent($intent);
             } else {
@@ -282,6 +285,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeEvent->setStatus(StripeEvent::CREATED_STATUS);
             $stripeEvent->setDateAdd($intent->created);
             $stripeEvent->setIsProcessed(1);
+            $stripeEvent->setFlowType('direct');
 
             if ($stripeEvent->save()) {
                 ProcessLoggerHandler::logInfo(
