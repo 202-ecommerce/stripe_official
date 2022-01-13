@@ -30,7 +30,7 @@ $(function(){
     // Create references to the submit button.
     const $submit = $('#payment-confirmation button[type="submit"], .stripe-europe-payments[data-method="bancontact"], .ideal-submit-button[data-method="ideal"], .stripe-europe-payments[data-method="giropay"], .stripe-europe-payments[data-method="sofort"], .stripe-europe-payments[data-method="fpx"], .stripe-europe-payments[data-method="eps"], .stripe-europe-payments[data-method="p24"], .stripe-europe-payments[data-method="sepa_debit"], .stripe-submit-button, .sepa_debit-submit-button');
     const $submitButtons = $('#payment-confirmation button[type="submit"], .stripe-submit-button');
-    const submitInitialText = $submitButtons.text();
+    const submitInitialText = $submitButtons.first().text();
 
     $form = $('#stripe-card-payment');
     let payment = '';
@@ -647,10 +647,14 @@ $(function(){
     // Update error message
     function updateError(element, error) {
       const $error = $(".stripe-payment-form:visible .stripe-error-message");
-      var elementError = $(element).find('.stripe-error-message');
-      var disableElement = $(element).siblings('.stripe-submit-button');
       if (error) {
-        if (stripe_ps_version == '1.6') {
+        if (stripe_ps_version === '1.6') {
+          let elementError;
+          if (payment === 'card') {
+            elementError = $('#stripe-card-payment .stripe-error-message');
+          } else {
+            elementError = $('#stripe-'+ payment +'-element .stripe-error-message');
+          }
           $(elementError).text(error.message).show();
         } else {
           $error.text(error.message).show();
@@ -660,11 +664,7 @@ $(function(){
         }
         enableSubmit($submitButtons);
       } else {
-        if (stripe_ps_version == '1.6') {
-          $(elementError).text("").hide();
-        } else {
-          $error.text("").hide();
-        }
+        $error.text("").hide();
       }
     }
 

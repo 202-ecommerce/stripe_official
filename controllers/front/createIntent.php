@@ -52,13 +52,11 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $paymentOption = Tools::getValue('payment_option');
             $paymentMethodId = Tools::getValue('id_payment_method');
 
-            $intentData = $this->constructIntentData($amount, $currency, $paymentOption, $paymentMethodId);
+            $intentData = $this->constructIntentData($amount, $currency->iso_code, $paymentOption, $paymentMethodId);
 
             $cardData = $this->constructCardData($paymentMethodId);
 
             $intent = $this->createIdempotencyKey($intentData);
-
-            $this->registerStripeEvent($intent);
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
                 "Retrieve Stripe Account Error => ".$e->getMessage(),
@@ -227,9 +225,14 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            if (empty($stripeIdempotencyKey->id) === true) {
+            $lastRegisteredEvent = new StripeEvent();
+            $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($stripeIdempotencyKey->id);
+
+            if (empty($stripeIdempotencyKey->id) === true || $lastRegisteredEvent->status === 'FAILED') {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
+                $this->registerStripeEvent($intent);
             } else {
+                unset($intentData['capture_method']);
                 $intent = $stripeIdempotencyKey->updateIntentData($intentData);
             }
 
@@ -282,6 +285,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeEvent->setStatus(StripeEvent::CREATED_STATUS);
             $stripeEvent->setDateAdd($intent->created);
             $stripeEvent->setIsProcessed(1);
+            $stripeEvent->setFlowType('direct');
 
             if ($stripeEvent->save()) {
                 ProcessLoggerHandler::logInfo(

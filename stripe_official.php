@@ -870,7 +870,7 @@ class Stripe_official extends PaymentModule
                 'registerWebhookSignature'
             );
 
-            $handler->process('Configuration');
+            $handler->process('ConfigurationActions');
         }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
@@ -1408,9 +1408,9 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') === 1) {
-            $query->where('id_shop = '.$this->context->shop->id);
-        }
+        $query->where('id_shop_group = '.$this->context->shop->id_shop_group);
+        $query->where('id_shop = '.$this->context->shop->id);
+
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
         foreach ($results as &$result) {
@@ -1678,7 +1678,7 @@ class Stripe_official extends PaymentModule
             'stripe_pk' => $this->getPublishableKey(),
             'stripe_merchant_country_code' => $merchantCountry->iso_code,
 
-            'stripe_currency' => Tools::strtolower($currency),
+            'stripe_currency' => Tools::strtolower($currency->iso_code),
             'stripe_amount' => Tools::ps_round($amount, 2),
 
             'stripe_fullname' => $stripe_fullname,
