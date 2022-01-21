@@ -28,14 +28,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
-
-function upgrade_module_2_4_0($module)
+function upgrade_module_2_4_1($module)
 {
     try {
         $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
 
-        if (!$installer->install()) {
+        if (!$installer->installExtension(Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension::class)) {
             return false;
         }
 

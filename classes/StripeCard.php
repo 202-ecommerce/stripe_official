@@ -91,6 +91,7 @@ class StripeCard extends ObjectModel
                 'type' => 'card',
             ]);
         } catch (Exception $e) {
+            ProcessLoggerHandler::logError('getAllCustomerCards - '.(string)$e->getMessage(), null, null, 'StripeCard');
             return array();
         }
 

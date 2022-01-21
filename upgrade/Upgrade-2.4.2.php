@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * 2007-2021 PrestaShop
  *
@@ -28,21 +29,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once dirname(__FILE__) . '/../classes/StripeEvent.php';
-
-function upgrade_module_2_4_0($module)
+function upgrade_module_2_4_2($module)
 {
-    try {
-        $installer = new Stripe_officialClasslib\Install\ModuleInstaller($module);
+    $sql = "TRUNCATE `" . _DB_PREFIX_ . "stripe_event`;";
 
-        if (!$installer->install()) {
-            return false;
-        }
-
-        return true;
-    } catch (PrestaShopDatabaseException $e) {
-        return false;
-    } catch (PrestaShopException $e) {
-        return false;
-    }
+    return Db::getInstance()->execute($sql);
 }

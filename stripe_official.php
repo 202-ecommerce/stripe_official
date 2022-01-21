@@ -30,30 +30,30 @@ if (!defined('_PS_VERSION_')) {
 require_once dirname(__FILE__) . '/vendor/autoload.php';
 
 /**
-* Stripe object model
-*/
+ * Stripe object model
+ */
 
 // use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 /**
-* Stripe official PrestaShop module main class extends payment class
-* Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
-* This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
-*
-* To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
-* // use Stripe_officialClasslib\Install\ModuleInstaller;
-* // use Stripe_officialClasslib\Actions\ActionsHandler;
-* // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
-*
-* Developers use declarative method to define objects, parameters, controllers... needed in this module
-*/
+ * Stripe official PrestaShop module main class extends payment class
+ * Please note this module use _202 PrestaShop Classlib Project_ (202 classlib) a library developed by "202 ecommerce"
+ * This library provide utils common features as DB installer, internal logger, chain of responsibility design pattern
+ *
+ * To let module compatible with Prestashop 1.6 please keep this following line commented in PrestaShop 1.6:
+ * // use Stripe_officialClasslib\Install\ModuleInstaller;
+ * // use Stripe_officialClasslib\Actions\ActionsHandler;
+ * // use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension;
+ *
+ * Developers use declarative method to define objects, parameters, controllers... needed in this module
+ */
 
 class Stripe_official extends PaymentModule
 {
     /**
-    * Stripe Prestashop configuration
-    * use Configuration::get(Stripe_official::CONST_NAME) to return a value
-    */
+     * Stripe Prestashop configuration
+     * use Configuration::get(Stripe_official::CONST_NAME) to return a value
+     */
     const KEY = 'STRIPE_KEY';
     const TEST_KEY = 'STRIPE_TEST_KEY';
     const PUBLISHABLE = 'STRIPE_PUBLISHABLE';
@@ -113,16 +113,16 @@ class Stripe_official extends PaymentModule
     );
 
     /**
-    * List of _202 classlib_ extentions
-    * @var array
-    */
+     * List of _202 classlib_ extentions
+     * @var array
+     */
     public $extensions = array(
         Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerExtension::class,
     );
 
     /**
-    * To be retrocompatible with PS 1.7, admin tab (controllers) are defined in moduleAdminControllers
-    */
+     * To be retrocompatible with PS 1.7, admin tab (controllers) are defined in moduleAdminControllers
+     */
     public $moduleAdminControllers = array(
         array(
             'name' => array(
@@ -148,17 +148,17 @@ class Stripe_official extends PaymentModule
      * List of ModuleFrontController used in this Module
      * Module::install() register it, after that you can edit it in BO (for rewrite if needed)
      * @var array
-      */
+     */
     public $controllers = array(
         'orderFailure',
         'stripeCards',
     );
 
     /**
-    * List of hooks needed in this module
-    * _202 classlib_ extentions will plugged automatically hooks
-    * @var array
-    */
+     * List of hooks needed in this module
+     * _202 classlib_ extentions will plugged automatically hooks
+     * @var array
+     */
     public $hooks = array(
         'header',
         'orderConfirmation',
@@ -486,43 +486,78 @@ class Stripe_official extends PaymentModule
      */
     public function install()
     {
-        if (!parent::install()) {
+        try {
+            if (!parent::install()) {
+                return false;
+            }
+
+            $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
+
+            if (!$installer->install()) {
+                return false;
+            }
+
+            $sql = "SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'";
+
+            if (!Db::getInstance()->executeS($sql)) {
+                $sql = "SELECT MAX(id_stripe_event) AS id_stripe_event FROM `" . _DB_PREFIX_ . "stripe_event` GROUP BY `id_payment_intent`, `status`";
+                $duplicateRows = Db::getInstance()->executeS($sql);
+
+                $idList = array_column($duplicateRows, 'id_stripe_event');
+
+                if (!empty($idList)) {
+                    $sql = "DELETE FROM `" . _DB_PREFIX_ . "stripe_event` WHERE id_stripe_event NOT IN (" . implode(',', $idList) . ");";
+                    Db::getInstance()->execute($sql);
+                }
+
+                $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
+                Db::getInstance()->execute($sql);
+            }
+
+            $shopGroupId = Stripe_official::getShopGroupIdContext();
+            $shopId = Stripe_official::getShopIdContext();
+
+            // preset default values
+            if (!Configuration::updateValue(self::MODE, 1, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::REFUND_MODE, 1, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_IDEAL, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_SOFORT, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_GIROPAY, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_FPX, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_EPS, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_P24, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_SEPA, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_ALIPAY, 0, false, $shopGroupId, $shopId)
+                || !Configuration::updateValue(self::ENABLE_OXXO, 0, false, $shopGroupId, $shopId)) {
+                return false;
+            }
+
+            if (!$this->installOrderState()) {
+                return false;
+            }
+
+            return true;
+        } catch (PrestaShopDatabaseException $e) {
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+            return false;
+        } catch (PrestaShopException $e) {
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                $e->getMessage(),
+                null,
+                null,
+                'Stripe_official - install'
+            );
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return false;
         }
-
-        $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
-
-        if ($installer->install()
-            && !Db::getInstance()->executeS("SHOW KEYS FROM `" . _DB_PREFIX_ . "stripe_event` WHERE Key_name = 'ix_id_payment_intentstatus'")) {
-            $sql = "ALTER TABLE `" . _DB_PREFIX_ . "stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);";
-            Db::getInstance()->execute($sql);
-        }
-
-        $shopGroupId = Stripe_official::getShopGroupIdContext();
-        $shopId = Stripe_official::getShopIdContext();
-
-        // preset default values
-        if (!Configuration::updateValue(self::MODE, 1, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::REFUND_MODE, 1, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::MINIMUM_AMOUNT_3DS, 50, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_IDEAL, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_SOFORT, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_GIROPAY, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_BANCONTACT, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_FPX, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_EPS, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_P24, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_SEPA, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_ALIPAY, 0, false, $shopGroupId, $shopId)
-            || !Configuration::updateValue(self::ENABLE_OXXO, 0, false, $shopGroupId, $shopId)) {
-                 return false;
-        }
-
-        if (!$this->installOrderState()) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -558,9 +593,6 @@ class Stripe_official extends PaymentModule
      */
     public function installOrderState()
     {
-        $shopGroupId = Stripe_official::getShopGroupIdContext();
-        $shopId = Stripe_official::getShopIdContext();
-
         if (!Configuration::get(self::OS_SOFORT_WAITING)
             || !Validate::isLoadedObject(new OrderState(Configuration::get(self::OS_SOFORT_WAITING)))) {
             $order_state = new OrderState();
@@ -594,6 +626,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/cc-sofort.png';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -634,13 +667,14 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#03befc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
 
-            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id, false, $shopGroupId, $shopId);
+            Configuration::updateValue(self::CAPTURE_WAITING, $order_state->id);
         }
 
         /* Create Order State for Stripe */
@@ -677,6 +711,7 @@ class Stripe_official extends PaymentModule
             $order_state->logable = false;
             $order_state->invoice = false;
             $order_state->color = '#fcba03';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -718,6 +753,7 @@ class Stripe_official extends PaymentModule
             $order_state->send_email = false;
             $order_state->logable = true;
             $order_state->color = '#e3e1dc';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -761,6 +797,7 @@ class Stripe_official extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->color = '#C23416';
+            $order_state->module_name = $this->name;
             if ($order_state->add()) {
                 $source = _PS_MODULE_DIR_.'stripe_official/views/img/ca_icon.gif';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
@@ -820,9 +857,9 @@ class Stripe_official extends PaymentModule
         if (Tools::isSubmit('submit_login')) {
             $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
             $handler->setConveyor(array(
-                        'context' => $this->context,
-                        'module' => $this
-                    ));
+                'context' => $this->context,
+                'module' => $this
+            ));
 
             $handler->addActions(
                 'registerKeys',
@@ -833,7 +870,7 @@ class Stripe_official extends PaymentModule
                 'registerWebhookSignature'
             );
 
-            $handler->process('Configuration');
+            $handler->process('ConfigurationActions');
         }
 
         $shopGroupId = Stripe_official::getShopGroupIdContext();
@@ -1079,23 +1116,27 @@ class Stripe_official extends PaymentModule
             if (!$this->copyAppleDomainFile()) {
                 $this->warning[] = $this->l('Your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard" which is located in the tab F.A.Q of the module.');
             } else {
-                \Stripe\Stripe::setApiKey($secret_key);
-                \Stripe\ApplePayDomain::create(array(
-                  'domain_name' => $this->context->shop->domain
-                ));
+                try {
+                    \Stripe\Stripe::setApiKey($secret_key);
+                    \Stripe\ApplePayDomain::create(array(
+                        'domain_name' => $this->context->shop->domain
+                    ));
 
-                $curl = curl_init(Tools::getShopDomainSsl(true, true).'/.well-known/apple-developer-merchantid-domain-association');
-                curl_setopt($curl, CURLOPT_FAILONERROR, true);
-                curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-                $result = curl_exec($curl);
-                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                curl_close($curl);
+                    $curl = curl_init(Tools::getShopDomainSsl(true, true) . '/.well-known/apple-developer-merchantid-domain-association');
+                    curl_setopt($curl, CURLOPT_FAILONERROR, true);
+                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+                    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                    $result = curl_exec($curl);
+                    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    curl_close($curl);
 
-                if ($httpcode != 200 || !$result) {
-                    $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                    if ($httpcode != 200 || !$result) {
+                        $this->warning[] = $this->l('The configurations has been saved, however your host does not authorize us to add your domain to use ApplePay. To add your domain manually please follow the subject "Add my domain ApplePay manually from my dashboard in order to use ApplePay" which is located in the tab F.A.Q of the module.');
+                    }
+                } catch (\Stripe\Exception\ApiErrorException $e) {
+                    $this->warning[] = $e->getMessage();
                 }
             }
         }
@@ -1367,9 +1408,9 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') === 1) {
-            $query->where('id_shop = '.$this->context->shop->id);
-        }
+        $query->where('id_shop_group = '.$this->context->shop->id_shop_group);
+        $query->where('id_shop = '.$this->context->shop->id);
+
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
         foreach ($results as &$result) {
@@ -1516,17 +1557,38 @@ class Stripe_official extends PaymentModule
             && !empty($order->getHistory($this->context->language->id, Configuration::get(self::CAPTURE_WAITING)))
             && in_array($params['newOrderStatus']->id, explode(',', Configuration::get(self::CAPTURE_STATUS)))) {
             $stripePayment = new StripePayment();
-            $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
-            $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
 
-            if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+            try {
+                $stripePaymentDatas = $stripePayment->getStripePaymentByCart($order->id_cart);
+                $amount = $this->isZeroDecimalCurrency($stripePayment->currency) ? $order->total_paid : $order->total_paid * 100;
+
+                if (!$this->captureFunds($amount, $stripePaymentDatas->id_payment_intent)) {
+                    return false;
+                }
+
+                $stripeCapture = new StripeCapture();
+                $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
+                $stripeCapture->date_authorize = date('Y-m-d H:i:s');
+                $stripeCapture->save();
+            } catch (\Stripe\Exception\UnexpectedValueException $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+                return false;
+            } catch (PrestaShopException $e) {
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
+                    $e->getMessage(),
+                    null,
+                    null,
+                    'Stripe_official - hookActionOrderStatusUpdate'
+                );
+                Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
                 return false;
             }
-
-            $stripeCapture = new StripeCapture();
-            $stripeCapture->getByIdPaymentIntent($stripePaymentDatas->id_payment_intent);
-            $stripeCapture->date_authorize = date('Y-m-d H:i:s');
-            $stripeCapture->save();
         }
 
         return true;
@@ -1547,11 +1609,13 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        $currency = $this->context->currency->iso_code;
-        $address = new Address($this->context->cart->id_address_invoice);
-        $amount = $this->context->cart->getOrderTotal();
+        $cart = $this->context->cart;
+
+        $address = new Address($cart->id_address_invoice);
+        $currency = new Currency($cart->id_currency);
+        $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
-        $amount = $this->isZeroDecimalCurrency($currency) ? $amount : $amount * 100;
+        $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
 
         if ($amount == 0) {
             return;
@@ -1614,7 +1678,7 @@ class Stripe_official extends PaymentModule
             'stripe_pk' => $this->getPublishableKey(),
             'stripe_merchant_country_code' => $merchantCountry->iso_code,
 
-            'stripe_currency' => Tools::strtolower($currency),
+            'stripe_currency' => Tools::strtolower($currency->iso_code),
             'stripe_amount' => Tools::ps_round($amount, 2),
 
             'stripe_fullname' => $stripe_fullname,
@@ -1686,12 +1750,12 @@ class Stripe_official extends PaymentModule
 
         // The hookHeader isn't triggered when updating the cart or the carrier
         // on PS1.6 with OPC; so we need to update the PaymentIntent here
-        $currency = new Currency($params['cart']->id_currency);
-        $currency_iso_code = Tools::strtolower($currency->iso_code);
-        $address = new Address($params['cart']->id_address_invoice);
-        $amount = $this->context->cart->getOrderTotal();
+        $cart = $params['cart'];
+        $address = new Address($cart->id_address_invoice);
+        $currency = new Currency($cart->id_currency);
+        $amount = $cart->getOrderTotal();
         $amount = Tools::ps_round($amount, 2);
-        $amount = $this->isZeroDecimalCurrency($currency_iso_code) ? $amount : $amount * 100;
+        $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
 
         if (Configuration::get(self::POSTCODE) == null) {
             $stripe_reinsurance_enabled = 'off';
@@ -1736,6 +1800,7 @@ class Stripe_official extends PaymentModule
             }
 
             // Check for currency support
+            $currency_iso_code = Tools::strtolower($currency->iso_code);
             if (isset($paymentMethod['currencies']) && !in_array($currency_iso_code, $paymentMethod['currencies'])) {
                 continue;
             }
@@ -1809,7 +1874,7 @@ class Stripe_official extends PaymentModule
 
     /**
      * Hook Stripe Payment for PS 1.7
-    */
+     */
     public function hookPaymentOptions($params)
     {
         if (!self::isWellConfigured() || !$this->active) {
@@ -1878,9 +1943,9 @@ class Stripe_official extends PaymentModule
             // The customer can potientially use this payment method
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
-            ->setModuleName($this->name)
-            //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
-            ->setCallToActionText($this->button_label[$name]);
+                ->setModuleName($this->name)
+                //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
+                ->setCallToActionText($this->button_label[$name]);
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], array('redirect', 'receiver'))) {
@@ -1931,8 +1996,8 @@ class Stripe_official extends PaymentModule
 
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
-            ->setModuleName($this->name)
-            ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
+                ->setModuleName($this->name)
+                ->setCallToActionText($this->button_label['save_card'].' : '.Tools::ucfirst($card->card->brand).' **** **** **** '.$card->card->last4);
 
             $this->context->smarty->assign(array(
                 'id_payment_method' => $card->id

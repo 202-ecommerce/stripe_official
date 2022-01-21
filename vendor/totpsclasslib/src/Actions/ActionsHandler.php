@@ -20,34 +20,40 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) 202-ecommerce
  * @license   Commercial license
- * @version   release/2.1.1
+ *
+ * @version   release/2.3.1
  */
 
 namespace Stripe_officialClasslib\Actions;
 
-use \Tools;
+use Hook;
+use Module;
+use ObjectModel;
+use Tools;
 
 /**
  * Actions Handler
  */
 class ActionsHandler
 {
+    const PROCESS_OVERRIDE_HOOK = 'actionStripe_officialActionsHandler';
+
     /**
-     * @var ObjectModel $modelObject
+     * @var ObjectModel
      */
     protected $modelObject;
 
     /**
      * Values conveyored by the classes
      *
-     * @var array $conveyor
+     * @var array
      */
-    protected $conveyor = array();
+    protected $conveyor = [];
 
     /**
      * List of actions
      *
-     * @var array $actions
+     * @var array
      */
     protected $actions;
 
@@ -55,6 +61,7 @@ class ActionsHandler
      * Set an modelObject
      *
      * @param ObjectModel $modelObject
+     *
      * @return $this
      */
     public function setModelObject($modelObject)
@@ -68,6 +75,7 @@ class ActionsHandler
      * Set the conveyor
      *
      * @param array $conveyorData
+     *
      * @return $this
      */
     public function setConveyor($conveyorData)
@@ -91,53 +99,68 @@ class ActionsHandler
      * Call sevral actions
      *
      * @param mixed $actions
+     *
      * @return $this
      */
     public function addActions($actions)
     {
         $this->actions = func_get_args();
+
         return $this;
     }
 
     /**
      * Process the action call back of cross modules
      *
-     * @param string $chain Name of the actions chain
+     * @param string $className Name of the actions chain / Namespaced classname
+     *
      * @return bool
+     *
+     * @throws \Exception
      */
-    public function process($chain)
+    public function process($className)
     {
-        $className = Tools::ucfirst($chain).'Actions';
-        if (!preg_match("/^[a-zA-Z]+$/", $className)) {
-            throw new \Exception($className .'" class name not valid "');
+        if (!class_exists($className)) {
+            $className = Tools::ucfirst($className) . 'Actions';
+            if (!preg_match('/^[a-zA-Z]+$/', $className)) {
+                throw new \Exception($className . '" class name not valid "');
+            }
+            include_once _PS_MODULE_DIR_ . 'stripe_official/classes/actions/' . $className . '.php';
+
+            $overridePath = _PS_OVERRIDE_DIR_ . 'modules/stripe_official/classes/actions/' . $className . '.php';
+            if (file_exists($overridePath)) {
+                $className .= 'Override';
+                include_once $overridePath;
+            }
         }
-        include_once _PS_MODULE_DIR_.'stripe_official/classes/actions/'.$className.'.php';
-        
-        $overridePath = _PS_OVERRIDE_DIR_.'modules/stripe_official/classes/actions/'.$className.'.php';
-        if (file_exists($overridePath)) {
-            $className .= 'Override';
-            include_once $overridePath;
+
+        $moduleId = Module::getModuleIdByName('stripe_official');
+        /** @var array $hookResult */
+        $hookResult = Hook::exec(self::PROCESS_OVERRIDE_HOOK, ['className' => $className], $moduleId, true, false);
+        if (!empty($hookResult) && !empty($hookResult['stripe_official'])) {
+            $className = $hookResult['stripe_official'];
         }
-        
+
         if (class_exists($className)) {
-            /** @var Stripe_officialDefaultActions $classAction */
-            $classAction = new $className;
+            /** @var DefaultActions $classAction */
+            $classAction = new $className();
             $classAction->setModelObject($this->modelObject);
             $classAction->setConveyor($this->conveyor);
-            
+
             foreach ($this->actions as $action) {
-                if (!is_callable(array($classAction, $action), false, $callable_name)) {
+                if (!is_callable([$classAction, $action], false, $callableName)) {
                     continue;
                 }
-                if (!call_user_func_array(array($classAction, $action), array())) {
+                if (!call_user_func_array([$classAction, $action], [])) {
                     $this->setConveyor($classAction->getConveyor());
+
                     return false;
                 }
             }
-            
+
             $this->setConveyor($classAction->getConveyor());
         } else {
-            throw new \Exception($className .'" class not defined "');
+            throw new \Exception($className . '" class not defined "');
         }
 
         return true;
