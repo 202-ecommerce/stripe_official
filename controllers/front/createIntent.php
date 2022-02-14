@@ -226,7 +226,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
             $lastRegisteredEvent = new StripeEvent();
-            $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($stripeIdempotencyKey->id);
+            $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($stripeIdempotencyKey->id_payment_intent);
 
             if (empty($stripeIdempotencyKey->id) === true || $lastRegisteredEvent->status === 'FAILED') {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
