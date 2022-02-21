@@ -1,7 +1,7 @@
 {
   "name": "stripe_official",
   "version": "2.4.3",
-  "description": "PayPal official Module",
+  "description": "Stripe official Module",
   "scripts": {
     "watch": "webpack --mode development --colors --devtool source-map --hide-modules -w",
     "build": "webpack --mode production --colors --devtool source-map --progress -p",
@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/202-ecommerce/paypal/"
+    "url": "https://github.com/202-ecommerce/stripe_official/"
   },
   "keywords": [
-    "PayPal"
+    "stripe_official"
   ],
   "homepage": "https://github.com/",
   "devDependencies": {
