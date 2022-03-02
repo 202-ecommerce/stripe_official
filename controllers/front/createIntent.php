@@ -225,23 +225,27 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            $lastRegisteredEvent = new StripeEvent();
-            $lastRegisteredEvent = $lastRegisteredEvent->getLastRegisteredEventByPaymentIntent($stripeIdempotencyKey->id);
-
-            if (empty($stripeIdempotencyKey->id) === true || $lastRegisteredEvent->status === 'FAILED') {
+            if (empty($stripeIdempotencyKey->id) === true) {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
                 $this->registerStripeEvent($intent);
+
+                ProcessLoggerHandler::logInfo(
+                    'Create New Intent => '.$intent,
+                    null,
+                    null,
+                    'createIntent - createIdempotencyKey'
+                );
             } else {
                 unset($intentData['capture_method']);
                 $intent = $stripeIdempotencyKey->updateIntentData($intentData);
-            }
 
-            ProcessLoggerHandler::logInfo(
-                'Intent => '.$intent,
-                null,
-                null,
-                'createIntent - initContent'
-            );
+                ProcessLoggerHandler::logInfo(
+                    'Update Previous Intent => '.$intent,
+                    null,
+                    null,
+                    'createIntent - createIdempotencyKey'
+                );
+            }
 
             return $intent;
         } catch (\Stripe\Exception\ApiErrorException $e) {
@@ -249,7 +253,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "Create Stripe Intent Error => ".$e->getMessage(),
                 null,
                 null,
-                'createIntent'
+                'createIntent - createIdempotencyKey'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
@@ -259,7 +263,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "Save Stripe Idempotency Key Error => ".$e->getMessage(),
                 null,
                 null,
-                'createIntent'
+                'createIntent - createIdempotencyKey'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
@@ -269,7 +273,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 "Save Stripe Payment Intent Error => ".$e->getMessage(),
                 null,
                 null,
-                'createIntent'
+                'createIntent - createIdempotencyKey'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);

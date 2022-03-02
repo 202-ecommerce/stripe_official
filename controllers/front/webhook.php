@@ -549,8 +549,9 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
                 'addTentative'
             );
         } elseif (($eventType == 'charge.pending' && $paymentMethodType == 'sofort')
-            || (($eventType == 'charge.succeeded' || $eventType == 'payment_intent.requires_action')
-                && Stripe_official::$paymentMethods[$paymentMethodType]['flow'] == 'redirect')
+            || ($eventType == 'charge.succeeded'
+                && Stripe_official::$paymentMethods[$paymentMethodType]['flow'] == 'redirect'
+                && $paymentMethodType != 'sofort')
         ) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow with redirection',
