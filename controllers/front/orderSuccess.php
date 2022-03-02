@@ -200,8 +200,9 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'addTentative'
             );
         } elseif (($eventType == 'pending' && $payment_method == 'sofort')
-            || (($eventType == 'succeeded' || $eventType == 'requires_action')
-                && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect')
+            || ($eventType == 'charge.succeeded'
+                && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect'
+                && $payment_method != 'sofort')
         ) {
             ProcessLoggerHandler::logInfo(
                 'Payment method flow with redirection',
