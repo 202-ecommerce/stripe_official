@@ -139,6 +139,11 @@ class StripeEvent extends ObjectModel
         return $this->flow_type;
     }
 
+    public function save($null_values = false, $auto_date = false)
+    {
+        return parent::save($null_values, $auto_date);
+    }
+
     public function getLastRegisteredEventByPaymentIntent($paymentIntent)
     {
         $query = new DbQuery();
