@@ -290,7 +290,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeEvent = new StripeEvent();
             $stripeEvent->setIdPaymentIntent($intent->id);
             $stripeEvent->setStatus(StripeEvent::CREATED_STATUS);
-            $stripeEvent->setDateAdd($stripeEventDate);
+            $stripeEvent->setDateAdd($stripeEventDate->format('Y-m-d H:i:s'));
             $stripeEvent->setIsProcessed(1);
             $stripeEvent->setFlowType('direct');
 
