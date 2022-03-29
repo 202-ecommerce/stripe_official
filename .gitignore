@@ -3,6 +3,7 @@
 /node_modules
 /views/css
 /views/js
+package-lock.json
 
 # @TODO We should probably git composer.lock
 composer.lock
