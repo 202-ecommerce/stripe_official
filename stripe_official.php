@@ -889,7 +889,7 @@ class Stripe_official extends PaymentModule
                 $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve($webhookId);
 
                 /* Check if webhook url is wrong */
-                $expectedWebhookUrl = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT'));
+                $expectedWebhookUrl = self::getWebhookUrl();
                 if ($webhookEndpoint->url != $expectedWebhookUrl) {
                     $this->errors[] =
                         $this->l('Webhook URL configuration is wrong, click on save button to fix issue. Webhook configuration will be corrected.', $this->name) .' | '.
@@ -1075,7 +1075,7 @@ class Stripe_official extends PaymentModule
             'alipay' => Configuration::get(self::ENABLE_ALIPAY,null, $shopGroupId, $shopId),
             'oxxo' => Configuration::get(self::ENABLE_OXXO,null, $shopGroupId, $shopId),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY,null, $shopGroupId, $shopId),
-            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')),
+            'url_webhhoks' => self::getWebhookUrl(),
         ));
     }
 
@@ -1306,6 +1306,40 @@ class Stripe_official extends PaymentModule
         foreach ($templates as $tpl) {
             $this->_clearCache($tpl);
         }
+    }
+
+    /**
+     * get webhook url of stripe_official module
+     *
+     * @return string
+     */
+    public static function getWebhookUrl()
+    {
+        $context = Context::getContext();
+        $id_lang = self::getLangIdContext();
+        $id_shop = self::getShopIdContext();
+
+        return $context->link->getModuleLink(
+            'stripe_official',
+            'webhook',
+            [],
+            true,
+            $id_lang,
+            $id_shop
+        );
+    }
+
+    /**
+     * get current LangId according to activate multishop feature
+     *
+     * @return int|null
+     */
+    public static function getLangIdContext()
+    {
+        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') && Shop::getContext() === Shop::CONTEXT_ALL) {
+            return Configuration::get('PS_LANG_DEFAULT', null, 1, 1);
+        }
+        return Configuration::get('PS_LANG_DEFAULT');
     }
 
     /**

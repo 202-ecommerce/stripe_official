@@ -30,20 +30,12 @@ class StripeWebhook extends ObjectModel
     public static function create()
     {
         try {
-            $context = Context::getContext();
             $shopGroupId = Stripe_official::getShopGroupIdContext();
             $shopId = Stripe_official::getShopIdContext();
 
             $stripeAccount = \Stripe\Account::retrieve();
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink(
-                    'stripe_official',
-                    'webhook',
-                    array(),
-                    true,
-                    Configuration::get('PS_LANG_DEFAULT'),
-                    $shopId ?: Configuration::get('PS_SHOP_DEFAULT')
-                ),
+                'url' => Stripe_official::getWebhookUrl(),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
@@ -97,14 +89,7 @@ class StripeWebhook extends ObjectModel
         }
 
         $webhooksList = self::getWebhookList();
-        $webhookUrl = $context->link->getModuleLink(
-            'stripe_official',
-            'webhook',
-            array(),
-            true,
-            Configuration::get('PS_LANG_DEFAULT'),
-            Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')
-        );
+        $webhookUrl = Stripe_official::getWebhookUrl();
         $webhookExists = false;
 
         foreach ($webhooksList->data as $webhook) {
