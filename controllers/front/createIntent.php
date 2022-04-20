@@ -23,6 +23,7 @@
  * @license   Commercial license
  */
 
+use Stripe\PaymentIntent;
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialCreateIntentModuleFrontController extends ModuleFrontController
@@ -225,7 +226,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            if (empty($stripeIdempotencyKey->id) === true) {
+            $paymentIntentStatus = (empty($stripeIdempotencyKey->id) === false) ? PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent)->status : null;
+            $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
+
+            if (in_array($paymentIntentStatus, $updatableStatus) === false) {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
                 $this->registerStripeEvent($intent);
 
