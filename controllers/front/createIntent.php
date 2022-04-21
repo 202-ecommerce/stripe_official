@@ -23,6 +23,7 @@
  * @license   Commercial license
  */
 
+use Stripe\PaymentIntent;
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialCreateIntentModuleFrontController extends ModuleFrontController
@@ -66,7 +67,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         }
 
         ProcessLoggerHandler::logInfo(
@@ -141,7 +142,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         } catch (PrestaShopDatabaseException $e) {
             ProcessLoggerHandler::logError(
                 "Retrieve Prestashop State Error => ".$e->getMessage(),
@@ -151,7 +152,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logError(
                 "Retrieve Prestashop State Error => ".$e->getMessage(),
@@ -161,7 +162,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         }
     }
 
@@ -225,7 +226,10 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            if (empty($stripeIdempotencyKey->id) === true) {
+            $paymentIntentStatus = (empty($stripeIdempotencyKey->id) === false) ? PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent)->status : null;
+            $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
+
+            if (in_array($paymentIntentStatus, $updatableStatus) === false) {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
                 $this->registerStripeEvent($intent);
 
@@ -267,17 +271,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
-        } catch (PrestaShopException $e) {
-            ProcessLoggerHandler::logError(
-                "Save Stripe Payment Intent Error => ".$e->getMessage(),
-                null,
-                null,
-                'createIntent - createIdempotencyKey'
-            );
-            ProcessLoggerHandler::closeLogger();
-            http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         }
     }
 
@@ -310,7 +304,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(400);
-                die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+                die('An unexpected problem has occurred. Please contact the support.');
             }
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logError(
@@ -321,7 +315,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support : https://addons.prestashop.com/en/contact-us?id_product=24922');
+            die('An unexpected problem has occurred. Please contact the support.');
         }
     }
 
