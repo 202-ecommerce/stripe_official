@@ -346,7 +346,10 @@ class ValidationOrderActions extends DefaultActions
                 $this->conveyor['cart']->id,
                 (int)$orderStatus,
                 $paid,
-                $this->module->l(Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name']).' via Stripe', 'ValidationOrderActions'),
+                sprintf(
+                    $this->module->l('%s via Stripe', 'ValidationOrderActions'),
+                    Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name'])
+                ),
                 $message,
                 array(),
                 null,
