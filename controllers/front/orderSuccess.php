@@ -299,7 +299,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 true,
                 null,
                 array(
-                    'id_cart' => $stripePayment->id_cart,
+                    'id_cart' => $id_cart,
                     'id_module' => (int)$this->module->id,
                     'id_order' => $id_order,
                     'key' => $secure_key
