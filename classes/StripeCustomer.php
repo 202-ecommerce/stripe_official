@@ -107,19 +107,28 @@ class StripeCustomer extends ObjectModel
 
     public function stripeCustomerExists($email, $stripe_customer_id)
     {
-        $customersList = \Stripe\Customer::all(
-            [
-                'email' => $email,
-                'limit' => 100
-            ]
-        );
+        try {
+            $customer = \Stripe\Customer::retrieve(
+                $stripe_customer_id
+            );
 
-        foreach ($customersList as $customer) {
-            if ($customer['id'] == $stripe_customer_id) {
-                return true;
-            }
+            return $email === $customer->email;
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
         }
+    }
 
-        return false;
+    public function getStripeCustomerCards()
+    {
+        try {
+            return \Stripe\Customer::allPaymentMethods(
+                $this->stripe_customer_key,
+                ['type' => 'card']
+            );
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 }

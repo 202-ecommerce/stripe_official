@@ -838,7 +838,7 @@ class Stripe_official extends PaymentModule
         /* Check if TLS is enabled and the TLS version used is 1.2 */
         if (self::isWellConfigured()) {
             $secret_key = trim(Tools::getValue(self::TEST_KEY));
-            if ($this->checkApiConnection($secret_key)) {
+            if ($this->checkApiConnection($secret_key) !== false) {
                 try {
                     \Stripe\Charge::all();
                 } catch (\Stripe\Error\ApiConnection $e) {
@@ -1178,7 +1178,7 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
+        if ($this->checkApiConnection($this->getSecretKey()) !== false && !empty($refund_id)) {
             $query = new DbQuery();
             $query->select('*');
             $query->from('stripe_payment');
@@ -1375,13 +1375,12 @@ class Stripe_official extends PaymentModule
 
         try {
             \Stripe\Stripe::setApiKey($secretKey);
-            \Stripe\Account::retrieve();
+            return \Stripe\Account::retrieve();
         } catch (Exception $e) {
             error_log($e->getMessage());
             $this->errors[] = $e->getMessage();
             return false;
         }
-        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
@@ -1739,7 +1738,9 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        if (!$this->checkApiConnection()) {
+        $stripeAccount = $this->checkApiConnection();
+
+        if ($stripeAccount === false) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
@@ -1811,7 +1812,6 @@ class Stripe_official extends PaymentModule
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
         }
 
-        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
@@ -1827,8 +1827,7 @@ class Stripe_official extends PaymentModule
             return $display;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        $customerCards = $stripeCard->getAllCustomerCards();
+        $customerCards = $stripeCustomer->getStripeCustomerCards();
 
         if (empty($customerCards)) {
             return $display;
@@ -1881,7 +1880,9 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        if (!$this->checkApiConnection()) {
+        $stripeAccount = $this->checkApiConnection();
+
+        if ($stripeAccount === false) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
@@ -1966,7 +1967,6 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
-        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
@@ -1982,8 +1982,7 @@ class Stripe_official extends PaymentModule
             return $options;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        $customerCards = $stripeCard->getAllCustomerCards();
+        $customerCards = $stripeCustomer->getStripeCustomerCards();
 
         if (empty($customerCards)) {
             return $options;
