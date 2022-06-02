@@ -251,8 +251,22 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 $id_cart = $intent->metadata->id_cart;
             }
 
+            ProcessLoggerHandler::logInfo(
+                'Cart Id => ' . $id_cart,
+                null,
+                null,
+                'orderSuccess - displayOrderConfirmation'
+            );
+
             if ($id_cart !== null) {
-                $id_order = (int) Order::getOrderByCartId($id_cart);
+                $id_order = $this->getOrderIdByCartId($id_cart);
+
+                ProcessLoggerHandler::logInfo(
+                    'Order Id => ' . $id_order,
+                    null,
+                    null,
+                    'orderSuccess - displayOrderConfirmation'
+                );
 
                 if ($id_order) {
                     ProcessLoggerHandler::logInfo(
@@ -317,5 +331,16 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         Tools::redirect($url);
         exit;
+    }
+
+    private function getOrderIdByCartId($cartId)
+    {
+        $query = (new DbQuery())
+            ->select('id_order')
+            ->from(Order::$definition['table'])
+            ->where('`id_cart` = ' . (int) $cartId);
+        $orderId = Db::getInstance()->getValue($query, false);
+
+        return empty($orderId) ? 0 : (int) $orderId;
     }
 }
