@@ -96,7 +96,7 @@ class StripeCustomer extends ObjectModel
         $query->where('id_account = "'.pSQL($id_account).'"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
-        if ($result == false) {
+        if (empty($result) === true) {
             return $this;
         }
 
@@ -114,7 +114,9 @@ class StripeCustomer extends ObjectModel
 
             return $email === $customer->email;
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return false;
         }
     }
@@ -127,7 +129,9 @@ class StripeCustomer extends ObjectModel
                 ['type' => 'card']
             );
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             return false;
         }
     }

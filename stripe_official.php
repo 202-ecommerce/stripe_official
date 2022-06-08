@@ -1178,7 +1178,8 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        if ($this->checkApiConnection($this->getSecretKey()) !== false && !empty($refund_id)) {
+        $stripeAccount = $this->checkApiConnection($this->getSecretKey());
+        if (empty($stripeAccount) !== false && empty($refund_id) !== false) {
             $query = new DbQuery();
             $query->select('*');
             $query->from('stripe_payment');
@@ -1377,7 +1378,9 @@ class Stripe_official extends PaymentModule
             \Stripe\Stripe::setApiKey($secretKey);
             return \Stripe\Account::retrieve();
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             $this->errors[] = $e->getMessage();
             return false;
         }
@@ -1740,7 +1743,7 @@ class Stripe_official extends PaymentModule
 
         $stripeAccount = $this->checkApiConnection();
 
-        if ($stripeAccount === false) {
+        if (empty($stripeAccount) === true) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
@@ -1882,7 +1885,7 @@ class Stripe_official extends PaymentModule
 
         $stripeAccount = $this->checkApiConnection();
 
-        if ($stripeAccount === false) {
+        if (empty($stripeAccount) === true) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
