@@ -345,7 +345,7 @@ class StripePayment extends ObjectModel
     {
         $url_type = '';
         if ($this->state == 1) {
-            $url_type = 'test';
+            $url_type = 'test/';
         }
 
         switch ($this->result) {
@@ -368,8 +368,8 @@ class StripePayment extends ObjectModel
         }
 
         $url_dashboard = array(
-            'charge' => 'https://dashboard.stripe.com/'.$url_type.'/payments/'.$this->id_stripe,
-            'paymentIntent' => 'https://dashboard.stripe.com/'.$url_type.'/payments/'.$this->id_payment_intent
+            'charge' => 'https://dashboard.stripe.com/'.$url_type.'payments/'.$this->id_stripe,
+            'paymentIntent' => 'https://dashboard.stripe.com/'.$url_type.'payments/'.$this->id_payment_intent
         );
 
         return $url_dashboard;

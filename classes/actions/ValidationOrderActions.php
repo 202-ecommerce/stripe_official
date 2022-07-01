@@ -335,11 +335,21 @@ class ValidationOrderActions extends DefaultActions
             $addressDelivery = new Address($this->conveyor['cart']->id_address_delivery);
             $this->context->country = new Country($addressDelivery->id_country);
 
+            ProcessLoggerHandler::logInfo(
+                'Paid Amount => '.$paid,
+                null,
+                null,
+                'ValidationOrderActions - createOrder'
+            );
+
             $this->module->validateOrder(
                 $this->conveyor['cart']->id,
                 (int)$orderStatus,
                 $paid,
-                $this->module->l(Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name']).' via Stripe', 'ValidationOrderActions'),
+                sprintf(
+                    $this->module->l('%s via Stripe', 'ValidationOrderActions'),
+                    Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name'])
+                ),
                 $message,
                 array(),
                 null,
@@ -377,6 +387,25 @@ class ValidationOrderActions extends DefaultActions
                 $currency = new Currency($order->id_currency, $this->context->language->id, $this->context->shop->id);
 
                 $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->getTotalPaid() : $order->getTotalPaid() * 100;
+
+                ProcessLoggerHandler::logInfo(
+                    'Capture Amount => '.$amount,
+                    null,
+                    null,
+                    'ValidationOrderActions - createOrder'
+                );
+
+                $paid = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $paid : $paid * 100;
+
+                if ($amount != $paid) {
+                    ProcessLoggerHandler::logInfo(
+                        'Fix invalid amount "'.$amount.'" to "'.$paid,
+                        null,
+                        null,
+                        'ValidationOrderActions - createOrder'
+                    );
+                    $amount = $paid;
+                }
 
                 if (!$this->module->captureFunds($amount, $this->conveyor['paymentIntent'])) {
                     ProcessLoggerHandler::closeLogger();
@@ -419,8 +448,8 @@ class ValidationOrderActions extends DefaultActions
 
             ProcessLoggerHandler::logInfo(
                 'createOrder : OK',
-                null,
-                null,
+                Order::class,
+                $order->id,
                 'ValidationOrderActions - createOrder'
             );
             ProcessLoggerHandler::closeLogger();
@@ -723,7 +752,7 @@ class ValidationOrderActions extends DefaultActions
 
         if ($order->module != 'stripe_official') {
             ProcessLoggerHandler::logInfo(
-                'This order #'.$id_order.' was not made with stripe',
+                'This order #'.$id_order.' was made with '.$order->module.' not with Stripe',
                 null,
                 null,
                 'ValidationOrderActions - chargeWebhook'

@@ -41,7 +41,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         if ($this->registerStripeEvent($intent))
             $this->handleWebhookActions($intent);
 
-        $this->displayOrderConfirmation($intent->id);
+        $this->displayOrderConfirmation($intent);
     }
 
     private function retrievePaymentIntent()
@@ -200,7 +200,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'addTentative'
             );
         } elseif (($eventType == 'pending' && $payment_method == 'sofort')
-            || ($eventType == 'charge.succeeded'
+            || ($eventType == 'succeeded'
                 && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect'
                 && $payment_method != 'sofort')
         ) {
@@ -231,7 +231,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
     }
 
-    private function displayOrderConfirmation($id_intent)
+    private function displayOrderConfirmation($intent)
     {
         ProcessLoggerHandler::logInfo(
             'Display order confirmation',
@@ -242,10 +242,17 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         $id_order = 0;
         for($i = 1; $i <= 15; $i++) {
-            $stripePayment = new StripePayment();
-            $stripePayment->getStripePaymentByPaymentIntent($id_intent);
-            if ($stripePayment->id_cart !== null) {
-                $id_order = (int) Order::getOrderByCartId($stripePayment->id_cart);
+            if (empty($intent->metadata->id_cart)) {
+                $stripePayment = new StripePayment();
+                $stripePayment->getStripePaymentByPaymentIntent($intent->id);
+
+                $id_cart = $stripePayment->id_cart;
+            } else {
+                $id_cart = $intent->metadata->id_cart;
+            }
+
+            if ($id_cart !== null) {
+                $id_order = (int) Order::getOrderByCartId($id_cart);
 
                 if ($id_order) {
                     ProcessLoggerHandler::logInfo(
@@ -292,7 +299,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 true,
                 null,
                 array(
-                    'id_cart' => $stripePayment->id_cart,
+                    'id_cart' => $id_cart,
                     'id_module' => (int)$this->module->id,
                     'id_order' => $id_order,
                     'key' => $secure_key

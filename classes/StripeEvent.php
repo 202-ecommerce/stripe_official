@@ -139,6 +139,11 @@ class StripeEvent extends ObjectModel
         return $this->flow_type;
     }
 
+    public function save($null_values = false, $auto_date = false)
+    {
+        return parent::save($null_values, $auto_date);
+    }
+
     public function getLastRegisteredEventByPaymentIntent($paymentIntent)
     {
         $query = new DbQuery();
@@ -218,6 +223,7 @@ class StripeEvent extends ObjectModel
             case StripeEvent::REQUIRES_ACTION_STATUS:
                 return [
                     StripeEvent::CREATED_STATUS,
+                    StripeEvent::FAILED_STATUS,
                 ];
 
             case StripeEvent::PENDING_STATUS:
@@ -233,6 +239,7 @@ class StripeEvent extends ObjectModel
                     StripeEvent::CREATED_STATUS,
                     StripeEvent::REQUIRES_ACTION_STATUS,
                     StripeEvent::PENDING_STATUS,
+                    StripeEvent::FAILED_STATUS,
                 ];
 
             case StripeEvent::CAPTURED_STATUS:

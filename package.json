@@ -1,17 +1,22 @@
 {
   "name": "stripe_official",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.4.3",
+  "description": "Stripe official Module",
   "main": "webpack.config.js",
   "scripts": {
     "watch": "webpack --mode development --colors --devtool source-map --hide-modules -w",
     "build": "webpack --mode production --colors --devtool source-map --progress -p",
-    "lint-css": "stylelint \"_dev/scss/**/*.scss\" --cache --cache-location .cache/.stylelintcache"
+    "lint-css": "stylelint \"_dev/scss/**/*.scss\" --cache --cache-location .cache/.stylelintcache --fix",
+    "lint-css-fix": "stylelint \"_dev/scss/**/*.scss\" --cache --cache-location .cache/.stylelintcache --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.202-ecommerce.com:module-partners/stripe_official_17.git"
+    "url": "https://github.com/202-ecommerce/stripe_official/"
   },
+  "keywords": [
+    "stripe_official"
+  ],
+  "homepage": "https://github.com/",
   "author": "202-ecommerce",
   "license": "SEE LICENSE IN stripe_official.php",
   "devDependencies": {
@@ -26,7 +31,7 @@
     "css-loader": "^3.2.0",
     "file-loader": "^4.2.0",
     "mini-css-extract-plugin": "^0.8.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.12.0",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^1.0.0",
