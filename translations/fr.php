@@ -52,9 +52,12 @@ $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4c2a8fe7eaf2
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_a0db49ba470c1c9ae2128c3470339153'] = 'Niveau';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_68972b8768ecc5cdcb803169e5f42407'] = 'Nom de l\'objet';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_d95fc016a6eee828f434ed5f55504427'] = 'ID de l\'objet';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_f89167d8204a193c6bbeabb68922d448'] = 'ID de session';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_2d8e32e9c23e2a7155c88028b3fbff66'] = 'Paramètres de l\'outil de consignation des processus';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_2ce895700ba5c16bede3b769128d216f'] = 'Ici, vous pouvez modifier la configuration par défaut de ce processus de logs';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4ffdbc22f758943cdb6b6a54b361f373'] = 'Activer le mode silencieux';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_ea7a14b5d41ab5c1022a7d59f1b1e9df'] = 'Si le mode silencieux est activé, seuls les journaux de réussite et d\'erreur sont enregistrés. Les journaux d\'information ne sont pas enregistrés.';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_3073ef21c0b326939d5b630edd08cfb6'] = 'Désactiver l\'effacement automatique';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_434ef5977d28afa36e430439de18cbad'] = 'Si désactivé, les journaux seront automatiquement effacés après le délai';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_1607c94671fd5baf4ac06f554b118b2a'] = 'Délai d\'effacement automatique (en jours)';
@@ -162,6 +165,7 @@ $_MODULE['<{stripe_official}prestashop>admin_content_order_e2b54a61bf4e56c4a0443
 $_MODULE['<{stripe_official}prestashop>admin_content_order_2311c8c5e8f44924a3e61c78e2223049'] = 'Expiration du coupon le :';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_49ee3087348e8d44e1feda1917443987'] = 'Nom';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'E-mail';
+$_MODULE['<{stripe_official}prestashop>payment_form_oxxo_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter maintenant';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_4e997b9d3b7152f2afeacd96ab1ef1cb'] = 'Mes cartes bancaires';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a44217022190f5734b2f72ba1e4f8a79'] = 'Numéro de carte bancaire';
@@ -191,6 +195,7 @@ $_MODULE['<{stripe_official}prestashop>payment_form_card_eeceac1af4e7620894d6d20
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_ac23f66a874a7808e300a15f2e94320a'] = 'Payer avec iDeal';
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter maintenant';
 $_MODULE['<{stripe_official}prestashop>payment_form_eps_c446bbd08309aff37eee1e0c43b19cde'] = 'Payer avec EPS';
+$_MODULE['<{stripe_official}prestashop>stripe-cards16_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'Mon compte';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a46d3e7285f76d2401202f18b0acbcbd'] = 'Mes cartes bancaires';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a44217022190f5734b2f72ba1e4f8a79'] = 'Numéro de carte bancaire';
@@ -213,7 +218,6 @@ $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_9d67bee92ea5
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_7dc9c0e2e38c2bbf16923bc6d79b7b06'] = 'Veuillez [a @href1@]réessayer[/a] ou contacter le propriétaire du site Web.';
 $_MODULE['<{stripe_official}prestashop>payment_form_alipay_47e1e580d173b931fdfdeb6bb5f14848'] = 'Payer avec Alipay';
 $_MODULE['<{stripe_official}prestashop>payment_form_fpx_74253765ffa5a6b91d758c7df4d3c871'] = 'Payer avec FPX';
-$_MODULE['<{stripe_official}prestashop>payment_form_fpx_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter';
 $_MODULE['<{stripe_official}prestashop>configurationactions_187b101d0358396a634514ea228616d5'] = 'Vous avez fourni des clés API de production au lieu de clés API de test';
 $_MODULE['<{stripe_official}prestashop>configurationactions_2df5570b8a0e0c076571d1213f7f901e'] = 'Les champs ID du client et Clé secrète sont obligatoires';
 $_MODULE['<{stripe_official}prestashop>configurationactions_5fba3565c1b6638ac41f7627066aaa58'] = 'Vous avez fourni des clés API de test au lieu de clés API de production';

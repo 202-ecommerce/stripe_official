@@ -21,7 +21,7 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
 *}
-{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='My cards' mod='stripe_official'}</span>{/capture}
+{capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account' mod='stripe_official'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='My cards' mod='stripe_official'}</span>{/capture}
 
 <h1 class="page-heading bottom-indent">
     {l s='My cards' mod='stripe_official'}
