@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Para poder utilizar este módulo, activa cURL (extensión PHP).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Pagar con tarjeta';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Pagar con Bancontact';
@@ -104,7 +104,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_53619d5dc16df90ad84a8958b71
 $_MODULE['<{stripe_official}prestashop>configuration_1f6176c4f26f546cd5424d53fac0f2f8'] = 'Discovers';
 $_MODULE['<{stripe_official}prestashop>configuration_0e29ba92a96e3342f6e47f324a0c8857'] = 'Carteras digitales, es decir, Apple Pay y Google Pay. [br] Al usar Apple Pay, aceptas los términos de servicio de [a @href1@] Stripe [/a] y [a @href2@] Apple [/a].';
 $_MODULE['<{stripe_official}prestashop>configuration_f80b9de6d53dc9db807d2a123c149fc7'] = 'No recopiles el código postal (no se recomienda*).';
-$_MODULE['<{stripe_official}prestashop>configuration_c99b5f040533a2516fed921947a3b7f4'] = 'Esta información mejora las tasas de aceptación de las tarjetas emitidas en los Estados Unidos, el Reino Unido y Canadá.';
+$_MODULE['<{stripe_official}prestashop>configuration_c99b5f040533a2516fed921947a3b7f4'] = 'Esta información mejora las tasas de aceptación de las tarjetas emitidas en los Estados Unidos, el Reino Unido y Canadá.';
 $_MODULE['<{stripe_official}prestashop>configuration_8cb12d0aa65678a528d4395dbf3a4138'] = 'Recopilar el nombre del titular de la tarjeta';
 $_MODULE['<{stripe_official}prestashop>configuration_25b9cedf5864546692ee2f44f83ec4a7'] = 'Guardar tarjetas de clientes (para futuros pagos con un solo clic)';
 $_MODULE['<{stripe_official}prestashop>configuration_04cdecad3493646701ed01647741b78f'] = 'Preguntar al cliente';

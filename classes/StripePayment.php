@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class StripePayment extends ObjectModel
 {
     /** @var string */
@@ -59,86 +58,86 @@ class StripePayment extends ObjectModel
     /**
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_payment',
-        'primary'      => 'id_payment',
-        'fields'       => array(
-            'id_stripe'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+    public static $definition = [
+        'table' => 'stripe_payment',
+        'primary' => 'id_payment',
+        'fields' => [
+            'id_stripe' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'id_payment_intent'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 255,
+            ],
+            'id_payment_intent' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'name'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 255,
+            ],
+            'name' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'id_cart' => array(
-                'type'     => ObjectModel::TYPE_INT,
+                'size' => 255,
+            ],
+            'id_cart' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
                 'size' => 10,
-            ),
-            'last4'  => array(
-                'type'     => ObjectModel::TYPE_INT,
+            ],
+            'last4' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
-                'size'     => 4,
-            ),
-            'type'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 4,
+            ],
+            'type' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 20,
-            ),
-            'amount' => array(
-                'type'     => ObjectModel::TYPE_FLOAT,
+                'size' => 20,
+            ],
+            'amount' => [
+                'type' => ObjectModel::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'size' => 10,
-                'scale' => 2
-            ),
-            'refund' => array(
-                'type'     => ObjectModel::TYPE_FLOAT,
+                'scale' => 2,
+            ],
+            'refund' => [
+                'type' => ObjectModel::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'size' => 10,
-                'scale' => 2
-            ),
-            'currency'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'scale' => 2,
+            ],
+            'currency' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 3,
-            ),
-            'result'  => array(
-                'type'     => ObjectModel::TYPE_INT,
+                'size' => 3,
+            ],
+            'result' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
-                'size'     => 1,
-            ),
-            'state'  => array(
-                'type'     => ObjectModel::TYPE_INT,
+                'size' => 1,
+            ],
+            'state' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
-                'size'     => 1,
-            ),
-            'voucher_url'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 1,
+            ],
+            'voucher_url' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'voucher_expire'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+                'size' => 255,
+            ],
+            'voucher_expire' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-            'voucher_validate'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+            ],
+            'voucher_validate' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-            'date_add'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+            ],
+            'date_add' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     public function setIdStripe($id_stripe)
     {
@@ -295,7 +294,7 @@ class StripePayment extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_cart = ' . (int)$id_cart);
+        $query->where('id_cart = ' . (int) $id_cart);
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
@@ -367,10 +366,10 @@ class StripePayment extends ObjectModel
                 break;
         }
 
-        $url_dashboard = array(
-            'charge' => 'https://dashboard.stripe.com/'.$url_type.'payments/'.$this->id_stripe,
-            'paymentIntent' => 'https://dashboard.stripe.com/'.$url_type.'payments/'.$this->id_payment_intent
-        );
+        $url_dashboard = [
+            'charge' => 'https://dashboard.stripe.com/' . $url_type . 'payments/' . $this->id_stripe,
+            'paymentIntent' => 'https://dashboard.stripe.com/' . $url_type . 'payments/' . $this->id_payment_intent,
+        ];
 
         return $url_dashboard;
     }

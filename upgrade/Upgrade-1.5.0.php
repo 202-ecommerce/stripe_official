@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -39,5 +38,6 @@ function upgrade_module_1_5_0($module)
     if (!$module->installOrderState()) {
         return false;
     }
+
     return true;
 }

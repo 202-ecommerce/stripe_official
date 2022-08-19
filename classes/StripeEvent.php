@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class StripeEvent extends ObjectModel
 {
     const CREATED_STATUS = 'CREATED';
@@ -35,59 +34,60 @@ class StripeEvent extends ObjectModel
     const REQUIRES_ACTION_STATUS = 'REQUIRES_ACTION';
 
     /**
-     * @var string $id_payment_intent
+     * @var string
      */
     public $id_payment_intent;
     /**
-     * @var string $status
+     * @var string
      */
     public $status;
     /**
-     * @var DateTime $date_add
+     * @var DateTime
      */
     public $date_add;
     /**
-     * @var bool $is_processed
+     * @var bool
      */
     public $is_processed;
     /**
-     * @var $flow_type
+     * @var
      */
     public $flow_type = 'webhook';
 
     /**
-     * @var array $definition
+     * @var array
+     *
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_event',
-        'primary'      => 'id_stripe_event',
-        'fields'       => array(
-            'id_payment_intent'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+    public static $definition = [
+        'table' => 'stripe_event',
+        'primary' => 'id_stripe_event',
+        'fields' => [
+            'id_payment_intent' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 40,
-            ),
-            'status'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 40,
+            ],
+            'status' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 30,
-            ),
-            'date_add'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+                'size' => 30,
+            ],
+            'date_add' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-            'is_processed' => array(
-                'type'     => ObjectModel::TYPE_BOOL,
+            ],
+            'is_processed' => [
+                'type' => ObjectModel::TYPE_BOOL,
                 'validate' => 'isBool',
-            ),
-            'flow_type'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+            ],
+            'flow_type' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 30,
-            ),
-        ),
-    );
+                'size' => 30,
+            ],
+        ],
+    ];
 
     public function setIdPaymentIntent($id_payment_intent)
     {
@@ -181,8 +181,7 @@ class StripeEvent extends ObjectModel
 
     public static function getStatusAssociatedToChargeType($chargeType)
     {
-        switch ($chargeType)
-        {
+        switch ($chargeType) {
             case 'charge.succeeded':
             case 'succeeded':
                 return StripeEvent::AUTHORIZED_STATUS;
@@ -218,8 +217,7 @@ class StripeEvent extends ObjectModel
 
     public static function getTransitionStatusByNewStatus($newStatus)
     {
-        switch ($newStatus)
-        {
+        switch ($newStatus) {
             case StripeEvent::REQUIRES_ACTION_STATUS:
                 return [
                     StripeEvent::CREATED_STATUS,

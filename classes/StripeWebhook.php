@@ -46,11 +46,12 @@ class StripeWebhook extends ObjectModel
             return true;
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                'Create webhook endpoint - '.(string)$e->getMessage(),
+                'Create webhook endpoint - ' . (string) $e->getMessage(),
                 null,
                 null,
                 'StripeWebhook'
             );
+
             return false;
         }
     }
@@ -60,16 +61,17 @@ class StripeWebhook extends ObjectModel
         try {
             return \Stripe\WebhookEndpoint::all(
                 [
-                    'limit' => 16
+                    'limit' => 16,
                 ]
             );
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                'getWebhookList - '.(string)$e->getMessage(),
+                'getWebhookList - ' . (string) $e->getMessage(),
                 null,
                 null,
                 'StripeWebhook'
             );
+
             return false;
         }
     }
@@ -77,6 +79,7 @@ class StripeWebhook extends ObjectModel
     public static function countWebhooksList()
     {
         $list = self::getWebhookList();
+
         return count($list->data);
     }
 

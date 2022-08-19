@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,7 +29,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_1_3_0()
 {
     $alter_stripe_payment_table = true;
-    $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_payment');
+    $result = Db::getInstance()->executeS('SHOW FIELDS FROM ' . _DB_PREFIX_ . 'stripe_payment');
 
     if (!empty($result)) {
         foreach ($result as $res) {
@@ -40,7 +39,7 @@ function upgrade_module_1_3_0()
         }
 
         if ($alter_stripe_payment_table === true) {
-            $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment ADD state tinyint(4) NOT NULL';
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'stripe_payment ADD state tinyint(4) NOT NULL';
             if (!Db::getInstance()->execute($sql)) {
                 return false;
             }

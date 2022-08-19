@@ -22,15 +22,12 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 require_once dirname(__FILE__) . '/../classes/StripeCapture.php';
 require_once dirname(__FILE__) . '/../classes/StripeCustomer.php';
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
 
 function upgrade_module_2_1_0($module)
 {
@@ -40,9 +37,9 @@ function upgrade_module_2_1_0($module)
     $installer->registerHooks();
 
     $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
-    $handler->setConveyor(array(
-                'context' => Context::getContext()
-            ));
+    $handler->setConveyor([
+                'context' => Context::getContext(),
+            ]);
     $handler->addActions('registerWebhookSignature');
     $handler->process('ConfigurationActions');
 

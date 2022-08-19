@@ -7,7 +7,6 @@
 */
 
 use Tot\Tests\Entity\Module;
-use Tot\Tests\Tools\Db;
 use Tot\Tests\TotTestCase;
 
 /**
@@ -15,7 +14,6 @@ use Tot\Tests\TotTestCase;
  */
 class TestAdmin extends TotTestCase
 {
-
     /**
      * @desc: setup of Phpunit
      */
@@ -25,7 +23,6 @@ class TestAdmin extends TotTestCase
         if (is_object($this->stripe->module) && !$this->stripe->module->isInstalled('stripe_official')) {
             $this->stripe->module->install();
         }
-        
     }
 
     /**
@@ -33,21 +30,22 @@ class TestAdmin extends TotTestCase
      */
     public function testPageConfig()
     {
-    	//$_GET['controller'] = 'AdminModules';
-    	//$_GET['configure'] = 'stripe_official';
-    	//$_GET['token'] = '6c813dd7e398d06deb0d92b4d99dfd60';
-    	$context = Context::getContext();
-    	$controller = new AdminModulesController();
-    	$context->controller = $controller;
-    	$context->smarty->addTemplateDir(array(
-			'default' => _PS_ROOT_DIR_.'/bb/themes/default/template/',
-		));
+        //$_GET['controller'] = 'AdminModules';
+        //$_GET['configure'] = 'stripe_official';
+        //$_GET['token'] = '6c813dd7e398d06deb0d92b4d99dfd60';
+        $context = Context::getContext();
+        $controller = new AdminModulesController();
+        $context->controller = $controller;
+        $context->smarty->addTemplateDir([
+            'default' => _PS_ROOT_DIR_ . '/bb/themes/default/template/',
+        ]);
         unset($_POST);
         try {
             $display = $this->stripe->module->getContent();
             echo $display;
         } catch (Exception $ex) {
             $this->assertRegExp('/xxx/', $ex->getMessage());
+
             return;
         }
     }

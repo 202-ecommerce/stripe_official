@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Um dieses Modul zu benutzen, aktivieren Sie bitte cURL (PHP-Erweiterung).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Mit Karte zahlen';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Mit Bancontact zahlen';

@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class stripe_officialUpdateIntentModuleFrontController extends ModuleFrontController
 {
     /**
@@ -35,7 +34,7 @@ class stripe_officialUpdateIntentModuleFrontController extends ModuleFrontContro
         $intent = \Stripe\PaymentIntent::update(
             Tools::getValue('id_payment_intent'),
             [
-                'payment_method_types' => [Tools::getValue('payment')]
+                'payment_method_types' => [Tools::getValue('payment')],
             ]
         );
 

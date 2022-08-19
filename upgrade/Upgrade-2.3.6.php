@@ -23,7 +23,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -33,7 +32,7 @@ if (!defined('_PS_VERSION_')) {
  */
 function upgrade_module_2_3_6($module)
 {
-    $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_official_processlogger` MODIFY msg TEXT';
+    $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'stripe_official_processlogger` MODIFY msg TEXT';
     if (!Db::getInstance()->execute($sql)) {
         return false;
     }

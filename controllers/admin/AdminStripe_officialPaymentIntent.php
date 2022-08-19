@@ -36,9 +36,9 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
 
         $this->_select = 'o.id_order, sp.id_cart, sp.id_payment_intent, sp.type, spi.status, o.reference';
         $this->_join =
-            'INNER JOIN `'._DB_PREFIX_.'stripe_payment` sp ON (a.id_payment_intent = sp.id_payment_intent AND sp.result > 0)
-            INNER JOIN `'._DB_PREFIX_.'stripe_payment_intent` spi ON (sp.id_payment_intent = spi.id_payment_intent)
-            INNER JOIN `'._DB_PREFIX_.'orders` o ON (sp.id_cart = o.id_cart)';
+            'INNER JOIN `' . _DB_PREFIX_ . 'stripe_payment` sp ON (a.id_payment_intent = sp.id_payment_intent AND sp.result > 0)
+            INNER JOIN `' . _DB_PREFIX_ . 'stripe_payment_intent` spi ON (sp.id_payment_intent = spi.id_payment_intent)
+            INNER JOIN `' . _DB_PREFIX_ . 'orders` o ON (sp.id_cart = o.id_cart)';
 
         $this->explicitSelect = true;
 
@@ -70,7 +70,7 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
             'reference' => [
                 'title' => $this->module->l('Order Reference', 'AdminStripe_officialPaymentIntentController'),
                 'orderby' => false,
-            ]
+            ],
         ];
     }
 
@@ -87,6 +87,7 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
 
     /**
      * @throws PrestaShopException
+     *
      * @see AdminController::initToolbar()
      */
     public function renderDetails()

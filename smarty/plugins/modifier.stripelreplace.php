@@ -23,7 +23,7 @@
  * @license   Commercial license
  */
 
-/**
+/*
  * Smarty modifier to replace HTML tags in translations.
  * @usage {{l='test'}|totlreplace}
  * @param.value string
@@ -31,9 +31,9 @@
  */
 
 if (!function_exists('smarty_modifier_stripelreplace')) {
-    function smarty_modifier_stripelreplace($string, $replaces = array())
+    function smarty_modifier_stripelreplace($string, $replaces = [])
     {
-        $search = array(
+        $search = [
             '[b]',
             '[/b]',
             '[br]',
@@ -47,9 +47,9 @@ if (!function_exists('smarty_modifier_stripelreplace')) {
             '[strong]',
             '[/strong]',
             '[i]',
-            '[/i]'
-        );
-        $replace = array(
+            '[/i]',
+        ];
+        $replace = [
             '<b>',
             '</b>',
             '<br>',
@@ -63,8 +63,8 @@ if (!function_exists('smarty_modifier_stripelreplace')) {
             '<strong>',
             '</strong>',
             '<i>',
-            '</i>'
-        );
+            '</i>',
+        ];
         $string = str_replace($search, $replace, $string);
         foreach ($replaces as $k => $v) {
             $string = str_replace($k, $v, $string);

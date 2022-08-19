@@ -49,10 +49,10 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         );
 
         if (empty($this->context->cart->getProducts())) {
-            $chargeResult = array(
+            $chargeResult = [
                 'code' => '0',
-                'url' => $url_failed
-            );
+                'url' => $url_failed,
+            ];
             echo Tools::jsonEncode($chargeResult);
             exit;
         }
@@ -60,15 +60,15 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
         // Create the handler
         $handler = new ActionsHandler();
 
-         // Set input data
-        $handler->setConveyor(array(
+        // Set input data
+        $handler->setConveyor([
                     'source' => Tools::getValue('source'),
                     'response' => Tools::getValue('response'),
                     'id_payment_intent' => Tools::getValue('payment_intent'),
                     'saveCard' => Tools::getValue('saveCard'),
                     'module' => $this->module,
                     'context' => $this->context,
-                ));
+                ]);
 
         // Set list of actions to execute
         if (Tools::getValue('source')) {
@@ -101,7 +101,6 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             Tools::redirect($url_failed);
         }
 
-
         $id_order = Order::getOrderByCartId($this->context->cart->id);
 
         if (isset($this->context->customer->secure_key)) {
@@ -114,12 +113,12 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'order-confirmation',
             true,
             null,
-            array(
-                'id_cart' => (int)$this->context->cart->id,
-                'id_module' => (int)$this->module->id,
-                'id_order' => (int)$id_order,
-                'key' => $secure_key
-            )
+            [
+                'id_cart' => (int) $this->context->cart->id,
+                'id_module' => (int) $this->module->id,
+                'id_order' => (int) $id_order,
+                'key' => $secure_key,
+            ]
         );
 
         if (!empty(Tools::getValue('source')) || !empty(Tools::getValue('payment_intent'))) {
@@ -127,11 +126,11 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             exit;
         }
 
-         /* Ajax redirection Order Confirmation */
-        $chargeResult = array(
+        /* Ajax redirection Order Confirmation */
+        $chargeResult = [
             'code' => '1',
-            'url' => $url
-        );
+            'url' => $url,
+        ];
 
         echo Tools::jsonEncode($chargeResult);
         exit;

@@ -60,14 +60,14 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $intent = $this->createIdempotencyKey($intentData);
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                "Retrieve Stripe Account Error => ".$e->getMessage(),
+                'Retrieve Stripe Account Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         }
 
         ProcessLoggerHandler::logInfo(
@@ -78,13 +78,13 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         );
         ProcessLoggerHandler::closeLogger();
 
-        echo(
+        echo
             json_encode([
                 'intent' => $intent,
                 'cardPayment' => $cardData['cardPayment'],
-                'saveCard' => $cardData['save_card']
+                'saveCard' => $cardData['save_card'],
             ])
-        );
+        ;
         exit;
     }
 
@@ -97,15 +97,15 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $shippingAddress = new Address($this->context->cart->id_address_delivery);
             $shippingAddressState = new State($shippingAddress->id_state);
 
-            $intentData = array(
-                "amount" => $amount,
-                "currency" => $currency,
-                "payment_method_types" => [$paymentOption],
-                "capture_method" => $captureMethod,
-                "metadata" => [
-                    'id_cart' => $this->context->cart->id
+            $intentData = [
+                'amount' => $amount,
+                'currency' => $currency,
+                'payment_method_types' => [$paymentOption],
+                'capture_method' => $captureMethod,
+                'metadata' => [
+                    'id_cart' => $this->context->cart->id,
                 ],
-                "description" => 'Product Purchase',
+                'description' => 'Product Purchase',
                 'shipping' => [
                     'name' => $customerFullName,
                     'address' => [
@@ -116,7 +116,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                         'country' => Country::getIsoById($shippingAddress->id_country),
                     ],
                 ],
-            );
+            ];
 
             if ($paymentMethodId) {
                 $stripeAccount = \Stripe\Account::retrieve();
@@ -126,7 +126,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             ProcessLoggerHandler::logInfo(
-                'Intent Data => '.Tools::jsonEncode($intentData),
+                'Intent Data => ' . Tools::jsonEncode($intentData),
                 null,
                 null,
                 'createIntent - constructIntentData'
@@ -135,34 +135,34 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             return $intentData;
         } catch (\Stripe\Exception\ApiErrorException $e) {
             ProcessLoggerHandler::logError(
-                "Retrieve Stripe Account Error => ".$e->getMessage(),
+                'Retrieve Stripe Account Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         } catch (PrestaShopDatabaseException $e) {
             ProcessLoggerHandler::logError(
-                "Retrieve Prestashop State Error => ".$e->getMessage(),
+                'Retrieve Prestashop State Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logError(
-                "Retrieve Prestashop State Error => ".$e->getMessage(),
+                'Retrieve Prestashop State Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         }
     }
 
@@ -171,19 +171,19 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         if (!$paymentMethodId) {
             $address = new Address($this->context->cart->id_address_invoice);
 
-            $payment_method = array(
-                'billing_details' => array(
-                    'address' => array(
+            $payment_method = [
+                'billing_details' => [
+                    'address' => [
                         'city' => $address->city,
                         'country' => Country::getIsoById($address->id_country),
                         'line1' => $address->address1,
                         'line2' => $address->address2,
-                        'postal_code' => $address->postcode
-                    ),
+                        'postal_code' => $address->postcode,
+                    ],
                     'email' => $this->context->customer->email,
-                    'name' => $this->getCustomerFullNameContext()
-                )
-            );
+                    'name' => $this->getCustomerFullNameContext(),
+                ],
+            ];
         } else {
             $payment_method = $paymentMethodId;
         }
@@ -201,16 +201,16 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripe_validation_return_url = $this->context->link->getModuleLink(
                 'stripe_official',
                 'orderConfirmationReturn',
-                array(
-                    'id_cart' => $this->context->cart->id
-                ),
+                [
+                    'id_cart' => $this->context->cart->id,
+                ],
                 true
             );
             $cardData['cardPayment']['return_url'] = $stripe_validation_return_url;
         }
 
         ProcessLoggerHandler::logInfo(
-            'Card Payment => '.Tools::jsonEncode($cardData),
+            'Card Payment => ' . Tools::jsonEncode($cardData),
             null,
             null,
             'createIntent - constructCardPaymentData'
@@ -238,7 +238,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $this->registerStripeEvent($intent);
 
                 ProcessLoggerHandler::logInfo(
-                    'Create New Intent => '.$intent,
+                    'Create New Intent => ' . $intent,
                     null,
                     null,
                     'createIntent - createIdempotencyKey'
@@ -248,7 +248,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $intent = $stripeIdempotencyKey->updateIntentData($intentData);
 
                 ProcessLoggerHandler::logInfo(
-                    'Update Previous Intent => '.$intent,
+                    'Update Previous Intent => ' . $intent,
                     null,
                     null,
                     'createIntent - createIdempotencyKey'
@@ -258,24 +258,24 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             return $intent;
         } catch (\Stripe\Exception\ApiErrorException $e) {
             ProcessLoggerHandler::logError(
-                "Create Stripe Intent Error => ".$e->getMessage(),
+                'Create Stripe Intent Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent - createIdempotencyKey'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die($e->getMessage());
+            exit($e->getMessage());
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logError(
-                "Save Stripe Idempotency Key Error => ".$e->getMessage(),
+                'Save Stripe Idempotency Key Error => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent - createIdempotencyKey'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         }
     }
 
@@ -294,7 +294,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
             if ($stripeEvent->save()) {
                 ProcessLoggerHandler::logInfo(
-                    'Register created Stripe event status for payment intent '.$intent->id,
+                    'Register created Stripe event status for payment intent ' . $intent->id,
                     'StripeEvent',
                     $stripeEvent->id,
                     'createIntent - registerStripeEvent'
@@ -308,18 +308,18 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(400);
-                die('An unexpected problem has occurred. Please contact the support.');
+                exit('An unexpected problem has occurred. Please contact the support.');
             }
         } catch (PrestaShopException $e) {
             ProcessLoggerHandler::logError(
-                "An issue appears during saving Stripe module event in database",
+                'An issue appears during saving Stripe module event in database',
                 null,
                 null,
                 'createIntent - registerStripeEvent'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(400);
-            die('An unexpected problem has occurred. Please contact the support.');
+            exit('An unexpected problem has occurred. Please contact the support.');
         }
     }
 

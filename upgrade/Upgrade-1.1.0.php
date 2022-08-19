@@ -22,12 +22,11 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 function upgrade_module_1_1_0($module)
 {
-    return ($module->registerHook('header'));
+    return $module->registerHook('header');
 }

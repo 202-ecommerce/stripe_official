@@ -26,7 +26,6 @@ use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontController
 {
     /**
@@ -38,8 +37,9 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         $intent = $this->retrievePaymentIntent();
 
-        if ($this->registerStripeEvent($intent))
+        if ($this->registerStripeEvent($intent)) {
             $this->handleWebhookActions($intent);
+        }
 
         $this->displayOrderConfirmation($intent);
     }
@@ -60,7 +60,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
 
         ProcessLoggerHandler::logInfo(
-            'Retrieve payment intent : '.$intent,
+            'Retrieve payment intent : ' . $intent,
             null,
             null,
             'orderSuccess - retrievePaymentIntent'
@@ -77,12 +77,13 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         if (!$stripeEventStatus) {
             ProcessLoggerHandler::logInfo(
-                'Charge event does not need to be processed : '.$eventCharge->status,
+                'Charge event does not need to be processed : ' . $eventCharge->status,
                 null,
                 null,
                 'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -108,6 +109,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'orderSuccess - checkEventStatus'
                 );
                 ProcessLoggerHandler::closeLogger();
+
                 return false;
             }
         }
@@ -120,6 +122,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -156,6 +159,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'orderSuccess - registerStripeEvent'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
     }
@@ -241,7 +245,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         );
 
         $id_order = 0;
-        for($i = 1; $i <= 15; $i++) {
+        for ($i = 1; $i <= 15; ++$i) {
             if (empty($intent->metadata->id_cart)) {
                 $stripePayment = new StripePayment();
                 $stripePayment->getStripePaymentByPaymentIntent($intent->id);
@@ -286,12 +290,12 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',
                 'orderFailure',
-                array(),
+                [],
                 true
             );
 
             ProcessLoggerHandler::logInfo(
-                'Failed order url => '.$url,
+                'Failed order url => ' . $url,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
@@ -301,16 +305,16 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'order-confirmation',
                 true,
                 null,
-                array(
+                [
                     'id_cart' => $id_cart,
-                    'id_module' => (int)$this->module->id,
+                    'id_module' => (int) $this->module->id,
                     'id_order' => $id_order,
-                    'key' => $secure_key
-                )
+                    'key' => $secure_key,
+                ]
             );
 
             ProcessLoggerHandler::logInfo(
-                'Confirmation order url => '.$url,
+                'Confirmation order url => ' . $url,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'

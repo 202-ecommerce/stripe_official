@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class StripeCapture extends ObjectModel
 {
     /** @var string */
@@ -39,34 +38,34 @@ class StripeCapture extends ObjectModel
     /**
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_capture',
-        'primary'      => 'id_stripe_capture',
-        'fields'       => array(
-            'id_payment_intent'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+    public static $definition = [
+        'table' => 'stripe_capture',
+        'primary' => 'id_stripe_capture',
+        'fields' => [
+            'id_payment_intent' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 40,
-            ),
-            'id_order' => array(
-                'type'     => ObjectModel::TYPE_INT,
+                'size' => 40,
+            ],
+            'id_order' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
                 'size' => 10,
-            ),
-            'expired' => array(
-                'type'     => ObjectModel::TYPE_BOOL,
+            ],
+            'expired' => [
+                'type' => ObjectModel::TYPE_BOOL,
                 'validate' => 'isBool',
-            ),
-            'date_catch'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+            ],
+            'date_catch' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-            'date_authorize'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+            ],
+            'date_authorize' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     public function setIdPaymentIntent($id_payment_intent)
     {

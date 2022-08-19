@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Para poder utilizar este módulo, ative o cURL (extensão PHP).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Pagar com cartão';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Pagar com Bancontact';
@@ -45,7 +45,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_15f04500d9edaac382bb3d451
 $_MODULE['<{stripe_official}prestashop>stripe_official_86c7338e09e2c3ca2e458da630895e25'] = 'Nenhuma chave API foi fornecida. Entre em contato com o proprietário do site.';
 $_MODULE['<{stripe_official}prestashop>stripecards_cd81f9f55969c822377f076017bb3484'] = 'Cartões';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_d3b206d196cd6be3a2764c1fb90b200f'] = 'Supprimer la sélection';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_49ee3087348e8d44e1feda1917443987'] = 'Nom';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4c2a8fe7eaf24721cc7a9f0175115bd4'] = 'Message';
@@ -61,10 +61,10 @@ $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_1607c94671fd
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_71c3e06323cd5a59436ec53afca80c57'] = 'Choisissez le nombre de jours pendant lesquels vous souhaitez conserver les journaux dans la base de données';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_dcc459e0cef1e36a18a356fbc5789b16'] = 'Effacer tout';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_f51c7af7c02cd3a846d87d97bfaf6b58'] = 'Tous les logs ont été effacés';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_9ca4bc48596557840045a7477c803657'] = 'Vous devez spécifier un nombre \"Délai d\'effacement automatique (en jours)\" valide.';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
 $_MODULE['<{stripe_official}prestashop>main_c2cc7082a89c1ad6631a2f66af5f00c0'] = 'Ligação';
 $_MODULE['<{stripe_official}prestashop>main_76f0ed934de85cc7131910b32ede7714'] = 'Reembolso';
 $_MODULE['<{stripe_official}prestashop>configuration_e6ad4dd232a1bb7d77852af7fc2e0538'] = '[a @href1@]Crie a sua conta Stripe em 10 minutos[/a] e comece imediatamente a aceitar pagamentos com cartão, bem como métodos de pagamento locais (não é necessário um contrato adicional/identificação do comerciante do seu banco).';

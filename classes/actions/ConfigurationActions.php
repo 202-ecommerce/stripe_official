@@ -24,8 +24,6 @@
  */
 
 use Stripe_officialClasslib\Actions\DefaultActions;
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-use Stripe_officialClasslib\Registry;
 
 class ConfigurationActions extends DefaultActions
 {
@@ -41,10 +39,10 @@ class ConfigurationActions extends DefaultActions
         $this->module = $this->conveyor['module'];
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
-        $mode = Configuration::get(Stripe_official::MODE,null, $shopGroupId, $shopId);
-        $secretKeyLive = Configuration::get(Stripe_official::KEY,null, $shopGroupId, $shopId);
-        $secretKeyTest = Configuration::get(Stripe_official::TEST_KEY,null, $shopGroupId, $shopId);
-        $webhookId = Configuration::get(Stripe_official::WEBHOOK_ID,null, $shopGroupId, $shopId);
+        $mode = Configuration::get(Stripe_official::MODE, null, $shopGroupId, $shopId);
+        $secretKeyLive = Configuration::get(Stripe_official::KEY, null, $shopGroupId, $shopId);
+        $secretKeyTest = Configuration::get(Stripe_official::TEST_KEY, null, $shopGroupId, $shopId);
+        $webhookId = Configuration::get(Stripe_official::WEBHOOK_ID, null, $shopGroupId, $shopId);
 
         /* If mode has changed delete webhook of previous mode */
         if (Tools::getValue(Stripe_official::MODE) != $mode && $webhookId
@@ -133,7 +131,7 @@ class ConfigurationActions extends DefaultActions
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
         if (!Tools::getValue('save_card')) {
-            Configuration::updateValue(Stripe_official::SAVE_CARD, null,false, $shopGroupId, $shopId);
+            Configuration::updateValue(Stripe_official::SAVE_CARD, null, false, $shopGroupId, $shopId);
         } else {
             Configuration::updateValue(Stripe_official::SAVE_CARD, Tools::getValue('save_card'), false, $shopGroupId, $shopId);
             Configuration::updateValue(Stripe_official::ASK_CUSTOMER, Tools::getValue('ask_customer'), false, $shopGroupId, $shopId);
@@ -196,8 +194,8 @@ class ConfigurationActions extends DefaultActions
         $this->context = $this->conveyor['context'];
         $shopGroupId = Stripe_official::getShopGroupIdContext();
         $shopId = Stripe_official::getShopIdContext();
-        $webhookSignature = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE,null, $shopGroupId, $shopId);
-        $webhookId = Configuration::get(Stripe_official::WEBHOOK_ID,null, $shopGroupId, $shopId);
+        $webhookSignature = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE, null, $shopGroupId, $shopId);
+        $webhookId = Configuration::get(Stripe_official::WEBHOOK_ID, null, $shopGroupId, $shopId);
         $webhookConfError = false;
 
         /* Check if webhook_id and webhook_signature have been defined */
@@ -225,11 +223,12 @@ class ConfigurationActions extends DefaultActions
                 } else {
                     $eventError = true;
                 }
-                if ($eventError)
+                if ($eventError) {
                     $webhookUpdateData['enabled_events'] = Stripe_official::$webhook_events;
+                }
 
                 if (!empty($webhookUpdateData)) {
-                    $secretKey = Configuration::get(Stripe_official::MODE,null, $shopGroupId, $shopId) ? Configuration::get(Stripe_official::TEST_KEY,null, $shopGroupId, $shopId) : Configuration::get(Stripe_official::KEY,null, $shopGroupId, $shopId);
+                    $secretKey = Configuration::get(Stripe_official::MODE, null, $shopGroupId, $shopId) ? Configuration::get(Stripe_official::TEST_KEY, null, $shopGroupId, $shopId) : Configuration::get(Stripe_official::KEY, null, $shopGroupId, $shopId);
                     $stripeClient = new \Stripe\StripeClient($secretKey);
                     $stripeClient->webhookEndpoints->update($webhookId, $webhookUpdateData);
                 }

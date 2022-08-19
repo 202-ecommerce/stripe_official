@@ -22,9 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 class StripeDispute extends ObjectModel
 {
     /** @var string */

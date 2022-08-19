@@ -59,8 +59,9 @@ class StripeCard extends ObjectModel
                 'customer' => $this->stripe_customer_key,
             ]);
         } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
-            ProcessLoggerHandler::logError('Save card - '.(string)$e->getMessage(), null, null, 'StripeCard');
+            $this->_error[] = (string) $e->getMessage();
+            ProcessLoggerHandler::logError('Save card - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
             return false;
         }
 
@@ -75,8 +76,9 @@ class StripeCard extends ObjectModel
             );
             $payment_method->detach();
         } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
-            ProcessLoggerHandler::logError('Delete card - '.(string)$e->getMessage(), null, null, 'StripeCard');
+            $this->_error[] = (string) $e->getMessage();
+            ProcessLoggerHandler::logError('Delete card - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
             return false;
         }
 
@@ -91,8 +93,9 @@ class StripeCard extends ObjectModel
                 'type' => 'card',
             ]);
         } catch (Exception $e) {
-            ProcessLoggerHandler::logError('getAllCustomerCards - '.(string)$e->getMessage(), null, null, 'StripeCard');
-            return array();
+            ProcessLoggerHandler::logError('getAllCustomerCards - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
+            return [];
         }
 
         return $allCards->data;

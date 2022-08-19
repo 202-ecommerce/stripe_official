@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -30,7 +29,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_3_0($module)
 {
     $alter_stripe_payment_table = true;
-    $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_payment');
+    $result = Db::getInstance()->executeS('SHOW FIELDS FROM ' . _DB_PREFIX_ . 'stripe_payment');
 
     if (!empty($result)) {
         foreach ($result as $res) {
@@ -40,7 +39,7 @@ function upgrade_module_2_3_0($module)
         }
 
         if ($alter_stripe_payment_table === true) {
-            $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_payment
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'stripe_payment
                     ADD voucher_url varchar(255) AFTER state,
                     ADD voucher_expire varchar(255) AFTER voucher_url,
                     ADD voucher_validate varchar(255) AFTER voucher_expire';
@@ -50,9 +49,8 @@ function upgrade_module_2_3_0($module)
         }
     }
 
-
     $alter_stripe_customer_table = true;
-    $result = Db::getInstance()->executeS('SHOW FIELDS FROM '._DB_PREFIX_.'stripe_customer');
+    $result = Db::getInstance()->executeS('SHOW FIELDS FROM ' . _DB_PREFIX_ . 'stripe_customer');
 
     if (!empty($result)) {
         foreach ($result as $res) {
@@ -62,7 +60,7 @@ function upgrade_module_2_3_0($module)
         }
 
         if ($alter_stripe_customer_table === true) {
-            $sql = 'ALTER TABLE '._DB_PREFIX_.'stripe_customer
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'stripe_customer
                     ADD id_account varchar(255) AFTER stripe_customer_key';
             if (!Db::getInstance()->execute($sql)) {
                 return false;

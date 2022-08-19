@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * 2007-2021 PrestaShop
  *
@@ -24,14 +23,13 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 function upgrade_module_2_4_2($module)
 {
-    $sql = "TRUNCATE `" . _DB_PREFIX_ . "stripe_event`;";
+    $sql = 'TRUNCATE `' . _DB_PREFIX_ . 'stripe_event`;';
 
     return Db::getInstance()->execute($sql);
 }

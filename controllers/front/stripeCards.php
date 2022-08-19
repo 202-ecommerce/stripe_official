@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class stripe_officialStripeCardsModuleFrontController extends ModuleFrontController
 {
     /**
@@ -32,7 +31,7 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
     {
         parent::initContent();
 
-        $allCards = array();
+        $allCards = [];
 
         if ($this->context->customer->id != null) {
             $stripeAccount = \Stripe\Account::retrieve();
@@ -50,9 +49,9 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
             }
         }
 
-        $this->context->smarty->assign(array(
-            'cards' => $allCards
-        ));
+        $this->context->smarty->assign([
+            'cards' => $allCards,
+        ]);
 
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $this->setTemplate('module:stripe_official/views/templates/front/stripe-cards.tpl');
@@ -70,10 +69,11 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
             'url' => $this->context->link->getModuleLink(
                 'stripe_official',
                 'stripeCards',
-                array(),
+                [],
                 true
             ),
         ];
+
         return $breadcrumb;
     }
 
@@ -81,14 +81,14 @@ class stripe_officialStripeCardsModuleFrontController extends ModuleFrontControl
     {
         parent::setMedia();
 
-        Media::addJsDef(array(
+        Media::addJsDef([
             'stripe_remove_card_url' => $this->context->link->getModuleLink(
                 'stripe_official',
                 'removeCard',
-                array(),
+                [],
                 true
-            )
-        ));
+            ),
+        ]);
 
         $this->addJS(_MODULE_DIR_ . 'stripe_official/views/js/stripeCard.js');
     }
