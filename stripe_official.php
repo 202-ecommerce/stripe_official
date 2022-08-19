@@ -1410,8 +1410,6 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
-        $query->where('id_shop_group = '.$this->context->shop->id_shop_group);
-        $query->where('id_shop = '.$this->context->shop->id);
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
@@ -1761,10 +1759,16 @@ class Stripe_official extends PaymentModule
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
 
-        if (Configuration::get(self::POSTCODE) == null) {
+        if (Configuration::get(self::REINSURANCE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
-            $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
+            $stripe_reinsurance_enabled = Configuration::get(self::REINSURANCE);
+        }
+
+        if (Configuration::get(self::POSTCODE) == null) {
+            $stripe_postcode_enabled = 'off';
+        } else {
+            $stripe_postcode_enabled = Configuration::get(self::POSTCODE);
         }
 
         $show_save_card = false;
@@ -1777,9 +1781,9 @@ class Stripe_official extends PaymentModule
             'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
-            'stripe_postcode_enabled' => $stripe_reinsurance_enabled,
+            'stripe_postcode_enabled' => $stripe_postcode_enabled,
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
-            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
+            'stripe_reinsurance_enabled' => $stripe_reinsurance_enabled,
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
             'customer_name' => $address->firstname . ' ' . $address->lastname,
