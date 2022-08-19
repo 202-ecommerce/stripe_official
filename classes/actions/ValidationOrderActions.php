@@ -815,15 +815,8 @@ class ValidationOrderActions extends DefaultActions
                 break;
 
             case 'charge.refunded':
-                if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
-                    $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-                    ProcessLoggerHandler::logInfo(
-                        'Order canceled',
-                        null,
-                        null,
-                        'ValidationOrderActions - chargeWebhook'
-                    );
-                } else {
+                $currentState = new \OrderState($order->getCurrentState());
+                if ((bool) $currentState->paid === true) {
                     if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
                         || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
                         $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
