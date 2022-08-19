@@ -376,7 +376,9 @@ class ValidationOrderActions extends DefaultActions
                 'ValidationOrderActions - createOrder'
             );
 
-            if ($intent->payment_method_types[0] == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
+            if ($intent->payment_method_types[0] == 'card'
+                && $intent->capture_method != 'automatic'
+                && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
                 ProcessLoggerHandler::logInfo(
                     'Capturing card',
                     null,
