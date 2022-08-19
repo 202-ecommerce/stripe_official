@@ -162,6 +162,7 @@ $_MODULE['<{stripe_official}prestashop>admin_content_order_e2b54a61bf4e56c4a0443
 $_MODULE['<{stripe_official}prestashop>admin_content_order_2311c8c5e8f44924a3e61c78e2223049'] = 'Voucher verloopt op:';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_49ee3087348e8d44e1feda1917443987'] = 'Naam';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'E-mailadres';
+$_MODULE['<{stripe_official}prestashop>payment_form_oxxo_eeceac1af4e7620894d6d2083921bb73'] = 'Nu kopen';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_4e997b9d3b7152f2afeacd96ab1ef1cb'] = 'Mijn kaarten';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a44217022190f5734b2f72ba1e4f8a79'] = 'Kaartnummer';
@@ -191,6 +192,7 @@ $_MODULE['<{stripe_official}prestashop>payment_form_card_eeceac1af4e7620894d6d20
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_ac23f66a874a7808e300a15f2e94320a'] = 'Betalen met iDEAL';
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_eeceac1af4e7620894d6d2083921bb73'] = 'Nu kopen';
 $_MODULE['<{stripe_official}prestashop>payment_form_eps_c446bbd08309aff37eee1e0c43b19cde'] = 'Betalen met EPS';
+$_MODULE['<{stripe_official}prestashop>stripe-cards16_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'Mijn rekening';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a46d3e7285f76d2401202f18b0acbcbd'] = 'Mijn kaarten';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a44217022190f5734b2f72ba1e4f8a79'] = 'Kaartnummer';
@@ -213,7 +215,6 @@ $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_9d67bee92ea5
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_7dc9c0e2e38c2bbf16923bc6d79b7b06'] = '[a @href1@]Probeer het opnieuw[/a] of neem contact op met de beheerder van de website.';
 $_MODULE['<{stripe_official}prestashop>payment_form_alipay_47e1e580d173b931fdfdeb6bb5f14848'] = 'Betalen met Alipay';
 $_MODULE['<{stripe_official}prestashop>payment_form_fpx_74253765ffa5a6b91d758c7df4d3c871'] = 'Betalen met FPX';
-$_MODULE['<{stripe_official}prestashop>payment_form_fpx_eeceac1af4e7620894d6d2083921bb73'] = 'Nu kopen';
 $_MODULE['<{stripe_official}prestashop>configurationactions_187b101d0358396a634514ea228616d5'] = 'Er zijn API-sleutels voor de livemodus opgegeven in plaats van API-sleutels voor de testmodus';
 $_MODULE['<{stripe_official}prestashop>configurationactions_2df5570b8a0e0c076571d1213f7f901e'] = 'De velden Client-ID en Geheime sleutel zijn verplicht';
 $_MODULE['<{stripe_official}prestashop>configurationactions_5fba3565c1b6638ac41f7627066aaa58'] = 'Er zijn API-sleutels voor de testmodus opgegeven in plaats van API-sleutels voor de livemodus';
