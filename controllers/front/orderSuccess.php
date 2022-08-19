@@ -251,40 +251,29 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 $id_cart = $intent->metadata->id_cart;
             }
 
+            if (empty($id_cart) === true) {
+                break;
+            }
+            $id_order = $this->getOrderIdByCartId($id_cart);
+
             ProcessLoggerHandler::logInfo(
-                'Cart Id => ' . $id_cart,
+                'Waiting proccess time => ' . $i . 'Order Id => ' . $id_order,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
             );
 
-            if ($id_cart !== null) {
-                $id_order = $this->getOrderIdByCartId($id_cart);
-
+            if (empty($id_order) === false) {
                 ProcessLoggerHandler::logInfo(
-                    'Order Id => ' . $id_order,
+                    'Waiting proccess order OK',
                     null,
                     null,
                     'orderSuccess - displayOrderConfirmation'
                 );
-
-                if ($id_order) {
-                    ProcessLoggerHandler::logInfo(
-                        'Waiting proccess order OK',
-                        null,
-                        null,
-                        'orderSuccess - displayOrderConfirmation'
-                    );
-                    break;
-                }
+                break;
             }
+
             sleep(2);
-            ProcessLoggerHandler::logInfo(
-                'Waiting proccess time => '.$i,
-                null,
-                null,
-                'orderSuccess - displayOrderConfirmation'
-            );
         }
 
         if (isset($this->context->customer->secure_key)) {
