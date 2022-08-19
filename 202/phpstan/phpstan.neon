@@ -9,11 +9,12 @@ parameters:
       - ../../stripe_official.php
       - ../../classes
       - ../../controllers
-      - ../../src
+      - ../../smarty
       - ../../upgrade
+      - ../../translations
   ignoreErrors:
   excludePaths:
     - ../../classes/Compatibility/backword-compatibility.php
 
   reportUnmatchedIgnoredErrors: false
-  level: 1
+  level: 3
