@@ -78,8 +78,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         );
         ProcessLoggerHandler::closeLogger();
 
-        echo
-            json_encode([
+        echo json_encode([
                 'intent' => $intent,
                 'cardPayment' => $cardData['cardPayment'],
                 'saveCard' => $cardData['save_card'],
