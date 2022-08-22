@@ -401,6 +401,10 @@ class Stripe_official extends PaymentModule
 
     public $success;
 
+    public $display;
+
+    public $meta_title;
+
     public $button_label = [];
 
     public function __construct()
@@ -458,7 +462,7 @@ class Stripe_official extends PaymentModule
                     'https://addons.prestashop.com/en/payment-card-wallet/24922-stripe-official.html',
                     'pp_partner_EX2Z2idAZw7OWr'
                 );
-            } catch (\Stripe\Error\ApiConnection $e) {
+            } catch (\Stripe\Exception\ApiConnectionException $e) {
                 Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                     'Fail to set API Key. Stripe SDK return error: ' . $e
                 );
@@ -847,7 +851,7 @@ class Stripe_official extends PaymentModule
             if ($this->checkApiConnection($secret_key) !== false) {
                 try {
                     \Stripe\Charge::all();
-                } catch (\Stripe\Error\ApiConnection $e) {
+                } catch (\Stripe\Exception\ApiConnectionException $e) {
                     Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logInfo($e);
                     Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 
@@ -1214,7 +1218,7 @@ class Stripe_official extends PaymentModule
                 }
                 try {
                     $ch = \Stripe\Charge::retrieve($refund_id);
-                    $ch->refunds->create(['amount' => $ref_amount]);
+                    $ch->refunds->create(['amount' => $ref_amount ?? 0]);
                 } catch (Exception $e) {
                     // Something else happened, completely unrelated to Stripe
                     $this->errors[] = $e->getMessage();
@@ -1482,7 +1486,7 @@ class Stripe_official extends PaymentModule
             $intent->capture(['amount_to_capture' => $amount]);
 
             return true;
-        } catch (\Stripe\Error\ApiConnection $e) {
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError(
                 'Fail to capture amount. Stripe SDK return error: ' . $e
             );
