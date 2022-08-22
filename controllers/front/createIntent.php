@@ -226,13 +226,19 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
-            $previousPaymentIntentData = PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
+            if (empty($stripeIdempotencyKey->id) === false) {
+                $previousPaymentIntentData = PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
+                $paymentIntentStatus = $previousPaymentIntentData->status;
+                $paymentIntentCaptureMethod = $previousPaymentIntentData->capture_method;
+            } else {
+                $paymentIntentStatus = null;
+                $paymentIntentCaptureMethod = null;
+            }
 
-            $paymentIntentStatus = (empty($stripeIdempotencyKey->id) === false) ? $previousPaymentIntentData->status : null;
             $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
 
             if (in_array($paymentIntentStatus, $updatableStatus) === false
-                || $previousPaymentIntentData->capture_method !== $intentData['capture_method']
+                || $paymentIntentCaptureMethod !== $intentData['capture_method']
             ) {
                 $intent = $stripeIdempotencyKey->createNewOne($cart->id, $intentData);
                 $this->registerStripeEvent($intent);
