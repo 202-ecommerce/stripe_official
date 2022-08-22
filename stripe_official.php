@@ -838,7 +838,7 @@ class Stripe_official extends PaymentModule
         /* Check if TLS is enabled and the TLS version used is 1.2 */
         if (self::isWellConfigured()) {
             $secret_key = trim(Tools::getValue(self::TEST_KEY));
-            if ($this->checkApiConnection($secret_key)) {
+            if ($this->checkApiConnection($secret_key) !== false) {
                 try {
                     \Stripe\Charge::all();
                 } catch (\Stripe\Error\ApiConnection $e) {
@@ -889,7 +889,7 @@ class Stripe_official extends PaymentModule
                 $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve($webhookId);
 
                 /* Check if webhook url is wrong */
-                $expectedWebhookUrl = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT'));
+                $expectedWebhookUrl = self::getWebhookUrl();
                 if ($webhookEndpoint->url != $expectedWebhookUrl) {
                     $this->errors[] =
                         $this->l('Webhook URL configuration is wrong, click on save button to fix issue. Webhook configuration will be corrected.', $this->name) .' | '.
@@ -1075,7 +1075,7 @@ class Stripe_official extends PaymentModule
             'alipay' => Configuration::get(self::ENABLE_ALIPAY,null, $shopGroupId, $shopId),
             'oxxo' => Configuration::get(self::ENABLE_OXXO,null, $shopGroupId, $shopId),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY,null, $shopGroupId, $shopId),
-            'url_webhhoks' => $this->context->link->getModuleLink($this->name, 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')),
+            'url_webhhoks' => self::getWebhookUrl(),
         ));
     }
 
@@ -1178,7 +1178,8 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
+        $stripeAccount = $this->checkApiConnection($this->getSecretKey());
+        if (empty($stripeAccount) !== false && empty($refund_id) !== false) {
             $query = new DbQuery();
             $query->select('*');
             $query->from('stripe_payment');
@@ -1309,6 +1310,40 @@ class Stripe_official extends PaymentModule
     }
 
     /**
+     * get webhook url of stripe_official module
+     *
+     * @return string
+     */
+    public static function getWebhookUrl()
+    {
+        $context = Context::getContext();
+        $id_lang = self::getLangIdContext();
+        $id_shop = self::getShopIdContext();
+
+        return $context->link->getModuleLink(
+            'stripe_official',
+            'webhook',
+            [],
+            true,
+            $id_lang,
+            $id_shop
+        );
+    }
+
+    /**
+     * get current LangId according to activate multishop feature
+     *
+     * @return int|null
+     */
+    public static function getLangIdContext()
+    {
+        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') && Shop::getContext() === Shop::CONTEXT_ALL) {
+            return Configuration::get('PS_LANG_DEFAULT', null, 1, 1);
+        }
+        return Configuration::get('PS_LANG_DEFAULT');
+    }
+
+    /**
      * get current ShopId according to activate multishop feature
      *
      * @return int|null
@@ -1375,13 +1410,14 @@ class Stripe_official extends PaymentModule
 
         try {
             \Stripe\Stripe::setApiKey($secretKey);
-            \Stripe\Account::retrieve();
+            return \Stripe\Account::retrieve();
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             $this->errors[] = $e->getMessage();
             return false;
         }
-        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
@@ -1408,8 +1444,6 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
-        $query->where('id_shop_group = '.$this->context->shop->id_shop_group);
-        $query->where('id_shop = '.$this->context->shop->id);
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
@@ -1739,7 +1773,9 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        if (!$this->checkApiConnection()) {
+        $stripeAccount = $this->checkApiConnection();
+
+        if (empty($stripeAccount) === true) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
@@ -1757,10 +1793,16 @@ class Stripe_official extends PaymentModule
         $amount = Tools::ps_round($amount, 2);
         $amount = $this->isZeroDecimalCurrency($currency->iso_code) ? $amount : $amount * 100;
 
-        if (Configuration::get(self::POSTCODE) == null) {
+        if (Configuration::get(self::REINSURANCE) == null) {
             $stripe_reinsurance_enabled = 'off';
         } else {
-            $stripe_reinsurance_enabled = Configuration::get(self::POSTCODE);
+            $stripe_reinsurance_enabled = Configuration::get(self::REINSURANCE);
+        }
+
+        if (Configuration::get(self::POSTCODE) == null) {
+            $stripe_postcode_enabled = 'off';
+        } else {
+            $stripe_postcode_enabled = Configuration::get(self::POSTCODE);
         }
 
         $show_save_card = false;
@@ -1773,9 +1815,9 @@ class Stripe_official extends PaymentModule
             'stripe_amount' => Tools::ps_round($amount, 0),
             'applepay_googlepay' => Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY),
             'prestashop_version' => '1.6',
-            'stripe_postcode_enabled' => $stripe_reinsurance_enabled,
+            'stripe_postcode_enabled' => $stripe_postcode_enabled,
             'stripe_cardholdername_enabled' => Configuration::get(self::CARDHOLDERNAME),
-            'stripe_reinsurance_enabled' => Configuration::get(self::REINSURANCE),
+            'stripe_reinsurance_enabled' => $stripe_reinsurance_enabled,
             'stripe_payment_methods' => $this->getPaymentMethods(),
             'module_dir' => Media::getMediaPath(_PS_MODULE_DIR_.$this->name),
             'customer_name' => $address->firstname . ' ' . $address->lastname,
@@ -1811,7 +1853,6 @@ class Stripe_official extends PaymentModule
             $display .= $this->display(__FILE__, 'views/templates/front/payment_form_common.tpl');
         }
 
-        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
@@ -1827,8 +1868,7 @@ class Stripe_official extends PaymentModule
             return $display;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        $customerCards = $stripeCard->getAllCustomerCards();
+        $customerCards = $stripeCustomer->getStripeCustomerCards();
 
         if (empty($customerCards)) {
             return $display;
@@ -1881,7 +1921,9 @@ class Stripe_official extends PaymentModule
             return;
         }
 
-        if (!$this->checkApiConnection()) {
+        $stripeAccount = $this->checkApiConnection();
+
+        if (empty($stripeAccount) === true) {
             $this->context->smarty->assign(array(
                 'stripeError' => $this->l(
                     'No API keys have been provided. Please contact the owner of the website.',
@@ -1966,7 +2008,6 @@ class Stripe_official extends PaymentModule
             $options[] = $option;
         }
 
-        $stripeAccount = \Stripe\Account::retrieve();
         $stripeCustomer = new StripeCustomer();
         $stripeCustomer->getCustomerById($this->context->customer->id, $stripeAccount->id);
 
@@ -1982,8 +2023,7 @@ class Stripe_official extends PaymentModule
             return $options;
         }
 
-        $stripeCard = new StripeCard($stripeCustomer->stripe_customer_key);
-        $customerCards = $stripeCard->getAllCustomerCards();
+        $customerCards = $stripeCustomer->getStripeCustomerCards();
 
         if (empty($customerCards)) {
             return $options;

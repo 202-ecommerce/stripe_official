@@ -200,7 +200,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'addTentative'
             );
         } elseif (($eventType == 'pending' && $payment_method == 'sofort')
-            || ($eventType == 'charge.succeeded'
+            || ($eventType == 'succeeded'
                 && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect'
                 && $payment_method != 'sofort')
         ) {
@@ -251,26 +251,29 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 $id_cart = $intent->metadata->id_cart;
             }
 
-            if ($id_cart !== null) {
-                $id_order = (int) Order::getOrderByCartId($id_cart);
-
-                if ($id_order) {
-                    ProcessLoggerHandler::logInfo(
-                        'Waiting proccess order OK',
-                        null,
-                        null,
-                        'orderSuccess - displayOrderConfirmation'
-                    );
-                    break;
-                }
+            if (empty($id_cart) === true) {
+                break;
             }
-            sleep(2);
+            $id_order = $this->getOrderIdByCartId($id_cart);
+
             ProcessLoggerHandler::logInfo(
-                'Waiting proccess time => '.$i,
+                'Waiting proccess time => ' . $i . 'Order Id => ' . $id_order,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
             );
+
+            if (empty($id_order) === false) {
+                ProcessLoggerHandler::logInfo(
+                    'Waiting proccess order OK',
+                    null,
+                    null,
+                    'orderSuccess - displayOrderConfirmation'
+                );
+                break;
+            }
+
+            sleep(2);
         }
 
         if (isset($this->context->customer->secure_key)) {
@@ -317,5 +320,16 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         Tools::redirect($url);
         exit;
+    }
+
+    private function getOrderIdByCartId($cartId)
+    {
+        $query = (new DbQuery())
+            ->select('id_order')
+            ->from(Order::$definition['table'])
+            ->where('`id_cart` = ' . (int) $cartId);
+        $orderId = Db::getInstance()->getValue($query, false);
+
+        return empty($orderId) ? 0 : (int) $orderId;
     }
 }

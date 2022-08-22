@@ -207,7 +207,7 @@ class ConfigurationActions extends DefaultActions
             /* Check if webhook access is write */
             try {
                 $webhookEndpoint = \Stripe\WebhookEndpoint::retrieve($webhookId);
-                $webhookUrlExpected = $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT'));
+                $webhookUrlExpected = Stripe_official::getWebhookUrl();
                 $webhookUpdateData = [];
 
                 /* Check if webhook configuration is wrong */
@@ -242,7 +242,7 @@ class ConfigurationActions extends DefaultActions
             $webhooksList = StripeWebhook::getWebhookList();
 
             foreach ($webhooksList as $webhookEndpoint) {
-                if ($webhookEndpoint->url == $this->context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT'))) {
+                if ($webhookEndpoint->url == Stripe_official::getWebhookUrl()) {
                     $webhookEndpoint->delete();
                 }
             }
