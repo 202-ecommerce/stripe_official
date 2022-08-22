@@ -2,7 +2,7 @@
     "name": "202-ecommerce/stripe_official",
     "description": "PrestaShop module Stripe Official",
     "homepage": "https://stripe.com/",
-    "license": "AFL-3.0",
+    "license": "OSL-3.0",
     "authors": [
         {
             "name": "202 ecommerce",
@@ -39,5 +39,6 @@
     "scripts": {
         "pre-autoload-dump": "if [ ${TOTPSCLASSLIB_DEV_PATH} ]; then php ${TOTPSCLASSLIB_DEV_PATH}/classlib/refresh.php .; fi"
     },
-    "type": "prestashop-module"
+    "type": "prestashop-module",
+    "author": "PrestaShop"
 }

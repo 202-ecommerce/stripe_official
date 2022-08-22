@@ -1,5 +1,5 @@
-{*
- * 2007-2019 PrestaShop
+{**
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ *}
 
 <p>
     <b>{l s='Congratulations, your order has been placed and will be processed soon.' mod='stripe_official'}</b><br/><br/>

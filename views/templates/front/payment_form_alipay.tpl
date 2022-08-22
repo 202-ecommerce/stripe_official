@@ -1,5 +1,5 @@
-{*
- * 2007-2019 PrestaShop
+{**
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ *}
 
 <form class="stripe-payment-form" id="stripe-alipay-element" action="">
     <input type="hidden" name="stripe-payment-method" value="alipay">

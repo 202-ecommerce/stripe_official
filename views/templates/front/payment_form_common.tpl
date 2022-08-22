@@ -1,5 +1,5 @@
-{*
- * 2007-2019 PrestaShop
+{**
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -20,6 +20,6 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ *}
 
 <input type="hidden" id="stripe-amount" value="{{$stripe_amount|escape:'htmlall':'UTF-8'}}">

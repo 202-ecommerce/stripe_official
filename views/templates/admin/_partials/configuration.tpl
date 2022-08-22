@@ -1,5 +1,5 @@
-{*
- * 2007-2019 PrestaShop
+{**
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ *}
 
 <form id="configuration_form" class="defaultForm form-horizontal stripe_official" action="#stripe_step_1" method="post" enctype="multipart/form-data" novalidate="">
 	<input type="hidden" name="submit_login" value="1">

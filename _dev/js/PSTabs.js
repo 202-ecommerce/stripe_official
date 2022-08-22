@@ -1,5 +1,5 @@
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -17,8 +17,8 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author   MIT license
- * @copyright Copyright 2014, Codrops
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
 

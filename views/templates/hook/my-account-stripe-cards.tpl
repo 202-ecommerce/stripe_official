@@ -1,5 +1,5 @@
-{*
- * 2007-2019 PrestaShop
+{**
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
-*}
+ *}
 {if $isSaveCard }
   {if $prestashop_version == '1.7'}
       <a class="col-lg-4 col-md-6 col-sm-6 col-xs-12" href="{$link->getModuleLink('stripe_official', 'stripeCards')|escape:'html':'UTF-8'}" title="{l s='My cards' mod='stripe_official'}">

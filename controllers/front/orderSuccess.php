@@ -1,10 +1,6 @@
 <?php
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -26,6 +22,10 @@ use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
+
+use Stripe_officialClasslib\Actions\ActionsHandler;
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
+
 class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontController
 {
     /**

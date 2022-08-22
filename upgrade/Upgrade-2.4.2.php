@@ -1,7 +1,6 @@
 <?php
-
 /**
- * 2007-2021 PrestaShop
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -23,6 +22,7 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }

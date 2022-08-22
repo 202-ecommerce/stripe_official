@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -22,6 +22,7 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
+
 class StripePayment extends ObjectModel
 {
     /** @var string */
