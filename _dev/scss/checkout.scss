@@ -46,7 +46,7 @@
 #HOOK_PAYMENT .ideal-submit-button {
   position: relative;
   display: inline-block;
-  width: 210px;
+  width: 260px;
   padding: 5px 7px;
   margin-bottom: 15px;
   font-weight: bold;
@@ -93,21 +93,15 @@
 }
 
 .stripe-payment-form .stripe-card-cvc, .stripe-payment-form .stripe-card-expiry {
-    width: 102px;
-    max-width: 102px;
     display: inline-block;
     padding: 3px 1px !important;
-}
-
-#stripe-card-number {
-    width: 210px;
 }
 
 #stripe-card-cvc,
 #stripe-card-expiry,
 #stripe-card-postalcode {
-    width: 102px;
-    max-width: 102px;
+    width: 127px;
+    max-width: 127px;
 }
 
 #stripe-card-number,
@@ -119,7 +113,7 @@
     padding: 3px;
     box-sizing: border-box;
     font-size: 15px;
-    width: 210px;
+    width: 260px;
     background-color: #ffffff;
     position: relative;
 }
@@ -134,7 +128,7 @@ form#stripe-card-payment img.card_logo {
     width: 50px;
     height: auto;
     display: inline-block;
-    margin: 0px 10px;
+    margin: 0 10px;
 }
 
 form#stripe-card-payment #cards-logos {
@@ -170,7 +164,7 @@ form#stripe-card-payment #cards-logos {
 .stripe-submit-button {
     position: relative;
     display: inline-block;
-    width: 210px;
+    width: 260px;
     padding: 5px 7px;
     margin-bottom: 15px;
     font-weight: bold;
@@ -199,7 +193,7 @@ form#stripe-card-payment #cards-logos {
     padding: 3px;
     box-sizing: border-box;
     font-size: 15px;
-    width: 210px;
+    width: 260px;
     background-color: #ffffff;
     position: relative;
     display: block;
@@ -225,8 +219,8 @@ form#stripe-card-payment #cards-logos {
 }
 
 #stripe-card-payment .label16 {
-    padding: 0px;
-    letter-spacing: 0px;
+    padding: 0;
+    letter-spacing: 0;
     color: #777777;
     font-size: 14px;
     font-weight: normal;
