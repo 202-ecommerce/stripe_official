@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class stripe_officialOrderConfirmationReturnModuleFrontController extends ModuleFrontController
 {
     public function __construct()

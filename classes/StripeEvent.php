@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class StripeEvent extends ObjectModel
 {
     const CREATED_STATUS = 'CREATED';

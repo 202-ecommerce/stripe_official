@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class StripeIdempotencyKey extends ObjectModel
 {
     /** @var int */

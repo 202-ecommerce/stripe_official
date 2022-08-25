@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class stripe_officialStripeCardsModuleFrontController extends ModuleFrontController
 {
     /**

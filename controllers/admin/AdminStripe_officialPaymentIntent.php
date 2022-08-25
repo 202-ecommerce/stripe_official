@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 class AdminStripe_officialPaymentIntentController extends ModuleAdminController
 {
     /** @var bool Active bootstrap for Prestashop 1.6 */

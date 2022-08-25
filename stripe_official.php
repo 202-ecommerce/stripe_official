@@ -22,7 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -1218,7 +1217,7 @@ class Stripe_official extends PaymentModule
                 }
                 try {
                     $ch = \Stripe\Charge::retrieve($refund_id);
-                    $ch->refunds->create(['amount' => $ref_amount ?? 0]);
+                    $ch->refunds->create(['amount' => isset($ref_amount) ? $ref_amount : 0]);
                 } catch (Exception $e) {
                     // Something else happened, completely unrelated to Stripe
                     $this->errors[] = $e->getMessage();

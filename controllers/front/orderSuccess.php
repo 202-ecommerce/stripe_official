@@ -306,7 +306,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 true,
                 null,
                 [
-                    'id_cart' => $id_cart ?? 0,
+                    'id_cart' => isset($id_cart) ? $id_cart : 0,
                     'id_module' => (int) $this->module->id,
                     'id_order' => $id_order,
                     'key' => $secure_key,

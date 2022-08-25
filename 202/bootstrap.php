@@ -22,8 +22,6 @@
  * @copyright Copyright (c) Stripe
  * @license   Commercial license
  */
-
-
 ini_set('memory_limit', '200M');
 
 define('TOT_SHARED_DIR', getenv('TOT_SHARED_DIR'));
