@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2022 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
 class StripeCustomer extends ObjectModel
 {
@@ -91,8 +91,8 @@ class StripeCustomer extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_customer = ' . pSQL($id_customer));
-        $query->where('id_account = "' . pSQL($id_account) . '"');
+        $query->where('id_customer = ' . pSQL((int) $id_customer));
+        $query->where('id_account = "' . pSQL((int) $id_account) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if (empty($result) === true) {

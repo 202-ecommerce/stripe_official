@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2022 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
 class StripeIdempotencyKey extends ObjectModel
 {
@@ -91,7 +91,7 @@ class StripeIdempotencyKey extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_cart = ' . pSQL($id_cart));
+        $query->where('id_cart = ' . pSQL((int) $id_cart));
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {

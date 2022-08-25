@@ -1,5 +1,5 @@
 {**
- * 2007-2022 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  *}
 {capture name=path}<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account' mod='stripe_official'}</a><span class="navigation-pipe">{$navigationPipe}</span><span class="navigation_page">{l s='My cards' mod='stripe_official'}</span>{/capture}
 
