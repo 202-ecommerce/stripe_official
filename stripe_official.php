@@ -1444,8 +1444,11 @@ class Stripe_official extends PaymentModule
         $query->from('configuration');
         $query->where('name LIKE "STRIPE_PAYMENT%"');
         $query->where('value = "on"');
-        $query->where('id_shop_group = ' . $this->context->shop->id_shop_group);
-        $query->where('id_shop = ' . $this->context->shop->id);
+
+        if (Shop::isFeatureActive() === true) {
+            $query->where('id_shop_group = ' . $this->context->shop->id_shop_group);
+            $query->where('id_shop = ' . $this->context->shop->id);
+        }
 
         $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
 
