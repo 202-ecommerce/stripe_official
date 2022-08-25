@@ -4,7 +4,7 @@
 /views/css
 /views/js
 package-lock.json
-
+!.htaccess
 # @TODO We should probably git composer.lock
 composer.lock
 
