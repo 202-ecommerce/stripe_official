@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,12 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 class stripe_officialOrderConfirmationReturnModuleFrontController extends ModuleFrontController
 {
     public function __construct()
@@ -54,25 +50,26 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
             $payment_intent
         );
 
-        if (isset($intent->payment_method_details->type))
-            $payment_method =  $intent->payment_method_details->type;
-        elseif (isset($intent->payment_method_types[0]))
+        if (isset($intent->payment_method_details->type)) {
+            $payment_method = $intent->payment_method_details->type;
+        } elseif (isset($intent->payment_method_types[0])) {
             $payment_method = $intent->payment_method_types[0];
-        else
+        } else {
             $payment_method = null;
+        }
 
         if (Tools::getValue('redirect_status') == 'failed') {
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',
                 'orderFailure',
-                array(),
+                [],
                 true
             );
         } else {
-            $data = array(
+            $data = [
                 'payment_intent' => $payment_intent,
-                'payment_method' => $payment_method
-            );
+                'payment_method' => $payment_method,
+            ];
 
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',

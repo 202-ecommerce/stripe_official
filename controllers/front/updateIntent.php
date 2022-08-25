@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 class stripe_officialUpdateIntentModuleFrontController extends ModuleFrontController
 {
     /**
@@ -35,7 +34,7 @@ class stripe_officialUpdateIntentModuleFrontController extends ModuleFrontContro
         $intent = \Stripe\PaymentIntent::update(
             Tools::getValue('id_payment_intent'),
             [
-                'payment_method_types' => [Tools::getValue('payment')]
+                'payment_method_types' => [Tools::getValue('payment')],
             ]
         );
 

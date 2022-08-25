@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 class StripeCustomer extends ObjectModel
 {
     /** @var int */
@@ -35,27 +34,27 @@ class StripeCustomer extends ObjectModel
     /**
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_customer',
-        'primary'      => 'id_stripe_customer',
-        'fields'       => array(
-            'id_customer' => array(
-                'type'     => ObjectModel::TYPE_INT,
+    public static $definition = [
+        'table' => 'stripe_customer',
+        'primary' => 'id_stripe_customer',
+        'fields' => [
+            'id_customer' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
                 'size' => 10,
-            ),
-            'stripe_customer_key'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+            ],
+            'stripe_customer_key' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 50,
-            ),
-            'id_account'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 50,
+            ],
+            'id_account' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 50,
-            ),
-        ),
-    );
+                'size' => 50,
+            ],
+        ],
+    ];
 
     public function setIdCustomer($id_customer)
     {
@@ -92,8 +91,8 @@ class StripeCustomer extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_customer = '.pSQL($id_customer));
-        $query->where('id_account = "'.pSQL($id_account).'"');
+        $query->where('id_customer = ' . pSQL((int) $id_customer));
+        $query->where('id_account = "' . pSQL((int) $id_account) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if (empty($result) === true) {
@@ -117,6 +116,7 @@ class StripeCustomer extends ObjectModel
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+
             return false;
         }
     }
@@ -132,6 +132,7 @@ class StripeCustomer extends ObjectModel
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
+
             return false;
         }
     }
