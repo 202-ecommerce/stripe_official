@@ -1461,16 +1461,22 @@ class Stripe_official extends PaymentModule
 
     public function getPaymentMethods()
     {
-        $query = new DbQuery();
-        $query->select('name');
-        $query->from('configuration');
-        $query->where('name LIKE "STRIPE_PAYMENT%"');
-        $query->where('value = "on"');
+        $configurations = Configuration::getMultiple([
+            self::VISA,
+            self::MASTERCARD,
+            self::AMERICAN_EXPRESS,
+            self::CB,
+            self::DINERS_CLUB,
+            self::UNION_PAY,
+            self::JCB,
+            self::DISCOVERS,
+        ]);
 
-        $results = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query->build());
-
-        foreach ($results as &$result) {
-            $result['name'] = Tools::strtolower(str_replace('STRIPE_PAYMENT_', '', $result['name']));
+        $results = [];
+        foreach ($configurations as $key => $configuration) {
+            if ($configuration === 'on') {
+                $results[] = ['name' => Tools::strtolower(str_replace('STRIPE_PAYMENT_', '', $key))];
+            }
         }
 
         return $results;
