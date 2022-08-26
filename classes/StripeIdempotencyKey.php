@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 class StripeIdempotencyKey extends ObjectModel
 {
     /** @var int */
@@ -35,27 +34,27 @@ class StripeIdempotencyKey extends ObjectModel
     /**
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_idempotency_key',
-        'primary'      => 'id_idempotency_key',
-        'fields'       => array(
-            'id_cart'  => array(
-                'type'     => ObjectModel::TYPE_INT,
+    public static $definition = [
+        'table' => 'stripe_idempotency_key',
+        'primary' => 'id_idempotency_key',
+        'fields' => [
+            'id_cart' => [
+                'type' => ObjectModel::TYPE_INT,
                 'validate' => 'isInt',
-                'size'     => 10,
-            ),
-            'idempotency_key'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 10,
+            ],
+            'idempotency_key' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-            'id_payment_intent'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 255,
+            ],
+            'id_payment_intent' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 255,
-            ),
-        ),
-    );
+                'size' => 255,
+            ],
+        ],
+    ];
 
     public function setIdCart($id_cart)
     {
@@ -92,7 +91,7 @@ class StripeIdempotencyKey extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_cart = '.pSQL($id_cart));
+        $query->where('id_cart = ' . pSQL((int) $id_cart));
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
@@ -109,7 +108,7 @@ class StripeIdempotencyKey extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_payment_intent = "'.pSQL($id_payment_intent).'"');
+        $query->where('id_payment_intent = "' . pSQL($id_payment_intent) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if ($result == false) {
@@ -127,12 +126,12 @@ class StripeIdempotencyKey extends ObjectModel
      */
     public function createNewOne($id_cart, $datasIntent)
     {
-        $idempotency_key = $id_cart.'_'.uniqid();
+        $idempotency_key = $id_cart . '_' . uniqid();
 
         $intent = \Stripe\PaymentIntent::create(
             $datasIntent,
             [
-              'idempotency_key' => $idempotency_key
+              'idempotency_key' => $idempotency_key,
             ]
         );
 
@@ -146,8 +145,8 @@ class StripeIdempotencyKey extends ObjectModel
         $paymentIntent->setStatus($intent->status);
         $paymentIntent->setAmount($intent->amount);
         $paymentIntent->setCurrency($intent->currency);
-        $paymentIntent->setDateAdd(date("Y-m-d H:i:s", $intent->created));
-        $paymentIntent->setDateUpd(date("Y-m-d H:i:s", $intent->created));
+        $paymentIntent->setDateAdd(date('Y-m-d H:i:s', $intent->created));
+        $paymentIntent->setDateUpd(date('Y-m-d H:i:s', $intent->created));
         $paymentIntent->save(false, false);
 
         return $intent;
@@ -166,7 +165,7 @@ class StripeIdempotencyKey extends ObjectModel
         $paymentIntent->setStatus($intent->status);
         $paymentIntent->setAmount($intent->amount);
         $paymentIntent->setCurrency($intent->currency);
-        $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
+        $paymentIntent->setDateUpd(date('Y-m-d H:i:s'));
         $paymentIntent->save(false, false);
 
         return $intent;

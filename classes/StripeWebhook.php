@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
 
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
@@ -30,20 +30,12 @@ class StripeWebhook extends ObjectModel
     public static function create()
     {
         try {
-            $context = Context::getContext();
             $shopGroupId = Stripe_official::getShopGroupIdContext();
             $shopId = Stripe_official::getShopIdContext();
 
             $stripeAccount = \Stripe\Account::retrieve();
             $webhookEndpoint = \Stripe\WebhookEndpoint::create([
-                'url' => $context->link->getModuleLink(
-                    'stripe_official',
-                    'webhook',
-                    array(),
-                    true,
-                    Configuration::get('PS_LANG_DEFAULT'),
-                    $shopId ?: Configuration::get('PS_SHOP_DEFAULT')
-                ),
+                'url' => Stripe_official::getWebhookUrl(),
                 'enabled_events' => Stripe_official::$webhook_events,
             ]);
 
@@ -54,11 +46,12 @@ class StripeWebhook extends ObjectModel
             return true;
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                'Create webhook endpoint - '.(string)$e->getMessage(),
+                'Create webhook endpoint - ' . (string) $e->getMessage(),
                 null,
                 null,
                 'StripeWebhook'
             );
+
             return false;
         }
     }
@@ -68,16 +61,17 @@ class StripeWebhook extends ObjectModel
         try {
             return \Stripe\WebhookEndpoint::all(
                 [
-                    'limit' => 16
+                    'limit' => 16,
                 ]
             );
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                'getWebhookList - '.(string)$e->getMessage(),
+                'getWebhookList - ' . (string) $e->getMessage(),
                 null,
                 null,
                 'StripeWebhook'
             );
+
             return false;
         }
     }
@@ -85,6 +79,7 @@ class StripeWebhook extends ObjectModel
     public static function countWebhooksList()
     {
         $list = self::getWebhookList();
+
         return count($list->data);
     }
 
@@ -97,14 +92,7 @@ class StripeWebhook extends ObjectModel
         }
 
         $webhooksList = self::getWebhookList();
-        $webhookUrl = $context->link->getModuleLink(
-            'stripe_official',
-            'webhook',
-            array(),
-            true,
-            Configuration::get('PS_LANG_DEFAULT'),
-            Stripe_official::getShopIdContext() ?: Configuration::get('PS_SHOP_DEFAULT')
-        );
+        $webhookUrl = Stripe_official::getWebhookUrl();
         $webhookExists = false;
 
         foreach ($webhooksList->data as $webhook) {

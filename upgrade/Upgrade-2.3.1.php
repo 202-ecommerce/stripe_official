@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -35,19 +34,19 @@ function upgrade_module_2_3_1($module)
     $installer->installObjectModel('StripeIdempotencyKey');
     $installer->installObjectModel('StripePayment');
 
-    $sql = 'ALTER TABLE `'._DB_PREFIX_.'stripe_official_processlogger` MODIFY msg TEXT';
+    $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'stripe_official_processlogger` MODIFY msg TEXT';
     if (!Db::getInstance()->execute($sql)) {
         return false;
     }
 
-    $indexes = array(
+    $indexes = [
         'id_idempotency_key',
         'id_cart',
         'idempotency_key',
-        'id_payment_intent'
-    );
-    $already_indexed = array();
-    $results = Db::getInstance()->executeS('SHOW INDEX FROM '._DB_PREFIX_.'stripe_idempotency_key');
+        'id_payment_intent',
+    ];
+    $already_indexed = [];
+    $results = Db::getInstance()->executeS('SHOW INDEX FROM ' . _DB_PREFIX_ . 'stripe_idempotency_key');
 
     foreach ($results as $result) {
         array_push($already_indexed, $result['Column_name']);
@@ -58,7 +57,7 @@ function upgrade_module_2_3_1($module)
     if (!empty($to_index)) {
         $sql = '';
         foreach ($to_index as $index) {
-            $sql .= 'ALTER TABLE `'._DB_PREFIX_.'stripe_idempotency_key` ADD INDEX( `'.$index.'`);';
+            $sql .= 'ALTER TABLE `' . _DB_PREFIX_ . 'stripe_idempotency_key` ADD INDEX( `' . $index . '`);';
         }
 
         if (!Db::getInstance()->execute($sql)) {

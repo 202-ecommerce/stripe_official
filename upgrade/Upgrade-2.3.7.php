@@ -1,7 +1,6 @@
 <?php
-
 /**
- * 2007-2021 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -21,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -33,8 +31,8 @@ function upgrade_module_2_3_7($module)
     $shopGroupId = Stripe_official::getShopGroupIdContext();
     $shopId = Stripe_official::getShopIdContext();
 
-    if (Configuration::get('STRIPE_PARTIAL_REFUND_STATE',null, $shopGroupId, $shopId)
-        && $orderState = new OrderState(Configuration::get('STRIPE_PARTIAL_REFUND_STATE',null, $shopGroupId, $shopId))) {
+    if (Configuration::get('STRIPE_PARTIAL_REFUND_STATE', null, $shopGroupId, $shopId)
+        && $orderState = new OrderState(Configuration::get('STRIPE_PARTIAL_REFUND_STATE', null, $shopGroupId, $shopId))) {
         if (!Configuration::deleteByName('STRIPE_PARTIAL_REFUND_STATE') && !$orderState->delete()) {
             return false;
         }

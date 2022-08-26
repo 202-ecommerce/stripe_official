@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Para usar este módulo, ative o cURL (extensão PHP).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Pagar com cartão';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Pagar com Bancontact';
@@ -45,7 +45,7 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_15f04500d9edaac382bb3d451
 $_MODULE['<{stripe_official}prestashop>stripe_official_86c7338e09e2c3ca2e458da630895e25'] = 'Nenhuma chave API foi fornecida. Entre em contato com o proprietário do site.';
 $_MODULE['<{stripe_official}prestashop>stripecards_cd81f9f55969c822377f076017bb3484'] = 'Cartões';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_d3b206d196cd6be3a2764c1fb90b200f'] = 'Supprimer la sélection';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_49ee3087348e8d44e1feda1917443987'] = 'Nom';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4c2a8fe7eaf24721cc7a9f0175115bd4'] = 'Message';
@@ -61,10 +61,10 @@ $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_1607c94671fd
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_71c3e06323cd5a59436ec53afca80c57'] = 'Choisissez le nombre de jours pendant lesquels vous souhaitez conserver les journaux dans la base de données';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_dcc459e0cef1e36a18a356fbc5789b16'] = 'Effacer tout';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_f51c7af7c02cd3a846d87d97bfaf6b58'] = 'Tous les logs ont été effacés';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_9ca4bc48596557840045a7477c803657'] = 'Vous devez spécifier un nombre \"Délai d\'effacement automatique (en jours)\" valide.';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
 $_MODULE['<{stripe_official}prestashop>main_c2cc7082a89c1ad6631a2f66af5f00c0'] = 'Conexão';
 $_MODULE['<{stripe_official}prestashop>main_76f0ed934de85cc7131910b32ede7714'] = 'Reembolso';
 $_MODULE['<{stripe_official}prestashop>configuration_e6ad4dd232a1bb7d77852af7fc2e0538'] = '[a @href1@]Crie sua conta Stripe em 10 minutos[/a] e comece a aceitar pagamentos em cartão ou formas de pagamento locais (sem necessidade de contrato adicional/ID de comerciante de seu banco).';
@@ -162,6 +162,7 @@ $_MODULE['<{stripe_official}prestashop>admin_content_order_e2b54a61bf4e56c4a0443
 $_MODULE['<{stripe_official}prestashop>admin_content_order_2311c8c5e8f44924a3e61c78e2223049'] = 'O vale vence em:';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_49ee3087348e8d44e1feda1917443987'] = 'Nome';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'E-mail';
+$_MODULE['<{stripe_official}prestashop>payment_form_oxxo_eeceac1af4e7620894d6d2083921bb73'] = 'Compre Agora';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_4e997b9d3b7152f2afeacd96ab1ef1cb'] = 'Meus cartões';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Tipo';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a44217022190f5734b2f72ba1e4f8a79'] = 'Número do cartão';
@@ -191,6 +192,7 @@ $_MODULE['<{stripe_official}prestashop>payment_form_card_eeceac1af4e7620894d6d20
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_ac23f66a874a7808e300a15f2e94320a'] = 'Pagar com iDEAL';
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_eeceac1af4e7620894d6d2083921bb73'] = 'Comprar agora';
 $_MODULE['<{stripe_official}prestashop>payment_form_eps_c446bbd08309aff37eee1e0c43b19cde'] = 'Pagar com EPS';
+$_MODULE['<{stripe_official}prestashop>stripe-cards16_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'minha conta';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a46d3e7285f76d2401202f18b0acbcbd'] = 'Meus cartões';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Tipo';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a44217022190f5734b2f72ba1e4f8a79'] = 'Número do cartão';
@@ -213,7 +215,6 @@ $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_9d67bee92ea5
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_7dc9c0e2e38c2bbf16923bc6d79b7b06'] = '[a @href1@]Tente outra vez[/a] ou fale com o proprietário do site.';
 $_MODULE['<{stripe_official}prestashop>payment_form_alipay_47e1e580d173b931fdfdeb6bb5f14848'] = 'Pagar com Alipay';
 $_MODULE['<{stripe_official}prestashop>payment_form_fpx_74253765ffa5a6b91d758c7df4d3c871'] = 'Pagar com FPX';
-$_MODULE['<{stripe_official}prestashop>payment_form_fpx_eeceac1af4e7620894d6d2083921bb73'] = 'Comprar agora';
 $_MODULE['<{stripe_official}prestashop>configurationactions_187b101d0358396a634514ea228616d5'] = 'Chaves de API de produção fornecidas em vez de chaves de API de teste';
 $_MODULE['<{stripe_official}prestashop>configurationactions_2df5570b8a0e0c076571d1213f7f901e'] = 'Os campos de ID do cliente e chave secreta são obrigatórios';
 $_MODULE['<{stripe_official}prestashop>configurationactions_5fba3565c1b6638ac41f7627066aaa58'] = 'Chaves de API de teste fornecidas em vez de chaves de API em tempo real';

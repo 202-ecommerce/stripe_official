@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Pour pouvoir utiliser ce module, veuillez activer cURL (extension PHP).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Payer par carte bancaire';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Payer avec Bancontact';
@@ -17,16 +17,16 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_2323886b0c940583803772a50
 $_MODULE['<{stripe_official}prestashop>stripe_official_6a408e5941b4ed7630edd7c211aed267'] = 'Payer par carte bancaire';
 $_MODULE['<{stripe_official}prestashop>stripe_official_ce7566d1d08cc094b74cf283cf9c56a5'] = 'Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_7349826060a4851f4835aade49af34c7'] = 'Module de paiement Stripe';
-$_MODULE['<{stripe_official}prestashop>stripe_official_7c716e01a03b426976692f4a7a0d80be'] = 'Commencez à accepter des paiements Stripe dès aujourd\'hui, directement depuis votre boutique !';
-$_MODULE['<{stripe_official}prestashop>stripe_official_876f23178c29dc2552c0b48bf23cd9bd'] = 'Voulez-vous vraiment désinstaller ?';
+$_MODULE['<{stripe_official}prestashop>stripe_official_7c716e01a03b426976692f4a7a0d80be'] = 'Commencez à accepter des paiements Stripe dès aujourd\'hui, directement depuis votre boutique !';
+$_MODULE['<{stripe_official}prestashop>stripe_official_876f23178c29dc2552c0b48bf23cd9bd'] = 'Voulez-vous vraiment désinstaller ?';
 $_MODULE['<{stripe_official}prestashop>stripe_official_6341ee14cd6d47787171f68d27f1f41b'] = 'Paiement par Stripe';
 $_MODULE['<{stripe_official}prestashop>stripe_official_a6ee78c840497aed8a81b6164d4224e6'] = 'Vous devez activer SSL sur la boutique si vous souhaitez utiliser ce module en production.';
-$_MODULE['<{stripe_official}prestashop>stripe_official_66f67e1a8f01161f2009c2ed39c3cb1e'] = 'Vous avez atteint la limite de 16 points de terminaison de webhook enregistrés dans votre Dashboard Stripe pour ce compte. Veuillez en supprimer un si vous souhaitez enregistrer ce domaine.';
+$_MODULE['<{stripe_official}prestashop>stripe_official_66f67e1a8f01161f2009c2ed39c3cb1e'] = 'Vous avez atteint la limite de 16 points de terminaison de webhook enregistrés dans votre Dashboard Stripe pour ce compte. Veuillez en supprimer un si vous souhaitez enregistrer ce domaine.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_69e6a2456656fcc3c9a79452ef3a7928'] = 'Votre version TLS n\'est pas prise en charge. Vous devrez mettre à jour votre intégration. Veuillez consulter la FAQ si vous ne savez pas comment faire.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_47daed1af40eaa1fb3c750322137815d'] = 'La configuration du Webhook est introuvable dans PrestaShop, cliquez sur le bouton Enregistrer pour résoudre le problème. Un nouveau webhook sera créé sur Stripe, puis enregistré dans PrestaShop.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_4684c4310f6bd9917b3c079bc38fd335'] = 'La configuration de l\'URL du Webhook est incorrecte, cliquez sur le bouton Enregistrer pour résoudre le problème. La configuration du Webhook sera corrigée.';
-$_MODULE['<{stripe_official}prestashop>stripe_official_572bde45cccf4cde600e2a846cfe8085'] = 'URL du webhook actuel :';
-$_MODULE['<{stripe_official}prestashop>stripe_official_12632987bdd5031845a591acdf5faa40'] = 'URL de webhook attendue :';
+$_MODULE['<{stripe_official}prestashop>stripe_official_572bde45cccf4cde600e2a846cfe8085'] = 'URL du webhook actuel :';
+$_MODULE['<{stripe_official}prestashop>stripe_official_12632987bdd5031845a591acdf5faa40'] = 'URL de webhook attendue :';
 $_MODULE['<{stripe_official}prestashop>stripe_official_2226fcd706ac6ba242dc3381636cf74b'] = 'La configuration des événements Webhook est incorrecte, cliquez sur le bouton Enregistrer pour résoudre le problème. La configuration du Webhook sera corrigée.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_4047173bbb1dd67cd5e877f7736c1e86'] = 'Evénements webhook actuels :';
 $_MODULE['<{stripe_official}prestashop>stripe_official_78b8b4d922d4061d31e55caece729f8b'] = 'Evénements webhook attendus :';
@@ -36,8 +36,8 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_3e5298c1c5d8c871334c4e399
 $_MODULE['<{stripe_official}prestashop>stripe_official_eb804bebeffc55fb161165d50bcf74f8'] = 'ID de paiement Stripe inconnu.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_2c9360a1d3c79d4adba0cbc6c9ad2618'] = 'Remboursements effectués';
 $_MODULE['<{stripe_official}prestashop>stripe_official_8dd2f915acf4ec98006d11c9a4b0945b'] = 'Paramètres mis à jour.';
-$_MODULE['<{stripe_official}prestashop>stripe_official_566442fe2a78f88e12572cc083aa9c30'] = 'Votre hébergeur ne nous autorise pas à ajouter votre domaine pour utiliser Apple Pay. Pour ajouter votre domaine manuellement, veuillez consulter le sujet « Ajouter mon domaine Apple Pay manuellement depuis mon Dashboard », que vous trouverez dans l\'onglet FAQ du module.';
-$_MODULE['<{stripe_official}prestashop>stripe_official_5a741711b570f9ec19ea6ef4587c8a29'] = 'Vos configurations ont été enregistrées, cependant votre hébergeur ne nous autorise pas à ajouter votre domaine pour utiliser Apple Pay. Pour ajouter votre domaine manuellement, veuillez consulter le sujet « Ajouter mon domaine Apple Pay manuellement depuis mon Dashboard pour utiliser Apple Pay », que vous trouverez dans l\'onglet FAQ du module.';
+$_MODULE['<{stripe_official}prestashop>stripe_official_566442fe2a78f88e12572cc083aa9c30'] = 'Votre hébergeur ne nous autorise pas à ajouter votre domaine pour utiliser Apple Pay. Pour ajouter votre domaine manuellement, veuillez consulter le sujet « Ajouter mon domaine Apple Pay manuellement depuis mon Dashboard », que vous trouverez dans l\'onglet FAQ du module.';
+$_MODULE['<{stripe_official}prestashop>stripe_official_5a741711b570f9ec19ea6ef4587c8a29'] = 'Vos configurations ont été enregistrées, cependant votre hébergeur ne nous autorise pas à ajouter votre domaine pour utiliser Apple Pay. Pour ajouter votre domaine manuellement, veuillez consulter le sujet « Ajouter mon domaine Apple Pay manuellement depuis mon Dashboard pour utiliser Apple Pay », que vous trouverez dans l\'onglet FAQ du module.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_9769caadb45900927273623278fd5de2'] = 'Identifiants Stripe non valides, veuillez vérifier votre configuration.';
 $_MODULE['<{stripe_official}prestashop>stripe_official_fd2bdc826d325902e451236cf6fd774e'] = 'Traitement';
 $_MODULE['<{stripe_official}prestashop>stripe_official_b24ee2c7cb1734370b544eb4e6cdc2b6'] = 'Veuillez accepter les CGV';
@@ -45,26 +45,29 @@ $_MODULE['<{stripe_official}prestashop>stripe_official_15f04500d9edaac382bb3d451
 $_MODULE['<{stripe_official}prestashop>stripe_official_86c7338e09e2c3ca2e458da630895e25'] = 'Aucune clé API n\'a été fournie. Veuillez contacter le propriétaire du site Web.';
 $_MODULE['<{stripe_official}prestashop>stripecards_cd81f9f55969c822377f076017bb3484'] = 'Cartes bancaires';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_d3b206d196cd6be3a2764c1fb90b200f'] = 'Supprimer la sélection';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_53c6a96a3df980c3270d6ed82b6f174b'] = 'Souhaitez-vous supprimer les éléments sélectionnés ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_49ee3087348e8d44e1feda1917443987'] = 'Nom';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4c2a8fe7eaf24721cc7a9f0175115bd4'] = 'Message';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_a0db49ba470c1c9ae2128c3470339153'] = 'Niveau';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_68972b8768ecc5cdcb803169e5f42407'] = 'Nom de l\'objet';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_d95fc016a6eee828f434ed5f55504427'] = 'ID de l\'objet';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_f89167d8204a193c6bbeabb68922d448'] = 'ID de session';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_2d8e32e9c23e2a7155c88028b3fbff66'] = 'Paramètres de l\'outil de consignation des processus';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_2ce895700ba5c16bede3b769128d216f'] = 'Ici, vous pouvez modifier la configuration par défaut de ce processus de logs';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_4ffdbc22f758943cdb6b6a54b361f373'] = 'Activer le mode silencieux';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_ea7a14b5d41ab5c1022a7d59f1b1e9df'] = 'Si le mode silencieux est activé, seuls les journaux de réussite et d\'erreur sont enregistrés. Les journaux d\'information ne sont pas enregistrés.';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_3073ef21c0b326939d5b630edd08cfb6'] = 'Désactiver l\'effacement automatique';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_434ef5977d28afa36e430439de18cbad'] = 'Si désactivé, les journaux seront automatiquement effacés après le délai';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_1607c94671fd5baf4ac06f554b118b2a'] = 'Délai d\'effacement automatique (en jours)';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_71c3e06323cd5a59436ec53afca80c57'] = 'Choisissez le nombre de jours pendant lesquels vous souhaitez conserver les journaux dans la base de données';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_dcc459e0cef1e36a18a356fbc5789b16'] = 'Effacer tout';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_729a51874fe901b092899e9e8b31c97a'] = 'Êtes-vous sûr(e) ?';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_f51c7af7c02cd3a846d87d97bfaf6b58'] = 'Tous les logs ont été effacés';
 $_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_9ca4bc48596557840045a7477c803657'] = 'Vous devez spécifier un nombre \"Délai d\'effacement automatique (en jours)\" valide.';
-$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
+$_MODULE['<{stripe_official}prestashop>adminprocessloggercontroller_5988c28d05527a0d0ce8ae3da1134352'] = 'Les paramètres de journal ont été mis à jour avec succès !';
 $_MODULE['<{stripe_official}prestashop>main_c2cc7082a89c1ad6631a2f66af5f00c0'] = 'Connexion';
 $_MODULE['<{stripe_official}prestashop>main_76f0ed934de85cc7131910b32ede7714'] = 'Remboursement';
 $_MODULE['<{stripe_official}prestashop>configuration_e6ad4dd232a1bb7d77852af7fc2e0538'] = '[a @href1@]Créez votre compte Stripe en 10 minutes[/a] et commencez immédiatement à accepter les paiements par carte bancaire ainsi que les moyens de paiement locaux (sans aucun autre ID de contrat/marchand requis de votre banque).';
@@ -107,7 +110,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_25b9cedf5864546692ee2f44f83
 $_MODULE['<{stripe_official}prestashop>configuration_04cdecad3493646701ed01647741b78f'] = 'Demander au client';
 $_MODULE['<{stripe_official}prestashop>configuration_0275d5a919dc2906f576e72335d1faf1'] = 'Enregistrer sans demander au client';
 $_MODULE['<{stripe_official}prestashop>configuration_33bcccaf7654c09d4a90ee486c45cfd2'] = 'Activer l\'autorisation et la capture distinctes. Si cette option est activée, Stripe bloquera au moment du règlement le montant de la commande sur le compte de la carte bancaire. Cette autorisation sera capturée et l\'argent sera versé sur votre compte lorsque la commande passera à l\'état de votre choix.';
-$_MODULE['<{stripe_official}prestashop>configuration_73a5b8196763ea2e1043092e8f9c015e'] = 'Attention : vous disposez d\'un délai de 7 jours calendaires pour capturer l\'autorisation avant qu\'elle n\'expire et que les fonds bloqués sur la carte soient débloqués.';
+$_MODULE['<{stripe_official}prestashop>configuration_73a5b8196763ea2e1043092e8f9c015e'] = 'Attention : vous disposez d\'un délai de 7 jours calendaires pour capturer l\'autorisation avant qu\'elle n\'expire et que les fonds bloqués sur la carte soient débloqués.';
 $_MODULE['<{stripe_official}prestashop>configuration_1097f096a2eedb06b25489aed19a2ae7'] = 'Capturer le paiement lors du passage aux états de commande suivants.';
 $_MODULE['<{stripe_official}prestashop>configuration_160341e19f4199f98bae44696b547c48'] = 'Votre état';
 $_MODULE['<{stripe_official}prestashop>configuration_ec211f7c20af43e742bf2570c3cb84f9'] = 'Ajouter';
@@ -126,7 +129,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fad
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>refund_2b660da0c521cc6bc51a188bc9f7d084'] = 'Sélectionnez la commande que vous voulez rembourser';
 $_MODULE['<{stripe_official}prestashop>refund_24e85d1e652b3681994e9cae2cc1f35a'] = 'ID de paiement Stripe';
-$_MODULE['<{stripe_official}prestashop>refund_991bd624dcaff354bd793e4cacbd6ea3'] = 'Cet ID se trouve dans l\'onglet Stripe de la commande que vous souhaitez rembourser. Il commence par « ch_ » ou « py_ ».';
+$_MODULE['<{stripe_official}prestashop>refund_991bd624dcaff354bd793e4cacbd6ea3'] = 'Cet ID se trouve dans l\'onglet Stripe de la commande que vous souhaitez rembourser. Il commence par « ch_ » ou « py_ ».';
 $_MODULE['<{stripe_official}prestashop>refund_c0a3c3e9b5fbd21c505e082644b2220c'] = 'Remboursement total';
 $_MODULE['<{stripe_official}prestashop>refund_77fd2b4393b379bedd30efcd5df02090'] = 'Remboursement partiel';
 $_MODULE['<{stripe_official}prestashop>refund_fe9cc1bcfa322db8ade8960ddf4bb19c'] = 'Nous enverrons immédiatement tout remboursement effectué à la banque de votre client.';
@@ -162,6 +165,7 @@ $_MODULE['<{stripe_official}prestashop>admin_content_order_e2b54a61bf4e56c4a0443
 $_MODULE['<{stripe_official}prestashop>admin_content_order_2311c8c5e8f44924a3e61c78e2223049'] = 'Expiration du coupon le :';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_49ee3087348e8d44e1feda1917443987'] = 'Nom';
 $_MODULE['<{stripe_official}prestashop>payment_form_oxxo_ce8ae9da5b7cd6c3df2929543a9af92d'] = 'E-mail';
+$_MODULE['<{stripe_official}prestashop>payment_form_oxxo_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter maintenant';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_4e997b9d3b7152f2afeacd96ab1ef1cb'] = 'Mes cartes bancaires';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards_a44217022190f5734b2f72ba1e4f8a79'] = 'Numéro de carte bancaire';
@@ -191,6 +195,7 @@ $_MODULE['<{stripe_official}prestashop>payment_form_card_eeceac1af4e7620894d6d20
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_ac23f66a874a7808e300a15f2e94320a'] = 'Payer avec iDeal';
 $_MODULE['<{stripe_official}prestashop>payment_form_ideal_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter maintenant';
 $_MODULE['<{stripe_official}prestashop>payment_form_eps_c446bbd08309aff37eee1e0c43b19cde'] = 'Payer avec EPS';
+$_MODULE['<{stripe_official}prestashop>stripe-cards16_d95cf4ab2cbf1dfb63f066b50558b07d'] = 'Mon compte';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a46d3e7285f76d2401202f18b0acbcbd'] = 'Mes cartes bancaires';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_a44217022190f5734b2f72ba1e4f8a79'] = 'Numéro de carte bancaire';
@@ -198,7 +203,7 @@ $_MODULE['<{stripe_official}prestashop>stripe-cards16_b07cc2801693b2e722906a3db3
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_f2a6c498fb90ee345d997f888fce3b18'] = 'Supprimer';
 $_MODULE['<{stripe_official}prestashop>stripe-cards16_78560f5a4e1f5716c8fb9d7cb35f56de'] = 'Vous n\'avez pas encore enregistré de carte bancaire.';
 $_MODULE['<{stripe_official}prestashop>payment_form_p24_751e90522b3385322c4c34b6f73847d2'] = 'Payer avec P24';
-$_MODULE['<{stripe_official}prestashop>payment_form_save_card_6e9c53f6d39367724e9b996b3ea9ef22'] = 'Payer par carte bancaire :';
+$_MODULE['<{stripe_official}prestashop>payment_form_save_card_6e9c53f6d39367724e9b996b3ea9ef22'] = 'Payer par carte bancaire :';
 $_MODULE['<{stripe_official}prestashop>payment_form_save_card_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter maintenant';
 $_MODULE['<{stripe_official}prestashop>payment_form_giropay_32e26982dda43a14285657baee320523'] = 'Payer avec Giropay';
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-16_9d67bee92ea535ba9c7840797966edfa'] = 'Une erreur est survenue lors de votre paiement.';
@@ -213,7 +218,6 @@ $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_9d67bee92ea5
 $_MODULE['<{stripe_official}prestashop>order-confirmation-failed-17_7dc9c0e2e38c2bbf16923bc6d79b7b06'] = 'Veuillez [a @href1@]réessayer[/a] ou contacter le propriétaire du site Web.';
 $_MODULE['<{stripe_official}prestashop>payment_form_alipay_47e1e580d173b931fdfdeb6bb5f14848'] = 'Payer avec Alipay';
 $_MODULE['<{stripe_official}prestashop>payment_form_fpx_74253765ffa5a6b91d758c7df4d3c871'] = 'Payer avec FPX';
-$_MODULE['<{stripe_official}prestashop>payment_form_fpx_eeceac1af4e7620894d6d2083921bb73'] = 'Acheter';
 $_MODULE['<{stripe_official}prestashop>configurationactions_187b101d0358396a634514ea228616d5'] = 'Vous avez fourni des clés API de production au lieu de clés API de test';
 $_MODULE['<{stripe_official}prestashop>configurationactions_2df5570b8a0e0c076571d1213f7f901e'] = 'Les champs ID du client et Clé secrète sont obligatoires';
 $_MODULE['<{stripe_official}prestashop>configurationactions_5fba3565c1b6638ac41f7627066aaa58'] = 'Vous avez fourni des clés API de test au lieu de clés API de production';

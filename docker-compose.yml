@@ -3,10 +3,10 @@ services:
     prestashop:
         build: $PWD/202/docker
         environment:
-            PS_DOMAIN: "6602-2a01-e34-ecba-50c0-5115-2479-804c-530.ngrok.io"
+            PS_DOMAIN: "172.20.0.2"
             RUN_USER: clotaire
         ports:
-            - 8080:80
+            - 2180:80
         volumes:
             - $PWD:/var/www/html/modules/stripe_official
 volumes:

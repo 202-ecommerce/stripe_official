@@ -1,3 +1,26 @@
+/**
+ * 2007-2022 Stripe
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    202-ecommerce <tech@202-ecommerce.com>
+ * @copyright Copyright (c) Stripe
+ * @license   Academic Free License (AFL 3.0)
+ */
 #stripe-card-element {
   padding: 6px 12px;
   margin-bottom: 8px;
@@ -46,7 +69,7 @@
 #HOOK_PAYMENT .ideal-submit-button {
   position: relative;
   display: inline-block;
-  width: 210px;
+  width: 260px;
   padding: 5px 7px;
   margin-bottom: 15px;
   font-weight: bold;
@@ -93,21 +116,15 @@
 }
 
 .stripe-payment-form .stripe-card-cvc, .stripe-payment-form .stripe-card-expiry {
-    width: 122px;
-    max-width: 122px;
     display: inline-block;
     padding: 3px 1px !important;
-}
-
-#stripe-card-number {
-    width: 250px;
 }
 
 #stripe-card-cvc,
 #stripe-card-expiry,
 #stripe-card-postalcode {
-    width: 122px;
-    max-width: 122px;
+    width: 127px;
+    max-width: 127px;
 }
 
 #stripe-card-number,
@@ -119,7 +136,7 @@
     padding: 3px;
     box-sizing: border-box;
     font-size: 15px;
-    width: 250px;
+    width: 260px;
     background-color: #ffffff;
     position: relative;
 }
@@ -134,7 +151,7 @@ form#stripe-card-payment img.card_logo {
     width: 50px;
     height: auto;
     display: inline-block;
-    margin: 0px 10px;
+    margin: 0 10px;
 }
 
 form#stripe-card-payment #cards-logos {
@@ -170,7 +187,7 @@ form#stripe-card-payment #cards-logos {
 .stripe-submit-button {
     position: relative;
     display: inline-block;
-    width: 250px;
+    width: 260px;
     padding: 5px 7px;
     margin-bottom: 15px;
     font-weight: bold;
@@ -199,7 +216,7 @@ form#stripe-card-payment #cards-logos {
     padding: 3px;
     box-sizing: border-box;
     font-size: 15px;
-    width: 250px;
+    width: 260px;
     background-color: #ffffff;
     position: relative;
     display: block;
@@ -225,8 +242,8 @@ form#stripe-card-payment #cards-logos {
 }
 
 #stripe-card-payment .label16 {
-    padding: 0px;
-    letter-spacing: 0px;
+    padding: 0;
+    letter-spacing: 0;
     color: #777777;
     font-size: 14px;
     font-weight: normal;

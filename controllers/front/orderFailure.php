@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 class stripe_officialOrderFailureModuleFrontController extends ModuleFrontController
 {
     /**
@@ -32,9 +31,9 @@ class stripe_officialOrderFailureModuleFrontController extends ModuleFrontContro
     {
         parent::initContent();
 
-        $this->context->smarty->assign(array(
-            'stripe_order_url' => $this->context->link->getPageLink('order')
-        ));
+        $this->context->smarty->assign([
+            'stripe_order_url' => $this->context->link->getPageLink('order'),
+        ]);
 
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $this->setTemplate('module:stripe_official/views/templates/front/order-confirmation-failed-17.tpl');

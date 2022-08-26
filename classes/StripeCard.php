@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,7 +20,7 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
 
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
@@ -59,8 +59,9 @@ class StripeCard extends ObjectModel
                 'customer' => $this->stripe_customer_key,
             ]);
         } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
-            ProcessLoggerHandler::logError('Save card - '.(string)$e->getMessage(), null, null, 'StripeCard');
+            $this->_error[] = (string) $e->getMessage();
+            ProcessLoggerHandler::logError('Save card - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
             return false;
         }
 
@@ -75,8 +76,9 @@ class StripeCard extends ObjectModel
             );
             $payment_method->detach();
         } catch (PrestaShopException $e) {
-            $this->_error[] = (string)$e->getMessage();
-            ProcessLoggerHandler::logError('Delete card - '.(string)$e->getMessage(), null, null, 'StripeCard');
+            $this->_error[] = (string) $e->getMessage();
+            ProcessLoggerHandler::logError('Delete card - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
             return false;
         }
 
@@ -91,8 +93,9 @@ class StripeCard extends ObjectModel
                 'type' => 'card',
             ]);
         } catch (Exception $e) {
-            ProcessLoggerHandler::logError('getAllCustomerCards - '.(string)$e->getMessage(), null, null, 'StripeCard');
-            return array();
+            ProcessLoggerHandler::logError('getAllCustomerCards - ' . (string) $e->getMessage(), null, null, 'StripeCard');
+
+            return [];
         }
 
         return $allCards->data;

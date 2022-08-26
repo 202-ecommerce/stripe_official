@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,12 +20,11 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
 
 use Stripe_officialClasslib\Actions\DefaultActions;
 use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-use Stripe_officialClasslib\Registry;
 
 class ValidationOrderActions extends DefaultActions
 {
@@ -45,7 +44,7 @@ class ValidationOrderActions extends DefaultActions
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
 
             ProcessLoggerHandler::logInfo(
-                '$intent : '.$intent,
+                '$intent : ' . $intent,
                 null,
                 null,
                 'ValidationOrderActions - prepareFlowNone'
@@ -85,12 +84,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - prepareFlowNone'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -113,8 +113,9 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
 
             if ($sourceRetrieve->status == 'failed') {
-                ProcessLoggerHandler::logInfo($source . " => status failed", 'Cart', $this->context->cart->id);
+                ProcessLoggerHandler::logInfo($source . ' => status failed', 'Cart', $this->context->cart->id);
                 ProcessLoggerHandler::closeLogger();
+
                 return false;
             }
 
@@ -128,11 +129,11 @@ class ValidationOrderActions extends DefaultActions
                 $amount = $amount * 100;
             }
 
-            $response = \Stripe\Charge::create(array(
+            $response = \Stripe\Charge::create([
               'amount' => $amount,
               'currency' => $this->context->currency->iso_code,
               'source' => $source,
-            ));
+            ]);
 
             return false;
 
@@ -154,12 +155,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - prepareFlowRedirect'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -209,12 +211,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - prepareFlowRedirectPaymentIntent'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -230,14 +233,14 @@ class ValidationOrderActions extends DefaultActions
         try {
             $amount = $this->conveyor['amount'];
             if (strstr($this->conveyor['chargeId'], 'ch_')) {
-                $amount = $amount*100;
+                $amount = $amount * 100;
             }
 
             $paymentIntent = new StripePaymentIntent();
             $paymentIntent->findByIdPaymentIntent($this->conveyor['paymentIntent']);
             $paymentIntent->setAmount($amount);
             $paymentIntent->setStatus($this->conveyor['status']);
-            $paymentIntent->setDateUpd(date("Y-m-d H:i:s"));
+            $paymentIntent->setDateUpd(date('Y-m-d H:i:s'));
 
             $paymentIntent->update();
 
@@ -250,12 +253,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - updatePaymentIntent'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -268,7 +272,7 @@ class ValidationOrderActions extends DefaultActions
     */
     public function createOrder()
     {
-        $this->conveyor['isAlreadyOrdered'] = (bool)Order::getOrderByCartId((int)$this->conveyor['id_cart']);
+        $this->conveyor['isAlreadyOrdered'] = (bool) Order::getOrderByCartId((int) $this->conveyor['id_cart']);
 
         if ($this->conveyor['isAlreadyOrdered']) {
             ProcessLoggerHandler::logInfo(
@@ -277,6 +281,7 @@ class ValidationOrderActions extends DefaultActions
                 null,
                 'ValidationOrderActions - createOrder'
             );
+
             return true;
         }
 
@@ -288,7 +293,7 @@ class ValidationOrderActions extends DefaultActions
             return false;
         }
 
-        $message = 'Stripe Transaction ID: '.$this->conveyor['paymentIntent'];
+        $message = 'Stripe Transaction ID: ' . $this->conveyor['paymentIntent'];
 
         if (strpos($this->conveyor['token'], 'pm_') !== false) {
             $this->conveyor['payment_method'] = \Stripe\PaymentMethod::retrieve($this->conveyor['token']);
@@ -300,7 +305,7 @@ class ValidationOrderActions extends DefaultActions
             $this->conveyor['datas']['owner'] = $this->conveyor['source']->owner->name;
         }
 
-        $this->conveyor['cart'] = new Cart((int)$this->conveyor['id_cart']);
+        $this->conveyor['cart'] = new Cart((int) $this->conveyor['id_cart']);
 
         $paid = $this->conveyor['amount'];
 
@@ -336,7 +341,7 @@ class ValidationOrderActions extends DefaultActions
             $this->context->country = new Country($addressDelivery->id_country);
 
             ProcessLoggerHandler::logInfo(
-                'Paid Amount => '.$paid,
+                'Paid Amount => ' . $paid,
                 null,
                 null,
                 'ValidationOrderActions - createOrder'
@@ -344,14 +349,14 @@ class ValidationOrderActions extends DefaultActions
 
             $this->module->validateOrder(
                 $this->conveyor['cart']->id,
-                (int)$orderStatus,
+                (int) $orderStatus,
                 $paid,
                 sprintf(
                     $this->module->l('%s via Stripe', 'ValidationOrderActions'),
                     Tools::ucfirst(Stripe_official::$paymentMethods[$this->conveyor['datas']['type']]['name'])
                 ),
                 $message,
-                array(),
+                [],
                 null,
                 false,
                 $this->conveyor['cart']->secure_key
@@ -370,13 +375,15 @@ class ValidationOrderActions extends DefaultActions
             // capture payment for card if no catch and authorize enabled
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
             ProcessLoggerHandler::logInfo(
-                'payment method => '.$intent->payment_method_types[0],
+                'payment method => ' . $intent->payment_method_types[0],
                 null,
                 null,
                 'ValidationOrderActions - createOrder'
             );
 
-            if ($intent->payment_method_types[0] == 'card' && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
+            if ($intent->payment_method_types[0] == 'card'
+                && $intent->capture_method != 'automatic'
+                && Configuration::get(Stripe_official::CATCHANDAUTHORIZE) == null) {
                 ProcessLoggerHandler::logInfo(
                     'Capturing card',
                     null,
@@ -389,7 +396,7 @@ class ValidationOrderActions extends DefaultActions
                 $amount = $this->module->isZeroDecimalCurrency($currency->iso_code) ? $order->getTotalPaid() : $order->getTotalPaid() * 100;
 
                 ProcessLoggerHandler::logInfo(
-                    'Capture Amount => '.$amount,
+                    'Capture Amount => ' . $amount,
                     null,
                     null,
                     'ValidationOrderActions - createOrder'
@@ -399,7 +406,7 @@ class ValidationOrderActions extends DefaultActions
 
                 if ($amount != $paid) {
                     ProcessLoggerHandler::logInfo(
-                        'Fix invalid amount "'.$amount.'" to "'.$paid,
+                        'Fix invalid amount "' . $amount . '" to "' . $paid,
                         null,
                         null,
                         'ValidationOrderActions - createOrder'
@@ -409,6 +416,7 @@ class ValidationOrderActions extends DefaultActions
 
                 if (!$this->module->captureFunds($amount, $this->conveyor['paymentIntent'])) {
                     ProcessLoggerHandler::closeLogger();
+
                     return false;
                 }
 
@@ -425,14 +433,14 @@ class ValidationOrderActions extends DefaultActions
                 \Stripe\PaymentIntent::update(
                     $this->conveyor['paymentIntent'],
                     [
-                        'description' => $this->context->shop->name.' '.$order->reference
+                        'description' => $this->context->shop->name . ' ' . $order->reference,
                     ]
                 );
             } else {
                 \Stripe\Charge::update(
                     $this->conveyor['chargeId'],
                     [
-                        'description' => $this->context->shop->name.' '.$order->reference
+                        'description' => $this->context->shop->name . ' ' . $order->reference,
                     ]
                 );
             }
@@ -455,12 +463,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - createOrder'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -475,27 +484,29 @@ class ValidationOrderActions extends DefaultActions
             }
 
             $dir_mail = false;
-            if (file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.txt') &&
-                file_exists(dirname(__FILE__).'/../../mails/'.$this->context->language->iso_code.'/oxxo.html')) {
-                $dir_mail = dirname(__FILE__).'/../../mails/';
+            if (file_exists(dirname(__FILE__) . '/../../mails/' . $this->context->language->iso_code . '/oxxo.txt') &&
+                file_exists(dirname(__FILE__) . '/../../mails/' . $this->context->language->iso_code . '/oxxo.html')) {
+                $dir_mail = dirname(__FILE__) . '/../../mails/';
             }
 
-            $orderId = Order::getOrderByCartId((int)$this->conveyor['id_cart']);
-            $order = new Order((int)$orderId);
+            $orderId = Order::getOrderByCartId((int) $this->conveyor['id_cart']);
+            $order = new Order((int) $orderId);
 
-            if (!isset($this->conveyor['voucher_url']))
+            if (!isset($this->conveyor['voucher_url'])) {
                 $this->conveyor['voucher_url'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->hosted_voucher_url;
-            if (!isset($this->conveyor['voucher_expire']))
+            }
+            if (!isset($this->conveyor['voucher_expire'])) {
                 $this->conveyor['voucher_expire'] = $this->conveyor['event_json']->data->object->next_action->oxxo_display_details->expires_after;
+            }
 
-            $template_vars = array(
+            $template_vars = [
                 '{name}' => $this->conveyor['payment_method']->billing_details->name,
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{order_id}' => $order->id,
                 '{voucher_url}' => $this->conveyor['voucher_url'],
                 '{order_ref}' => $order->reference,
                 '{total_paid}' => Tools::displayPrice($order->total_paid, new Currency($order->id_currency)),
-            );
+            ];
 
             if ($dir_mail) {
                 Mail::Send(
@@ -524,12 +535,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - sendMail'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -554,7 +566,7 @@ class ValidationOrderActions extends DefaultActions
                 $customer = \Stripe\Customer::create([
                     'description' => 'Customer created from Prestashop Stripe module',
                     'email' => $cartCustomer->email,
-                    'name' => $cartCustomer->firstname.' '.$cartCustomer->lastname,
+                    'name' => $cartCustomer->firstname . ' ' . $cartCustomer->lastname,
                 ]);
 
                 $stripeCustomer->id_customer = $cartCustomer->id;
@@ -585,12 +597,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - saveCard'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -623,30 +636,30 @@ class ValidationOrderActions extends DefaultActions
             $stripePayment->setIdStripe($this->conveyor['chargeId']);
             $stripePayment->setIdPaymentIntent($this->conveyor['paymentIntent']);
             $stripePayment->setName($this->conveyor['datas']['owner']);
-            $stripePayment->setIdCart((int)$this->context->cart->id);
+            $stripePayment->setIdCart((int) $this->context->cart->id);
             $stripePayment->setType(Tools::strtolower($cardType));
             $stripePayment->setAmount($this->conveyor['amount']);
-            $stripePayment->setRefund((int)0);
+            $stripePayment->setRefund((int) 0);
             $stripePayment->setCurrency(Tools::strtolower($this->context->currency->iso_code));
-            $stripePayment->setResult((int)$this->conveyor['result']);
-            $stripePayment->setState((int)Configuration::get('STRIPE_MODE'));
+            $stripePayment->setResult((int) $this->conveyor['result']);
+            $stripePayment->setState((int) Configuration::get('STRIPE_MODE'));
             if (isset($this->conveyor['voucher_url']) && isset($this->conveyor['voucher_expire'])) {
                 $stripePayment->setVoucherUrl($this->conveyor['voucher_url']);
-                $stripePayment->setVoucherExpire(date("Y-m-d H:i:s", $this->conveyor['voucher_expire']));
+                $stripePayment->setVoucherExpire(date('Y-m-d H:i:s', $this->conveyor['voucher_expire']));
             }
-            $stripePayment->setDateAdd(date("Y-m-d H:i:s"));
+            $stripePayment->setDateAdd(date('Y-m-d H:i:s'));
             $stripePayment->save();
 
             // Payment with Sofort is not accepted yet, so we can't get his orderPayment
             if (Tools::strtolower($cardType) != 'sofort'
                 && Tools::strtolower($cardType) != 'sepa_debit'
                 && Tools::strtolower($cardType) != 'oxxo') {
-                $orderId = Order::getOrderByCartId((int)$this->context->cart->id);
+                $orderId = Order::getOrderByCartId((int) $this->context->cart->id);
                 $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
 
                 if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
                     ProcessLoggerHandler::logError(
-                        'OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' .$this->conveyor['chargeId'] . ' on payment.',
+                        'OrderPayment is not created due to a PrestaShop, please verify order state configuration is loggable (Consider the associated order as validated). We try to create one with charge id ' . $this->conveyor['chargeId'] . ' on payment.',
                         'Order',
                         $orderId,
                         'ValidationOrderActions - addTentative'
@@ -664,12 +677,13 @@ class ValidationOrderActions extends DefaultActions
                             3,
                             null,
                             'Cart',
-                            (int)$this->context->cart->id,
+                            (int) $this->context->cart->id,
                             true
                         );
                         throw new PrestaShopException('Can\'t save Order Payment');
                     }
                     ProcessLoggerHandler::closeLogger();
+
                     return true;
                 }
 
@@ -687,12 +701,13 @@ class ValidationOrderActions extends DefaultActions
             ProcessLoggerHandler::closeLogger();
         } catch (Exception $e) {
             ProcessLoggerHandler::logError(
-                preg_replace("/\n/", '<br>', (string)$e->getMessage().'<br>'.$e->getTraceAsString()),
+                preg_replace("/\n/", '<br>', (string) $e->getMessage() . '<br>' . $e->getTraceAsString()),
                 null,
                 null,
                 'ValidationOrderActions - addTentative'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -721,13 +736,14 @@ class ValidationOrderActions extends DefaultActions
         if ($id_order == false) {
             if (in_array($event_type, Stripe_official::$webhook_events)) {
                 ProcessLoggerHandler::logInfo(
-                    'Unknown order => '.$event_type,
+                    'Unknown order => ' . $event_type,
                     null,
                     null,
                     'ValidationOrderActions - chargeWebhook'
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(200);
+
                 return true;
             } else {
                 ProcessLoggerHandler::logError(
@@ -738,6 +754,7 @@ class ValidationOrderActions extends DefaultActions
                 );
                 ProcessLoggerHandler::closeLogger();
                 http_response_code(200);
+
                 return false;
             }
         }
@@ -752,13 +769,14 @@ class ValidationOrderActions extends DefaultActions
 
         if ($order->module != 'stripe_official') {
             ProcessLoggerHandler::logInfo(
-                'This order #'.$id_order.' was made with '.$order->module.' not with Stripe',
+                'This order #' . $id_order . ' was made with ' . $order->module . ' not with Stripe',
                 null,
                 null,
                 'ValidationOrderActions - chargeWebhook'
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(200);
+
             return true;
         }
 
@@ -772,19 +790,18 @@ class ValidationOrderActions extends DefaultActions
             );
             ProcessLoggerHandler::closeLogger();
             http_response_code(200);
+
             return true;
         }
 
         ProcessLoggerHandler::logInfo(
-            'current charge => '.$event_type,
+            'current charge => ' . $event_type,
             null,
             null,
             'ValidationOrderActions - chargeWebhook'
         );
 
-
-        switch($event_type)
-        {
+        switch ($event_type) {
             case 'charge.succeeded':
                 if ($order->getCurrentState() != Configuration::get('PS_OS_OUTOFSTOCK_PAID')) {
                     $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
@@ -793,7 +810,7 @@ class ValidationOrderActions extends DefaultActions
                         $stripePayment = new StripePayment();
                         $stripePayment->getStripePaymentByPaymentIntent($this->conveyor['IdPaymentIntent']);
                         $stripePayment->setIdStripe($this->conveyor['event_json']->data->object->id);
-                        $stripePayment->setVoucherValidate(date("Y-m-d H:i:s"));
+                        $stripePayment->setVoucherValidate(date('Y-m-d H:i:s'));
                         $stripePayment->save();
 
                         ProcessLoggerHandler::logInfo(
@@ -813,18 +830,12 @@ class ValidationOrderActions extends DefaultActions
                 break;
 
             case 'charge.refunded':
-                if ($order->getCurrentState() != Configuration::get('PS_OS_PAYMENT')) {
-                    $order->setCurrentState(Configuration::get('PS_OS_CANCELED'));
-                    ProcessLoggerHandler::logInfo(
-                        'Order canceled',
-                        null,
-                        null,
-                        'ValidationOrderActions - chargeWebhook'
-                    );
-                } else {
+                $currentState = new \OrderState($order->getCurrentState());
+                if ((bool) $currentState->paid === true) {
                     if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
                         || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
-                        $order->setCurrentState(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND'));
+                        $newOrderState =  empty(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND')) ? Configuration::get('PS_OS_REFUND') : Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND');
+                        $order->setCurrentState($newOrderState);
                         ProcessLoggerHandler::logInfo(
                             'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
                             null,
@@ -858,7 +869,7 @@ class ValidationOrderActions extends DefaultActions
                 return true;
         }
 
-        $currentOrderState = $order->getCurrentOrderState()->name[(int)Configuration::get('PS_LANG_DEFAULT')];
+        $currentOrderState = $order->getCurrentOrderState()->name[(int) Configuration::get('PS_LANG_DEFAULT')];
 
         ProcessLoggerHandler::logInfo(
             'Set Order State to ' . $currentOrderState . ' for ' . $event_type,
@@ -867,6 +878,7 @@ class ValidationOrderActions extends DefaultActions
             'ValidationOrderActions - chargeWebhook'
         );
         ProcessLoggerHandler::closeLogger();
+
         return true;
     }
 }

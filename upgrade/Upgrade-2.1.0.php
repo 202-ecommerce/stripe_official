@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,17 +20,14 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 require_once dirname(__FILE__) . '/../classes/StripeCapture.php';
 require_once dirname(__FILE__) . '/../classes/StripeCustomer.php';
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
 
 function upgrade_module_2_1_0($module)
 {
@@ -40,9 +37,9 @@ function upgrade_module_2_1_0($module)
     $installer->registerHooks();
 
     $handler = new Stripe_officialClasslib\Actions\ActionsHandler();
-    $handler->setConveyor(array(
-                'context' => Context::getContext()
-            ));
+    $handler->setConveyor([
+                'context' => Context::getContext(),
+            ]);
     $handler->addActions('registerWebhookSignature');
     $handler->process('ConfigurationActions');
 

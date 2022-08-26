@@ -1,7 +1,6 @@
 <?php
-
 /**
- * 2007-2021 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -21,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -40,7 +38,7 @@ function upgrade_module_2_3_5($module)
         $stripeClient = new \Stripe\StripeClient(Configuration::get(Stripe_official::KEY));
         $webhooksList = $stripeClient->webhookEndpoints->all();
         foreach ($webhooksList as $webhookEndpoint) {
-            if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
+            if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', [], true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
                 $webhookEndpoint->delete();
             }
         }
@@ -50,7 +48,7 @@ function upgrade_module_2_3_5($module)
         $stripeClient = new \Stripe\StripeClient(Configuration::get(Stripe_official::TEST_KEY));
         $webhooksList = $stripeClient->webhookEndpoints->all();
         foreach ($webhooksList as $webhookEndpoint) {
-            if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', array(), true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
+            if ($webhookEndpoint->url == $context->link->getModuleLink('stripe_official', 'webhook', [], true, Configuration::get('PS_LANG_DEFAULT'), Configuration::get('PS_SHOP_DEFAULT'))) {
                 $webhookEndpoint->delete();
             }
         }
@@ -58,7 +56,7 @@ function upgrade_module_2_3_5($module)
     /* Create new webhook in current Mode */
     StripeWebhook::create();
     /* Delete (if exist) table stripe_webhook from previous module version */
-    $sql = 'DROP TABLE IF EXISTS '._DB_PREFIX_.'stripe_webhook;';
+    $sql = 'DROP TABLE IF EXISTS ' . _DB_PREFIX_ . 'stripe_webhook;';
     if (!Db::getInstance()->execute($sql)) {
         return false;
     }

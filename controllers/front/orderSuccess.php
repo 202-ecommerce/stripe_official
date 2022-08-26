@@ -1,10 +1,6 @@
 <?php
-
-use Stripe_officialClasslib\Actions\ActionsHandler;
-use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
-
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -24,8 +20,11 @@ use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
+
+use Stripe_officialClasslib\Actions\ActionsHandler;
+use Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler;
 
 class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontController
 {
@@ -38,8 +37,9 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         $intent = $this->retrievePaymentIntent();
 
-        if ($this->registerStripeEvent($intent))
+        if ($this->registerStripeEvent($intent)) {
             $this->handleWebhookActions($intent);
+        }
 
         $this->displayOrderConfirmation($intent);
     }
@@ -60,7 +60,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         }
 
         ProcessLoggerHandler::logInfo(
-            'Retrieve payment intent : '.$intent,
+            'Retrieve payment intent : ' . $intent,
             null,
             null,
             'orderSuccess - retrievePaymentIntent'
@@ -77,12 +77,13 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         if (!$stripeEventStatus) {
             ProcessLoggerHandler::logInfo(
-                'Charge event does not need to be processed : '.$eventCharge->status,
+                'Charge event does not need to be processed : ' . $eventCharge->status,
                 null,
                 null,
                 'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -108,6 +109,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                     'orderSuccess - checkEventStatus'
                 );
                 ProcessLoggerHandler::closeLogger();
+
                 return false;
             }
         }
@@ -120,6 +122,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'orderSuccess - checkEventStatus'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
 
@@ -156,6 +159,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'orderSuccess - registerStripeEvent'
             );
             ProcessLoggerHandler::closeLogger();
+
             return false;
         }
     }
@@ -200,7 +204,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'addTentative'
             );
         } elseif (($eventType == 'pending' && $payment_method == 'sofort')
-            || ($eventType == 'charge.succeeded'
+            || ($eventType == 'succeeded'
                 && Stripe_official::$paymentMethods[$payment_method]['flow'] == 'redirect'
                 && $payment_method != 'sofort')
         ) {
@@ -241,7 +245,7 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
         );
 
         $id_order = 0;
-        for($i = 1; $i <= 15; $i++) {
+        for ($i = 1; $i <= 15; ++$i) {
             if (empty($intent->metadata->id_cart)) {
                 $stripePayment = new StripePayment();
                 $stripePayment->getStripePaymentByPaymentIntent($intent->id);
@@ -251,26 +255,29 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 $id_cart = $intent->metadata->id_cart;
             }
 
-            if ($id_cart !== null) {
-                $id_order = (int) Order::getOrderByCartId($id_cart);
-
-                if ($id_order) {
-                    ProcessLoggerHandler::logInfo(
-                        'Waiting proccess order OK',
-                        null,
-                        null,
-                        'orderSuccess - displayOrderConfirmation'
-                    );
-                    break;
-                }
+            if (empty($id_cart) === true) {
+                break;
             }
-            sleep(2);
+            $id_order = $this->getOrderIdByCartId($id_cart);
+
             ProcessLoggerHandler::logInfo(
-                'Waiting proccess time => '.$i,
+                'Waiting proccess time => ' . $i . 'Order Id => ' . $id_order,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
             );
+
+            if (empty($id_order) === false) {
+                ProcessLoggerHandler::logInfo(
+                    'Waiting proccess order OK',
+                    null,
+                    null,
+                    'orderSuccess - displayOrderConfirmation'
+                );
+                break;
+            }
+
+            sleep(2);
         }
 
         if (isset($this->context->customer->secure_key)) {
@@ -283,12 +290,12 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
             $url = Context::getContext()->link->getModuleLink(
                 'stripe_official',
                 'orderFailure',
-                array(),
+                [],
                 true
             );
 
             ProcessLoggerHandler::logInfo(
-                'Failed order url => '.$url,
+                'Failed order url => ' . $url,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
@@ -298,16 +305,16 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
                 'order-confirmation',
                 true,
                 null,
-                array(
-                    'id_cart' => $id_cart,
-                    'id_module' => (int)$this->module->id,
+                [
+                    'id_cart' => isset($id_cart) ? $id_cart : 0,
+                    'id_module' => (int) $this->module->id,
                     'id_order' => $id_order,
-                    'key' => $secure_key
-                )
+                    'key' => $secure_key,
+                ]
             );
 
             ProcessLoggerHandler::logInfo(
-                'Confirmation order url => '.$url,
+                'Confirmation order url => ' . $url,
                 null,
                 null,
                 'orderSuccess - displayOrderConfirmation'
@@ -317,5 +324,16 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
         Tools::redirect($url);
         exit;
+    }
+
+    private function getOrderIdByCartId($cartId)
+    {
+        $query = (new DbQuery())
+            ->select('id_order')
+            ->from(Order::$definition['table'])
+            ->where('`id_cart` = ' . (int) $cartId);
+        $orderId = Db::getInstance()->getValue($query, false);
+
+        return empty($orderId) ? 0 : (int) $orderId;
     }
 }

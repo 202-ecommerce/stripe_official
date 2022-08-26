@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2019 PrestaShop
+ * 2007-2022 Stripe
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,8 @@
  *
  * @author    202-ecommerce <tech@202-ecommerce.com>
  * @copyright Copyright (c) Stripe
- * @license   Commercial license
+ * @license   Academic Free License (AFL 3.0)
  */
-
 class StripePaymentIntent extends ObjectModel
 {
     /** @var string */
@@ -41,41 +40,41 @@ class StripePaymentIntent extends ObjectModel
     /**
      * @see ObjectModel::$definition
      */
-    public static $definition = array(
-        'table'        => 'stripe_payment_intent',
-        'primary'      => 'id_stripe_payment_intent',
-        'fields'       => array(
-            'id_payment_intent'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+    public static $definition = [
+        'table' => 'stripe_payment_intent',
+        'primary' => 'id_stripe_payment_intent',
+        'fields' => [
+            'id_payment_intent' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 40,
-            ),
-            'status'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'size' => 40,
+            ],
+            'status' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 30,
-            ),
-            'amount' => array(
-                'type'     => ObjectModel::TYPE_FLOAT,
+                'size' => 30,
+            ],
+            'amount' => [
+                'type' => ObjectModel::TYPE_FLOAT,
                 'validate' => 'isFloat',
                 'size' => 10,
-                'scale' => 2
-            ),
-            'currency'  => array(
-                'type'     => ObjectModel::TYPE_STRING,
+                'scale' => 2,
+            ],
+            'currency' => [
+                'type' => ObjectModel::TYPE_STRING,
                 'validate' => 'isString',
-                'size'     => 3,
-            ),
-            'date_add'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+                'size' => 3,
+            ],
+            'date_add' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-            'date_upd'  => array(
-                'type'     => ObjectModel::TYPE_DATE,
+            ],
+            'date_upd' => [
+                'type' => ObjectModel::TYPE_DATE,
                 'validate' => 'isDate',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     public function setIdPaymentIntent($id_payment_intent)
     {
@@ -145,7 +144,7 @@ class StripePaymentIntent extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(self::$definition['table']);
-        $query->where('id_payment_intent = "'. pSQL($idPaymentIntent) .'"');
+        $query->where('id_payment_intent = "' . pSQL($idPaymentIntent) . '"');
 
         $data = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if (!$data) {

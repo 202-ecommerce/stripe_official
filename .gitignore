@@ -10,3 +10,6 @@ composer.lock
 
 # Ignore cache folder used by linters.
 /.cache
+.php_cs.cache
+
+!.htaccess
