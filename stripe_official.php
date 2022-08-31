@@ -503,7 +503,6 @@ class Stripe_official extends PaymentModule
         }
 
         try {
-
             $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
 
             if (!$installer->install()) {

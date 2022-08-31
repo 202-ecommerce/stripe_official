@@ -834,7 +834,7 @@ class ValidationOrderActions extends DefaultActions
                 if ((bool) $currentState->paid === true) {
                     if ($this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount_captured
                         || $this->conveyor['event_json']->data->object->amount_refunded !== $this->conveyor['event_json']->data->object->amount) {
-                        $newOrderState =  empty(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND')) ? Configuration::get('PS_OS_REFUND') : Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND');
+                        $newOrderState = empty(Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND')) ? Configuration::get('PS_OS_REFUND') : Configuration::get('PS_CHECKOUT_STATE_PARTIAL_REFUND');
                         $order->setCurrentState($newOrderState);
                         ProcessLoggerHandler::logInfo(
                             'Partial refund of payment => ' . $this->conveyor['event_json']->data->object->id,
