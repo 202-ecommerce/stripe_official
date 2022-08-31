@@ -496,7 +496,13 @@ class Stripe_official extends PaymentModule
             if (!parent::install()) {
                 return false;
             }
+        } catch (PrestaShopDatabaseException $e) {
+            PrestaShopLogger::addLog($e->getMessage() . $e->getTraceAsString(), 1);
+        } catch (PrestaShopException $e) {
+            PrestaShopLogger::addLog($e->getMessage() . $e->getTraceAsString(), 1);
+        }
 
+        try {
             $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
 
             if (!$installer->install()) {
