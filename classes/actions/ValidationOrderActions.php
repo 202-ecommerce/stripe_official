@@ -730,7 +730,7 @@ class ValidationOrderActions extends DefaultActions
         );
 
         $id_cart = $this->conveyor['event_json']->data->object->metadata->id_cart;
-        $id_order = Order::getOrderByCartId($id_cart);
+        $id_order = $this->getOrderIdByCartId($id_cart);
         $event_type = $this->conveyor['event_json']->type;
 
         if ($id_order == false) {
@@ -880,5 +880,16 @@ class ValidationOrderActions extends DefaultActions
         ProcessLoggerHandler::closeLogger();
 
         return true;
+    }
+
+    private function getOrderIdByCartId($cartId)
+    {
+        $query = (new DbQuery())
+            ->select('id_order')
+            ->from(Order::$definition['table'])
+            ->where('`id_cart` = ' . (int) $cartId);
+        $orderId = Db::getInstance()->getValue($query, false);
+
+        return empty($orderId) ? 0 : (int) $orderId;
     }
 }
