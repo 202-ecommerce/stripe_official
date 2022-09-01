@@ -1333,7 +1333,6 @@ class Stripe_official extends PaymentModule
     public static function getWebhookUrl()
     {
         $context = Context::getContext();
-        $id_lang = self::getLangIdContext();
         $id_shop = self::getShopIdContext();
 
         return $context->link->getModuleLink(
@@ -1341,51 +1340,37 @@ class Stripe_official extends PaymentModule
             'webhook',
             [],
             true,
-            $id_lang,
+            null,
             $id_shop
         );
     }
 
     /**
-     * get current LangId according to activate multishop feature
-     *
-     * @return int|null
-     */
-    public static function getLangIdContext()
-    {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') && Shop::getContext() === Shop::CONTEXT_ALL) {
-            return Configuration::get('PS_LANG_DEFAULT', null, 1, 1);
-        }
-
-        return Configuration::get('PS_LANG_DEFAULT');
-    }
-
-    /**
-     * get current ShopId according to activate multishop feature
+     * get current ShopId according to all shop context
      *
      * @return int|null
      */
     public static function getShopIdContext()
     {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
-            return Context::getContext()->shop->id;
+        if ((int) Shop::getContext() !== (int) Shop::CONTEXT_ALL) {
+            return (int) Context::getContext()->shop->id;
         }
 
-        return Configuration::get('PS_SHOP_DEFAULT');
+        return 0;
     }
 
     /**
-     * get current ShopGroupId according to activate multishop feature
+     * get current ShopGroupId according to all shop context
      *
      * @return int|null
      */
     public static function getShopGroupIdContext()
     {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
-            return Context::getContext()->shop->id_shop_group;
+        if ((int) Shop::getContext() !== (int) Shop::CONTEXT_ALL) {
+            return (int) Context::getContext()->shop->id_shop_group;
         }
 
-        return Configuration::get('PS_SHOP_DEFAULT');
+        return 0;
     }
 
     /**
