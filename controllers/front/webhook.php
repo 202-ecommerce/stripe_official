@@ -120,8 +120,11 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'webhook - postProcess'
         );
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         // Retrieve secret endpoint
-        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE, null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE, null, $shopGroupId, $shopId);
         ProcessLoggerHandler::logInfo(
             'set endpoint secret => ' . $endpoint_secret,
             null,
@@ -133,9 +136,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         $event = $this->constructEvent($input, $sig_header, $endpoint_secret);
 
         // Check if shop is the good one
-        $cart = new Cart($event->data->object->metadata->id_cart);
-        if ($cart->id_shop_group != Stripe_official::getShopGroupIdContext()
-            || $cart->id_shop != Stripe_official::getShopIdContext()) {
+        /*$cart = new Cart($event->data->object->metadata->id_cart);
+        if (($cart->id_shop_group != $shopGroupId || $cart->id_shop != $shopId)) {
             ProcessLoggerHandler::logInfo(
                 $msg = 'This cart does not come from this shop',
                 'Cart',
@@ -146,7 +148,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             http_response_code(200);
             echo $msg;
             exit;
-        }
+        }*/
 
         // Retrieve payment intent
         if ($event->type == 'payment_intent.requires_action') {
