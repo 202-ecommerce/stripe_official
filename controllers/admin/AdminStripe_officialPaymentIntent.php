@@ -118,7 +118,7 @@ class AdminStripe_officialPaymentIntentController extends ModuleAdminController
         $this->_join = null;
         $this->_group = null;
         $this->_filter = null;
-        $this->_where = ' AND a.id_payment_intent = ' . (int) Tools::getValue('id_payment_intent');
+        $this->_where = ' AND a.id_payment_intent = "' . pSQL(Tools::getValue('id_payment_intent')) . '"';
         $this->_orderBy = 'date_add';
 
         $this->actions = [];
