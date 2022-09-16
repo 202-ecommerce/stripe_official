@@ -1183,85 +1183,82 @@ class Stripe_official extends PaymentModule
         $this->context->smarty->assign('return_url', $return_url);
     }
 
-    /*
-     ** @Method: apiRefund
-     ** @description: Make a Refund (charge) with Stripe
-     **
-     ** @arg: amount, id_stripe
-     ** @amount: if null total refund
-     ** @currency: "USD", "EUR", etc..
-     ** @mode: (boolean) ? total : partial
-     ** @return: (none)
+    /**
+     * @method apiRefund
+     * @description Make a Refund (charge) with Stripe
+     *
+     * @param $refund_id
+     * @param $currency
+     * @param $mode (boolean) ? total : partial
+     * @param $id_card
+     * @param $amount (if null total refund)
+     *
+     * @return false|void
+     *
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
         $stripeAccount = $this->checkApiConnection($this->getSecretKey());
-        if (empty($stripeAccount) !== false && empty($refund_id) !== false) {
-            $query = new DbQuery();
-            $query->select('*');
-            $query->from('stripe_payment');
-            $query->where('id_stripe = "' . pSQL($refund_id) . '"');
-            $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
-            if ($mode == 1) { /* Total refund */
-                try {
-                    $ch = \Stripe\Charge::retrieve($refund_id);
-                    $ch->refunds->create();
-                } catch (Exception $e) {
-                    // Something else happened, completely unrelated to Stripe
-                    $this->errors[] = $e->getMessage();
 
-                    return false;
-                }
+        if (Validate::isLoadedObject($stripeAccount) === false && empty($refund_id) === true) {
+            $this->errors[] = $this->l('Invalid Stripe credentials, please check your configuration.');
+            return false;
+        }
 
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from('stripe_payment');
+        $query->where('id_stripe = "' . pSQL($refund_id) . '"');
+        $refund = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS($query->build());
+
+        if ($mode == 1) { /* Total refund */
+            try {
+                $ch = \Stripe\Charge::retrieve($refund_id);
+                $ch->refunds->create();
+            } catch (Exception $e) {
+                // Something else happened, completely unrelated to Stripe
+                $this->errors[] = $e->getMessage();
+                return false;
+            }
+
+            Db::getInstance()->Execute(
+                'UPDATE `' . _DB_PREFIX_ . 'stripe_payment`
+                    SET `result` = 2,
+                        `date_add` = NOW(),
+                        `refund` = "' . pSQL($refund[0]['amount']) . '"
+                    WHERE `id_stripe` = "' . pSQL($refund_id) . '"'
+            );
+        } else { /* Partial refund */
+            if (!$this->isZeroDecimalCurrency($currency)) {
+                $ref_amount = $amount * 100;
+            }
+
+            try {
+                $ch = \Stripe\Charge::retrieve($refund_id);
+                $ch->refunds->create(['amount' => isset($ref_amount) ? $ref_amount : 0]);
+            } catch (Exception $e) {
+                // Something else happened, completely unrelated to Stripe
+                $this->errors[] = $e->getMessage();
+                return false;
+            }
+
+            $amount += ($refund[0]['refund']);
+            $result = ($amount == $refund[0]['amount']) ? 2 : 3;
+
+            if ($amount <= $refund[0]['amount']) {
                 Db::getInstance()->Execute(
-                    'UPDATE `' . _DB_PREFIX_ . 'stripe_payment` SET `result` = 2, `date_add` = NOW(), `refund` = "'
-                    . pSQL($refund[0]['amount']) . '" WHERE `id_stripe` = "' . pSQL($refund_id) . '"'
-                );
-            } else { /* Partial refund */
-                if (!$this->isZeroDecimalCurrency($currency)) {
-                    $ref_amount = $amount * 100;
-                }
-                try {
-                    $ch = \Stripe\Charge::retrieve($refund_id);
-                    $ch->refunds->create(['amount' => isset($ref_amount) ? $ref_amount : 0]);
-                } catch (Exception $e) {
-                    // Something else happened, completely unrelated to Stripe
-                    $this->errors[] = $e->getMessage();
-
-                    return false;
-                }
-
-                $amount += ($refund[0]['refund']);
-                if ($amount == $refund[0]['amount']) {
-                    $result = 2;
-                } else {
-                    $result = 3;
-                }
-
-                if ($amount <= $refund[0]['amount']) {
-                    Db::getInstance()->Execute(
-                        'UPDATE `' . _DB_PREFIX_ . 'stripe_payment`
-                        SET `result` = ' . (int) $result . ',
+                    'UPDATE `' . _DB_PREFIX_ . 'stripe_payment`
+                        SET `result` = ' . pSQL($result) . ',
                             `date_add` = NOW(),
                             `refund` = "' . pSQL($amount) . '"
                         WHERE `id_stripe` = "' . pSQL($refund_id) . '"'
-                    );
-                }
+                );
             }
-
-            $id_order = Order::getOrderByCartId($id_card);
-            $order = new Order($id_order);
-
-            $query = new DbQuery();
-            $query->select('result');
-            $query->from('stripe_payment');
-            $query->where('id_stripe = "' . pSQL($refund_id) . '"');
-            $state = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($query->build());
-
-            $this->success = $this->l('Refunds processed successfully');
-        } else {
-            $this->errors[] = $this->l('Invalid Stripe credentials, please check your configuration.');
         }
+
+        $this->success = $this->l('Refunds processed successfully');
     }
 
     public function isZeroDecimalCurrency($currency)
