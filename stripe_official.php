@@ -1445,8 +1445,8 @@ class Stripe_official extends PaymentModule
 
             return false;
         }
-        return true;
 
+        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
