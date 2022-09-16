@@ -92,7 +92,7 @@ class StripeCustomer extends ObjectModel
         $query->select('*');
         $query->from(static::$definition['table']);
         $query->where('id_customer = ' . pSQL((int) $id_customer));
-        $query->where('id_account = "' . pSQL((int) $id_account) . '"');
+        $query->where('id_account = "' . pSQL((string) $id_account) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if (empty($result) === true) {
