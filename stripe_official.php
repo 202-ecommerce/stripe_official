@@ -1195,7 +1195,6 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        $stripeAccount = $this->checkApiConnection($this->getSecretKey());
         if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
             $query = new DbQuery();
             $query->select('*');
