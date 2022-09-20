@@ -133,15 +133,6 @@ class Stripe_official extends PaymentModule
             'parent_class_name' => 'stripe_official',
             'visible' => false,
         ],
-        [
-            'name' => [
-                'en' => 'Paiment Intent List',
-                'fr' => 'Liste des intentions de paiement',
-            ],
-            'class_name' => 'AdminStripe_officialPaymentIntent',
-            'parent_class_name' => 'stripe_official',
-            'visible' => false,
-        ],
     ];
 
     /**
