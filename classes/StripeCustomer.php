@@ -113,7 +113,7 @@ class StripeCustomer extends ObjectModel
 
             return $email === $customer->email;
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 
@@ -129,7 +129,7 @@ class StripeCustomer extends ObjectModel
                 ['type' => 'card']
             );
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 
