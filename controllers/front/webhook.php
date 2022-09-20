@@ -186,24 +186,16 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
     private function checkApiKey($secretKey)
     {
         try {
-            ProcessLoggerHandler::logInfo(
-                $secretKey,
-                null,
-                null,
-                'webhook - checkApiKey'
-            );
-
             Stripe::setApiKey($secretKey);
 
             // Retrieve the request's body and parse it as JSON
             ProcessLoggerHandler::logInfo(
-                'setApiKey ok. Retrieve the request\'s body and parse it as JSON',
+                'setApiKey ok ' . substr($secretKey, 0, 10) . '... Retrieve the request\'s body and parse it as JSON',
                 null,
                 null,
                 'webhook - checkApiKey'
             );
         } catch (Exception $e) {
-            print_r($e->getMessage());
             ProcessLoggerHandler::logError(
                 'setApiKey not ok: ' . $e->getMessage(),
                 null,
