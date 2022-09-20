@@ -1195,8 +1195,7 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        $stripeAccount = $this->checkApiConnection($this->getSecretKey());
-        if (empty($stripeAccount) !== false && empty($refund_id) !== false) {
+        if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
             $query = new DbQuery();
             $query->select('*');
             $query->from('stripe_payment');
@@ -1446,6 +1445,8 @@ class Stripe_official extends PaymentModule
 
             return false;
         }
+
+        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
