@@ -1429,7 +1429,7 @@ class Stripe_official extends PaymentModule
 
             return \Stripe\Account::retrieve();
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             $this->errors[] = $e->getMessage();
