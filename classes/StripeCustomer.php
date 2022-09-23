@@ -91,8 +91,8 @@ class StripeCustomer extends ObjectModel
         $query = new DbQuery();
         $query->select('*');
         $query->from(static::$definition['table']);
-        $query->where('id_customer = ' . pSQL((int) $id_customer));
-        $query->where('id_account = "' . pSQL((int) $id_account) . '"');
+        $query->where('id_customer = ' . (int) $id_customer);
+        $query->where('id_account = "' . pSQL($id_account) . '"');
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query->build());
         if (empty($result) === true) {
@@ -113,7 +113,7 @@ class StripeCustomer extends ObjectModel
 
             return $email === $customer->email;
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 
@@ -129,7 +129,7 @@ class StripeCustomer extends ObjectModel
                 ['type' => 'card']
             );
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
 

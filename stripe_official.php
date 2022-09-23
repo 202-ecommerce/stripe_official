@@ -133,15 +133,6 @@ class Stripe_official extends PaymentModule
             'parent_class_name' => 'stripe_official',
             'visible' => false,
         ],
-        [
-            'name' => [
-                'en' => 'Paiment Intent List',
-                'fr' => 'Liste des intentions de paiement',
-            ],
-            'class_name' => 'AdminStripe_officialPaymentIntent',
-            'parent_class_name' => 'stripe_official',
-            'visible' => false,
-        ],
     ];
 
     /**
@@ -496,7 +487,13 @@ class Stripe_official extends PaymentModule
             if (!parent::install()) {
                 return false;
             }
+        } catch (PrestaShopDatabaseException $e) {
+            PrestaShopLogger::addLog($e->getMessage() . $e->getTraceAsString(), 1);
+        } catch (PrestaShopException $e) {
+            PrestaShopLogger::addLog($e->getMessage() . $e->getTraceAsString(), 1);
+        }
 
+        try {
             $installer = new Stripe_officialClasslib\Install\ModuleInstaller($this);
 
             if (!$installer->install()) {
@@ -1189,8 +1186,7 @@ class Stripe_official extends PaymentModule
      */
     public function apiRefund($refund_id, $currency, $mode, $id_card, $amount = null)
     {
-        $stripeAccount = $this->checkApiConnection($this->getSecretKey());
-        if (empty($stripeAccount) !== false && empty($refund_id) !== false) {
+        if ($this->checkApiConnection($this->getSecretKey()) && !empty($refund_id)) {
             $query = new DbQuery();
             $query->select('*');
             $query->from('stripe_payment');
@@ -1433,13 +1429,15 @@ class Stripe_official extends PaymentModule
 
             return \Stripe\Account::retrieve();
         } catch (Exception $e) {
-            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger(self::class);
+            Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::openLogger();
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::logError($e->getMessage());
             Stripe_officialClasslib\Extensions\ProcessLogger\ProcessLoggerHandler::closeLogger();
             $this->errors[] = $e->getMessage();
 
             return false;
         }
+
+        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
