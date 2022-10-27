@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{stripe_official}prestashop>stripe_official_4093808c9781fb6ca2ed5ade71deff4d'] = 'Pour pouvoir utiliser ce module, veuillez activer cURL (extension PHP).';
 $_MODULE['<{stripe_official}prestashop>stripe_official_cc21116ce900f38c0691823ab193b9a3'] = 'Payer par carte bancaire';
 $_MODULE['<{stripe_official}prestashop>stripe_official_d536f6cb1304cde5da44c530d3157886'] = 'Payer avec Bancontact';
@@ -125,6 +125,7 @@ $_MODULE['<{stripe_official}prestashop>configuration_a57244b3910a511e885d0750379
 $_MODULE['<{stripe_official}prestashop>configuration_9dd810bd2e3bd1db689ace1de85336ee'] = 'Nécessite une activation';
 $_MODULE['<{stripe_official}prestashop>configuration_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Non';
 $_MODULE['<{stripe_official}prestashop>configuration_93cba07454f06a4a960172bbd6e2a435'] = 'Oui';
+$_MODULE['<{stripe_official}prestashop>configuration_90eb8b5cffc408bf9f70174784472f54'] = 'Pour afficher ses méthodes de paiement, le client doit saisir une adresse de livraison ou de facturation dans le pays où cette méthode est disponible';
 $_MODULE['<{stripe_official}prestashop>configuration_0a2c4e503e93bc3135308bb3fadbe0bd'] = 'Vous devez commencer par activer ces moyens de paiement dans votre [a @href2@]Dashboard Stripe[/a].';
 $_MODULE['<{stripe_official}prestashop>configuration_c9cc8cce247e49bae79f15173ce97354'] = 'Enregistrer';
 $_MODULE['<{stripe_official}prestashop>refund_2b660da0c521cc6bc51a188bc9f7d084'] = 'Sélectionnez la commande que vous voulez rembourser';
@@ -223,3 +224,4 @@ $_MODULE['<{stripe_official}prestashop>configurationactions_2df5570b8a0e0c076571
 $_MODULE['<{stripe_official}prestashop>configurationactions_5fba3565c1b6638ac41f7627066aaa58'] = 'Vous avez fourni des clés API de test au lieu de clés API de production';
 $_MODULE['<{stripe_official}prestashop>configurationactions_50ce374ab3f05a63a6981484b8757094'] = 'Activer l\'autorisation et la capture distinctes';
 $_MODULE['<{stripe_official}prestashop>configurationactions_8dd2f915acf4ec98006d11c9a4b0945b'] = 'Paramètres mis à jour.';
+$_MODULE['<{stripe_official}prestashop>validationorderactions_e4bfd8a14358d5995b2fe3efc812fee9'] = '%s via Stripe';
