@@ -479,7 +479,7 @@ class ValidationOrderActions extends DefaultActions
     public function sendMail()
     {
         try {
-            if ($this->conveyor['datas']['type'] != 'oxxo') {
+            if (empty($this->conveyor['datas']['type']) || $this->conveyor['datas']['type'] != 'oxxo') {
                 return true;
             }
 
