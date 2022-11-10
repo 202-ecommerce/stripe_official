@@ -125,7 +125,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             ProcessLoggerHandler::logInfo(
-                'Intent Data => ' . Tools::jsonEncode($intentData),
+                'Intent Data => ' . json_encode($intentData),
                 null,
                 null,
                 'createIntent - constructIntentData'
@@ -209,7 +209,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         }
 
         ProcessLoggerHandler::logInfo(
-            'Card Payment => ' . Tools::jsonEncode($cardData),
+            'Card Payment => ' . json_encode($cardData),
             null,
             null,
             'createIntent - constructCardPaymentData'
