@@ -517,6 +517,14 @@ class Stripe_official extends PaymentModule
                 Db::getInstance()->execute($sql);
             }
 
+            if (Hook::getHookStatusByName('actionStripeOfficialMetadataDefinition') === false) {
+                $name = 'actionStripeOfficialAddPaymentIntent';
+                $title = 'Define metadata of Stripe payment intent';
+                $description = 'Metadata is passing during creation and update of Stripe payment intent';
+                $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'hook` (`name`, `title`, `description`) VALUES ("' . $name . '", "' . $title . '", "' . $description . '");';
+                Db::getInstance()->execute($sql);
+            }
+
             $shopGroupId = Stripe_official::getShopGroupIdContext();
             $shopId = Stripe_official::getShopIdContext();
 
@@ -1436,8 +1444,6 @@ class Stripe_official extends PaymentModule
 
             return false;
         }
-
-        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
