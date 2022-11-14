@@ -235,7 +235,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
         } catch (\Stripe\Exception\ApiErrorException $e) {
             ProcessLoggerHandler::logInfo(
-                "Cannot retrieve Stripe Intent => ".$e->getMessage(),
+                'Cannot retrieve Stripe Intent => ' . $e->getMessage(),
                 null,
                 null,
                 'createIntent - createIdempotencyKey'
