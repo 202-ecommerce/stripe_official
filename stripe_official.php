@@ -2024,7 +2024,7 @@ class Stripe_official extends PaymentModule
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
                 ->setModuleName($this->name)
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
+                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . $cc_img))
                 ->setCallToActionText($this->button_label[$name]);
 
             // Display additional information for redirect and receiver based payment methods
