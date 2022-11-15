@@ -654,8 +654,9 @@ class ValidationOrderActions extends DefaultActions
             if (Tools::strtolower($cardType) != 'sofort'
                 && Tools::strtolower($cardType) != 'sepa_debit'
                 && Tools::strtolower($cardType) != 'oxxo') {
-                $orderId = Order::getOrderByCartId((int) $this->context->cart->id);
-                $orderPaymentDatas = OrderPayment::getByOrderId($orderId);
+                $orderId = Order::getOrderByCartId($this->conveyor['cart']->id);
+                $order = new Order($orderId);
+                $orderPaymentDatas = $order->getOrderPaymentCollection();
 
                 if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
                     ProcessLoggerHandler::logError(
@@ -664,7 +665,7 @@ class ValidationOrderActions extends DefaultActions
                         $orderId,
                         'ValidationOrderActions - addTentative'
                     );
-                    $order = new Order($orderId);
+
                     if (!$order->addOrderPayment($this->conveyor['amount'], null, $this->conveyor['chargeId'])) {
                         ProcessLoggerHandler::logError(
                             'PaymentModule::validateOrder - Cannot save Order Payment',

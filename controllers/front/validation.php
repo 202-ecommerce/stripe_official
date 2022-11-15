@@ -53,7 +53,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
                 'code' => '0',
                 'url' => $url_failed,
             ];
-            echo Tools::jsonEncode($chargeResult);
+            echo json_encode($chargeResult);
             exit;
         }
 
@@ -132,7 +132,7 @@ class stripe_officialValidationModuleFrontController extends ModuleFrontControll
             'url' => $url,
         ];
 
-        echo Tools::jsonEncode($chargeResult);
+        echo json_encode($chargeResult);
         exit;
     }
 }

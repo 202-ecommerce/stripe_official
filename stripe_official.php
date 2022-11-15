@@ -153,8 +153,8 @@ class Stripe_official extends PaymentModule
      * @var array
      */
     public $hooks = [
-        'header',
-        'orderConfirmation',
+        'displayHeader',
+        'displayOrderConfirmation',
         'displayBackOfficeHeader',
         'displayAdminOrderTabOrder',
         'displayAdminOrderContentOrder',
@@ -164,9 +164,7 @@ class Stripe_official extends PaymentModule
         'paymentOptions',
         'payment',
         'displayPaymentEU',
-        'adminOrder',
         'actionOrderStatusUpdate',
-        'displayMyAccountBlock',
         'displayCustomerAccount',
     ];
 
@@ -406,7 +404,10 @@ class Stripe_official extends PaymentModule
         $this->bootstrap = true;
         $this->display = 'view';
         $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7.9.99'];
+        $this->ps_versions_compliancy = [
+            'min' => '1.6',
+            'max' => '8.99.99',
+        ];
         $this->currencies = true;
 
         /* curl check */
@@ -1663,7 +1664,7 @@ class Stripe_official extends PaymentModule
     /**
      * Load JS on the front office order page
      */
-    public function hookHeader()
+    public function hookDisplayHeader()
     {
         $orderPageNames = ['order', 'orderopc'];
         Hook::exec('actionStripeDefineOrderPageNames', ['orderPageNames' => &$orderPageNames]);
@@ -2088,9 +2089,9 @@ class Stripe_official extends PaymentModule
     }
 
     /**
-     * Hook Order Confirmation
+     * Hook Display Order Confirmation
      */
-    public function hookOrderConfirmation($params)
+    public function hookDisplayOrderConfirmation($params)
     {
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $order = $params['order'];

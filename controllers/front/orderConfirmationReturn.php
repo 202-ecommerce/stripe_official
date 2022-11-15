@@ -85,7 +85,7 @@ class stripe_officialOrderConfirmationReturnModuleFrontController extends Module
             exit;
         }
 
-        echo Tools::jsonEncode($url);
+        echo json_encode($url);
         exit;
     }
 }

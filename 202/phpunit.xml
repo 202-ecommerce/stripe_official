@@ -3,7 +3,13 @@
 <!--
  https://phpunit.de/manual/current/en/appendixes.configuration.html
 -->
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="true" stopOnFailure="false" syntaxCheck="true" bootstrap="./build/prestashop/admin-dev/bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         verbose="true"
+         convertNoticesToExceptions="false"
+         bootstrap="phpunit_bootstrap.php">
     <php>
         <ini name="error_reporting" value="-1"/>
         <env name="addon_name" value="stripe_official"/>
