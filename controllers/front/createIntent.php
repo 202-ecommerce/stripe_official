@@ -96,10 +96,8 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $shippingAddress = new Address($this->context->cart->id_address_delivery);
             $shippingAddressState = new State($shippingAddress->id_state);
 
-            $metadata = Hook::exec(
-                'actionStripeOfficialMetadataDefinition',
-                ['id_cart' => $this->context->cart->id]
-            );
+            $metadata = ['id_cart' => $this->context->cart->id];
+            Hook::exec('actionStripeOfficialMetadataDefinition', &$metadata);
 
             $intentData = [
                 'amount' => $amount,
