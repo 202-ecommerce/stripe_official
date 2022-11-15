@@ -517,7 +517,7 @@ class Stripe_official extends PaymentModule
                 Db::getInstance()->execute($sql);
             }
 
-            if (Hook::getHookStatusByName('actionStripeOfficialMetadataDefinition') === false) {
+            if (Hook::getIdByName('actionStripeOfficialMetadataDefinition') === false) {
                 $name = 'actionStripeOfficialAddPaymentIntent';
                 $title = 'Define metadata of Stripe payment intent';
                 $description = 'Metadata is passing during creation and update of Stripe payment intent';
