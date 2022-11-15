@@ -406,7 +406,7 @@ class Stripe_official extends PaymentModule
         $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
         $this->ps_versions_compliancy = [
             'min' => '1.6',
-            'max' => '8.99.99'
+            'max' => '8.99.99',
         ];
         $this->currencies = true;
 
