@@ -220,11 +220,11 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
     private function createIdempotencyKey($intentData)
     {
-        try {
-            $cart = $this->context->cart;
-            $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
+        $cart = $this->context->cart;
+        $stripeIdempotencyKey = new StripeIdempotencyKey();
+        $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
+        try {
             if (empty($stripeIdempotencyKey->id) === false) {
                 $previousPaymentIntentData = PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
                 $paymentIntentStatus = $previousPaymentIntentData->status;
@@ -233,9 +233,20 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $paymentIntentStatus = null;
                 $paymentIntentCaptureMethod = null;
             }
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            ProcessLoggerHandler::logInfo(
+                'Cannot retrieve Stripe Intent => ' . $e->getMessage(),
+                null,
+                null,
+                'createIntent - createIdempotencyKey'
+            );
+            $paymentIntentStatus = null;
+            $paymentIntentCaptureMethod = null;
+        }
 
-            $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
+        $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
 
+        try {
             if (in_array($paymentIntentStatus, $updatableStatus) === false
                 || $paymentIntentCaptureMethod !== $intentData['capture_method']
             ) {
