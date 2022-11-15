@@ -209,8 +209,8 @@
 							<thead>
 								<th class="col-md-1">{l s='Enable' mod='stripe_official'}</th>
 								<th class="col-md-2">{l s='Payment method' mod='stripe_official'}</th>
-								<th class="col-md-6">{l s='Relevant countries' mod='stripe_official'}</th>
-								<th class="col-md-3">{l s='Require activation' mod='stripe_official'} *</th>
+                <th class="col-md-6">{l s='Relevant countries' mod='stripe_official'}&nbsp;<b>*</b></th>
+                <th class="col-md-3">{l s='Require activation' mod='stripe_official'}&nbsp;<b>**</b></th>
 							</thead>
 							<tbody>
 								{foreach from=$payment_methods item=payment_method key=key}
@@ -247,7 +247,8 @@
 								{/foreach}
 							</tbody>
 						</table><br/>
-						<p>* {{l s='You need to activate these payments methods in your [a @href2@]Stripe Dashboard[/a] first' mod='stripe_official'}|stripelreplace:['@href2@' => {{$stripe_payments_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}</p>
+            <p><b>*</b>&nbsp;{{l s='To display their payment methods, the customer must enter a delivery or billing address in the country where this method is available' mod='stripe_official'}}</p>
+						<p><b>**</b>&nbsp;{{l s='You need to activate these payments methods in your [a @href2@]Stripe Dashboard[/a] first' mod='stripe_official'}|stripelreplace:['@href2@' => {{$stripe_payments_url|escape:'htmlall':'UTF-8'}}, '@target@' => {'target="blank"'}]}</p>
 					</li>
 				</ol>
 
