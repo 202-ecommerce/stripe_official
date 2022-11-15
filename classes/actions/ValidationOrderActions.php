@@ -656,6 +656,7 @@ class ValidationOrderActions extends DefaultActions
                 && Tools::strtolower($cardType) != 'oxxo') {
                 $orderId = Order::getOrderByCartId($this->conveyor['cart']->id);
                 $order = new Order($orderId);
+                $orderPaymentDatas = $order->getOrderPaymentCollection();
 
                 if (empty($orderPaymentDatas[0]) || empty($orderPaymentDatas[0]->id)) {
                     ProcessLoggerHandler::logError(
