@@ -2006,18 +2006,21 @@ class Stripe_official extends PaymentModule
                 continue;
             }
 
-            if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY) === 'on') {
-                $cc_img = 'logo_all_card_payment.png';
-            } else {
-                $cc_img = 'logo_card_payment.png';
-            }
-
             // The customer can potentially use this payment method
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
                 ->setModuleName($this->name)
-                ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . $cc_img))
                 ->setCallToActionText($this->button_label[$name]);
+
+            if (strtolower($paymentMethod['name']) === 'card') {
+                if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY) === 'on') {
+                    $cc_img = 'logo_all_card_payment.png';
+                } else {
+                    $cc_img = 'logo_card_payment.png';
+                }
+
+                $option->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . $cc_img));
+            }
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], ['redirect', 'receiver'])) {
