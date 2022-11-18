@@ -25,6 +25,15 @@
 <form class="stripe-payment-form" id="stripe-oxxo-element" action="">
     <input type="hidden" name="stripe-payment-method" value="oxxo">
 
+    {if isset($prestashop_version) && $prestashop_version == '1.6'}
+      <div class="payment_module" data-method="oxxo">
+        <p title="{l s='Pay by Oxxo' mod='stripe_official'}">
+          <img id="ideal" src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/oxxo.png" alt="{l s='Pay by iDeal' mod='stripe_official'}" />
+          &nbsp;{l s='Pay by Oxxo' mod='stripe_official'}
+        </p>
+      </div>
+    {/if}
+
     <div class="form-row">
         <input id="oxxo-name" name="oxxo-name" placeholder="{l s='Name' mod='stripe_official'}" required>
     </div>
