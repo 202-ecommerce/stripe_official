@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_')) {
 
 /**
  * @param Module $module
+ *
  * @return bool
  */
 function upgrade_module_2_5_0($module)
@@ -54,6 +55,6 @@ function upgrade_module_2_5_0($module)
         return false;
     }
 
-    return  $module->registerHook('displayHeader')
-        &&  $module->registerHook('displayOrderConfirmation');
+    return $module->registerHook('displayHeader')
+        && $module->registerHook('displayOrderConfirmation');
 }
