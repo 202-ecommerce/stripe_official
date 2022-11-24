@@ -519,7 +519,7 @@ class Stripe_official extends PaymentModule
             }
 
             if (Hook::getIdByName('actionStripeOfficialMetadataDefinition') === false) {
-                $name = 'actionStripeOfficialAddPaymentIntent';
+                $name = 'actionStripeOfficialMetadataDefinition';
                 $title = 'Define metadata of Stripe payment intent';
                 $description = 'Metadata is passing during creation and update of Stripe payment intent';
                 $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
@@ -834,6 +834,8 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
+        dump(Hook::getIdByName('actionStripeOfficialMetadataDefinition'));
+        dump(Hook::getHookStatusByName('actionStripeOfficialMetadataDefinition'));
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->warning[] = $this->l(

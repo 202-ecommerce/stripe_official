@@ -51,10 +51,17 @@ function upgrade_module_2_5_0($module)
         $is_valid = $is_valid && $module->unregisterHook('displayMyAccountBlock');
     }
 
+    if (false === $module->isRegisteredInHook('displayHeader')) {
+        $is_valid = $is_valid && $module->registerHook('displayHeader');
+    }
+
+    if (false === $module->isRegisteredInHook('displayOrderConfirmation')) {
+        $is_valid = $is_valid && $module->registerHook('displayOrderConfirmation');
+    }
+
     if (false === $is_valid) {
         return false;
     }
 
-    return $module->registerHook('displayHeader')
-        && $module->registerHook('displayOrderConfirmation');
+    return true;
 }
