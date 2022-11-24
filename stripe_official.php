@@ -522,7 +522,15 @@ class Stripe_official extends PaymentModule
                 $name = 'actionStripeOfficialMetadataDefinition';
                 $title = 'Define metadata of Stripe payment intent';
                 $description = 'Metadata is passing during creation and update of Stripe payment intent';
-                $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
+                $sql = 'INSERT INTO `' . pSQL(_DB_PREFIX_) . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
+                Db::getInstance()->execute($sql);
+            }
+
+            if (Hook::getIdByName('actionStripeDefineOrderPageNames') === false) {
+                $name = 'actionStripeDefineOrderPageNames';
+                $title = 'Define order page names of Stripe payment module';
+                $description = 'Order page names is passing during Stripe JS call to process payment';
+                $sql = 'INSERT INTO `' . pSQL(_DB_PREFIX_) . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
                 Db::getInstance()->execute($sql);
             }
 
