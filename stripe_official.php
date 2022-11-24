@@ -834,8 +834,6 @@ class Stripe_official extends PaymentModule
      */
     public function getContent()
     {
-        dump(Hook::getIdByName('actionStripeOfficialMetadataDefinition'));
-        dump(Hook::getHookStatusByName('actionStripeOfficialMetadataDefinition'));
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->warning[] = $this->l(
