@@ -153,8 +153,8 @@ class Stripe_official extends PaymentModule
      * @var array
      */
     public $hooks = [
-        'header',
-        'orderConfirmation',
+        'displayHeader',
+        'displayOrderConfirmation',
         'displayBackOfficeHeader',
         'displayAdminOrderTabOrder',
         'displayAdminOrderContentOrder',
@@ -164,9 +164,7 @@ class Stripe_official extends PaymentModule
         'paymentOptions',
         'payment',
         'displayPaymentEU',
-        'adminOrder',
         'actionOrderStatusUpdate',
-        'displayMyAccountBlock',
         'displayCustomerAccount',
     ];
 
@@ -406,7 +404,10 @@ class Stripe_official extends PaymentModule
         $this->bootstrap = true;
         $this->display = 'view';
         $this->module_key = 'bb21cb93bbac29159ef3af00bca52354';
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.7.9.99'];
+        $this->ps_versions_compliancy = [
+            'min' => '1.6',
+            'max' => '8.99.99',
+        ];
         $this->currencies = true;
 
         /* curl check */
@@ -514,6 +515,22 @@ class Stripe_official extends PaymentModule
                 }
 
                 $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'stripe_event` ADD UNIQUE `ix_id_payment_intentstatus` (`id_payment_intent`, `status`);';
+                Db::getInstance()->execute($sql);
+            }
+
+            if (Hook::getIdByName('actionStripeOfficialMetadataDefinition') === false) {
+                $name = 'actionStripeOfficialMetadataDefinition';
+                $title = 'Define metadata of Stripe payment intent';
+                $description = 'Metadata is passing during creation and update of Stripe payment intent';
+                $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
+                Db::getInstance()->execute($sql);
+            }
+
+            if (Hook::getIdByName('actionStripeDefineOrderPageNames') === false) {
+                $name = 'actionStripeDefineOrderPageNames';
+                $title = 'Define order page names of Stripe payment module';
+                $description = 'Order page names is passing during Stripe JS call to process payment';
+                $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'hook` (`name`, `title`, `description`) VALUES ("' . pSQL($name) . '", "' . pSQL($title) . '", "' . pSQL($description) . '");';
                 Db::getInstance()->execute($sql);
             }
 
@@ -1329,7 +1346,6 @@ class Stripe_official extends PaymentModule
     public static function getWebhookUrl()
     {
         $context = Context::getContext();
-        $id_lang = self::getLangIdContext();
         $id_shop = self::getShopIdContext();
 
         return $context->link->getModuleLink(
@@ -1337,51 +1353,37 @@ class Stripe_official extends PaymentModule
             'webhook',
             [],
             true,
-            $id_lang,
+            null,
             $id_shop
         );
     }
 
     /**
-     * get current LangId according to activate multishop feature
-     *
-     * @return int|null
-     */
-    public static function getLangIdContext()
-    {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE') && Shop::getContext() === Shop::CONTEXT_ALL) {
-            return Configuration::get('PS_LANG_DEFAULT', null, 1, 1);
-        }
-
-        return Configuration::get('PS_LANG_DEFAULT');
-    }
-
-    /**
-     * get current ShopId according to activate multishop feature
+     * get current ShopId according to all shop context
      *
      * @return int|null
      */
     public static function getShopIdContext()
     {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
-            return Context::getContext()->shop->id;
+        if ((int) Shop::getContext() !== (int) Shop::CONTEXT_ALL) {
+            return (int) Context::getContext()->shop->id;
         }
 
-        return Configuration::get('PS_SHOP_DEFAULT');
+        return 0;
     }
 
     /**
-     * get current ShopGroupId according to activate multishop feature
+     * get current ShopGroupId according to all shop context
      *
      * @return int|null
      */
     public static function getShopGroupIdContext()
     {
-        if (Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE')) {
-            return Context::getContext()->shop->id_shop_group;
+        if ((int) Shop::getContext() !== (int) Shop::CONTEXT_ALL) {
+            return (int) Context::getContext()->shop->id_shop_group;
         }
 
-        return Configuration::get('PS_SHOP_DEFAULT');
+        return 0;
     }
 
     /**
@@ -1436,8 +1438,6 @@ class Stripe_official extends PaymentModule
 
             return false;
         }
-
-        return true;
     }
 
     public function updateConfigurationKey($oldKey, $newKey)
@@ -1663,7 +1663,7 @@ class Stripe_official extends PaymentModule
     /**
      * Load JS on the front office order page
      */
-    public function hookHeader()
+    public function hookDisplayHeader()
     {
         $orderPageNames = ['order', 'orderopc'];
         Hook::exec('actionStripeDefineOrderPageNames', ['orderPageNames' => &$orderPageNames]);
@@ -2014,12 +2014,21 @@ class Stripe_official extends PaymentModule
                 continue;
             }
 
-            // The customer can potientially use this payment method
+            // The customer can potentially use this payment method
             $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
             $option
                 ->setModuleName($this->name)
-                //->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/'.$cc_img))
                 ->setCallToActionText($this->button_label[$name]);
+
+            if (strtolower($paymentMethod['name']) === 'card') {
+                if (Configuration::get(self::ENABLE_APPLEPAY_GOOGLEPAY) === 'on') {
+                    $cc_img = 'logo_all_card_payment.png';
+                } else {
+                    $cc_img = 'logo_card_payment.png';
+                }
+
+                $option->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/' . $cc_img));
+            }
 
             // Display additional information for redirect and receiver based payment methods
             if (in_array($paymentMethod['flow'], ['redirect', 'receiver'])) {
@@ -2088,9 +2097,9 @@ class Stripe_official extends PaymentModule
     }
 
     /**
-     * Hook Order Confirmation
+     * Hook Display Order Confirmation
      */
-    public function hookOrderConfirmation($params)
+    public function hookDisplayOrderConfirmation($params)
     {
         if (version_compare(_PS_VERSION_, '1.7', '>=')) {
             $order = $params['order'];

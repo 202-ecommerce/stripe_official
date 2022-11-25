@@ -96,14 +96,15 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             $shippingAddress = new Address($this->context->cart->id_address_delivery);
             $shippingAddressState = new State($shippingAddress->id_state);
 
+            $metadata = ['id_cart' => $this->context->cart->id];
+            Hook::exec('actionStripeOfficialMetadataDefinition', ['metadata' => &$metadata]);
+
             $intentData = [
                 'amount' => $amount,
                 'currency' => $currency,
                 'payment_method_types' => [$paymentOption],
                 'capture_method' => $captureMethod,
-                'metadata' => [
-                    'id_cart' => $this->context->cart->id,
-                ],
+                'metadata' => $metadata,
                 'description' => 'Product Purchase',
                 'shipping' => [
                     'name' => $customerFullName,
@@ -125,7 +126,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
             }
 
             ProcessLoggerHandler::logInfo(
-                'Intent Data => ' . Tools::jsonEncode($intentData),
+                'Intent Data => ' . json_encode($intentData),
                 null,
                 null,
                 'createIntent - constructIntentData'
@@ -209,7 +210,7 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
         }
 
         ProcessLoggerHandler::logInfo(
-            'Card Payment => ' . Tools::jsonEncode($cardData),
+            'Card Payment => ' . json_encode($cardData),
             null,
             null,
             'createIntent - constructCardPaymentData'
@@ -220,11 +221,11 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
 
     private function createIdempotencyKey($intentData)
     {
-        try {
-            $cart = $this->context->cart;
-            $stripeIdempotencyKey = new StripeIdempotencyKey();
-            $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
+        $cart = $this->context->cart;
+        $stripeIdempotencyKey = new StripeIdempotencyKey();
+        $stripeIdempotencyKey = $stripeIdempotencyKey->getByIdCart($cart->id);
 
+        try {
             if (empty($stripeIdempotencyKey->id) === false) {
                 $previousPaymentIntentData = PaymentIntent::retrieve($stripeIdempotencyKey->id_payment_intent);
                 $paymentIntentStatus = $previousPaymentIntentData->status;
@@ -233,9 +234,20 @@ class stripe_officialCreateIntentModuleFrontController extends ModuleFrontContro
                 $paymentIntentStatus = null;
                 $paymentIntentCaptureMethod = null;
             }
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            ProcessLoggerHandler::logInfo(
+                'Cannot retrieve Stripe Intent => ' . $e->getMessage(),
+                null,
+                null,
+                'createIntent - createIdempotencyKey'
+            );
+            $paymentIntentStatus = null;
+            $paymentIntentCaptureMethod = null;
+        }
 
-            $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
+        $updatableStatus = ['requires_payment_method', 'requires_confirmation', 'requires_action'];
 
+        try {
             if (in_array($paymentIntentStatus, $updatableStatus) === false
                 || $paymentIntentCaptureMethod !== $intentData['capture_method']
             ) {

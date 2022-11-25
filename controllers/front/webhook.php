@@ -99,6 +99,11 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
         // Retrieve secret API key
         $secret_key = $this->module->getSecretKey();
 
+        if (true === empty($secret_key)) {
+            Shop::setContext(Shop::CONTEXT_ALL);
+            $secret_key = $this->module->getSecretKey();
+        }
+
         // Check API key validity
         $this->checkApiKey($secret_key);
 
@@ -120,8 +125,11 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
             'webhook - postProcess'
         );
 
+        $shopGroupId = Stripe_official::getShopGroupIdContext();
+        $shopId = Stripe_official::getShopIdContext();
+
         // Retrieve secret endpoint
-        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE, null, Stripe_official::getShopGroupIdContext(), Stripe_official::getShopIdContext());
+        $endpoint_secret = Configuration::get(Stripe_official::WEBHOOK_SIGNATURE, null, $shopGroupId, $shopId);
         ProcessLoggerHandler::logInfo(
             'set endpoint secret => ' . $endpoint_secret,
             null,
@@ -134,8 +142,8 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
         // Check if shop is the good one
         $cart = new Cart($event->data->object->metadata->id_cart);
-        if ($cart->id_shop_group != Stripe_official::getShopGroupIdContext()
-            || $cart->id_shop != Stripe_official::getShopIdContext()) {
+        if ($cart->id_shop_group != $shopGroupId
+            || $cart->id_shop != $shopId) {
             ProcessLoggerHandler::logInfo(
                 $msg = 'This cart does not come from this shop',
                 'Cart',

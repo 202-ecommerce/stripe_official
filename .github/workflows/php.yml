@@ -3,7 +3,7 @@ on: [pull_request]
 jobs:
     # Check there is no syntax errors in the project
     php-linter:
-        name: PHP Syntax check 5.6|7.2|7.3
+        name: PHP Syntax check 5.6|7.2|7.3|7.4|8.0|8.1
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -24,6 +24,21 @@ jobs:
               with:
                 folder-to-exclude: "! -path \"./202/*\" ! -path \"./vendor/*\""
 
+            - name: PHP syntax checker 7.4
+              uses: prestashop/github-action-php-lint/7.4@master
+              with:
+                folder-to-exclude: "! -path \"./202/*\" ! -path \"./vendor/*\""
+
+            - name: PHP syntax checker 8.0
+              uses: prestashop/github-action-php-lint/8.0@master
+              with:
+                folder-to-exclude: "! -path \"./202/*\" ! -path \"./vendor/*\""
+
+            - name: PHP syntax checker 8.1
+              uses: prestashop/github-action-php-lint/8.1@master
+              with:
+                folder-to-exclude: "! -path \"./202/*\" ! -path \"./vendor/*\""
+
     # Check the PHP code follow the coding standards
     php-cs-fixer:
         name: PHP-CS-Fixer
@@ -36,6 +51,13 @@ jobs:
 
             - name: Checkout
               uses: actions/checkout@v2.0.0
+
+            # Add vendor folder in cache to make next builds faster
+            - name: Cache vendor folder
+              uses: actions/cache@v1
+              with:
+                path: vendor
+                key: php-${{ hashFiles('composer.lock') }}
 
             - name: Cache dependencies
               uses: actions/cache@v2
