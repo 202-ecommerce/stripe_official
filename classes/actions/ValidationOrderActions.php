@@ -181,25 +181,34 @@ class ValidationOrderActions extends DefaultActions
             $intent = \Stripe\PaymentIntent::retrieve($this->conveyor['paymentIntent']);
             $charges = $intent->charges->data;
 
-            // Payment failed for redirect payment methods
             if (empty($charges)) {
-                return false;
+                $currency = $intent->currency;
+                $token = $intent->payment_method;
+                $status = $intent->status;
+                $chargeId = $intent->offsetGet('latest_charge');
+                $amount = $intent->amount;
+            } else {
+                $currency = $charges[0]->currency;
+                $token = $charges[0]->payment_method;
+                $status = $charges[0]->status;
+                $chargeId = $charges[0]->id;
+                $amount = $charges[0]->amount;
             }
 
             $stripeIdempotencyKey = new StripeIdempotencyKey();
             $stripeIdempotencyKey->getByIdPaymentIntent($intent->id);
             $this->conveyor['id_cart'] = $stripeIdempotencyKey->id_cart;
 
-            $this->conveyor['currency'] = $charges[0]->currency;
-            $this->conveyor['token'] = $charges[0]->payment_method;
-            $this->conveyor['status'] = $charges[0]->status;
-            $this->conveyor['chargeId'] = $charges[0]->id;
+            $this->conveyor['currency'] = $currency;
+            $this->conveyor['token'] = $token;
+            $this->conveyor['status'] = $status;
+            $this->conveyor['chargeId'] = $chargeId;
             $this->conveyor['saveCard'] = null;
 
-            if ($this->module->isZeroDecimalCurrency($charges[0]->currency)) {
-                $this->conveyor['amount'] = $charges[0]->amount;
+            if ($this->module->isZeroDecimalCurrency($currency)) {
+                $this->conveyor['amount'] = $amount;
             } else {
-                $this->conveyor['amount'] = $charges[0]->amount / 100;
+                $this->conveyor['amount'] = $amount / 100;
             }
 
             ProcessLoggerHandler::logInfo(
