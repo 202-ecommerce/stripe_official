@@ -46,6 +46,8 @@ class stripe_officialOrderSuccessModuleFrontController extends ModuleFrontContro
 
     private function retrievePaymentIntent()
     {
+        ProcessLoggerHandler::openLogger();
+
         try {
             $payment_intent = Tools::getValue('payment_intent');
             $intent = \Stripe\PaymentIntent::retrieve($payment_intent);

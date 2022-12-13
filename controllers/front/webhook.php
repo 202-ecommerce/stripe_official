@@ -89,6 +89,7 @@ class stripe_officialWebhookModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        ProcessLoggerHandler::openLogger();
         ProcessLoggerHandler::logInfo(
             '[ Webhook Process Beginning ]',
             null,
