@@ -1,3 +1,10 @@
+After years of hard work with Stripe connector for PrestaShop, 202 ecommerce stop the development of Stripe module on January 9th 2023.
+
+After this date, you can get support directly from :
+https://support.stripe.com/contact/email?topic=third_party_integrationshttps://support.stripe.com/contact/email?question=other&topic=third_party_integrations&subject=Prestashop%20Support%20Request&body=Include%20details%20of%20your%20Prestashop%20issue:%20
+
+Thanks for all contributors that help us!
+
 [![Coding Standart](https://github.com/202-ecommerce/stripe_official/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/202-ecommerce/stripe_official/actions/workflows/php.yml)
 
 # Stripe Official
